@@ -3,6 +3,8 @@ package learner;
 import classifier.NearestNeighborsClassifier;
 import data.LabeledData;
 
+import java.util.Arrays;
+
 public class ActiveTreeSearch implements Learner {
     private NearestNeighborsClassifier knn;
     private int lookahead;
@@ -87,9 +89,6 @@ public class ActiveTreeSearch implements Learner {
             }
         }
 
-        //System.out.println("max proba: " + optimalUtility);
-        //System.out.println("max proba index: " + optimalRow);
-
         if (steps <= 1){
             return new UtilityResult(optimalRow, optimalUtility);
         }
@@ -99,33 +98,19 @@ public class ActiveTreeSearch implements Learner {
         double u0 = optimalUtilityUpperBound(steps-1, 0);
         double u1 = optimalUtilityUpperBound(steps-1, 1);
 
-        System.out.println("lr: " + data.getNumLabeledRows());
-        System.out.println("opt util: " + optimalUtility);
-        System.out.println("u0 = " + u0 + ", u1 = " + u1);
-
-        int count = 0;
         for (int row = 0; row < data.getNumRows(); row++) {
-            if (data.rowIsLabeled(row)){
-                continue;
-            }
-            //System.out.println("opt util: " + optimalUtility);
-            //System.out.println("bound: " + ((u1 + 1) * probas[row] + u0 * (1 - probas[row])));
-            if ((u1 + 1) * probas[row] + u0 * (1 - probas[row]) <= optimalUtility){
-                count++;
+            if (data.rowIsLabeled(row) || (u1 + 1) * probas[row] + u0 * (1 - probas[row]) <= optimalUtility){
                 continue;
             }
 
             double util = optimalUtilityGivenPoint(data, steps, row, probas[row]);
-            //System.out.println("util: " + util);
+
             if (util > optimalUtility){
                 optimalUtility = util;
                 optimalRow = row;
             }
         }
-        System.out.print(count);
-        System.out.print(", ");
-        System.out.println((double) count / data.getNumUnlabeledRows());
-        System.out.println();
+
         return new UtilityResult(optimalRow, optimalUtility);
     }
 
