@@ -1,6 +1,7 @@
 import classifier.Classifier;
 import classifier.NearestNeighborsClassifier;
 import data.LabeledData;
+import learner.ActiveTreeSearch;
 import learner.Learner;
 import learner.RandomLearner;
 import learner.UncertaintySampler;
@@ -70,18 +71,21 @@ public class RunExperiment {
         double[][] X = generateX(250, 2, 0);
         int[] y = generateY(X);
 
-        Classifier clf = new NearestNeighborsClassifier(X, 10, 0.1);
+        NearestNeighborsClassifier clf = new NearestNeighborsClassifier(X, 20, 0.1);
 
         Learner learner;
         //learner = new RandomLearner(clf)
-        learner = new UncertaintySampler(clf);
+        //learner = new UncertaintySampler(clf);
+        learner = new ActiveTreeSearch(clf, 3);
 
-        LinkedHashSet<Integer> rows = Explore.run(X, y, learner, 100);
+        LinkedHashSet<Integer> rows = Explore.run(X, y, learner, 150);
 
         double[] cumsum = computeAccuracy(rows, y);
 
         System.out.println(rows);
         System.out.println(cumsum.length);
         System.out.println(Arrays.toString(cumsum));
+        System.out.println(Arrays.toString(clf.predict(new LabeledData(X, y))));
+        System.out.println(Arrays.toString(y));
     }
 }

@@ -15,22 +15,19 @@ public class LabeledData {
         labeledRows = new LinkedHashSet<>();
     }
 
-    public LabeledData(int rows, int dim){
-        if(rows < 1 || dim < 1){
-            throw new IllegalArgumentException("Rows and dim must be positive numbers");
+    public double[] getRow(int row) {
+        return X[row];
+    }
+
+    public int getLabel(int row){
+        return y[row];
+    }
+
+    public void setLabel(int row, int label){
+        if (label < 0 || label > 1){
+            throw new IllegalArgumentException("Only 0 or 1 labels supported.");
         }
-
-        X = new double[rows][dim];
-        y = new int[rows];
-        labeledRows = new LinkedHashSet<>();
-    }
-
-    public double[][] getX() {
-        return X;
-    }
-
-    public int[] getY() {
-        return y;
+        y[row] = label;
     }
 
     public LinkedHashSet<Integer> getLabeledRows() {

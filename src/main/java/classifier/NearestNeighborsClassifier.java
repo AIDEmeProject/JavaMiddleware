@@ -56,7 +56,7 @@ public class NearestNeighborsClassifier implements Classifier {
             for(int labeledIndex : data.getLabeledRows()){
                 // if labeledIndex is between the k-closest neighbors, increment labelsSum and count
                 if(Arrays.binarySearch(indexes[i], labeledIndex) >= 0){
-                    labelsSum[i] += data.getY()[labeledIndex];
+                    labelsSum[i] += data.getLabel(labeledIndex);
                     count[i]++;
                 }
             }
@@ -77,5 +77,19 @@ public class NearestNeighborsClassifier implements Classifier {
     @Override
     public double probability(LabeledData data, int rowNumber){
         return (gamma + labelsSum[rowNumber]) / (1 + count[rowNumber]);
+    }
+
+    public double pStar(int maxLabeledPoints){
+        double maxValue = Double.NEGATIVE_INFINITY;
+        double value;
+
+        for (int i = 0; i < indexes.length; i++) {
+            value = (gamma + labelsSum[i] + maxLabeledPoints) / (1 + count[i] + maxLabeledPoints);
+
+            if (value > maxValue){
+                maxValue = value;
+            }
+        }
+        return maxValue;
     }
 }
