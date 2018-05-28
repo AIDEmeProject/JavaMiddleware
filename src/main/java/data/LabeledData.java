@@ -57,7 +57,7 @@ public class LabeledData {
         labeledRows.add(row);
     }
 
-    public boolean checkRowIsLabeled(int row){
+    public boolean rowIsLabeled(int row){
         return labeledRows.contains(row);
     }
 

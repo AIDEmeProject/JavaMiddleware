@@ -49,18 +49,18 @@ public class NearestNeighborsClassifier implements Classifier {
     @Override
     public void fit(LabeledData data) {
         for (int i = 0; i < data.getNumRows(); i++) {
+            // reset any previous values
+            labelsSum[i] = 0;
+            count[i] = 0;
+
             for(int labeledIndex : data.getLabeledRows()){
                 // if labeledIndex is between the k-closest neighbors, increment labelsSum and count
                 if(Arrays.binarySearch(indexes[i], labeledIndex) >= 0){
-                    labelsSum[i] += data.getY()[i];
+                    labelsSum[i] += data.getY()[labeledIndex];
                     count[i]++;
                 }
             }
         }
-    }
-
-    private double probabilitySingle(int rowNumber){
-        return (gamma + labelsSum[rowNumber]) / (1 + count[rowNumber]);
     }
 
     @Override
@@ -68,20 +68,14 @@ public class NearestNeighborsClassifier implements Classifier {
         int[] labels = new int[data.getNumRows()];
 
         for (int i = 0; i < labels.length; i++) {
-            labels[i] = probabilitySingle(i) > 0.5 ? 1 : 0;
+            labels[i] = probability(data, i) > 0.5 ? 1 : 0;
         }
 
         return labels;
     }
 
     @Override
-    public double[] probability(LabeledData data) {
-        double[] probas = new double[data.getNumRows()];
-
-        for (int i = 0; i < indexes.length; i++) {
-            probas[i] = probabilitySingle(i);
-        }
-
-        return probas;
+    public double probability(LabeledData data, int rowNumber){
+        return (gamma + labelsSum[rowNumber]) / (1 + count[rowNumber]);
     }
 }

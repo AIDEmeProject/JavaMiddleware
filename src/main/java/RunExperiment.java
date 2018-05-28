@@ -3,6 +3,7 @@ import classifier.NearestNeighborsClassifier;
 import data.LabeledData;
 import learner.Learner;
 import learner.RandomLearner;
+import learner.UncertaintySampler;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -71,7 +72,9 @@ public class RunExperiment {
 
         Classifier clf = new NearestNeighborsClassifier(X, 10, 0.1);
 
-        Learner learner = new RandomLearner(clf);
+        Learner learner;
+        //learner = new RandomLearner(clf)
+        learner = new UncertaintySampler(clf);
 
         LinkedHashSet<Integer> rows = Explore.run(X, y, learner, 100);
 

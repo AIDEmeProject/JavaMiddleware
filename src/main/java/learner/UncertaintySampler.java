@@ -17,12 +17,7 @@ public class UncertaintySampler implements Learner {
     }
 
     @Override
-    public double[] predictProba(LabeledData data) {
-        return classifier.probability(data);
-    }
-
-    @Override
-    public double rank(double[] point) {
-        return 0; //Math.abs(classifier.probability(point) - 0.5) ;
+    public double rank(LabeledData data, int rowNumber) {
+        return Math.abs(classifier.probability(data, rowNumber) - 0.5) ;
     }
 }
