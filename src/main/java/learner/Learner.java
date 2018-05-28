@@ -1,30 +1,19 @@
 package learner;
 
+import classifier.Classifier;
 import data.LabeledData;
 
-public interface Learner {
-    void fit(LabeledData data);
-
-    double rank(LabeledData data, int rowNumber);
-
-    default int getNext(LabeledData data){
-        double minScore = Double.POSITIVE_INFINITY;
-        int pos = -1;
-
-        // TODO: maybe its better to create a single iterator over unlabeled points (index, x[index], y[index]) ?
-
-        for(int i=0; i < data.getNumRows(); i++){
-            if(data.rowIsLabeled(i)){
-                continue;
-            }
-
-            double score = rank(data, i);
-            if(score < minScore){
-                minScore = score;
-                pos = i;
-            }
-        }
-
-        return pos;
-    }
+/**
+ * Learner represents a classifier adapted to the Active Learning scenario. It is augmented with the capacity of
+ * "ranking unlabeled points from least to most informative", retrieving the one it deems most informative for labeling.
+ *
+ * @author luciano
+ */
+public interface Learner extends Classifier{
+    /**
+     * Retrieve the most informative point for labeling from the unlabeled set.
+     * @param data: labeled data object
+     * @return index of the next unlabeled point to label
+     */
+    int retrieveMostInformativeUnlabeledPoint(LabeledData data);
 }

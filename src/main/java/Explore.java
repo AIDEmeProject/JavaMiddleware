@@ -1,7 +1,7 @@
 import data.LabeledData;
 import learner.Learner;
 
-import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.Random;
 
 public class Explore {
@@ -31,7 +31,7 @@ public class Explore {
         return index;
     }
 
-    public static LinkedHashSet<Integer> run(double[][] X, int[] y, Learner learner, int budget){
+    public static Collection<Integer> run(double[][] X, int[] y, Learner learner, int budget){
         if (budget <= 0){
             throw new IllegalArgumentException("Budget must be a positive number.");
         }
@@ -48,7 +48,7 @@ public class Explore {
 
         for (int iter = 0; iter < budget && labeledData.getNumUnlabeledRows() > 0 ; iter++){
             // find next point to label
-            row = learner.getNext(labeledData);
+            row = learner.retrieveMostInformativeUnlabeledPoint(labeledData);
             labeledData.addLabeledRow(row);
 
             // retrain model

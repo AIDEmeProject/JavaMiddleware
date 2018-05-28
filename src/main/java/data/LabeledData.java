@@ -1,28 +1,80 @@
 package data;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.*;
 
+/**
+ * This module is responsible for storing the data points X, the "unknown" labels y, and the collection of labeled
+ * rows. It also controls data access, updating labels, and adding / removing labeled rows.
+ *
+ * @author luciano
+ */
 public class LabeledData {
+
+    /**
+     * collection of data points
+     */
     private double[][] X;
+
+    /**
+     * collection of labels
+     */
     private int[] y;
+
+    /**
+     * collection of labeled rows
+     */
     private LinkedHashSet<Integer> labeledRows;
 
+    /**
+     * @param X: features matrix
+     * @param y: labels array
+     * @throws IllegalArgumentException if either X.length or X[0].length is 0, or if X and y have different sizes
+     */
     public LabeledData(double[][] X, int[] y) {
+        if (X.length != y.length){
+            throw new IllegalArgumentException("X and y must have the same number of elements.");
+        }
+
+        if (X.length == 0){
+            throw new IllegalArgumentException("Data must contain at least one data point.");
+        }
+
+        if (X[0].length == 0){
+            throw new IllegalArgumentException("Data points have no dimension.");
+        }
+
         this.X = X;
         this.y = y;
         labeledRows = new LinkedHashSet<>();
     }
 
+    /**
+     * Retrieve the selected row from the data matrix X.
+     * @param row: row to retrieve
+     * @return data point at specified index
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     */
     public double[] getRow(int row) {
         return X[row];
     }
 
+    /**
+     * Retrieve the selected label from y.
+     * @param row: row to retrieve
+     * @return label at specified index
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     */
     public int getLabel(int row){
         return y[row];
     }
 
+    /**
+     * Sets a new label to the given position
+     * @param row: row to retrieve
+     * @param label: label to set
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     * @throws IllegalArgumentException if label is not 0 or 1
+     */
     public void setLabel(int row, int label){
         if (label < 0 || label > 1){
             throw new IllegalArgumentException("Only 0 or 1 labels supported.");
@@ -30,37 +82,65 @@ public class LabeledData {
         y[row] = label;
     }
 
-    public LinkedHashSet<Integer> getLabeledRows() {
+    /**
+     * Returns the collection of labeled rows so far
+     */
+    public Collection<Integer> getLabeledRows() {
         return labeledRows;
     }
 
+    /**
+     * @return Number of rows in data matrix X
+     */
     public int getNumRows(){
         return X.length;
     }
 
+    /**
+     * @return Number of labeled rows
+     */
     public int getNumLabeledRows(){
         return labeledRows.size();
     }
 
+    /**
+     * @return Number of unlabeled rows
+     */
     public int getNumUnlabeledRows(){
         return getNumRows() - getNumLabeledRows();
     }
 
+    /**
+     * @return Dimension of data points
+     */
     public int getDim(){
         return X[0].length;
     }
 
+    /**
+     * @param row: index to check
+     * @return whether row is in labeled set or not
+     */
+    public boolean isInLabeledSet(int row){
+        return labeledRows.contains(row);
+    }
+
+    /**
+     * Add new index to labeled rows collection. If element is already in set, nothing happens (as if value was discarded).
+     * @param row: index of labeled point to add
+     */
     public void addLabeledRow(int row){
         labeledRows.add(row);
     }
 
-    public boolean rowIsLabeled(int row){
-        return labeledRows.contains(row);
-    }
-
+    /**
+     * Removes an index from the labeled row collection. If not in set, nothing happens.
+     * @param row: index of labeled point to remove.
+     */
     public void removeLabeledRow(int row){
         labeledRows.remove(row);
     }
+
 
     private class UnlabeledIterator<T> implements Iterator<T>{
 

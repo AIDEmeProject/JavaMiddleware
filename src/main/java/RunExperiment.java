@@ -3,9 +3,7 @@ import learner.ActiveTreeSearch;
 import learner.Learner;
 import learner.UncertaintySampler;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Random;
+import java.util.*;
 
 public class RunExperiment {
 
@@ -41,7 +39,7 @@ public class RunExperiment {
         return y;
     }
 
-    private static double[] computeAccuracy(LinkedHashSet<Integer> rows, int[] y){
+    private static double[] computeAccuracy(Collection<Integer> rows, int[] y){
         double sum = 0;
         for (int label : y) {
             sum += label;
@@ -71,11 +69,11 @@ public class RunExperiment {
         NearestNeighborsClassifier clf = new NearestNeighborsClassifier(X, 10, 0.1);
 
         Learner learner;
-        //learner = new RandomLearner(clf)
+        //learner = new RandomSampler(clf)
         //learner = new UncertaintySampler(clf);
         learner = new ActiveTreeSearch(clf, 2);
 
-        LinkedHashSet<Integer> rows = Explore.run(X, y, learner, 100);
+        Collection<Integer> rows = Explore.run(X, y, learner, 100);
 
         double[] cumsum = computeAccuracy(rows, y);
 
