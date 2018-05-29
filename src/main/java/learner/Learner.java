@@ -14,6 +14,7 @@ public interface Learner extends Classifier{
      * Retrieve the most informative point for labeling from the unlabeled set.
      * @param data: labeled data object
      * @return index of the next unlabeled point to label
+     * @throws exceptions.EmptyUnlabeledSetException if unlabeled set is empty
      */
     int retrieveMostInformativeUnlabeledPoint(LabeledData data);
 }

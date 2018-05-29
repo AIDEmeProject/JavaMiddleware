@@ -2,6 +2,7 @@ package learner;
 
 import classifier.BoundedClassifier;
 import data.LabeledData;
+import exceptions.EmptyUnlabeledSetException;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:
@@ -29,7 +30,7 @@ import data.LabeledData;
 public class ActiveTreeSearch implements Learner {
 
     /**
-     * kNN classifier  TODO: add an interface for "implements computeProbabilityUpperBound function"?
+     * classifier with positive class probability with future labeled data
      */
     private BoundedClassifier classifier;
 
@@ -196,7 +197,7 @@ public class ActiveTreeSearch implements Learner {
         int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
 
         if (steps == 0){
-            throw new RuntimeException("Entire dataset was labeled, cannot get next point!");
+            throw new EmptyUnlabeledSetException();
         }
 
         return utility(data, steps).index;

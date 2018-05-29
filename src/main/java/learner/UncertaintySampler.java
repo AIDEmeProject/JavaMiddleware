@@ -2,6 +2,7 @@ package learner;
 
 import classifier.Classifier;
 import data.LabeledData;
+import exceptions.EmptyUnlabeledSetException;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class
@@ -39,8 +40,12 @@ public class UncertaintySampler implements Learner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
+        if (data.getNumUnlabeledRows() == 0){
+            throw new EmptyUnlabeledSetException();
+        }
+
         double minScore = Double.POSITIVE_INFINITY;
-        int pos = -1;
+        int minRow = -1;
 
         // TODO: maybe its better to create a single iterator over unlabeled points (index, x[index], y[index]) ?
         for(int i=0; i < data.getNumRows(); i++){
@@ -51,10 +56,10 @@ public class UncertaintySampler implements Learner {
             double score = Math.abs(classifier.probability(data, i) - 0.5) ;
             if(score < minScore){
                 minScore = score;
-                pos = i;
+                minRow = i;
             }
         }
 
-        return pos;
+        return minRow;
     }
 }

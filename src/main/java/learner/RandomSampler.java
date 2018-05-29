@@ -2,6 +2,7 @@ package learner;
 
 import classifier.Classifier;
 import data.LabeledData;
+import exceptions.EmptyUnlabeledSetException;
 
 import java.util.Random;
 
@@ -42,6 +43,10 @@ public class RandomSampler implements Learner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
+        if (data.getNumUnlabeledRows() == 0){
+            throw new EmptyUnlabeledSetException();
+        }
+
         int index = -1;
         int count = 0;
 
@@ -57,10 +62,6 @@ public class RandomSampler implements Learner {
             if (index < 0 || rand.nextDouble() < 1.0 / count){
                 index = i;
             }
-        }
-
-        if (index < 0){
-            throw new RuntimeException("All labels are negative!");
         }
 
         return index;

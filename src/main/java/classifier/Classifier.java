@@ -28,6 +28,7 @@ public interface Classifier {
      * Return class probability estimation for each point in the dataset.
      * @param data: collection of data points
      * @return probability estimation array
+     * TODO: throw exception if not fitted beforehand
      */
     default double[] probability(LabeledData data){
         double[] probas = new double[data.getNumRows()];
