@@ -6,7 +6,6 @@ import java.util.Random;
 
 public class Explore {
     private static int initialSampling(int[] labels){
-
         int index = -1;
         int count = 0;
 
@@ -24,8 +23,8 @@ public class Explore {
             }
         }
 
-        if (index <= 0){
-            throw new RuntimeException("Labels are all negative!");
+        if (index < 0){
+            throw new RuntimeException("All labels are negative!");
         }
 
         return index;

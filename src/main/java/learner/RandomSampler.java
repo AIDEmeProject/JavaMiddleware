@@ -3,6 +3,8 @@ package learner;
 import classifier.Classifier;
 import data.LabeledData;
 
+import java.util.Random;
+
 /**
  * The RandomSampler is the most used baseline learner. Basically, at every iteration it randomly samples one point from
  * the unlabeled set at random. It should only be used for comparison with new algorithms, never in any serious settings.
@@ -40,12 +42,27 @@ public class RandomSampler implements Learner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        // TODO: this can be slow if nearly all points have been labeled. Random sample directly from unlabeled points
-        while(true){
-            int randomIndex = (int)(Math.random() * data.getNumRows());
-            if(!data.isInLabeledSet(randomIndex)){
-                return randomIndex;
+        int index = -1;
+        int count = 0;
+
+        Random rand = new Random();
+
+        for (int i = 0; i < data.getNumRows(); i++) {
+            if (data.isInLabeledSet(i)){
+                continue;
+            }
+
+            count++;
+
+            if (index < 0 || rand.nextDouble() < 1.0 / count){
+                index = i;
             }
         }
+
+        if (index < 0){
+            throw new RuntimeException("All labels are negative!");
+        }
+
+        return index;
     }
 }
