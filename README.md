@@ -19,6 +19,7 @@ In this repository, we have implemented a couple techniques:
   since the complexity of the naive DP approach is exponential in the database size...).
 
 References:
+
   [1]   Garnett, R., Krishnamurthy, Y., Wang, D., Schneider, J., and Mann, R.
         Bayesian optimal active search on graphs
         Proceedings of the 9th Workshop on Mining and Learning with Graphs, 2011
