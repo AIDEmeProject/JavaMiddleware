@@ -6,12 +6,12 @@ import smile.neighbor.Neighbor;
 
 import java.util.Arrays;
 
-public class NearestNeighborsClassifier implements Classifier {
+public class NearestNeighborsClassifier implements BoundedClassifier {
     /**
-     * A variant of the usual Nearest Neighbors classifier, as described in the Active Search paper. This classifier
-     * differs on two main points:
+     * A variant of the usual Nearest Neighbors classifier, as described in the paper "Bayesian Optimal Active Search and Surveying".
+     * This classifier differs from the usual kNN on two main points:
      *
-     *  1) A KD-Tree is first fitted on all unlabeled points, and not only labeled data
+     *  1) A KD-Tree is first fitted over all unlabeled points, and not only labeled data
      *
      *  2) They add a smoothing parameter gamma for predicting class probabilities:
      *
@@ -19,7 +19,6 @@ public class NearestNeighborsClassifier implements Classifier {
      *
      *     Where L-kNN(x) is the intersection between the k-nearest neighbors of x (as computed above) and the current
      *     labeled set.
-     *
      *
      *  One limitation of this classifier is it cannot be reused with different datasets X; you must create a new instance.
      *  TODO: can we remove this limitation ?
@@ -115,13 +114,14 @@ public class NearestNeighborsClassifier implements Classifier {
     }
 
     /**
-     * The pStar function is an upper bound on the probability of class probability being 1, if we added as many new labeled
-     * points as we want, but no more than number of positive points. This value is used in ActiveTreeSearch class.
+     * Upper bound on "future probabilities". As described in the paper:
+     *      p*(D, n) = (gamma + n + \sum_{y \in L-kNN(x)} y) / (1 + n + \sum_{y \in L-kNN(x)} 1)
+     *
+     * @param data: labeled data
      * @param maxPositivePoints: maximum number of positive labeled points
-     * @return upper bound
-     * TODO: create interface for this method?
+     * @return probability upper bound
      */
-    public double pStar(LabeledData data, int maxPositivePoints){
+    public double computeProbabilityUpperBound(LabeledData data, int maxPositivePoints){
         double maxValue = Double.NEGATIVE_INFINITY;
         double value;
 

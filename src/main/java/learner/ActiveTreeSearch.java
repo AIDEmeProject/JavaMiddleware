@@ -1,6 +1,6 @@
 package learner;
 
-import classifier.NearestNeighborsClassifier;
+import classifier.BoundedClassifier;
 import data.LabeledData;
 
 /**
@@ -27,10 +27,11 @@ import data.LabeledData;
  *        ICML, 2012
  */
 public class ActiveTreeSearch implements Learner {
+
     /**
-     * kNN classifier  TODO: add an interface for "implements pStar function"?
+     * kNN classifier  TODO: add an interface for "implements computeProbabilityUpperBound function"?
      */
-    private NearestNeighborsClassifier knn;
+    private BoundedClassifier classifier;
 
     /**
      * number of steps to look into the future
@@ -38,25 +39,25 @@ public class ActiveTreeSearch implements Learner {
     private int lookahead;
 
     /**
-     * @param knn k-Nearest-Neighbors classifier
+     * @param classifier k-Nearest-Neighbors classifier
      * @param lookahead: number of steps to look into the future at every iteration. Usually 1 and 2 work fine.
      */
-    public ActiveTreeSearch(NearestNeighborsClassifier knn, int lookahead) {
+    public ActiveTreeSearch(BoundedClassifier classifier, int lookahead) {
         if (lookahead < 1){
             throw new IllegalArgumentException("Lookahead must be a positive number.");
         }
-        this.knn = knn;
+        this.classifier = classifier;
         this.lookahead = lookahead;
     }
 
     @Override
     public void fit(LabeledData data) {
-        knn.fit(data);
+        classifier.fit(data);
     }
 
     @Override
     public double probability(LabeledData data, int row) {
-        return knn.probability(data, row);
+        return classifier.probability(data, row);
     }
 
     /**
@@ -115,7 +116,7 @@ public class ActiveTreeSearch implements Learner {
      * @return upper bound on optimal utility
      */
     private double optimalUtilityUpperBound(LabeledData data, int steps, int maxLabeledPoints){
-        double pStar = knn.pStar(data, maxLabeledPoints);
+        double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
 
         if (steps <= 1){
             return pStar;
@@ -135,8 +136,8 @@ public class ActiveTreeSearch implements Learner {
      */
     private UtilityResult utility(LabeledData data, int steps){
         // compute class probabilities
-        knn.fit(data);
-        double[] probas = knn.probability(data);
+        classifier.fit(data);
+        double[] probas = classifier.probability(data);
 
         // get unlabeled point of maximum probability
         double optimalUtility = Double.NEGATIVE_INFINITY;
