@@ -1,6 +1,7 @@
 import classifier.NearestNeighborsClassifier;
 import learner.ActiveTreeSearch;
 import learner.Learner;
+import learner.RandomSampler;
 import learner.UncertaintySampler;
 
 import java.util.*;
@@ -63,17 +64,17 @@ public class RunExperiment {
     }
 
     public static void main(String[] args){
-        double[][] X = generateX(1000, 2, 1);
+        double[][] X = generateX(250, 2, 1);
         int[] y = generateY(X);
 
-        NearestNeighborsClassifier clf = new NearestNeighborsClassifier(X, 10, 0.1);
+        NearestNeighborsClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
 
         Learner learner;
-        //learner = new RandomSampler(clf)
+        //learner = new RandomSampler(clf);
         //learner = new UncertaintySampler(clf);
         learner = new ActiveTreeSearch(clf, 2);
 
-        Collection<Integer> rows = Explore.run(X, y, learner, 100);
+        Collection<Integer> rows = Explore.run(X, y, learner, 200);
 
         double[] cumsum = computeAccuracy(rows, y);
 

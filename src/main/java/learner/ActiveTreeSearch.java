@@ -114,15 +114,15 @@ public class ActiveTreeSearch implements Learner {
      * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
      * @return upper bound on optimal utility
      */
-    private double optimalUtilityUpperBound(int steps, int maxLabeledPoints){
-        double pStar = knn.pStar(maxLabeledPoints);
+    private double optimalUtilityUpperBound(LabeledData data, int steps, int maxLabeledPoints){
+        double pStar = knn.pStar(data, maxLabeledPoints);
 
         if (steps <= 1){
             return pStar;
         }
 
-        double positiveUpperBound = optimalUtilityUpperBound(steps - 1, maxLabeledPoints + 1);
-        double negativeUpperBound = optimalUtilityUpperBound(steps - 1, maxLabeledPoints);
+        double positiveUpperBound = optimalUtilityUpperBound(data, steps - 1, maxLabeledPoints + 1);
+        double negativeUpperBound = optimalUtilityUpperBound(data,steps - 1, maxLabeledPoints);
 
         return (positiveUpperBound + 1) * pStar + negativeUpperBound * (1 - pStar);
     }
@@ -161,8 +161,8 @@ public class ActiveTreeSearch implements Learner {
         // warm starting: start at most probable point of being positive
         optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
 
-        double u0 = optimalUtilityUpperBound(steps-1, 0);
-        double u1 = optimalUtilityUpperBound(steps-1, 1);
+        double u0 = optimalUtilityUpperBound(data,steps-1, 0);
+        double u1 = optimalUtilityUpperBound(data,steps-1, 1);
 
         for (int row = 0; row < data.getNumRows(); row++) {
             // skip labeled points and those not meeting the threshold

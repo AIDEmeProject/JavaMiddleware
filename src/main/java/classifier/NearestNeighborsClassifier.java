@@ -121,11 +121,15 @@ public class NearestNeighborsClassifier implements Classifier {
      * @return upper bound
      * TODO: create interface for this method?
      */
-    public double pStar(int maxPositivePoints){
+    public double pStar(LabeledData data, int maxPositivePoints){
         double maxValue = Double.NEGATIVE_INFINITY;
         double value;
 
         for (int i = 0; i < indexes.length; i++) {
+            if (data.isInLabeledSet(i)){
+                continue;
+            }
+
             value = (gamma + labelsSum[i] + maxPositivePoints) / (1 + labeledNeighborhoodSize[i] + maxPositivePoints);
 
             if (value > maxValue){
