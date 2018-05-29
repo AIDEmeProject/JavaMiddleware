@@ -3,6 +3,7 @@ package classifier;
 import java.util.Arrays;
 
 import data.LabeledData;
+import exceptions.EmptyLabeledSetException;
 import exceptions.UnfitClassifierException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
@@ -100,6 +101,10 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      */
     @Override
     public void fit(LabeledData data) {
+        if (data.getNumLabeledRows() == 0){
+            throw new EmptyLabeledSetException();
+        }
+
         for (int i = 0; i < data.getNumRows(); i++) {
             // reset any previous values
             labelsSum[i] = 0;
