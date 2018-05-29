@@ -1,6 +1,7 @@
 package classifier;
 
 import data.LabeledData;
+import exceptions.UnfitClassifierException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
 
@@ -44,6 +45,11 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      */
     private int[] labeledNeighborhoodSize;
 
+    /**
+     * Whether classifier has been previously fit over labeled data
+     */
+    private boolean isFit;
+
 
     /**
      * @param X: collection of all unlabeled data points. KD-tree will be built over this collection.
@@ -64,6 +70,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
         this.indexes = computeNeighbors(X, k);
         this.labelsSum = new int[X.length];
         this.labeledNeighborhoodSize = new int[X.length];
+        this.isFit = false;
     }
 
     private int[][] computeNeighbors(double[][] X, int k){
@@ -75,8 +82,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
             Neighbor<double[], double[]>[] neighbors = tree.knn(X[i], k);
 
             for (int j = 0; j < k; j++) {
-                Neighbor<double[], double[]> neighbor = neighbors[j];
-                indexes[i][j] = neighbor.index;
+                indexes[i][j] = neighbors[j].index;
             }
 
             // sort indexes so we can perform binary search when looking for labeled neighbors
@@ -106,10 +112,16 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
                 }
             }
         }
+
+        isFit = true;
     }
 
     @Override
     public double probability(LabeledData data, int row){
+        if (!isFit){
+            throw new UnfitClassifierException();
+        }
+
         return (gamma + labelsSum[row]) / (1 + labeledNeighborhoodSize[row]);
     }
 
@@ -122,6 +134,10 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      * @return probability upper bound
      */
     public double computeProbabilityUpperBound(LabeledData data, int maxPositivePoints){
+        if (!isFit){
+            throw new UnfitClassifierException();
+        }
+
         double maxValue = Double.NEGATIVE_INFINITY;
         double value;
 
