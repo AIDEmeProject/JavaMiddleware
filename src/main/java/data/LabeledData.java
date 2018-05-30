@@ -6,6 +6,11 @@ import java.util.*;
  * This module is responsible for storing the data points X, the "unknown" labels y, and the collection of labeled
  * rows. It also controls data access, updating labels, and adding / removing labeled rows.
  *
+ * Some observations on the behavior of adding / removing labeled rows:
+ *
+ *  1) If the same labeled row is added twice, the second insertion will be ignored.
+ *  2) If attempting to remove a labeled row which was not actually labeled, nothing happens.
+ *
  * @author luciano
  */
 public class LabeledData {
@@ -43,9 +48,25 @@ public class LabeledData {
             throw new IllegalArgumentException("Data points have no dimension.");
         }
 
+        validateLabels(y);
+
         this.X = X;
         this.y = y;
         labeledRows = new LinkedHashSet<>();
+    }
+
+    private static void validateLabels(int[] y){
+        for (int label : y) {
+            if (label < 0 || label > 1) {
+                throw new IllegalArgumentException("Labels must be either 0 or 1.");
+            }
+        }
+    }
+
+    private void validateRowIndex(int row){
+        if (row < 0 || row >= getNumRows()){
+            throw new IndexOutOfBoundsException("Row index " + row + " out of bounds.");
+        }
     }
 
     /**
@@ -122,6 +143,7 @@ public class LabeledData {
      * @return whether row is in labeled set or not
      */
     public boolean isInLabeledSet(int row){
+        validateRowIndex(row);
         return labeledRows.contains(row);
     }
 
@@ -130,6 +152,7 @@ public class LabeledData {
      * @param row: index of labeled point to add
      */
     public void addLabeledRow(int row){
+        validateRowIndex(row);
         labeledRows.add(row);
     }
 
@@ -138,6 +161,7 @@ public class LabeledData {
      * @param row: index of labeled point to remove.
      */
     public void removeLabeledRow(int row){
+        validateRowIndex(row);
         labeledRows.remove(row);
     }
 

@@ -38,9 +38,9 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
     private int[][] indexes;
 
     /**
-     * labelsSum[i] is the sum of all labels in the L-kNN neighborhood of X[i]
+     * sumOfLabelsInLabeledNeighborhood[i] is the sum of all labels in the L-kNN neighborhood of X[i]
      */
-    private int[] labelsSum;
+    private int[] sumOfLabelsInLabeledNeighborhood;
 
     /**
      * labeledNeighborhoodSize[i] is the size of the L-kNN neighborhood of X[i]
@@ -70,7 +70,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
 
         this.gamma = gamma;
         this.indexes = computeNeighbors(X, k);
-        this.labelsSum = new int[X.length];
+        this.sumOfLabelsInLabeledNeighborhood = new int[X.length];
         this.labeledNeighborhoodSize = new int[X.length];
         this.isFit = false;
     }
@@ -107,13 +107,13 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
 
         for (int i = 0; i < data.getNumRows(); i++) {
             // reset any previous values
-            labelsSum[i] = 0;
+            sumOfLabelsInLabeledNeighborhood[i] = 0;
             labeledNeighborhoodSize[i] = 0;
 
             for(int labeledIndex : data.getLabeledRows()){
-                // if labeledIndex is between the k-closest neighbors, increment labelsSum and labeledNeighborhoodSize
+                // if labeledIndex is between the k-closest neighbors, increment sumOfLabelsInLabeledNeighborhood and labeledNeighborhoodSize
                 if(Arrays.binarySearch(indexes[i], labeledIndex) >= 0){
-                    labelsSum[i] += data.getLabel(labeledIndex);
+                    sumOfLabelsInLabeledNeighborhood[i] += data.getLabel(labeledIndex);
                     labeledNeighborhoodSize[i]++;
                 }
             }
@@ -128,7 +128,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
             throw new UnfitClassifierException();
         }
 
-        return (gamma + labelsSum[row]) / (1 + labeledNeighborhoodSize[row]);
+        return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
     }
 
     /**
@@ -152,7 +152,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
                 continue;
             }
 
-            value = (gamma + labelsSum[i] + maxPositivePoints) / (1 + labeledNeighborhoodSize[i] + maxPositivePoints);
+            value = (gamma + sumOfLabelsInLabeledNeighborhood[i] + maxPositivePoints) / (1 + labeledNeighborhoodSize[i] + maxPositivePoints);
 
             if (value > maxValue){
                 maxValue = value;
