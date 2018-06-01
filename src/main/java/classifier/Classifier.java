@@ -12,7 +12,7 @@ public interface Classifier {
     /**
      * Train its classification model over training data. Only the labeled points should be considered for training.
      * @param data: collection of labeled points
-     * TODO: throw exception if labeled set is empty?
+     * @throws exceptions.EmptyUnlabeledSetException if labeled set is empty
      */
     void fit(LabeledData data);
 
