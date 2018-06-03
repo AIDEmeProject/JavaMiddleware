@@ -3,6 +3,7 @@ package learner;
 import classifier.Classifier;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
+import sampling.ReservoirSampler;
 
 import java.util.Random;
 
@@ -47,23 +48,7 @@ public class RandomSampler implements Learner {
             throw new EmptyUnlabeledSetException();
         }
 
-        int index = -1;
-        int count = 0;
-
-        Random rand = new Random();
-
-        for (int i = 0; i < data.getNumRows(); i++) {
-            if (data.isInLabeledSet(i)){
-                continue;
-            }
-
-            count++;
-
-            if (index < 0 || rand.nextDouble() < 1.0 / count){
-                index = i;
-            }
-        }
-
-        return index;
+        // sample an index between 0 and data.getNumRows(), excluding labeled points
+        return ReservoirSampler.sample(data.getNumRows(), data::isInLabeledSet);
     }
 }
