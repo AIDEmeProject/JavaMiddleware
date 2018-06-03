@@ -12,21 +12,25 @@ import java.util.function.Predicate;
  */
 public class ReservoirSampler {
     /**
-     * Sample uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == true}
+     * Sample k elements uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == true}
      * @param length: array size
+     * @param k: random subset size
      * @param filter: predicate which filters any index which returns true
      * @return random index
      * @throws IllegalArgumentException if length is not positive
-     * @throws RuntimeException if all elements are filtered
+     * @throws RuntimeException if there are less than k non-filtered elements
      */
-    public static int sample(int length, Predicate<Integer> filter){
+    public static int[] sample(int length, int k, Predicate<Integer> filter){
         if (length <= 0){
-            throw new IllegalArgumentException("Length must be positive.");
+            throw new IllegalArgumentException("Length must be positive: " + length);
         }
 
-        int index = -1;
-        int count = 0;
+        if (k <= 0){
+            throw new IllegalArgumentException("k out of bounds: " + k);
+        }
 
+        int index = 0;
+        int[] result = new int[k];
         Random rand = new Random();
 
         for (int i = 0; i < length; i++) {
@@ -34,17 +38,34 @@ public class ReservoirSampler {
                 continue;
             }
 
-            count++;
+            if (index < k){
+                result[index++] = i;
+            }
+            else {
+                int j = rand.nextInt(i+1);
 
-            if (index < 0 || rand.nextDouble() < 1.0 / count){
-                index = i;
+                if (j < k) {
+                    result[j] = i;
+                }
             }
         }
 
-        if (index < 0){
-            throw new RuntimeException("Sampling failed. All elements were filtered by predicate!");
+        if (index < k){
+            throw new RuntimeException("Sampling failed. There are less than " + k + " non-filtered elements in array.");
         }
 
-        return index;
+        return result;
+    }
+
+    /**
+     * Sample one single element from {i: 0 &lt; i &lt; length - 1, filter(i) == true}
+     * @param length: array size
+     * @param filter: predicate which filters any index which returns true
+     * @return random index
+     * @throws IllegalArgumentException if length is not positive
+     * @throws RuntimeException if all elements are filtered
+     */
+    public static int sample(int length, Predicate<Integer> filter){
+        return sample(length, 1, filter)[0];
     }
 }

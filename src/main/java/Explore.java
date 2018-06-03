@@ -21,7 +21,7 @@ public class Explore {
         // initial sampling: one negative and one positive random samples
         int row = sampleLabel(y, 0);
         labeledData.addLabeledRow(row);
-        
+
         row = sampleLabel(y, 1);
         labeledData.addLabeledRow(row);
 
