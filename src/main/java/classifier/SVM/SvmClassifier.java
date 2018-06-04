@@ -2,6 +2,7 @@ package classifier.SVM;
 
 import classifier.Classifier;
 import data.LabeledData;
+import exceptions.UnfitClassifierException;
 import libsvm.*;
 
 /**
@@ -39,20 +40,6 @@ public class SvmClassifier implements Classifier {
         this.model = buildSvmModel(bias, alpha, kernel, supportVectors);
     }
 
-    public double predict(double[] x) {
-        return margin(x) > 0 ? 1 : 0;
-    }
-
-    /**
-     * @param sample: data point
-     * @return sample's signed distance to svm's decision boundary
-     */
-    public double margin(double[] sample){
-        double[] margin = new double[1];
-        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(sample), margin);
-        return margin[0];
-    }
-
     @Override
     public void fit(LabeledData data) {
         svm_problem prob = buildSvmProblem(data);
@@ -68,12 +55,41 @@ public class SvmClassifier implements Classifier {
 
     @Override
     public double probability(LabeledData data, int row) {
-        if (parameter.probability()){
-            double[] probas = new double[2];
-            svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), probas);
-            return probas[0];
+        if (model == null){
+            throw new UnfitClassifierException();
         }
-        throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
+
+        if (!parameter.probability()){
+            throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
+
+        }
+
+        double[] probas = new double[2];
+
+        svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), probas);
+
+        return probas[0];
+
+    }
+
+    @Override
+    public int predict(LabeledData data, int row) {
+        if (model == null){
+            throw new UnfitClassifierException();
+        }
+
+        return margin(data, row) > 0 ? 1 : 0;
+    }
+
+    /**
+     * @param data: data point
+     * @param row : row index
+     * @return sample's signed distance to svm's decision boundary
+     */
+    public double margin(LabeledData data, int row){
+        double[] margin = new double[1];
+        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), margin);
+        return margin[0];
     }
 
     private svm_model buildSvmModel(double bias, double[] alpha, Kernel kernel, double[][] supportVectors){

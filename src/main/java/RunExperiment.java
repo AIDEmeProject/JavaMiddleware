@@ -4,10 +4,7 @@ import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
-import learner.Learner;
-import learner.ActiveTreeSearch;
-import learner.RandomSampler;
-import learner.UncertaintySampler;
+import learner.*;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 
@@ -89,14 +86,15 @@ public class RunExperiment {
 
         // LEARNER
         Learner learner;
-        learner = new RandomSampler(clf);  // random
+        //learner = new RandomSampler(clf);  // random
         //learner = new UncertaintySampler(clf);  // uncertainty sampling
         //learner = new ActiveTreeSearch(clf, 1);  // active search
+        learner = new SimpleMargin(new SvmClassifier(params));
 
         // EXPLORE
 
         // initial sampling
-        StratifiedSampler initialSampler = new StratifiedSampler(1, 0); // initial sampler
+        StratifiedSampler initialSampler = new StratifiedSampler(1, 1); // initial sampler
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);

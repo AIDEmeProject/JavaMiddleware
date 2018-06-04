@@ -35,6 +35,11 @@ public class RandomSampler implements Learner {
         return classifier.probability(data, row);
     }
 
+    @Override
+    public int predict(LabeledData data, int row) {
+        return classifier.predict(data, row);
+    }
+
     /**
      * Randomly pick a point from the unlabeled set.
      * @param data: labeled data object

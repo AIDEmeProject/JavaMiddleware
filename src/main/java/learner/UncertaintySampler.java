@@ -18,7 +18,6 @@ public class UncertaintySampler implements Learner {
      */
     private Classifier classifier;
 
-
     public UncertaintySampler(Classifier classifier) {
         this.classifier = classifier;
     }
@@ -40,26 +39,6 @@ public class UncertaintySampler implements Learner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        if (data.getNumUnlabeledRows() == 0){
-            throw new EmptyUnlabeledSetException();
-        }
-
-        double minScore = Double.POSITIVE_INFINITY;
-        int minRow = -1;
-
-        // TODO: maybe its better to create a single iterator over unlabeled points (index, x[index], y[index]) ?
-        for(int i=0; i < data.getNumRows(); i++){
-            if(data.isInLabeledSet(i)){
-                continue;
-            }
-
-            double score = Math.abs(classifier.probability(data, i) - 0.5) ;
-            if(score < minScore){
-                minScore = score;
-                minRow = i;
-            }
-        }
-
-        return minRow;
+        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(probability(dt, row) - 0.5));
     }
 }

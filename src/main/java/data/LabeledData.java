@@ -1,6 +1,10 @@
 package data;
 
+import exceptions.EmptyUnlabeledSetException;
+
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * This module is responsible for storing the data points X, the "unknown" labels y, and the collection of labeled
@@ -165,6 +169,33 @@ public class LabeledData {
         labeledRows.remove(row);
     }
 
+    /**
+     * @param scoreFunction: computes the score of data[row]
+     * @return unlabeled row minimizing the score function
+     */
+    public int retrieveMinimizerOverUnlabeledData(BiFunction<LabeledData, Integer, Double> scoreFunction){
+        if (getNumUnlabeledRows() == 0){
+            throw new EmptyUnlabeledSetException();
+        }
+
+        double minScore = Double.POSITIVE_INFINITY;
+        int minRow = -1;
+
+        // TODO: maybe its better to create a single iterator over unlabeled points (index, x[index], y[index]) ?
+        for(int i=0; i < getNumRows(); i++){
+            if(isInLabeledSet(i)){
+                continue;
+            }
+
+            double score = scoreFunction.apply(this, i);
+            if(score < minScore){
+                minScore = score;
+                minRow = i;
+            }
+        }
+
+        return minRow;
+    }
 
     private class UnlabeledIterator<T> implements Iterator<T>{
 
