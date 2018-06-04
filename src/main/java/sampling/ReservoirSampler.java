@@ -12,25 +12,25 @@ import java.util.function.Predicate;
  */
 public class ReservoirSampler {
     /**
-     * Sample k elements uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == true}
+     * Sample k elements uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == false}
      * @param length: array size
-     * @param k: random subset size
-     * @param filter: predicate which filters any index which returns true
+     * @param subsetSize: random subset size
+     * @param filter: predicate which filters any index returning true
      * @return random index
      * @throws IllegalArgumentException if length is not positive
      * @throws RuntimeException if there are less than k non-filtered elements
      */
-    public static int[] sample(int length, int k, Predicate<Integer> filter){
+    public static int[] sample(int length, int subsetSize, Predicate<Integer> filter){
         if (length <= 0){
             throw new IllegalArgumentException("Length must be positive: " + length);
         }
 
-        if (k <= 0){
-            throw new IllegalArgumentException("k out of bounds: " + k);
+        if (subsetSize <= 0){
+            throw new IllegalArgumentException("Subset size must be positive: " + subsetSize);
         }
 
         int index = 0;
-        int[] result = new int[k];
+        int[] result = new int[subsetSize];
         Random rand = new Random();
 
         for (int i = 0; i < length; i++) {
@@ -38,20 +38,22 @@ public class ReservoirSampler {
                 continue;
             }
 
-            if (index < k){
-                result[index++] = i;
+            if (index < subsetSize){
+                result[index] = i;
             }
             else {
-                int j = rand.nextInt(i+1);
+                int j = rand.nextInt(index+1);
 
-                if (j < k) {
+                if (j < subsetSize) {
                     result[j] = i;
                 }
             }
+
+            index++;
         }
 
-        if (index < k){
-            throw new RuntimeException("Sampling failed. There are less than " + k + " non-filtered elements in array.");
+        if (index < subsetSize){
+            throw new RuntimeException("Sampling failed. There are less than " + subsetSize + " non-filtered elements in array.");
         }
 
         return result;
