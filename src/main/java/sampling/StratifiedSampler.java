@@ -1,10 +1,10 @@
 package sampling;
 
-public class StratifiedSampling {
+public class StratifiedSampler {
     private int positiveSamples;
     private int negativeSamples;
 
-    public StratifiedSampling(int positiveSamples, int negativeSamples) {
+    public StratifiedSampler(int positiveSamples, int negativeSamples) {
         if (positiveSamples < 0){
             throw new IllegalArgumentException("positiveSamples must be positive: " + positiveSamples);
         }

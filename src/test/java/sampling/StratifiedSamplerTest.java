@@ -5,23 +5,23 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class StratifiedSamplingTest {
+class StratifiedSamplerTest {
 
-    private StratifiedSampling sampler;
+    private StratifiedSampler sampler;
 
     @BeforeEach
     void setUp() {
-        sampler = new StratifiedSampling(2, 2);
+        sampler = new StratifiedSampler(2, 2);
     }
 
     @Test
     void constructor_lessThanZeroPositiveSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new StratifiedSampling(-1, 1));
+        assertThrows(IllegalArgumentException.class, () -> new StratifiedSampler(-1, 1));
     }
 
     @Test
     void constructor_lessThanZeroNegativeSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new StratifiedSampling(1, -1));
+        assertThrows(IllegalArgumentException.class, () -> new StratifiedSampler(1, -1));
     }
 
     @Test
