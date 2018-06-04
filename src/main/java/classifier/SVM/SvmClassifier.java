@@ -1,7 +1,6 @@
 package classifier.SVM;
 
 import classifier.Classifier;
-
 import data.LabeledData;
 import libsvm.*;
 
@@ -40,14 +39,9 @@ public class SvmClassifier implements Classifier {
         this.model = buildSvmModel(bias, alpha, kernel, supportVectors);
     }
 
-//    @Override
-//    public double predict(double[][] x) {
-//        return svm.svm_predict(model, SvmNodeConverter.toSvmNodeArray(x));
-//    }
-//
-//    public double predict(double[] x) {
-//        return predict(x.getScaledAV());
-//    }
+    public double predict(double[] x) {
+        return margin(x) > 0 ? 1 : 0;
+    }
 
     /**
      * @param sample: data point
@@ -74,14 +68,19 @@ public class SvmClassifier implements Classifier {
 
     @Override
     public double probability(LabeledData data, int row) {
-        return 0;
+        if (parameter.probability()){
+            double[] probas = new double[2];
+            svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), probas);
+            return probas[0];
+        }
+        throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
     }
 
     private svm_model buildSvmModel(double bias, double[] alpha, Kernel kernel, double[][] supportVectors){
         svm_model model = new svm_model();
 
         model.nr_class = 2;
-        model.label = new int[] {1,0};  // {1,-1} do not change!
+        model.label = new int[] {1,0};  // do not change!
 
         model.l = supportVectors.length;
         model.nSV = new int[] {0, model.l};
@@ -95,11 +94,6 @@ public class SvmClassifier implements Classifier {
         return model;
     }
 
-    /**
-     * Converts a Tuple collection into a svm_problem object.
-     * @param data: labeled data collection
-     * @return svm_problem instance
-     */
     private svm_problem buildSvmProblem(LabeledData data){
         svm_problem prob = new svm_problem();
 

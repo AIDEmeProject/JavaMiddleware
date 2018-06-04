@@ -75,7 +75,6 @@ public class RunExperiment {
         // set module random seed
         ReservoirSampler.setSeed(0);
 
-
         // generate data
         double[][] X = generateX(250, 2, 1);
         int[] y = generateY(X);
@@ -84,16 +83,20 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 0);
 
         // build classifier
-//        SvmParameterAdapter params = new SvmParameterAdapter();
-//        params = params.C(1000).kernel(new Kernel());
-//        Classifier clf = new SvmClassifier(params);
+        Classifier clf;
 
-        BoundedClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
+        // svm
+        SvmParameterAdapter params = new SvmParameterAdapter();
+        params = params.C(1000).kernel(new Kernel()).probability(true);
+        clf = new SvmClassifier(params);
+
+        // knn
+        //BoundedClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
 
         // create learner
         Learner learner;
-        learner = new RandomSampler(clf);
-        //learner = new UncertaintySampler(clf);
+        //learner = new RandomSampler(clf);
+        learner = new UncertaintySampler(clf);
         //learner = new ActiveTreeSearch(clf, 1);
 
         // run active learning

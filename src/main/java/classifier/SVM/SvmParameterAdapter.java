@@ -23,7 +23,14 @@ public class SvmParameterAdapter {
     }
 
     /**
-     * Set SVM penalty parameter, C. Default value is 1.0
+     * @return SVM's penalty parameter. Default value is 1.0.
+     */
+    public double C() {
+        return C;
+    }
+
+    /**
+     * Set SVM's penalty parameter, C. Default value is 1.0
      * @param C: new C parameter
      * @return this
      * @throws IllegalArgumentException if C is negative
@@ -34,6 +41,13 @@ public class SvmParameterAdapter {
         }
         this.C = C;
         return this;
+    }
+
+    /**
+     * @return SVM kernel. Default is RBF, with gamma = 1 / num_features.
+     */
+    public Kernel kernel() {
+        return kernel;
     }
 
     /**
@@ -50,7 +64,14 @@ public class SvmParameterAdapter {
     }
 
     /**
-     * Set cache size for Svm solver. Default value is 100 MB.
+     * @return memory cache size for SVM solver. Default value is 100 MB.
+     */
+    public int cacheSize() {
+        return cacheSize;
+    }
+
+    /**
+     * Set memory cache size for SVM solver. Default value is 100 MB.
      * @param cacheSize: new cache size to use (in MB)
      * @return this
      * @throws IllegalArgumentException if cacheSize is negative
@@ -61,6 +82,13 @@ public class SvmParameterAdapter {
         }
         this.cacheSize = cacheSize;
         return this;
+    }
+
+    /**
+     * @return SVM solver tolerance. Default value is 0.001.
+     */
+    public double tolerance() {
+        return tolerance;
     }
 
     /**
@@ -78,6 +106,13 @@ public class SvmParameterAdapter {
     }
 
     /**
+     * @return whether to use the shrinking heuristic. Used for speeding up computations. Default value is true.
+     */
+    public boolean shrinking() {
+        return shrinking;
+    }
+
+    /**
      * Whether to use the shrinking heuristic when training the SVM, which can significantly reduce training time.
      * Default value is true.
      * @param shrinking: use shrinking?
@@ -89,13 +124,27 @@ public class SvmParameterAdapter {
     }
 
     /**
-     * Whether to compute probability class estimates. Default value is false.
+     * @return whether to compute class probability estimates. Default value is false.
+     */
+    public boolean probability() {
+        return probability;
+    }
+
+    /**
+     * Whether to compute class probability estimates. Default value is false.
      * @param probability: compute probability estimates?
      * @return this
      */
     public SvmParameterAdapter probability(boolean probability){
         this.probability = probability;
         return this;
+    }
+
+    /**
+     * @return class weights. By default, both classes are unweighted.
+     */
+    public double[] classWeights() {
+        return classWeights;
     }
 
     /**
@@ -140,7 +189,7 @@ public class SvmParameterAdapter {
 
         param.weight = classWeights;
         param.nr_weight = classWeights.length;  // if 0, then no weighting is performed
-        param.weight_label = new int[] {-1,1};
+        param.weight_label = new int[] {0,1};
 
         return param;
     }
