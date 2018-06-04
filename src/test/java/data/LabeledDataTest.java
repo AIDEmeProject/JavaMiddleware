@@ -1,5 +1,6 @@
 package data;
 
+import exceptions.EmptyUnlabeledSetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -156,5 +157,24 @@ class LabeledDataTest {
     void removeLabeledRow_outOfBoundsRow_throwsException() {
         assertThrows(IndexOutOfBoundsException.class, () -> data.removeLabeledRow(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> data.removeLabeledRow(X.length));
+    }
+
+    @Test
+    void retrieveMinimizerOverUnlabeledData_emptyUnlabeledSet_throwsException() {
+        for (int i = 0; i < data.getNumRows(); i++) {
+            data.addLabeledRow(i);
+        }
+        assertThrows(EmptyUnlabeledSetException.class, () -> data.retrieveMinimizerOverUnlabeledData(null));
+    }
+
+    @Test
+    void retrieveMinimizerOverUnlabeledData_emptyLabeledSetAndDummyScoreFunction_returnsCorrectMinimizer() {
+        assertEquals(0, data.retrieveMinimizerOverUnlabeledData((dt, i) -> (double) i));
+    }
+
+    @Test
+    void retrieveMinimizerOverUnlabeledData_nonEmptyLabeledSetAndDummyScoreFunction_returnsCorrectMinimizer() {
+        data.addLabeledRow(0);
+        assertEquals(1, data.retrieveMinimizerOverUnlabeledData((dt, i) -> (double) i));
     }
 }
