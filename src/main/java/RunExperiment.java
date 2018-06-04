@@ -72,37 +72,37 @@ public class RunExperiment {
     }
 
     public static void main(String[] args){
-        // set module random seed
-        ReservoirSampler.setSeed(0);
-
-        // generate data
+        // DATA
         double[][] X = generateX(250, 2, 1);
         int[] y = generateY(X);
 
-        // initial sampler
-        StratifiedSampler initialSampler = new StratifiedSampler(1, 0);
-
-        // build classifier
+        // CLASSIFIER
         Classifier clf;
 
         // svm
         SvmParameterAdapter params = new SvmParameterAdapter();
-        params = params.C(1000).kernel(new Kernel()).probability(true);
+        params = params.C(1000).kernel(new Kernel()).probability(false);
         clf = new SvmClassifier(params);
 
         // knn
         //BoundedClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
 
-        // create learner
+        // LEARNER
         Learner learner;
-        //learner = new RandomSampler(clf);
-        learner = new UncertaintySampler(clf);
-        //learner = new ActiveTreeSearch(clf, 1);
+        learner = new RandomSampler(clf);  // random
+        //learner = new UncertaintySampler(clf);  // uncertainty sampling
+        //learner = new ActiveTreeSearch(clf, 1);  // active search
 
-        // run active learning
-        Collection<Integer> rows = Explore.run(X, y, learner, 100, initialSampler);
+        // EXPLORE
 
-        // compute metrics
+        // initial sampling
+        StratifiedSampler initialSampler = new StratifiedSampler(1, 0); // initial sampler
+
+        // run exploration
+        Explore explore = new Explore(initialSampler, 100);
+        Collection<Integer> rows = explore.run(X, y, learner, 0);
+
+        // METRICS
         double[] cumsum = computeAccuracy(rows, y);
 
         System.out.println(rows);
