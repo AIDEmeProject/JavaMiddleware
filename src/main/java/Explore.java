@@ -6,11 +6,6 @@ import sampling.StratifiedSampler;
 import java.util.Collection;
 
 public class Explore {
-    private static int sampleLabel(int[] labels, int label){
-        // sample an index between 0 and labels.length - 1, excluding points of opposite label
-        return ReservoirSampler.sample(labels.length, i -> labels[i] == 1 - label);
-    }
-
     public static Collection<Integer> run(double[][] X, int[] y, Learner learner, int budget, StratifiedSampler initialSampler){
         if (budget <= 0){
             throw new IllegalArgumentException("Budget must be a positive number.");

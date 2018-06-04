@@ -11,6 +11,17 @@ import java.util.function.Predicate;
  * @author luciano
  */
 public class ReservoirSampler {
+
+    private static Random random = new Random();
+
+    /**
+     * Set the seed for the internal random generator. Used when one wants reproducibility.
+     * @param seed: new seed
+     */
+    public static void setSeed(int seed){
+        random.setSeed(seed);
+    }
+
     /**
      * Sample k elements uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == false}
      * @param length: array size
@@ -31,7 +42,6 @@ public class ReservoirSampler {
 
         int index = 0;
         int[] result = new int[subsetSize];
-        Random rand = new Random();
 
         for (int i = 0; i < length; i++) {
             if (filter.test(i)){
@@ -42,7 +52,7 @@ public class ReservoirSampler {
                 result[index] = i;
             }
             else {
-                int j = rand.nextInt(index+1);
+                int j = random.nextInt(index+1);
 
                 if (j < subsetSize) {
                     result[j] = i;

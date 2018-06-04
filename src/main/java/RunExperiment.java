@@ -1,8 +1,15 @@
+import classifier.BoundedClassifier;
+import classifier.Classifier;
 import classifier.NearestNeighborsClassifier;
-import learner.ActiveTreeSearch;
+import classifier.SVM.Kernel;
+import classifier.SVM.SvmClassifier;
+import classifier.SVM.SvmParameterAdapter;
 import learner.Learner;
+import learner.ActiveTreeSearch;
 import learner.RandomSampler;
 import learner.UncertaintySampler;
+import sampling.ReservoirSampler;
+import sampling.StratifiedSampler;
 
 import java.util.*;
 
@@ -47,6 +54,7 @@ public class RunExperiment {
         }
 
         double[] cumsum = new double[rows.size()];
+
         int i = 0;
         for(int row: rows){
             cumsum[i] = y[row];
@@ -64,23 +72,37 @@ public class RunExperiment {
     }
 
     public static void main(String[] args){
+        // set module random seed
+        ReservoirSampler.setSeed(0);
+
+
+        // generate data
         double[][] X = generateX(250, 2, 1);
         int[] y = generateY(X);
 
-        NearestNeighborsClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
+        // initial sampler
+        StratifiedSampler initialSampler = new StratifiedSampler(1, 0);
 
+        // build classifier
+//        SvmParameterAdapter params = new SvmParameterAdapter();
+//        params = params.C(1000).kernel(new Kernel());
+//        Classifier clf = new SvmClassifier(params);
+
+        BoundedClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
+
+        // create learner
         Learner learner;
-        //learner = new RandomSampler(clf);
+        learner = new RandomSampler(clf);
         //learner = new UncertaintySampler(clf);
-        learner = new ActiveTreeSearch(clf, 2);
+        //learner = new ActiveTreeSearch(clf, 1);
 
-        Collection<Integer> rows = Explore.run(X, y, learner, 200);
+        // run active learning
+        Collection<Integer> rows = Explore.run(X, y, learner, 100, initialSampler);
 
+        // compute metrics
         double[] cumsum = computeAccuracy(rows, y);
 
         System.out.println(rows);
         System.out.println(Arrays.toString(cumsum));
-        //System.out.println(Arrays.toString(clf.predict(new LabeledData(X, y))));
-        //System.out.println(Arrays.toString(y));
     }
 }
