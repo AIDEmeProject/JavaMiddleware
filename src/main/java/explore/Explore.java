@@ -1,8 +1,12 @@
+package explore;
+
 import data.LabeledData;
 import learner.Learner;
+import metrics.ConfusionMatrix;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Explore {
@@ -27,11 +31,7 @@ public class Explore {
         ReservoirSampler.setSeed(seed);
     }
 
-    public Collection<Integer> run(double[][] X, int[] y, Learner learner){
-        return run(X, y, learner, System.currentTimeMillis());
-    }
-
-    public Collection<Integer> run(double[][] X, int[] y, Learner learner, long seed){
+    public ExplorationResult run(double[][] X, int[] y, Learner learner, long seed){
         // set random seed
         setSeed(seed);
 
@@ -46,6 +46,13 @@ public class Explore {
         // fit model to initial sample
         learner.fit(data);
 
+        // compute accuracy metrics
+        ConfusionMatrix accuracy = ConfusionMatrix.compute(y, learner.predict(data));
+
+        // store accuracy metrics
+        Collection<ConfusionMatrix> accuracyMetrics = new ArrayList<>();
+        accuracyMetrics.add(accuracy);
+
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
             // find next point to label
             int row = learner.retrieveMostInformativeUnlabeledPoint(data);
@@ -53,9 +60,19 @@ public class Explore {
 
             // retrain model
             learner.fit(data);
+
+            // compute accuracy metrics
+            accuracy = ConfusionMatrix.compute(y, learner.predict(data));
+
+            // store accuracy metrics
+            accuracyMetrics.add(accuracy);
         }
 
-        // TODO: return labeledData object or labeled rows indexes only?
-        return data.getLabeledRows();
+        // return object
+        return new ExplorationResult(data.getLabeledRows(), accuracyMetrics);
+    }
+
+    public ExplorationResult run(double[][] X, int[] y, Learner learner){
+        return run(X, y, learner, System.currentTimeMillis());
     }
 }

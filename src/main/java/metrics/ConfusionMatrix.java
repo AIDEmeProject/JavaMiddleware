@@ -9,12 +9,12 @@ package metrics;
  * @author luciano
  */
 public class ConfusionMatrix {
-    private final double truePositives;
-    private final double trueNegatives;
-    private final double falsePositives;
-    private final double falseNegatives;
+    private final int truePositives;
+    private final int trueNegatives;
+    private final int falsePositives;
+    private final int falseNegatives;
 
-    private ConfusionMatrix(double truePositives, double trueNegatives, double falsePositives, double falseNegatives) {
+    private ConfusionMatrix(int truePositives, int trueNegatives, int falsePositives, int falseNegatives) {
         this.truePositives = truePositives;
         this.trueNegatives = trueNegatives;
         this.falsePositives = falsePositives;
@@ -40,7 +40,7 @@ public class ConfusionMatrix {
             throw new IllegalArgumentException("Received empty array as input.");
         }
 
-        double truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
+        int truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
 
         for(int i=0; i < trueLabels.length; i++){
             if(trueLabels[i] == 1 && predictedLabels[i] == 1){
@@ -122,5 +122,11 @@ public class ConfusionMatrix {
 
     private double trueDivide(double a, double b){
         return (b == 0) ? 0 : a / b;
+    }
+
+    @Override
+    public String toString() {
+        return "tp = " + truePositives + ", tn = " + trueNegatives + ", fp = " + falsePositives + ", fn = " + falseNegatives +
+               ", ac = " + accuracy() + ", pr = " + precision() + ", re = " + recall() + ", fs = " + fscore();
     }
 }

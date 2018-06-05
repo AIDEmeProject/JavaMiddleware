@@ -4,8 +4,10 @@ import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
+import explore.ExplorationResult;
+import explore.Explore;
 import learner.*;
-import sampling.ReservoirSampler;
+import metrics.ConfusionMatrix;
 import sampling.StratifiedSampler;
 
 import java.util.*;
@@ -54,14 +56,11 @@ public class RunExperiment {
 
         int i = 0;
         for(int row: rows){
-            cumsum[i] = y[row];
-            if(i > 0){
-                cumsum[i] += cumsum[i-1];
-            }
-            i++;
+            cumsum[i++] = y[row];
         }
 
-        for (i = 0; i < cumsum.length; i++) {
+        for (i = 1; i < cumsum.length; i++) {
+            cumsum[i] += cumsum[i-1];
             cumsum[i] /= sum;
         }
 
@@ -74,36 +73,33 @@ public class RunExperiment {
         int[] y = generateY(X);
 
         // CLASSIFIER
-        Classifier clf;
-
-        // svm
         SvmParameterAdapter params = new SvmParameterAdapter();
         params = params.C(1000).kernel(new Kernel()).probability(false);
-        clf = new SvmClassifier(params);
-
-        // knn
-        //BoundedClassifier clf = new NearestNeighborsClassifier(X, 5, 0.1);
+        Classifier clf = new SvmClassifier(params);
 
         // LEARNER
         Learner learner;
-        //learner = new RandomSampler(clf);  // random
-        //learner = new UncertaintySampler(clf);  // uncertainty sampling
-        //learner = new ActiveTreeSearch(clf, 1);  // active search
-        learner = new SimpleMargin(new SvmClassifier(params));
+        //learner = new RandomSampler(clf);
+        //learner = new UncertaintySampler(clf);
+        learner = new ActiveTreeSearch(new NearestNeighborsClassifier(X, 5, 0.1), 1);
+        //learner = new SimpleMargin(new SvmClassifier(params));
 
         // EXPLORE
-
         // initial sampling
-        StratifiedSampler initialSampler = new StratifiedSampler(1, 1); // initial sampler
+        StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);
-        Collection<Integer> rows = explore.run(X, y, learner, 0);
+        ExplorationResult result = explore.run(X, y, learner, 0);
 
         // METRICS
-        double[] cumsum = computeAccuracy(rows, y);
+        for (ConfusionMatrix metric : result.getAccuracyMetrics()){
+            System.out.println(metric);
+        }
 
-        System.out.println(rows);
+        System.out.println(result.getLabeledRows());
+
+        double[] cumsum = computeAccuracy(result.getLabeledRows(), y);
         System.out.println(Arrays.toString(cumsum));
     }
 }
