@@ -3,6 +3,7 @@ package explore;
 import data.LabeledData;
 import learner.Learner;
 import metrics.ConfusionMatrix;
+import metrics.PositiveSetAccuracy;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 
@@ -47,11 +48,14 @@ public class Explore {
         learner.fit(data);
 
         // compute accuracy metrics
-        ConfusionMatrix accuracy = ConfusionMatrix.compute(y, learner.predict(data));
+        ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(y, learner.predict(data));
+        PositiveSetAccuracy positiveSetAccuracy = PositiveSetAccuracy.compute(data.getLabeledRows(), y);
 
         // store accuracy metrics
         Collection<ConfusionMatrix> accuracyMetrics = new ArrayList<>();
-        accuracyMetrics.add(accuracy);
+        Collection<Double> positiveSetAccuracyMetric = new ArrayList<>();
+        accuracyMetrics.add(confusionMatrix);
+        positiveSetAccuracyMetric.add(positiveSetAccuracy.accuracy());
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
             // find next point to label
@@ -62,14 +66,16 @@ public class Explore {
             learner.fit(data);
 
             // compute accuracy metrics
-            accuracy = ConfusionMatrix.compute(y, learner.predict(data));
+            confusionMatrix = ConfusionMatrix.compute(y, learner.predict(data));
+            positiveSetAccuracy = PositiveSetAccuracy.compute(data.getLabeledRows(), y);
 
             // store accuracy metrics
-            accuracyMetrics.add(accuracy);
+            accuracyMetrics.add(confusionMatrix);
+            positiveSetAccuracyMetric.add(positiveSetAccuracy.accuracy());
         }
 
         // return object
-        return new ExplorationResult(data.getLabeledRows(), accuracyMetrics);
+        return new ExplorationResult(data.getLabeledRows(), accuracyMetrics, positiveSetAccuracyMetric);
     }
 
     public ExplorationResult run(double[][] X, int[] y, Learner learner){

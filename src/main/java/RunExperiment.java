@@ -46,27 +46,6 @@ public class RunExperiment {
         return y;
     }
 
-    private static double[] computeAccuracy(Collection<Integer> rows, int[] y){
-        double sum = 0;
-        for (int label : y) {
-            sum += label;
-        }
-
-        double[] cumsum = new double[rows.size()];
-
-        int i = 0;
-        for(int row: rows){
-            cumsum[i++] = y[row];
-        }
-
-        for (i = 1; i < cumsum.length; i++) {
-            cumsum[i] += cumsum[i-1];
-            cumsum[i] /= sum;
-        }
-
-        return cumsum;
-    }
-
     public static void main(String[] args){
         // DATA
         double[][] X = generateX(250, 2, 1);
@@ -98,8 +77,6 @@ public class RunExperiment {
         }
 
         System.out.println(result.getLabeledRows());
-
-        double[] cumsum = computeAccuracy(result.getLabeledRows(), y);
-        System.out.println(Arrays.toString(cumsum));
+        System.out.println(result.getPositiveSetAccuracy());
     }
 }
