@@ -3,8 +3,10 @@ import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
-import learner.*;
+import metrics.ConfusionMatrixCalculator;
+import metrics.MetricCalculator;
 import sampling.StratifiedSampler;
+import learner.*;
 
 import java.util.*;
 
@@ -59,12 +61,16 @@ public class RunExperiment {
         learner = new ActiveTreeSearch(new NearestNeighborsClassifier(X, 5, 0.1), 1);
         //learner = new SimpleMargin(new SvmClassifier(params));
 
+        // METRICS
+        Collection<MetricCalculator> metricCalculators = new ArrayList<>();
+        metricCalculators.add(new ConfusionMatrixCalculator());
+
         // EXPLORE
         // initial sampling
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // run exploration
-        Explore explore = new Explore(initialSampler, 100);
+        Explore explore = new Explore(initialSampler, 100, metricCalculators);
 
         List<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
 

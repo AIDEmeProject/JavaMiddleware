@@ -2,13 +2,11 @@ import data.LabeledData;
 import learner.Learner;
 import learner.TimedLearner;
 import metrics.ConfusionMatrix;
+import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -33,12 +31,18 @@ public class Explore {
     private StratifiedSampler initialSampler;
 
     /**
+     * metric calculators
+     */
+    private Collection<MetricCalculator> metricCalculators;
+
+    /**
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
+     * @param metricCalculators: collection of metrics to be calculated
      * @throws NullPointerException if initialSampler is null
      * @throws IllegalArgumentException if budget is not positive
      */
-    public Explore(StratifiedSampler initialSampler, int budget) {
+    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
         if (initialSampler == null){
             throw new NullPointerException("Initial Sampler cannot be null.");
         }
@@ -49,6 +53,11 @@ public class Explore {
 
         this.initialSampler = initialSampler;
         this.budget = budget;
+        this.metricCalculators = metricCalculators;
+    }
+
+    public Explore(StratifiedSampler initialSampler, int budget) {
+        this(initialSampler, budget, new ArrayList<>());
     }
 
     private void setSeed(long seed){
@@ -104,8 +113,9 @@ public class Explore {
         learner.fit(data);
 
         // compute accuracy metrics
-        ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), learner.predict(data));
-        metrics.putAll(confusionMatrix.getMetrics());
+        for (MetricCalculator metricCalculator : metricCalculators){
+            metrics.putAll(metricCalculator.compute(data, learner).getMetrics());
+        }
 
         return metrics;
     }

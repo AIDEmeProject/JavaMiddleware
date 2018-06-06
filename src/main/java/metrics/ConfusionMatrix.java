@@ -11,7 +11,7 @@ import java.util.Map;
  * @see <a href="https://en.wikipedia.org/wiki/Confusion_matrix">Confusion Matrix Wiki</a>
  * @author luciano
  */
-public class ConfusionMatrix {
+public class ConfusionMatrix implements Metrics{
     private final int truePositives;
     private final int trueNegatives;
     private final int falsePositives;
