@@ -5,6 +5,7 @@ import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
+import metrics.TargetSetAccuracyCalculator;
 import sampling.StratifiedSampler;
 import learner.*;
 
@@ -64,6 +65,7 @@ public class RunExperiment {
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
         metricCalculators.add(new ConfusionMatrixCalculator());
+        metricCalculators.add(new TargetSetAccuracyCalculator());
 
         // EXPLORE
         // initial sampling

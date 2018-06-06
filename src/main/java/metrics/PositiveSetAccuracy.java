@@ -1,11 +1,13 @@
 package metrics;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class computes the evolution of the % of labeled set which was retrieved
  */
-public class PositiveSetAccuracy {
+public class PositiveSetAccuracy implements Metrics {
     private int numberOfTargetsRetrieved;
     private int totalNumberOfTargets;
 
@@ -34,5 +36,13 @@ public class PositiveSetAccuracy {
 
     public double accuracy(){
         return (double) numberOfTargetsRetrieved / totalNumberOfTargets;
+    }
+
+    @Override
+    public Map<String, Double> getMetrics() {
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("numberOfTargetsRetreived", (double) getNumberOfTargetsRetrieved());
+        metrics.put("targetSetAccuracy", accuracy());
+        return metrics;
     }
 }
