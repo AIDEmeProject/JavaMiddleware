@@ -1,5 +1,8 @@
 package metrics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This module is responsible for, given true labels and predicted labels arrays, compute its Confusion Matrix and
  * related metrics. In particular, we provide methods for computing Precision, Recall, Accuracy and F-Score.
@@ -122,5 +125,20 @@ public class ConfusionMatrix {
 
     private double trueDivide(double a, double b){
         return (b == 0) ? 0 : a / b;
+    }
+
+    /**
+     * @return Map object containing all metrics stored in the ConfusionMatrix object.
+     */
+    public Map<String, Double> getMetrics(){
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("truePositives", truePositives());
+        metrics.put("trueNegatives", trueNegatives());
+        metrics.put("falsePositives", falsePositives());
+        metrics.put("falseNegatives", falseNegatives());
+        metrics.put("precision", precision());
+        metrics.put("recall", recall());
+        metrics.put("fscore", fscore());
+        return metrics;
     }
 }

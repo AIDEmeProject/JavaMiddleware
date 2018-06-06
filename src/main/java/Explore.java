@@ -70,13 +70,7 @@ public class Explore {
         int[] prediction = learner.predict(data);
 
         ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), prediction);
-        metrics.put("truePositives", confusionMatrix.truePositives());
-        metrics.put("trueNegatives", confusionMatrix.trueNegatives());
-        metrics.put("falsePositives", confusionMatrix.falsePositives());
-        metrics.put("falseNegatives", confusionMatrix.falseNegatives());
-        metrics.put("precision", confusionMatrix.precision());
-        metrics.put("recall", confusionMatrix.recall());
-        metrics.put("fscore", confusionMatrix.fscore());
+        metrics.putAll(confusionMatrix.getMetrics());
         return metrics;
     }
 
