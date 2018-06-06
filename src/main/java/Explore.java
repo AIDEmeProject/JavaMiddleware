@@ -5,16 +5,35 @@ import metrics.ConfusionMatrix;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * This module is responsible for running the Active Learning exploration process. This is an iterative process which
+ * performs the following operations every iteration:
+ *
+ *  1) Retrieve the next point to label
+ *  2) Label is retrieved and labeled set is updated
+ *  3) We retrain our model over the current labeled set of points
+ *
+ * This process is repeated during a pre-defined number of operations.
+ */
 public class Explore {
-
+    /**
+     * Number of iteration to run in the active learning exploration process.
+     */
     private int budget;
+
+    /**
+     * Initial sampler. It randomly chooses an initial batch of positive and negative points to be labeled.
+     */
     private StratifiedSampler initialSampler;
 
+    /**
+     * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
+     * @param budget: number of iterations in the active learning exploration process
+     * @throws NullPointerException if initialSampler is null
+     * @throws IllegalArgumentException if budget is not positive
+     */
     public Explore(StratifiedSampler initialSampler, int budget) {
         if (initialSampler == null){
             throw new NullPointerException("Initial Sampler cannot be null.");
@@ -32,16 +51,20 @@ public class Explore {
         ReservoirSampler.setSeed(seed);
     }
 
-    public Collection<Map<String, Double>> run(double[][] X, int[] y, Learner learner){
-        return run(X, y, learner, System.currentTimeMillis());
-    }
-
-    public Collection<Map<String, Double>> run(double[][] X, int[] y, Learner learner, long seed){
+    /**
+     * Run the exploration process.
+     * @param X: features matrix
+     * @param y: labels array
+     * @param learner: active learner object
+     * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
+     * @return metrics collected during each iteration.
+     */
+    public List<Map<String, Double>> run(double[][] X, int[] y, Learner learner, long seed){
         // set random seed
         setSeed(seed);
 
         // TODO: maybe we should pass the labeledData instance directly as parameter ?
-        Collection<Map<String, Double>> metrics = new ArrayList<>();
+        List<Map<String, Double>> metrics = new ArrayList<>();
         LabeledData data = new LabeledData(X, y);
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
@@ -50,6 +73,16 @@ public class Explore {
 
         // TODO: return labeledData object or labeled rows indexes only?
         return metrics;
+    }
+
+    /**
+     * Run the exploration process with a random seed.
+     * @param X: features matrix
+     * @param y: labels array
+     * @param learner: active learner object
+     */
+    public List<Map<String, Double>> run(double[][] X, int[] y, Learner learner){
+        return run(X, y, learner, System.currentTimeMillis());
     }
 
     private Map<String, Double> runSingleIteration(LabeledData data, Learner learner){
@@ -67,9 +100,7 @@ public class Explore {
         learner.fit(data);
 
         // compute accuracy metrics
-        int[] prediction = learner.predict(data);
-
-        ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), prediction);
+        ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), learner.predict(data));
         metrics.putAll(confusionMatrix.getMetrics());
 
         return metrics;

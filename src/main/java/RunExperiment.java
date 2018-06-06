@@ -98,7 +98,7 @@ public class RunExperiment {
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);
-        Collection<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
+        List<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
 
         // METRICS
         for (Map<String, Double> metric : metrics){
