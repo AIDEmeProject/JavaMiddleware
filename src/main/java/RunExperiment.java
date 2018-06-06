@@ -98,12 +98,15 @@ public class RunExperiment {
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);
-        Collection<Integer> rows = explore.run(X, y, learner, 0);
+        Collection<HashMap<String, Double>> metrics = explore.run(X, y, learner, 0);
 
         // METRICS
-        double[] cumsum = computeAccuracy(rows, y);
-
-        System.out.println(rows);
-        System.out.println(Arrays.toString(cumsum));
+        for (HashMap<String, Double> metric : metrics){
+            System.out.println(metric);
+        }
+//        double[] cumsum = computeAccuracy(rows, y);
+//
+//        System.out.println(rows);
+//        System.out.println(Arrays.toString(cumsum));
     }
 }
