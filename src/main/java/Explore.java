@@ -71,6 +71,7 @@ public class Explore {
 
         ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), prediction);
         metrics.putAll(confusionMatrix.getMetrics());
+
         return metrics;
     }
 

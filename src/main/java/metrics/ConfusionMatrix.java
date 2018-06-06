@@ -26,7 +26,7 @@ public class ConfusionMatrix {
 
     /**
      * Factory method for Confusion Matrix. By being static, we separate the creation logic from each object, allowing
-     * for each ConfusionMatrix to be immutable.
+     * for each ConfusionMatrix object to be immutable.
      *
      * @param trueLabels: array of true labels
      * @param predictedLabels: array of predicted labels
@@ -75,21 +75,21 @@ public class ConfusionMatrix {
     }
 
     /**
-     * @return true negatives (prediction = label = -1)
+     * @return true negatives (prediction = label = 0)
      */
     public double trueNegatives() {
         return trueNegatives;
     }
 
     /**
-     * @return false positives (prediction = 1, label = -1)
+     * @return false positives (prediction = 1, label = 0)
      */
     public double falsePositives() {
         return falsePositives;
     }
 
     /**
-     * @return false negatives (prediction = -1, label = 1)
+     * @return false negatives (prediction = 0, label = 1)
      */
     public double falseNegatives() {
         return falseNegatives;
