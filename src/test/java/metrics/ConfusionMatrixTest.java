@@ -7,36 +7,15 @@ class ConfusionMatrixTest {
     private ConfusionMatrix confusionMatrix;
 
     private void setUpACoupleLabelsWrongScenario() {
-        int[] predictedLabels = new int[] {1, 1, 0, 0, 0, 0,  1,  1,  1,  1};
-        int[] trueLabels      = new int[] {1, 1, 0,  1,  1,  1, 0, 0, 0, 0};
-        confusionMatrix = ConfusionMatrix.compute(trueLabels, predictedLabels);
+        confusionMatrix = new ConfusionMatrix(2, 1, 4, 3);
     }
 
     private void setUpAllLabelsWrongScenario(){
-        int[] predictedLabels = new int[] {1, 1, 0, 0};
-        int[] trueLabels      = new int[] {0, 0, 1, 1};
-        confusionMatrix = ConfusionMatrix.compute(trueLabels, predictedLabels);
+        confusionMatrix = new ConfusionMatrix(0, 0, 2, 2);
     }
 
     private void setUpAllLabelsCorrectScenario(){
-        int[] predictedLabels = new int[] {1, 1, 0, 0};
-        int[] trueLabels      = new int[] {1, 1, 0, 0};
-        confusionMatrix = ConfusionMatrix.compute(trueLabels, predictedLabels);
-    }
-
-    @Test
-    void compute_LabelDifferentFrom0or1_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> ConfusionMatrix.compute(new int[] {1,0}, new int[] {-1,1}));
-    }
-
-    @Test
-    void compute_ZeroLengthLabels_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> ConfusionMatrix.compute(new int[0], new int[0]));
-    }
-
-    @Test
-    void compute_IncompatibleSizesLabels_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () ->  ConfusionMatrix.compute(new int[2], new int[4]));
+        confusionMatrix = new ConfusionMatrix(2, 2, 0, 0);
     }
 
     //-------------------------------

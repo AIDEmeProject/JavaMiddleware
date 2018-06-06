@@ -34,15 +34,15 @@ public class TargetSetAccuracy implements Metrics {
         return numberOfTargetsRetrieved;
     }
 
-    public double accuracy(){
+    public double targetSetAccuracy(){
         return (double) numberOfTargetsRetrieved / totalNumberOfTargets;
     }
 
     @Override
     public Map<String, Double> getMetrics() {
         Map<String, Double> metrics = new HashMap<>();
-        metrics.put("numberOfTargetsRetreived", (double) getNumberOfTargetsRetrieved());
-        metrics.put("targetSetAccuracy", accuracy());
+        metrics.put("numberOfTargetsRetrieved", (double) getNumberOfTargetsRetrieved());
+        metrics.put("targetSetAccuracy", targetSetAccuracy());
         return metrics;
     }
 }
