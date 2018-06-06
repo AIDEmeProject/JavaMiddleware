@@ -98,10 +98,10 @@ public class RunExperiment {
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);
-        Collection<HashMap<String, Double>> metrics = explore.run(X, y, learner, 0);
+        Collection<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
 
         // METRICS
-        for (HashMap<String, Double> metric : metrics){
+        for (Map<String, Double> metric : metrics){
             System.out.println(metric);
         }
 //        double[] cumsum = computeAccuracy(rows, y);
