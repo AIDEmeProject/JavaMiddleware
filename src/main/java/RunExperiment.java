@@ -67,11 +67,10 @@ public class RunExperiment {
         metricCalculators.add(new ConfusionMatrixCalculator());
         metricCalculators.add(new TargetSetAccuracyCalculator());
 
-        // EXPLORE
-        // initial sampling
+        // INITIAL SAMPLING
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
-        // run exploration
+        // EXPLORE
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
 
         List<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
@@ -80,10 +79,5 @@ public class RunExperiment {
         for (Map<String, Double> metric : metrics){
             System.out.println(metric);
         }
-//        double[] cumsum = computeAccuracy(rows, y);
-//
-//        System.out.println(rows);
-//        System.out.println(Arrays.toString(cumsum));
-
     }
 }
