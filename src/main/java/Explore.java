@@ -69,7 +69,8 @@ public class Explore {
         // compute accuracy metrics
         int[] prediction = learner.predict(data);
 
-        ConfusionMatrix confusionMatrix = ConfusionMatrix.compute(data.getY(), prediction);
+        ConfusionMatrix confusionMatrix = new ConfusionMatrix();
+        confusionMatrix.fit(data.getY(), prediction);
         metrics.put("truePositives", confusionMatrix.truePositives());
         metrics.put("trueNegatives", confusionMatrix.trueNegatives());
         metrics.put("falsePositives", confusionMatrix.falsePositives());

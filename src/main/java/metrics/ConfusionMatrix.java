@@ -9,29 +9,28 @@ package metrics;
  * @author luciano
  */
 public class ConfusionMatrix {
-    private final double truePositives;
-    private final double trueNegatives;
-    private final double falsePositives;
-    private final double falseNegatives;
+    private double truePositives;
+    private double trueNegatives;
+    private double falsePositives;
+    private double falseNegatives;
 
-    private ConfusionMatrix(double truePositives, double trueNegatives, double falsePositives, double falseNegatives) {
-        this.truePositives = truePositives;
-        this.trueNegatives = trueNegatives;
-        this.falsePositives = falsePositives;
-        this.falseNegatives = falseNegatives;
+    public ConfusionMatrix() {
+        resetCounters();
+    }
+
+    private void resetCounters(){
+        truePositives = 0; trueNegatives = 0; falseNegatives = 0; falsePositives = 0;
     }
 
     /**
-     * Factory method for Confusion Matrix. By being static, we separate the creation logic from each object, allowing
-     * for each ConfusionMatrix to be immutable.
+     * Fits the confusion matrix to the given true labels and predicted labels.
      *
      * @param trueLabels: array of true labels
      * @param predictedLabels: array of predicted labels
-     * @return a confusion matrix
      * @throws IllegalArgumentException if inputs have incompatible dimensions, are 0-length arrays, or contain any value
      * different from 1 or 0.
      */
-    public static ConfusionMatrix compute(int[] trueLabels, int[] predictedLabels){
+    public void fit(int[] trueLabels, int[] predictedLabels){
         if(trueLabels.length != predictedLabels.length){
             throw new IllegalArgumentException("Incompatible sizes: " + trueLabels.length + ", " + predictedLabels.length);
         }
@@ -40,7 +39,7 @@ public class ConfusionMatrix {
             throw new IllegalArgumentException("Received empty array as input.");
         }
 
-        double truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
+        resetCounters();
 
         for(int i=0; i < trueLabels.length; i++){
             if(trueLabels[i] == 1 && predictedLabels[i] == 1){
@@ -60,8 +59,6 @@ public class ConfusionMatrix {
                         "Only 1 and 0 labels are supported, received " + trueLabels[i] + " and " + predictedLabels[i]);
             }
         }
-
-        return new ConfusionMatrix(truePositives, trueNegatives, falsePositives, falseNegatives);
     }
 
     /**
@@ -72,21 +69,21 @@ public class ConfusionMatrix {
     }
 
     /**
-     * @return true negatives (prediction = label = -1)
+     * @return true negatives (prediction = label = 0)
      */
     public double trueNegatives() {
         return trueNegatives;
     }
 
     /**
-     * @return false positives (prediction = 1, label = -1)
+     * @return false positives (prediction = 1, label = 0)
      */
     public double falsePositives() {
         return falsePositives;
     }
 
     /**
-     * @return false negatives (prediction = -1, label = 1)
+     * @return false negatives (prediction = 0, label = 1)
      */
     public double falseNegatives() {
         return falseNegatives;
