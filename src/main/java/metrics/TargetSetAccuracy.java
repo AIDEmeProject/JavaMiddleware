@@ -7,16 +7,16 @@ import java.util.Map;
 /**
  * This class computes the evolution of the % of labeled set which was retrieved
  */
-public class PositiveSetAccuracy implements Metrics {
+public class TargetSetAccuracy implements Metrics {
     private int numberOfTargetsRetrieved;
     private int totalNumberOfTargets;
 
-    public PositiveSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
+    public TargetSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
         this.numberOfTargetsRetrieved = numberOfTargetsRetrieved;
         this.totalNumberOfTargets = totalNumberOfTargets;
     }
 
-    public static PositiveSetAccuracy compute(Collection<Integer> rows, int[] y){
+    public static TargetSetAccuracy compute(Collection<Integer> rows, int[] y){
         int numberOfTargetsRetrieved = 0;
         for (Integer row : rows){
             numberOfTargetsRetrieved += y[row];
@@ -27,7 +27,7 @@ public class PositiveSetAccuracy implements Metrics {
             totalNumberOfTargets += label;
         }
 
-        return new PositiveSetAccuracy(numberOfTargetsRetrieved, totalNumberOfTargets);
+        return new TargetSetAccuracy(numberOfTargetsRetrieved, totalNumberOfTargets);
     }
 
     public int getNumberOfTargetsRetrieved() {
