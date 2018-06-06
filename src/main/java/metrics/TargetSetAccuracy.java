@@ -1,14 +1,23 @@
 package metrics;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class computes the evolution of the % of labeled set which was retrieved
+ * This module stores the number of target elements retrieved so far, as well as the total number of targets in the dataset.
+ * This metric mostly used in the Active Search framework.
+ *
+ * @see TargetSetAccuracyCalculator
  */
 public class TargetSetAccuracy implements Metrics {
+    /**
+     * Number of targets retrieved so far
+     */
     private int numberOfTargetsRetrieved;
+
+    /**
+     * Total number of targets in the dataset
+     */
     private int totalNumberOfTargets;
 
     public TargetSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
@@ -16,24 +25,13 @@ public class TargetSetAccuracy implements Metrics {
         this.totalNumberOfTargets = totalNumberOfTargets;
     }
 
-    public static TargetSetAccuracy compute(Collection<Integer> rows, int[] y){
-        int numberOfTargetsRetrieved = 0;
-        for (Integer row : rows){
-            numberOfTargetsRetrieved += y[row];
-        }
-
-        int totalNumberOfTargets = 0;
-        for (int label : y){
-            totalNumberOfTargets += label;
-        }
-
-        return new TargetSetAccuracy(numberOfTargetsRetrieved, totalNumberOfTargets);
-    }
-
     public int getNumberOfTargetsRetrieved() {
         return numberOfTargetsRetrieved;
     }
 
+    /**
+     * @return percentage of target set retrieved so far
+     */
     public double targetSetAccuracy(){
         return (double) numberOfTargetsRetrieved / totalNumberOfTargets;
     }
