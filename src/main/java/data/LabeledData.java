@@ -59,6 +59,14 @@ public class LabeledData {
         labeledRows = new LinkedHashSet<>();
     }
 
+    public double[][] getX() {
+        return X;
+    }
+
+    public int[] getY() {
+        return y;
+    }
+
     private static void validateLabels(int[] y){
         for (int label : y) {
             if (label < 0 || label > 1) {
@@ -158,6 +166,16 @@ public class LabeledData {
     public void addLabeledRow(int row){
         validateRowIndex(row);
         labeledRows.add(row);
+    }
+
+    /**
+     * Add all rows in array to labeled rows. If any element is already in set, nothing happens (as if value was discarded).
+     * @param rows: collection of indexes to add
+     */
+    public void addLabeledRow(int[] rows){
+        for (int row : rows) {
+            addLabeledRow(row);
+        }
     }
 
     /**
