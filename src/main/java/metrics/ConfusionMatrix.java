@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This module is responsible for, given true labels and predicted labels arrays, compute its Confusion Matrix and
- * related metrics. In particular, we provide methods for computing Precision, Recall, Accuracy and F-Score.
+ * This module is responsible for storing the confusion matrix values. In particular, we provide methods for computing
+ * other classification metrics like Precision, Recall, Accuracy, and F-Score.
  *
- * We only support the binary classification scenario (0 and 1 labels).
+ * We only support the binary classification (0 and 1 labels).
  * @see <a href="https://en.wikipedia.org/wiki/Confusion_matrix">Confusion Matrix Wiki</a>
+ * @see ConfusionMatrixCalculator
  * @author luciano
  */
 public class ConfusionMatrix implements Metrics{
@@ -17,7 +18,7 @@ public class ConfusionMatrix implements Metrics{
     private final int falsePositives;
     private final int falseNegatives;
 
-    ConfusionMatrix(int truePositives, int trueNegatives, int falsePositives, int falseNegatives) {
+    public ConfusionMatrix(int truePositives, int trueNegatives, int falsePositives, int falseNegatives) {
         this.truePositives = truePositives;
         this.trueNegatives = trueNegatives;
         this.falsePositives = falsePositives;

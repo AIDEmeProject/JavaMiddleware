@@ -3,11 +3,16 @@ package metrics;
 import data.LabeledData;
 import learner.Learner;
 
+/**
+ * This module is a factory for ConfusionMatrix objects.
+ *
+ * @see ConfusionMatrix
+ */
 public class ConfusionMatrixCalculator implements MetricCalculator{
     /**
-     * Compute a ConfusionMatrix from the true labels and predicted labels.
-     * @param data: dataset
-     * @param learner: active learner
+     * Compute a ConfusionMatrix from the labeled dataset and learner objects.
+     * @param data: dataset containing both features X and true labels y
+     * @param learner: active learner object
      * @return a confusion matrix
      */
     @Override
@@ -16,8 +21,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
     }
 
     /**
-     * Factory method for Confusion Matrix. By being static, we separate the creation logic from each object, allowing
-     * for each ConfusionMatrix object to be immutable.
+     * Computes a ConfusionMatrix from the true labels and predicted labels arrays.
      *
      * @param trueLabels: array of true labels
      * @param predictedLabels: array of predicted labels
