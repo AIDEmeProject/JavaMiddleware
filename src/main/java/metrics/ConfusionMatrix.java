@@ -28,28 +28,28 @@ public class ConfusionMatrix implements Metrics{
     /**
      * @return true positives (prediction = label = 1)
      */
-    public double truePositives() {
+    public int truePositives() {
         return truePositives;
     }
 
     /**
      * @return true negatives (prediction = label = 0)
      */
-    public double trueNegatives() {
+    public int trueNegatives() {
         return trueNegatives;
     }
 
     /**
      * @return false positives (prediction = 1, label = 0)
      */
-    public double falsePositives() {
+    public int falsePositives() {
         return falsePositives;
     }
 
     /**
      * @return false negatives (prediction = 0, label = 1)
      */
-    public double falseNegatives() {
+    public int falseNegatives() {
         return falseNegatives;
     }
 
@@ -90,10 +90,10 @@ public class ConfusionMatrix implements Metrics{
      */
     public Map<String, Double> getMetrics(){
         Map<String, Double> metrics = new HashMap<>();
-        metrics.put("truePositives", truePositives());
-        metrics.put("trueNegatives", trueNegatives());
-        metrics.put("falsePositives", falsePositives());
-        metrics.put("falseNegatives", falseNegatives());
+        metrics.put("truePositives", (double) truePositives());
+        metrics.put("trueNegatives", (double) trueNegatives());
+        metrics.put("falsePositives", (double) falsePositives());
+        metrics.put("falseNegatives", (double) falseNegatives());
         metrics.put("precision", precision());
         metrics.put("recall", recall());
         metrics.put("fscore", fscore());
