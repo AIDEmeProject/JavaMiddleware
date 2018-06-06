@@ -36,7 +36,7 @@ class ConfusionMatrixTest {
 
     @Test
     void compute_IncompatibleSizesLabels_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> ConfusionMatrix.compute(new int[2], new int[4]));
+        assertThrows(IllegalArgumentException.class, () ->  ConfusionMatrix.compute(new int[2], new int[4]));
     }
 
     //-------------------------------

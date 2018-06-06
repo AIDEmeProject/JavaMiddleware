@@ -69,14 +69,17 @@ public class RunExperiment {
 
         // run exploration
         Explore explore = new Explore(initialSampler, 100);
-        ExplorationResult result = explore.run(X, y, learner, 0);
+
+        List<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
 
         // METRICS
-        for (ConfusionMatrix metric : result.getAccuracyMetrics()){
+        for (Map<String, Double> metric : metrics){
             System.out.println(metric);
         }
+//        double[] cumsum = computeAccuracy(rows, y);
+//
+//        System.out.println(rows);
+//        System.out.println(Arrays.toString(cumsum));
 
-        System.out.println(result.getLabeledRows());
-        System.out.println(result.getPositiveSetAccuracy());
     }
 }

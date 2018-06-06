@@ -1,5 +1,8 @@
 package metrics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This module is responsible for, given true labels and predicted labels arrays, compute its Confusion Matrix and
  * related metrics. In particular, we provide methods for computing Precision, Recall, Accuracy and F-Score.
@@ -23,7 +26,7 @@ public class ConfusionMatrix {
 
     /**
      * Factory method for Confusion Matrix. By being static, we separate the creation logic from each object, allowing
-     * for each ConfusionMatrix to be immutable.
+     * for each ConfusionMatrix object to be immutable.
      *
      * @param trueLabels: array of true labels
      * @param predictedLabels: array of predicted labels
@@ -72,21 +75,21 @@ public class ConfusionMatrix {
     }
 
     /**
-     * @return true negatives (prediction = label = -1)
+     * @return true negatives (prediction = label = 0)
      */
     public double trueNegatives() {
         return trueNegatives;
     }
 
     /**
-     * @return false positives (prediction = 1, label = -1)
+     * @return false positives (prediction = 1, label = 0)
      */
     public double falsePositives() {
         return falsePositives;
     }
 
     /**
-     * @return false negatives (prediction = -1, label = 1)
+     * @return false negatives (prediction = 0, label = 1)
      */
     public double falseNegatives() {
         return falseNegatives;
@@ -124,9 +127,18 @@ public class ConfusionMatrix {
         return (b == 0) ? 0 : a / b;
     }
 
-    @Override
-    public String toString() {
-        return "tp = " + truePositives + ", tn = " + trueNegatives + ", fp = " + falsePositives + ", fn = " + falseNegatives +
-               ", ac = " + accuracy() + ", pr = " + precision() + ", re = " + recall() + ", fs = " + fscore();
+    /**
+     * @return Map object containing all metrics stored in the ConfusionMatrix object.
+     */
+    public Map<String, Double> getMetrics(){
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("truePositives", truePositives());
+        metrics.put("trueNegatives", trueNegatives());
+        metrics.put("falsePositives", falsePositives());
+        metrics.put("falseNegatives", falseNegatives());
+        metrics.put("precision", precision());
+        metrics.put("recall", recall());
+        metrics.put("fscore", fscore());
+        return metrics;
     }
 }
