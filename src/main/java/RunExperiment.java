@@ -1,13 +1,9 @@
-import classifier.BoundedClassifier;
 import classifier.Classifier;
 import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
-import explore.ExplorationResult;
-import explore.Explore;
 import learner.*;
-import metrics.ConfusionMatrix;
 import sampling.StratifiedSampler;
 
 import java.util.*;
