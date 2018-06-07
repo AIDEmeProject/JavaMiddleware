@@ -73,16 +73,8 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        int runs = 5;
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
-
-        ExplorationMetrics metrics = explore.run(X, y, learner, 0);
-
-        for (int i = 1; i < runs; i++) {
-            metrics = ExplorationMetrics.sum(metrics, explore.run(X, y, learner, i+1));
-        }
-
-        metrics = ExplorationMetrics.divideByNumber(metrics, runs);
+        ExplorationMetrics metrics = explore.averageRun(X, y, learner, 5, new long[] {1,2,3,4,5});
 
         // METRICS
         for (Map<String, Double> metric : metrics.getMetrics()){

@@ -102,7 +102,52 @@ public class Explore {
      * @param learner: active learner object
      */
     public ExplorationMetrics run(double[][] X, int[] y, Learner learner){
-        return run(X, y, learner, System.currentTimeMillis());
+        return run(X, y, learner, System.nanoTime());
+    }
+
+    /**
+     * Run the exploration process several times (with random seeds) and average resulting metrics.
+     * @param X: features matrix
+     * @param y: labels array
+     * @param learner: active learner object
+     * @param runs: number of runs to perform
+     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
+     * TODO: can we remove the duplication between this method and the below? (i.e. how to choose "random" seeds?)
+     */
+    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs){
+        if (runs <= 0){
+            throw new IllegalArgumentException("Runs must be positive.");
+        }
+
+        ExplorationMetrics metrics = run(X, y, learner);
+
+        for (int i = 1; i < runs; i++) {
+            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner));
+        }
+
+        return ExplorationMetrics.divideByNumber(metrics, runs);
+    }
+
+    /**
+     * Run the exploration process several times (with specified seeds) and average resulting metrics.
+     * @param X: features matrix
+     * @param y: labels array
+     * @param learner: active learner object
+     * @param runs: number of runs to perform
+     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
+     */
+    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs, long[] seeds){
+        if (runs <= 0){
+            throw new IllegalArgumentException("Runs must be positive.");
+        }
+
+        ExplorationMetrics metrics = run(X, y, learner, seeds[0]);
+
+        for (int i = 1; i < runs; i++) {
+            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner, seeds[i]));
+        }
+
+        return ExplorationMetrics.divideByNumber(metrics, runs);
     }
 
     private Map<String, Double> runSingleIteration(LabeledData data, Learner learner){
