@@ -13,22 +13,14 @@ public class ExplorationMetrics {
         this.metrics = new ArrayList<>();
     }
 
-    private ExplorationMetrics(List<Metrics> metrics) {
-        this.metrics = metrics;
-    }
-
-    public List<Metrics> getMetrics() {
-        return metrics;
-    }
-
     public void add(Metrics map){
         metrics.add(map);
     }
 
     public static ExplorationMetrics sum(ExplorationMetrics metrics1, ExplorationMetrics metrics2){
         ExplorationMetrics result = new ExplorationMetrics();
-        Iterator<Metrics> it1 = metrics1.metrics.iterator();
-        Iterator<Metrics> it2 = metrics2.metrics.iterator();
+        Iterator<Metrics> it1 = metrics1.iterator();
+        Iterator<Metrics> it2 = metrics2.iterator();
 
         while (it1.hasNext() && it2.hasNext()){
             result.add(Metrics.sum(it1.next(), it2.next()));
@@ -57,6 +49,10 @@ public class ExplorationMetrics {
 
     public ExplorationMetrics divideByNumber(int denominator){
         return divideByNumber(this, denominator);
+    }
+
+    public Iterator<Metrics> iterator(){
+        return metrics.iterator();
     }
 
     @Override
