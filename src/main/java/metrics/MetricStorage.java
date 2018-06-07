@@ -10,8 +10,7 @@ import explore.Metrics;
  */
 public interface MetricStorage {
     /**
-     * @return all metrics contained in the object in a Map object. Keys are the metric's name, the the values the
-     * corresponding computed metric values.
+     * @return all metrics contained in the object in a Metrics object.
      */
     Metrics getMetrics();
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * This class is a simple storage of (String, Double) key-value pairs, where the String represents the metric's name and
  * the Double the metric's value. We provide Map-like methods for adding new metrics and retrieving keys, and also helper
@@ -20,6 +21,20 @@ public class Metrics {
      */
     public Metrics() {
         metrics = new HashMap<>();
+    }
+
+    /**
+     * @return Number of metrics stored in this object
+     */
+    public int size(){
+        return metrics.size();
+    }
+
+    /**
+     * @return true if object contains no metrics
+     */
+    public boolean isEmpty(){
+        return size() == 0;
     }
 
     /**
@@ -102,6 +117,7 @@ public class Metrics {
      * @param metric: object to be divided
      * @param denominator: number to divide each metric by
      * @return a new Metrics object containing the divided metrics at every position
+     * @throws IllegalArgumentException if denominator is zero
      */
     public static Metrics divideByNumber(Metrics metric, int denominator){
         if (denominator == 0){
@@ -119,9 +135,20 @@ public class Metrics {
      * Instance method for dividing each metric value by a number. Equivalent to divideByNumber(this, denominator).
      * @param denominator: number to divide each metric by
      * @return a new Metrics object containing the divided metrics
+     * @throws IllegalArgumentException if denominator is zero
      */
     public Metrics divideByNumber(int denominator){
         return divideByNumber(this, denominator);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Metrics metrics1 = (Metrics) o;
+
+        return metrics.equals(metrics1.metrics);
     }
 
     @Override

@@ -66,6 +66,7 @@ public class ExplorationMetrics {
      * @param metrics: object to be divided
      * @param denominator: number to divide each metric by
      * @return a new ExplorationMetric object containing the divided metrics at every position
+     * @throws IllegalArgumentException if denominator is zero
      */
     public static ExplorationMetrics divideByNumber(ExplorationMetrics metrics, int denominator){
         ExplorationMetrics result = new ExplorationMetrics();
@@ -81,6 +82,7 @@ public class ExplorationMetrics {
      * Instance method for dividing the current metric object by a number. Equivalent to divideByNumber(this, denominator).
      * @param denominator: number to divide each metric by
      * @return a new ExplorationMetric object containing the divided metrics at every position
+     * @throws IllegalArgumentException if denominator is zero
      */
     public ExplorationMetrics divideByNumber(int denominator){
         return divideByNumber(this, denominator);
