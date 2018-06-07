@@ -138,19 +138,8 @@ public class ActiveTreeSearch implements ActiveLearner {
         double[] probas = classifier.probability(data);
 
         // get unlabeled point of maximum probability
-        double optimalUtility = Double.NEGATIVE_INFINITY;
-        int optimalRow = -1;
-
-        for (int i = 0; i < data.getNumRows(); i++) {
-            if (data.isInLabeledSet(i)) {
-                continue;
-            }
-
-            if (probas[i] > optimalUtility){
-                optimalUtility = probas[i];
-                optimalRow = i;
-            }
-        }
+        int optimalRow = data.retrieveMinimizerOverUnlabeledData((dt, row) -> -probas[row]);
+        double optimalUtility = probas[optimalRow];
 
         // in 1-step case, just return point we are most certain of being positive (greedy approach)
         if (steps <= 1){
