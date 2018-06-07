@@ -26,9 +26,9 @@ public class Metrics {
         metrics.put(name, value);
     }
 
-    public void addAll(Map<String, Double> map){
-        for (String key : map.keySet()){
-            this.add(key, map.get(key));
+    public void addAll(Metrics metric){
+        for (String key : metric.names()){
+            this.add(key, metric.get(key));
         }
     }
 
