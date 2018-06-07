@@ -27,7 +27,7 @@ import exceptions.EmptyUnlabeledSetException;
  *        Bayesian Optimal Active Search and Surveying
  *        ICML, 2012
  */
-public class ActiveTreeSearch implements Learner {
+public class ActiveTreeSearch implements ActiveLearner {
 
     /**
      * classifier with positive class probability with future labeled data

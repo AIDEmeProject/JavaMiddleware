@@ -1,7 +1,7 @@
 package metrics;
 
 import data.LabeledData;
-import learner.Learner;
+import learner.ActiveLearner;
 
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledData data, Learner learner) {
+    public MetricStorage compute(LabeledData data, ActiveLearner activeLearner) {
         return compute(data.getLabeledRows(), data.getY());
     }
 }

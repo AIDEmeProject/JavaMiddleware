@@ -15,7 +15,7 @@ import data.LabeledData;
  *
  * @see <a href="http://www.jmlr.org/papers/volume2/tong01a/tong01a.pdf">Original paper</a>
  */
-public class SimpleMargin implements Learner {
+public class SimpleMargin implements ActiveLearner {
     private SvmClassifier svm;
 
     public SimpleMargin(SvmClassifier svm) {

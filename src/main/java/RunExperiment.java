@@ -58,11 +58,11 @@ public class RunExperiment {
         Classifier clf = new SvmClassifier(params);
 
         // LEARNER
-        Learner learner;
-        //learner = new RandomSampler(clf);
-        //learner = new UncertaintySampler(clf);
-        learner = new ActiveTreeSearch(new NearestNeighborsClassifier(X, 5, 0.1), 1);
-        //learner = new SimpleMargin(new SvmClassifier(params));
+        ActiveLearner activeLearner;
+        //activeLearner = new RandomSampler(clf);
+        //activeLearner = new UncertaintySampler(clf);
+        activeLearner = new ActiveTreeSearch(new NearestNeighborsClassifier(X, 5, 0.1), 1);
+        //activeLearner = new SimpleMargin(new SvmClassifier(params));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -74,7 +74,7 @@ public class RunExperiment {
 
         // EXPLORE
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
-        ExplorationMetrics metrics = explore.averageRun(X, y, learner, 5, new long[] {1,2,3,4,5});
+        ExplorationMetrics metrics = explore.averageRun(X, y, activeLearner, 5, new long[] {1,2,3,4,5});
 
         // METRICS
         System.out.println(metrics);

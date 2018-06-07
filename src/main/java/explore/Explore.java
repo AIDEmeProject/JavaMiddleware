@@ -1,8 +1,8 @@
 package explore;
 
 import data.LabeledData;
-import learner.Learner;
-import learner.TimedLearner;
+import learner.ActiveLearner;
+import learner.TimedActiveLearner;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -74,11 +74,11 @@ public class Explore {
      * Run the exploration process.
      * @param X: features matrix
      * @param y: labels array
-     * @param learner: active learner object
+     * @param activeLearner: active activeLearner object
      * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
      * @return metrics collected during each iteration.
      */
-    public ExplorationMetrics run(double[][] X, int[] y, Learner learner, long seed){
+    public ExplorationMetrics run(double[][] X, int[] y, ActiveLearner activeLearner, long seed){
         // set random seed
         setSeed(seed);
 
@@ -86,7 +86,7 @@ public class Explore {
         LabeledData data = new LabeledData(X, y); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
-            metrics.add(runSingleIteration(data, learner));
+            metrics.add(runSingleIteration(data, activeLearner));
         }
 
         return metrics;
@@ -96,29 +96,29 @@ public class Explore {
      * Run the exploration process with a random seed.
      * @param X: features matrix
      * @param y: labels array
-     * @param learner: active learner object
+     * @param activeLearner: active activeLearner object
      */
-    public ExplorationMetrics run(double[][] X, int[] y, Learner learner){
-        return run(X, y, learner, System.nanoTime());
+    public ExplorationMetrics run(double[][] X, int[] y, ActiveLearner activeLearner){
+        return run(X, y, activeLearner, System.nanoTime());
     }
 
     /**
      * Run the exploration process several times (with specified seeds) and average resulting metrics.
      * @param X: features matrix
      * @param y: labels array
-     * @param learner: active learner object
+     * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      */
-    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs, long[] seeds){
+    public ExplorationMetrics averageRun(double[][] X, int[] y, ActiveLearner activeLearner, int runs, long[] seeds){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
 
-        ExplorationMetrics metrics = run(X, y, learner, seeds[0]);
+        ExplorationMetrics metrics = run(X, y, activeLearner, seeds[0]);
 
         for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, y, learner, seeds[i]));
+            metrics = metrics.sum(run(X, y, activeLearner, seeds[i]));
         }
 
         return metrics.divideByNumber(runs);
@@ -128,54 +128,54 @@ public class Explore {
      * Run the exploration process several times (with random seeds) and average resulting metrics.
      * @param X: features matrix
      * @param y: labels array
-     * @param learner: active learner object
+     * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
      */
-    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs){
+    public ExplorationMetrics averageRun(double[][] X, int[] y, ActiveLearner activeLearner, int runs){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
 
-        ExplorationMetrics metrics = run(X, y, learner);
+        ExplorationMetrics metrics = run(X, y, activeLearner);
 
         for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, y, learner));
+            metrics = metrics.sum(run(X, y, activeLearner));
         }
 
         return metrics.divideByNumber(runs);
     }
 
-    private Metrics runSingleIteration(LabeledData data, Learner learner){
+    private Metrics runSingleIteration(LabeledData data, ActiveLearner activeLearner){
         Metrics metrics = new Metrics();
-        learner = new TimedLearner(learner, metrics);  // Apply timing decorator
+        activeLearner = new TimedActiveLearner(activeLearner, metrics);  // Apply timing decorator
 
         // find next points to label
-        int[] rows = getNextPointToLabel(data, learner);
+        int[] rows = getNextPointToLabel(data, activeLearner);
 
         // update labeled set
         data.addLabeledRow(rows);
         metrics.add("labeledRow", (double) rows[0]);
 
         // retrain model
-        learner.fit(data);
+        activeLearner.fit(data);
 
         // compute accuracy metrics
         for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.addAll(metricCalculator.compute(data, learner).getMetrics());
+            metrics.addAll(metricCalculator.compute(data, activeLearner).getMetrics());
         }
 
         return metrics;
     }
 
-    private int[] getNextPointToLabel(LabeledData data, Learner learner){
+    private int[] getNextPointToLabel(LabeledData data, ActiveLearner activeLearner){
         // initial sampling
         if (data.getNumLabeledRows() == 0){
             return initialSampler.sample(data.getY());
         }
 
         // retrieve most informative point according to model
-        return new int[] {learner.retrieveMostInformativeUnlabeledPoint(data)};
+        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data)};
     }
 }

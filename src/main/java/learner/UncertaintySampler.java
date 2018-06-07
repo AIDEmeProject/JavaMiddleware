@@ -2,7 +2,6 @@ package learner;
 
 import classifier.Classifier;
 import data.LabeledData;
-import exceptions.EmptyUnlabeledSetException;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class
@@ -11,7 +10,7 @@ import exceptions.EmptyUnlabeledSetException;
  *
  * @author luciano
  */
-public class UncertaintySampler implements Learner {
+public class UncertaintySampler implements ActiveLearner {
 
     /**
      * classifier used for fitting and predicting labels

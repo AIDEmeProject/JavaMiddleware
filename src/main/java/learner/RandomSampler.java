@@ -11,7 +11,7 @@ import sampling.ReservoirSampler;
  *
  * @author luciano
  */
-public class RandomSampler implements Learner {
+public class RandomSampler implements ActiveLearner {
 
     /**
      * A classifier used for fitting and predicting labels
