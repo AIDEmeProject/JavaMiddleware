@@ -58,6 +58,11 @@ public class Explore {
         this.metricCalculators = metricCalculators;
     }
 
+    /**
+     * Sets no metrics to calculate. Only time measurements will be provided in result.
+     * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
+     * @param budget: number of iterations in the active learning exploration process
+     */
     public Explore(StratifiedSampler initialSampler, int budget) {
         this(initialSampler, budget, new ArrayList<>());
     }
@@ -74,7 +79,7 @@ public class Explore {
      * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
      * @return metrics collected during each iteration.
      */
-    public List<Map<String, Double>> run(double[][] X, int[] y, Learner learner, long seed){
+    public ExplorationMetrics run(double[][] X, int[] y, Learner learner, long seed){
         // set random seed
         setSeed(seed);
 
@@ -87,7 +92,7 @@ public class Explore {
         }
 
         // TODO: return labeledData object or labeled rows indexes only?
-        return metrics;
+        return new ExplorationMetrics(metrics);
     }
 
     /**
@@ -96,7 +101,7 @@ public class Explore {
      * @param y: labels array
      * @param learner: active learner object
      */
-    public List<Map<String, Double>> run(double[][] X, int[] y, Learner learner){
+    public ExplorationMetrics run(double[][] X, int[] y, Learner learner){
         return run(X, y, learner, System.currentTimeMillis());
     }
 

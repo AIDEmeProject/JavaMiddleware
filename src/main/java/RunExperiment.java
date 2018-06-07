@@ -3,6 +3,7 @@ import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
+import explore.ExplorationMetrics;
 import explore.Explore;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
@@ -46,59 +47,6 @@ public class RunExperiment {
         return y;
     }
 
-    private static Map<String, Double> sumMaps(Map<String, Double> map1, Map<String, Double> map2){
-        if (!map1.keySet().equals(map2.keySet())){
-            throw new IllegalArgumentException("Maps must have the same key set.");
-        }
-
-        Map<String, Double> result = new HashMap<>();
-        for (String key : map1.keySet()){
-            result.put(key, map1.get(key) + map2.get(key));
-        }
-        return result;
-    }
-
-    private static List<Map<String, Double>> sumListMaps(List<Map<String, Double>> list1, List<Map<String, Double>> list2){
-        List<Map<String, Double>> result = new ArrayList<>();
-        Iterator<Map<String, Double>> it1 = list1.iterator();
-        Iterator<Map<String, Double>> it2 = list2.iterator();
-
-        while (it1.hasNext() && it2.hasNext()){
-            result.add(sumMaps(it1.next(), it2.next()));
-        }
-
-        if (it1.hasNext() || it2.hasNext()){
-            throw new IllegalArgumentException("Lists should have the same number of elements.");
-        }
-
-        return result;
-    }
-
-    private static Map<String, Double> divideMap(Map<String, Double> map, int denominator){
-        if (denominator == 0){
-            throw new IllegalArgumentException("Dividing by zero.");
-        }
-
-        Map<String, Double> result = new HashMap<>();
-
-        for (String key : map.keySet()){
-            result.put(key, map.get(key) / denominator);
-        }
-
-        return result;
-    }
-
-    private static List<Map<String, Double>> divideListMaps(List<Map<String, Double>> list, int denominator){
-        List<Map<String, Double>> result = new ArrayList<>();
-
-        for (Map<String, Double> map : list){
-            result.add(divideMap(map, denominator));
-        }
-
-        return result;
-    }
-
-
     public static void main(String[] args){
         // DATA
         double[][] X = generateX(250, 2, 1);
@@ -125,19 +73,19 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        int runs = 10;
+        int runs = 5;
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
 
-        List<Map<String, Double>> metrics = explore.run(X, y, learner, 0);
+        ExplorationMetrics metrics = explore.run(X, y, learner, 0);
 
         for (int i = 1; i < runs; i++) {
-            metrics = sumListMaps(metrics, explore.run(X, y, learner, i+1));
+            metrics = ExplorationMetrics.sum(metrics, explore.run(X, y, learner, i+1));
         }
 
-        metrics = divideListMaps(metrics, runs);
+        metrics = ExplorationMetrics.divideByNumber(metrics, runs);
 
         // METRICS
-        for (Map<String, Double> metric : metrics){
+        for (Map<String, Double> metric : metrics.getMetrics()){
             System.out.println(metric);
         }
     }
