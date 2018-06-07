@@ -2,7 +2,6 @@ package classifier.SVM;
 
 import classifier.Classifier;
 import data.LabeledData;
-import exceptions.UnfitClassifierException;
 import libsvm.*;
 
 /**
@@ -38,32 +37,39 @@ public class SvmClassifier implements Classifier {
         this.hasProbability = svm.svm_check_probability_model(model) == 1;
     }
 
-    @Override
-    public double probability(LabeledData data, int row) {
-        if (model == null){
-            throw new UnfitClassifierException();
-        }
-
+    public double probability(double[] point) {
         if (!hasProbability){
             throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
 
         }
 
         double[] probas = new double[2];
-
-        svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), probas);
-
+        svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(point), probas);
         return probas[0];
+    }
 
+    @Override
+    public double probability(LabeledData data, int row) {
+        return probability(data.getRow(row));
+    }
+
+    public int predict(double[] point) {
+        return margin(point) > 0 ? 1 : 0;
     }
 
     @Override
     public int predict(LabeledData data, int row) {
-        if (model == null){
-            throw new UnfitClassifierException();
-        }
+        return predict(data.getRow(row));
+    }
 
-        return margin(data, row) > 0 ? 1 : 0;
+    /**
+     * @param point: data point
+     * @return sample's signed distance to svm's decision boundary
+     */
+    public double margin(double[] point){
+        double[] margin = new double[1];
+        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(point), margin);
+        return margin[0];
     }
 
     /**
@@ -72,9 +78,7 @@ public class SvmClassifier implements Classifier {
      * @return sample's signed distance to svm's decision boundary
      */
     public double margin(LabeledData data, int row){
-        double[] margin = new double[1];
-        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(data.getRow(row)), margin);
-        return margin[0];
+        return margin(data.getRow(row));
     }
 
     private svm_model buildSvmModel(double bias, double[] alpha, Kernel kernel, double[][] supportVectors){

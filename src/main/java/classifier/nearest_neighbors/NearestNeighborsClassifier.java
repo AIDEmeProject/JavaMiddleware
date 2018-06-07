@@ -1,13 +1,7 @@
 package classifier.nearest_neighbors;
 
-import java.util.Arrays;
-
 import classifier.BoundedClassifier;
 import data.LabeledData;
-import exceptions.EmptyLabeledSetException;
-import exceptions.UnfitClassifierException;
-import smile.neighbor.KDTree;
-import smile.neighbor.Neighbor;
 
 
 /**

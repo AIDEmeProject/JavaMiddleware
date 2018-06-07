@@ -15,7 +15,6 @@ public interface Classifier {
      * @param data: collection of data points
      * @param row: row index of point of interest
      * @return probability of given point being positive
-     * @throws exceptions.UnfitClassifierException if fit() hasn't been called beforehand
      */
     double probability(LabeledData data, int row);
 
@@ -23,7 +22,6 @@ public interface Classifier {
      * Return class probability estimation for each point in the dataset.
      * @param data: collection of data points
      * @return probability estimation array
-     * @throws exceptions.UnfitClassifierException if fit() hasn't been called beforehand
      */
     default double[] probability(LabeledData data){
         double[] probas = new double[data.getNumRows()];
@@ -40,7 +38,6 @@ public interface Classifier {
      * @param data: collection of data points
      * @param row: row index of point of interest
      * @return class label of given point
-     * @throws exceptions.UnfitClassifierException if fit() hasn't been called beforehand
      */
     default int predict(LabeledData data, int row){
         return probability(data, row) > 0.5 ? 1 : 0;
@@ -50,7 +47,6 @@ public interface Classifier {
      * Return predicted class labels for each point in the dataset.
      * @param data: collection of data points
      * @return predicted class labels
-     * @throws exceptions.UnfitClassifierException if fit() hasn't been called beforehand
      */
     default int[] predict(LabeledData data){
         int[] labels = new int[data.getNumRows()];

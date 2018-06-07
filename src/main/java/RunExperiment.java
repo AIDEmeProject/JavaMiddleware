@@ -57,7 +57,10 @@ public class RunExperiment {
 
         // CLASSIFIER
         SvmParameterAdapter params = new SvmParameterAdapter();
-        params = params.C(1000).kernel(new Kernel()).probability(false);
+        params = params
+                .C(1000)
+                .kernel(new Kernel())
+                .probability(false);
         Learner learner = new SvmLearner(params);
 
         // LEARNER
