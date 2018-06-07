@@ -40,6 +40,10 @@ public class SvmClassifier implements Classifier {
         this.model = buildSvmModel(bias, alpha, kernel, supportVectors);
     }
 
+    SvmClassifier(svm_model model) {
+        this.model = model;
+    }
+
     @Override
     public void fit(LabeledData data) {
         svm_problem prob = buildSvmProblem(data);
