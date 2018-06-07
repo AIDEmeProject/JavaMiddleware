@@ -5,7 +5,6 @@ import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
 import explore.ExplorationMetrics;
 import explore.Explore;
-import explore.IterationMetrics;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;

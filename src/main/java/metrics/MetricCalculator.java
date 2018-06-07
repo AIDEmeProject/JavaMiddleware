@@ -13,5 +13,5 @@ public interface MetricCalculator {
      * @param learner: active learning or active search model
      * @return computed metric
      */
-    Metrics compute(LabeledData data, Learner learner);
+    MetricStorage compute(LabeledData data, Learner learner);
 }

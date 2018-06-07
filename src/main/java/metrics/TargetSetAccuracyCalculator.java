@@ -32,7 +32,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public Metrics compute(LabeledData data, Learner learner) {
+    public MetricStorage compute(LabeledData data, Learner learner) {
         return compute(data.getLabeledRows(), data.getY());
     }
 }

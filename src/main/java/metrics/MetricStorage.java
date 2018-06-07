@@ -1,6 +1,6 @@
 package metrics;
 
-import java.util.Map;
+import explore.Metrics;
 
 /**
  * This is an interface for objects storing one or more accuracy metrics. Factory methods are provided by MetricCalculator
@@ -8,10 +8,10 @@ import java.util.Map;
  *
  * @see MetricCalculator
  */
-public interface Metrics {
+public interface MetricStorage {
     /**
      * @return all metrics contained in the object in a Map object. Keys are the metric's name, the the values the
      * corresponding computed metric values.
      */
-    Map<String, Double> getMetrics();
+    Metrics getMetrics();
 }

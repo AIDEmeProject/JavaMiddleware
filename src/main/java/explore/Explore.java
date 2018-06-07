@@ -3,7 +3,6 @@ package explore;
 import data.LabeledData;
 import learner.Learner;
 import learner.TimedLearner;
-import metrics.ConfusionMatrix;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -148,8 +147,8 @@ public class Explore {
         return metrics.divideByNumber(runs);
     }
 
-    private IterationMetrics runSingleIteration(LabeledData data, Learner learner){
-        IterationMetrics metrics = new IterationMetrics();
+    private Metrics runSingleIteration(LabeledData data, Learner learner){
+        Metrics metrics = new Metrics();
         learner = new TimedLearner(learner, metrics);  // Apply timing decorator
 
         // find next points to label

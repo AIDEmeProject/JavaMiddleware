@@ -1,9 +1,7 @@
 package learner;
 
 import data.LabeledData;
-import explore.IterationMetrics;
-
-import java.util.Map;
+import explore.Metrics;
 
 /**
  * This decorator is used for retrieving timing information for several methods of a typical Learner object: fit, predict,
@@ -12,9 +10,9 @@ import java.util.Map;
 public class TimedLearner implements Learner {
 
     private Learner learner;
-    private IterationMetrics metrics;
+    private Metrics metrics;
 
-    public TimedLearner(Learner learner, IterationMetrics metrics) {
+    public TimedLearner(Learner learner, Metrics metrics) {
         this.learner = learner;
         this.metrics = metrics;
     }

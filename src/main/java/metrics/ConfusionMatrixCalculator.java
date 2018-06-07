@@ -16,7 +16,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * @return a confusion matrix
      */
     @Override
-    public Metrics compute(LabeledData data, Learner learner) {
+    public MetricStorage compute(LabeledData data, Learner learner) {
         return compute(data.getY(), learner.predict(data));
     }
 

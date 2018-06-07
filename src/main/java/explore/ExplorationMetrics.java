@@ -7,31 +7,31 @@ import java.util.*;
  * and normalizing values by a constant.
  */
 public class ExplorationMetrics {
-    private List<IterationMetrics> metrics;
+    private List<Metrics> metrics;
 
     public ExplorationMetrics(){
         this.metrics = new ArrayList<>();
     }
 
-    private ExplorationMetrics(List<IterationMetrics> metrics) {
+    private ExplorationMetrics(List<Metrics> metrics) {
         this.metrics = metrics;
     }
 
-    public List<IterationMetrics> getMetrics() {
+    public List<Metrics> getMetrics() {
         return metrics;
     }
 
-    public void add(IterationMetrics map){
+    public void add(Metrics map){
         metrics.add(map);
     }
 
     public static ExplorationMetrics sum(ExplorationMetrics metrics1, ExplorationMetrics metrics2){
         ExplorationMetrics result = new ExplorationMetrics();
-        Iterator<IterationMetrics> it1 = metrics1.metrics.iterator();
-        Iterator<IterationMetrics> it2 = metrics2.metrics.iterator();
+        Iterator<Metrics> it1 = metrics1.metrics.iterator();
+        Iterator<Metrics> it2 = metrics2.metrics.iterator();
 
         while (it1.hasNext() && it2.hasNext()){
-            result.add(IterationMetrics.sum(it1.next(), it2.next()));
+            result.add(Metrics.sum(it1.next(), it2.next()));
         }
 
         if (it1.hasNext() || it2.hasNext()){
@@ -48,7 +48,7 @@ public class ExplorationMetrics {
     public static ExplorationMetrics divideByNumber(ExplorationMetrics metrics, int denominator){
         ExplorationMetrics result = new ExplorationMetrics();
 
-        for (IterationMetrics map : metrics.metrics){
+        for (Metrics map : metrics.metrics){
             result.add(map.divideByNumber(denominator));
         }
 
@@ -62,7 +62,7 @@ public class ExplorationMetrics {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (IterationMetrics map : metrics){
+        for (Metrics map : metrics){
             builder.append(map.toString());
             builder.append('\n');
         }

@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class IterationMetrics {
+public class Metrics {
     private Map<String, Double> metrics;
 
-    public IterationMetrics() {
+    public Metrics() {
         metrics = new HashMap<>();
     }
 
@@ -36,31 +36,31 @@ public class IterationMetrics {
         return metrics.keySet();
     }
 
-    public static IterationMetrics sum(IterationMetrics map1, IterationMetrics map2){
-        IterationMetrics result = new IterationMetrics();
+    public static Metrics sum(Metrics map1, Metrics map2){
+        Metrics result = new Metrics();
         for (String key : map1.names()){
             result.add(key, map1.get(key) + map2.get(key));
         }
         return result;
     }
 
-    public IterationMetrics sum(IterationMetrics map){
-        return sum(this, map);
+    public Metrics sum(Metrics metric){
+        return sum(this, metric);
     }
 
-    public static IterationMetrics divideByNumber(IterationMetrics map, int denominator){
+    public static Metrics divideByNumber(Metrics metric, int denominator){
         if (denominator == 0){
             throw new IllegalArgumentException("Dividing by zero.");
         }
 
-        IterationMetrics result = new IterationMetrics();
-        for (String key : map.names()){
-            result.add(key, map.get(key) / denominator);
+        Metrics result = new Metrics();
+        for (String key : metric.names()){
+            result.add(key, metric.get(key) / denominator);
         }
         return result;
     }
 
-    public IterationMetrics divideByNumber(int denominator){
+    public Metrics divideByNumber(int denominator){
         return divideByNumber(this, denominator);
     }
 
