@@ -1,7 +1,8 @@
-package classifier;
+package classifier.nearest_neighbors;
 
 import java.util.Arrays;
 
+import classifier.BoundedClassifier;
 import data.LabeledData;
 import exceptions.EmptyLabeledSetException;
 import exceptions.UnfitClassifierException;
@@ -73,6 +74,11 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
         this.sumOfLabelsInLabeledNeighborhood = new int[X.length];
         this.labeledNeighborhoodSize = new int[X.length];
         this.isFit = false;
+    }
+
+    NearestNeighborsClassifier(int[] sumOfLabelsInLabeledNeighborhood, int[] labeledNeighborhoodSize) {
+        this.sumOfLabelsInLabeledNeighborhood = sumOfLabelsInLabeledNeighborhood;
+        this.labeledNeighborhoodSize = labeledNeighborhoodSize;
     }
 
     private int[][] computeNeighbors(double[][] X, int k){

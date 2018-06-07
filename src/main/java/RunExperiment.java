@@ -1,5 +1,5 @@
 import classifier.Classifier;
-import classifier.NearestNeighborsClassifier;
+import classifier.nearest_neighbors.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
