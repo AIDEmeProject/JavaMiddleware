@@ -20,6 +20,20 @@ public class ExplorationMetrics {
     }
 
     /**
+     * @return return number of metrics in store
+     */
+    public int size(){
+        return metrics.size();
+    }
+
+    /**
+     * @return true is there are no metrics stored
+     */
+    public boolean isEmpty(){
+        return metrics.isEmpty();
+    }
+
+    /**
      * Append a new metric to the end of the list.
      * @param metric: metrics to be appended
      */
@@ -93,6 +107,16 @@ public class ExplorationMetrics {
      */
     public Iterator<Metrics> iterator(){
         return metrics.iterator();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExplorationMetrics that = (ExplorationMetrics) o;
+
+        return metrics.equals(that.metrics);
     }
 
     @Override
