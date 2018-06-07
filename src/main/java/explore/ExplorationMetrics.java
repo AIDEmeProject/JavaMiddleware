@@ -26,7 +26,7 @@ public class ExplorationMetrics {
     }
 
     public static ExplorationMetrics sum(ExplorationMetrics metrics1, ExplorationMetrics metrics2){
-        List<IterationMetrics> result = new ArrayList<>();
+        ExplorationMetrics result = new ExplorationMetrics();
         Iterator<IterationMetrics> it1 = metrics1.metrics.iterator();
         Iterator<IterationMetrics> it2 = metrics2.metrics.iterator();
 
@@ -38,7 +38,7 @@ public class ExplorationMetrics {
             throw new IllegalArgumentException("Lists should have the same number of elements.");
         }
 
-        return new ExplorationMetrics(result);
+        return result;
     }
 
     public ExplorationMetrics sum(ExplorationMetrics metrics){
@@ -46,13 +46,13 @@ public class ExplorationMetrics {
     }
 
     public static ExplorationMetrics divideByNumber(ExplorationMetrics metrics, int denominator){
-        List<IterationMetrics> result = new ArrayList<>();
+        ExplorationMetrics result = new ExplorationMetrics();
 
         for (IterationMetrics map : metrics.metrics){
-            result.add(IterationMetrics.divideByNumber(map, denominator));
+            result.add(map.divideByNumber(denominator));
         }
 
-        return new ExplorationMetrics(result);
+        return result;
     }
 
     public ExplorationMetrics divideByNumber(int denominator){

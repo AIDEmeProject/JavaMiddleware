@@ -11,10 +11,6 @@ public class IterationMetrics {
         metrics = new HashMap<>();
     }
 
-    private IterationMetrics(Map<String, Double> metrics) {
-        this.metrics = metrics;
-    }
-
     public Double get(String name){
         Double value = metrics.get(name);
         if (value == null){
@@ -48,6 +44,10 @@ public class IterationMetrics {
         return result;
     }
 
+    public IterationMetrics sum(IterationMetrics map){
+        return sum(this, map);
+    }
+
     public static IterationMetrics divideByNumber(IterationMetrics map, int denominator){
         if (denominator == 0){
             throw new IllegalArgumentException("Dividing by zero.");
@@ -58,6 +58,10 @@ public class IterationMetrics {
             result.add(key, map.get(key) / denominator);
         }
         return result;
+    }
+
+    public IterationMetrics divideByNumber(int denominator){
+        return divideByNumber(this, denominator);
     }
 
     @Override
