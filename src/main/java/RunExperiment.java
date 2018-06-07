@@ -3,6 +3,7 @@ import classifier.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
+import explore.Explore;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
