@@ -1,7 +1,7 @@
 package classifier.nearest_neighbors;
 
-import classifier.Classifier;
-import classifier.Learner;
+import classifier.BoundedClassifier;
+import classifier.BoundedLearner;
 import data.LabeledData;
 import exceptions.EmptyLabeledSetException;
 import smile.neighbor.KDTree;
@@ -9,7 +9,12 @@ import smile.neighbor.Neighbor;
 
 import java.util.Arrays;
 
-public class NearestNeighborsLearner implements Learner {
+public class NearestNeighborsLearner implements BoundedLearner {
+
+    /**
+     * Probability smoothing parameter
+     */
+    private double gamma;
 
     /**
      * indexes[i] contains the indexes of the k-Nearest neighbors of X[i]. No particular ordering can be assumed.
@@ -21,12 +26,13 @@ public class NearestNeighborsLearner implements Learner {
      * @param k: neighborhood size
      * @throws IllegalArgumentException if gamma not in [0,1], or if k is not positive
      */
-    public NearestNeighborsLearner(double[][] X, int k) {
+    public NearestNeighborsLearner(double[][] X, int k, double gamma) {
         if (k <= 0){
             throw new IllegalArgumentException("Number of neighbors must be positive.");
         }
 
         this.indexes = computeNeighbors(X, k);
+        this.gamma = gamma;
     }
 
     private int[][] computeNeighbors(double[][] X, int k){
@@ -54,7 +60,7 @@ public class NearestNeighborsLearner implements Learner {
      * @param data: collection of labeled points
      */
     @Override
-    public Classifier fit(LabeledData data) {
+    public BoundedClassifier fit(LabeledData data) {
         if (data.getNumLabeledRows() == 0){
             throw new EmptyLabeledSetException();
         }
@@ -76,6 +82,6 @@ public class NearestNeighborsLearner implements Learner {
             }
         }
 
-        return new NearestNeighborsClassifier(sumOfLabelsInLabeledNeighborhood, labeledNeighborhoodSize);
+        return new NearestNeighborsClassifier(sumOfLabelsInLabeledNeighborhood, labeledNeighborhoodSize, gamma);
     }
 }

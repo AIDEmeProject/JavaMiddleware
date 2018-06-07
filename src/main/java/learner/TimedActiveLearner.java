@@ -1,5 +1,6 @@
 package learner;
 
+import classifier.Classifier;
 import data.LabeledData;
 import explore.Metrics;
 
@@ -26,27 +27,28 @@ public class TimedActiveLearner implements ActiveLearner {
     }
 
     @Override
-    public void fit(LabeledData data) {
+    public Classifier fit(LabeledData data) {
         long initialInstant = System.nanoTime();
-        activeLearner.fit(data);
+        Classifier classifier = activeLearner.fit(data);
         metrics.add("fitTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
+        return classifier;
     }
 
-    @Override
-    public int[] predict(LabeledData data) {
-        long initialInstant = System.nanoTime();
-        int[] prediction = activeLearner.predict(data);
-        metrics.add("predictTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
-        return prediction;
-    }
-
-    @Override
-    public double probability(LabeledData data, int row) {
-        return activeLearner.probability(data, row);
-    }
-
-    @Override
-    public int predict(LabeledData data, int row) {
-        return activeLearner.predict(data, row);
-    }
+//    @Override
+//    public int[] predict(LabeledData data) {
+//        long initialInstant = System.nanoTime();
+//        int[] prediction = activeLearner.predict(data);
+//        metrics.add("predictTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
+//        return prediction;
+//    }
+//
+//    @Override
+//    public double probability(LabeledData data, int row) {
+//        return activeLearner.probability(data, row);
+//    }
+//
+//    @Override
+//    public int predict(LabeledData data, int row) {
+//        return activeLearner.predict(data, row);
+//    }
 }

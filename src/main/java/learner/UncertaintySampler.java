@@ -1,6 +1,7 @@
 package learner;
 
 import classifier.Classifier;
+import classifier.Learner;
 import data.LabeledData;
 
 /**
@@ -16,19 +17,16 @@ public class UncertaintySampler implements ActiveLearner {
      * classifier used for fitting and predicting labels
      */
     private Classifier classifier;
+    private Learner learner;
 
-    public UncertaintySampler(Classifier classifier) {
-        this.classifier = classifier;
+    public UncertaintySampler(Learner learner) {
+        this.learner = learner;
     }
 
     @Override
-    public void fit(LabeledData data) {
-        classifier.fit(data);
-    }
-
-    @Override
-    public double probability(LabeledData data, int row) {
-        return classifier.probability(data, row);
+    public Classifier fit(LabeledData data) {
+        classifier = learner.fit(data);
+        return classifier;
     }
 
     /**
@@ -38,6 +36,6 @@ public class UncertaintySampler implements ActiveLearner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(probability(dt, row) - 0.5));
+        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(classifier.probability(dt, row) - 0.5));
     }
 }

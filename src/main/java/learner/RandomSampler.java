@@ -1,6 +1,7 @@
 package learner;
 
 import classifier.Classifier;
+import classifier.Learner;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
@@ -16,30 +17,19 @@ public class RandomSampler implements ActiveLearner {
     /**
      * A classifier used for fitting and predicting labels
      */
-    private Classifier classifier;
+    private Learner learner;
 
     /**
-     * @param classifier: classifier used for training and prediction. RandomSampler has no default classification algorithm.
+     * @param learner: classifier used for training and prediction. RandomSampler has no default classification algorithm.
      */
-    public RandomSampler(Classifier classifier) {
-        this.classifier = classifier;
+    public RandomSampler(Learner learner) {
+        this.learner = learner;
     }
 
     @Override
-    public void fit(LabeledData data) {
-        classifier.fit(data);
+    public Classifier fit(LabeledData data) {
+        return learner.fit(data);
     }
-
-    @Override
-    public double probability(LabeledData data, int row) {
-        return classifier.probability(data, row);
-    }
-
-    @Override
-    public int predict(LabeledData data, int row) {
-        return classifier.predict(data, row);
-    }
-
     /**
      * Randomly pick a point from the unlabeled set.
      * @param data: labeled data object

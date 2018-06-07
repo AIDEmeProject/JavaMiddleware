@@ -1,6 +1,6 @@
 package learner;
 
-import classifier.Classifier;
+import classifier.Learner;
 import data.LabeledData;
 
 /**
@@ -9,7 +9,7 @@ import data.LabeledData;
  *
  * @author luciano
  */
-public interface ActiveLearner extends Classifier{
+public interface ActiveLearner extends Learner{
     /**
      * Retrieve the most informative point for labeling from the unlabeled set.
      * @param data: labeled data object

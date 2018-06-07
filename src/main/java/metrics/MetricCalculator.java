@@ -1,5 +1,6 @@
 package metrics;
 
+import classifier.Classifier;
 import data.LabeledData;
 import learner.ActiveLearner;
 
@@ -10,8 +11,8 @@ public interface MetricCalculator {
     /**
      * Computes a Metric from the labeled data and activeLearner objects.
      * @param data: labeled data
-     * @param activeLearner: active learning or active search model
+     * @param classifier: classifier
      * @return computed metric
      */
-    MetricStorage compute(LabeledData data, ActiveLearner activeLearner);
+    MetricStorage compute(LabeledData data, Classifier classifier);
 }

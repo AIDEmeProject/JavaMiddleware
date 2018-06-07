@@ -1,5 +1,6 @@
 package explore;
 
+import classifier.Classifier;
 import data.LabeledData;
 import learner.ActiveLearner;
 import learner.TimedActiveLearner;
@@ -159,11 +160,11 @@ public class Explore {
         metrics.add("labeledRow", (double) rows[0]);
 
         // retrain model
-        activeLearner.fit(data);
+        Classifier classifier = activeLearner.fit(data);
 
         // compute accuracy metrics
         for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.addAll(metricCalculator.compute(data, activeLearner).getMetrics());
+            metrics.addAll(metricCalculator.compute(data, classifier).getMetrics());
         }
 
         return metrics;

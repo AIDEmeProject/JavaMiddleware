@@ -9,12 +9,6 @@ import data.LabeledData;
  * @author luciano
  */
 public interface Classifier {
-    /**
-     * Train its classification model over training data. Only the labeled points should be considered for training.
-     * @param data: collection of labeled points
-     * @throws exceptions.EmptyUnlabeledSetException if labeled set is empty
-     */
-    void fit(LabeledData data);
 
     /**
      * Return class probability estimation for a particular point in the dataset.

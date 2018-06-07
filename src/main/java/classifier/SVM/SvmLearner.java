@@ -16,6 +16,10 @@ import libsvm.svm_problem;
 public class SvmLearner implements Learner {
 
     private SvmParameterAdapter parameter;
+    static {
+        // Disables svm output
+        svm.svm_set_print_string_function(s -> {});
+    }
 
     /**
      * Builds SvmLearner from SvmParameterAdapter instance.
@@ -31,7 +35,7 @@ public class SvmLearner implements Learner {
      * @return SVM classifier instance
      */
     @Override
-    public Classifier fit(LabeledData data) {
+    public SvmClassifier fit(LabeledData data) {
         svm_problem prob = buildSvmProblem(data);
         svm_parameter param = parameter.build();
 

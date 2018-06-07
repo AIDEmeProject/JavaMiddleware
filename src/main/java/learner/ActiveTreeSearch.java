@@ -1,6 +1,8 @@
 package learner;
 
 import classifier.BoundedClassifier;
+import classifier.BoundedLearner;
+import classifier.Classifier;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
 
@@ -32,7 +34,7 @@ public class ActiveTreeSearch implements ActiveLearner {
     /**
      * classifier with positive class probability with future labeled data
      */
-    private BoundedClassifier classifier;
+    private BoundedLearner learner;
 
     /**
      * number of steps to look into the future
@@ -40,25 +42,20 @@ public class ActiveTreeSearch implements ActiveLearner {
     private int lookahead;
 
     /**
-     * @param classifier k-Nearest-Neighbors classifier
+     * @param learner k-Nearest-Neighbors classifier
      * @param lookahead: number of steps to look into the future at every iteration. Usually 1 and 2 work fine.
      */
-    public ActiveTreeSearch(BoundedClassifier classifier, int lookahead) {
+    public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
         if (lookahead < 1){
             throw new IllegalArgumentException("Lookahead must be a positive number.");
         }
-        this.classifier = classifier;
+        this.learner = learner;
         this.lookahead = lookahead;
     }
 
     @Override
-    public void fit(LabeledData data) {
-        classifier.fit(data);
-    }
-
-    @Override
-    public double probability(LabeledData data, int row) {
-        return classifier.probability(data, row);
+    public Classifier fit(LabeledData data) {
+        return learner.fit(data);
     }
 
     /**
@@ -116,15 +113,15 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
      * @return upper bound on optimal utility
      */
-    private double optimalUtilityUpperBound(LabeledData data, int steps, int maxLabeledPoints){
+    private double optimalUtilityUpperBound(LabeledData data, BoundedClassifier classifier, int steps, int maxLabeledPoints){
         double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
 
         if (steps <= 1){
             return pStar;
         }
 
-        double positiveUpperBound = optimalUtilityUpperBound(data, steps - 1, maxLabeledPoints + 1);
-        double negativeUpperBound = optimalUtilityUpperBound(data,steps - 1, maxLabeledPoints);
+        double positiveUpperBound = optimalUtilityUpperBound(data, classifier, steps - 1, maxLabeledPoints + 1);
+        double negativeUpperBound = optimalUtilityUpperBound(data, classifier, steps - 1, maxLabeledPoints);
 
         return (positiveUpperBound + 1) * pStar + negativeUpperBound * (1 - pStar);
     }
@@ -137,7 +134,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     private UtilityResult utility(LabeledData data, int steps){
         // compute class probabilities
-        classifier.fit(data);
+        BoundedClassifier classifier = learner.fit(data);
         double[] probas = classifier.probability(data);
 
         // get unlabeled point of maximum probability
@@ -163,8 +160,8 @@ public class ActiveTreeSearch implements ActiveLearner {
         // warm starting: start at most probable point of being positive
         optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
 
-        double u0 = optimalUtilityUpperBound(data,steps-1, 0);
-        double u1 = optimalUtilityUpperBound(data,steps-1, 1);
+        double u0 = optimalUtilityUpperBound(data, classifier,steps-1, 0);
+        double u1 = optimalUtilityUpperBound(data, classifier,steps-1, 1);
 
         for (int row = 0; row < data.getNumRows(); row++) {
             // skip labeled points and those not meeting the threshold

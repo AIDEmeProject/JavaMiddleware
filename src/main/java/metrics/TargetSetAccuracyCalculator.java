@@ -1,5 +1,6 @@
 package metrics;
 
+import classifier.Classifier;
 import data.LabeledData;
 import learner.ActiveLearner;
 
@@ -32,7 +33,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledData data, ActiveLearner activeLearner) {
+    public MetricStorage compute(LabeledData data, Classifier classifier) {
         return compute(data.getLabeledRows(), data.getY());
     }
 }

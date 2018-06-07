@@ -1,5 +1,6 @@
 package metrics;
 
+import classifier.Classifier;
 import data.LabeledData;
 import learner.ActiveLearner;
 
@@ -12,12 +13,12 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
     /**
      * Compute a ConfusionMatrix from the labeled dataset and activeLearner objects.
      * @param data: dataset containing both features X and true labels y
-     * @param activeLearner: active activeLearner object
+     * @param classifier: classifier object
      * @return a confusion matrix
      */
     @Override
-    public MetricStorage compute(LabeledData data, ActiveLearner activeLearner) {
-        return compute(data.getY(), activeLearner.predict(data));
+    public MetricStorage compute(LabeledData data, Classifier classifier) {
+        return compute(data.getY(), classifier.predict(data));
     }
 
     /**

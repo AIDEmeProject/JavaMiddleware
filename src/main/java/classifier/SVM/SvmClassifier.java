@@ -15,16 +15,8 @@ import libsvm.*;
  *  @author luciano
  */
 public class SvmClassifier implements Classifier {
-    private SvmParameterAdapter parameter;
+    private boolean hasProbability;
     private svm_model model;
-    static {
-        // Disables svm output
-        svm.svm_set_print_string_function(s -> {});
-    }
-
-    public SvmClassifier(SvmParameterAdapter parameter) {
-        this.parameter = parameter;
-    }
 
     /**
      * Instantiate SVM classifier from its parameters.
@@ -38,23 +30,12 @@ public class SvmClassifier implements Classifier {
             kernel = kernel.gamma(1.0 / supportVectors[0].length);  // 1 / num_features
         }
         this.model = buildSvmModel(bias, alpha, kernel, supportVectors);
+        this.hasProbability = false;
     }
 
     SvmClassifier(svm_model model) {
         this.model = model;
-    }
-
-    @Override
-    public void fit(LabeledData data) {
-        svm_problem prob = buildSvmProblem(data);
-        svm_parameter param = parameter.build();
-
-        // use default gamma if needed
-        if(param.gamma <= 0){
-            param.gamma = 1.0 / prob.x[0].length;
-        }
-
-        model = svm.svm_train(prob, param);
+        this.hasProbability = svm.svm_check_probability_model(model) == 1;
     }
 
     @Override
@@ -63,7 +44,7 @@ public class SvmClassifier implements Classifier {
             throw new UnfitClassifierException();
         }
 
-        if (!parameter.probability()){
+        if (!hasProbability){
             throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
 
         }
@@ -100,7 +81,7 @@ public class SvmClassifier implements Classifier {
         svm_model model = new svm_model();
 
         model.nr_class = 2;
-        model.label = new int[] {1,0};  // do not change!
+        model.label = new int[] {1,0};
 
         model.l = supportVectors.length;
         model.nSV = new int[] {0, model.l};
@@ -112,22 +93,5 @@ public class SvmClassifier implements Classifier {
         model.param = new SvmParameterAdapter().kernel(kernel).build();
 
         return model;
-    }
-
-    private svm_problem buildSvmProblem(LabeledData data){
-        svm_problem prob = new svm_problem();
-
-        prob.l = data.getNumLabeledRows();
-        prob.x = new svm_node[prob.l][];
-        prob.y = new double[prob.l];
-
-        int i = 0;
-        for (Integer row : data.getLabeledRows()) {
-            prob.x[i] = SvmNodeConverter.toSvmNodeArray(data.getRow(row));
-            prob.y[i] = data.getLabel(row);
-            i++;
-        }
-
-        return prob;
     }
 }

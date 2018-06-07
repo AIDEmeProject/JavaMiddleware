@@ -1,8 +1,11 @@
 import classifier.Classifier;
+import classifier.Learner;
+import classifier.SVM.SvmLearner;
 import classifier.nearest_neighbors.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
+import classifier.nearest_neighbors.NearestNeighborsLearner;
 import explore.ExplorationMetrics;
 import explore.Explore;
 import metrics.ConfusionMatrixCalculator;
@@ -55,14 +58,14 @@ public class RunExperiment {
         // CLASSIFIER
         SvmParameterAdapter params = new SvmParameterAdapter();
         params = params.C(1000).kernel(new Kernel()).probability(false);
-        Classifier clf = new SvmClassifier(params);
+        Learner learner = new SvmLearner(params);
 
         // LEARNER
         ActiveLearner activeLearner;
-        //activeLearner = new RandomSampler(clf);
-        //activeLearner = new UncertaintySampler(clf);
-        activeLearner = new ActiveTreeSearch(new NearestNeighborsClassifier(X, 5, 0.1), 1);
-        //activeLearner = new SimpleMargin(new SvmClassifier(params));
+        //activeLearner = new RandomSampler(learner);
+        //activeLearner = new UncertaintySampler(learner);
+        activeLearner = new ActiveTreeSearch(new NearestNeighborsLearner(X, 5, 0.1), 1);
+        //activeLearner = new SimpleMargin(new SvmLearner(params));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -74,7 +77,7 @@ public class RunExperiment {
 
         // EXPLORE
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
-        ExplorationMetrics metrics = explore.averageRun(X, y, activeLearner, 5, new long[] {1,2,3,4,5});
+        ExplorationMetrics metrics = explore.averageRun(X, y, activeLearner, 1, new long[] {1,2,3,4,5});
 
         // METRICS
         System.out.println(metrics);

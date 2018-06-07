@@ -1,6 +1,9 @@
 package learner;
 
+import classifier.Classifier;
+import classifier.Learner;
 import classifier.SVM.SvmClassifier;
+import classifier.SVM.SvmLearner;
 import data.LabeledData;
 
 /**
@@ -17,24 +20,16 @@ import data.LabeledData;
  */
 public class SimpleMargin implements ActiveLearner {
     private SvmClassifier svm;
+    private SvmLearner learner;
 
-    public SimpleMargin(SvmClassifier svm) {
-        this.svm = svm;
+    public SimpleMargin(SvmLearner learner) {
+        this.learner = learner;
     }
 
     @Override
-    public void fit(LabeledData data) {
-        svm.fit(data);
-    }
-
-    @Override
-    public double probability(LabeledData data, int row) {
-        return svm.probability(data, row);
-    }
-
-    @Override
-    public int predict(LabeledData data, int row) {
-        return svm.predict(data, row);
+    public Classifier fit(LabeledData data) {
+        svm = learner.fit(data);
+        return svm;
     }
 
     /**
