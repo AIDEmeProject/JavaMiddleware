@@ -1,5 +1,9 @@
 package explore;
 
+import exceptions.IncompatibleMetricsException;
+import exceptions.MetricAlreadyExistsException;
+import exceptions.MetricNotFoundException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,12 +44,12 @@ public class Metrics {
     /**
      * @param name: name of the metric to be retrieved
      * @return value of the metric with specified name.
-     * @throws RuntimeException if there isn't a metric of given name.
+     * @throws MetricNotFoundException if there isn't a metric of given name.
      */
     public Double get(String name){
         Double value = metrics.get(name);
         if (value == null){
-            throw new RuntimeException("Object does not contain the requested metric: " + name);
+            throw new MetricNotFoundException(name);
         }
         return value;
     }
@@ -54,11 +58,11 @@ public class Metrics {
      * Adds a new metric to our mapping
      * @param name: name of the new metric
      * @param value: value of the new metric
-     * @throws RuntimeException if it already contains the given metric
+     * @throws MetricAlreadyExistsException if it already contains the given metric
      */
     public void add(String name, Double value){
         if (metrics.containsKey(name)){
-            throw new RuntimeException("Trying to include the same metric twice.");
+            throw new MetricAlreadyExistsException(name);
         }
         metrics.put(name, value);
     }
@@ -66,7 +70,7 @@ public class Metrics {
     /**
      * Adds all metrics in 'metric' to the current object.
      * @param metric: metrics to be appended to this object
-     * @throws RuntimeException if any of the metrics to be added is already contained in this object
+     * @throws MetricAlreadyExistsException if any of the metrics to be added is already contained in this object
      */
     public void addAll(Metrics metric){
         for (String key : metric.names()){
@@ -88,11 +92,11 @@ public class Metrics {
      * @param metrics1: left hand side of sum
      * @param metrics2: right hand side of sum
      * @return new object containing the sum of the corresponding metrics
-     * @throws RuntimeException if objects do not contain the same metric names
+     * @throws IncompatibleMetricsException if objects do not contain the same metric names
      */
     public static Metrics sum(Metrics metrics1, Metrics metrics2){
         if ( !metrics1.names().equals(metrics2.names()) ){
-            throw new IllegalArgumentException("Objects to not contain the same metrics.");
+            throw new IncompatibleMetricsException();
         }
 
         Metrics result = new Metrics();
@@ -106,7 +110,7 @@ public class Metrics {
      * Instance method for summing another Metric object to this one. Equivalent to sum(this, metric).
      * @param metric: metric to sum to this object
      * @return a new object containing the sum.
-     * @throws RuntimeException if objects do not contain the same metric names
+     * @throws IncompatibleMetricsException if objects do not contain the same metric names
      */
     public Metrics sum(Metrics metric){
         return sum(this, metric);

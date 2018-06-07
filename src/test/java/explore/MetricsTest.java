@@ -1,5 +1,8 @@
 package explore;
 
+import exceptions.IncompatibleMetricsException;
+import exceptions.MetricAlreadyExistsException;
+import exceptions.MetricNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +32,7 @@ class MetricsTest {
 
     @Test
     void get_metricNameNotInObject_throwsException() {
-        assertThrows(RuntimeException.class, () -> metrics.get("accuracy1"));
+        assertThrows(MetricNotFoundException.class, () -> metrics.get("accuracy1"));
     }
 
     @Test
@@ -39,7 +42,7 @@ class MetricsTest {
 
     @Test
     void add_addMetricAlreadyInObject_throwsException() {
-        assertThrows(RuntimeException.class, () -> metrics.add("accuracy", 0.5));
+        assertThrows(MetricAlreadyExistsException.class, () -> metrics.add("accuracy", 0.5));
     }
 
     @Test
@@ -63,7 +66,7 @@ class MetricsTest {
     void addAll_addMetricWithTheSameMetricNames_throwsException() {
         Metrics metrics1 = new Metrics();
         metrics1.add("accuracy", 0.5);
-        assertThrows(RuntimeException.class, () -> metrics.addAll(metrics1));
+        assertThrows(MetricAlreadyExistsException.class, () -> metrics.addAll(metrics1));
     }
 
     @Test
@@ -99,14 +102,14 @@ class MetricsTest {
 
     @Test
     void sum_oneEmptyMetric_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> metrics.sum(new Metrics()));
+        assertThrows(IncompatibleMetricsException.class, () -> metrics.sum(new Metrics()));
     }
 
     @Test
     void sum_twoNonEmptyMetricsOfDifferentMetricsNames_throwsException() {
         Metrics metrics1 = new Metrics();
         metrics1.add("accuracy1", 0.5);
-        assertThrows(IllegalArgumentException.class, () -> metrics.sum(metrics1));
+        assertThrows(IncompatibleMetricsException.class, () -> metrics.sum(metrics1));
     }
 
     @Test
