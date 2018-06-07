@@ -25,20 +25,31 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
     /**
      * Probability smoothing parameter
      */
-    private double gamma;
+    private final double gamma;
 
     /**
      * sumOfLabelsInLabeledNeighborhood[i] is the sum of all labels in the L-kNN neighborhood of X[i]
      */
-    private int[] sumOfLabelsInLabeledNeighborhood;
+    private final int[] sumOfLabelsInLabeledNeighborhood;
 
     /**
      * labeledNeighborhoodSize[i] is the size of the L-kNN neighborhood of X[i]
      */
-    private int[] labeledNeighborhoodSize;
+    private final int[] labeledNeighborhoodSize;
 
 
-    NearestNeighborsClassifier(int[] sumOfLabelsInLabeledNeighborhood, int[] labeledNeighborhoodSize, double gamma) {
+    public NearestNeighborsClassifier(int[] sumOfLabelsInLabeledNeighborhood, int[] labeledNeighborhoodSize, double gamma) {
+        if (sumOfLabelsInLabeledNeighborhood.length != labeledNeighborhoodSize.length){
+            throw new IllegalArgumentException("Arrays have incompatible sizes.");
+        }
+
+        if (sumOfLabelsInLabeledNeighborhood.length == 0){
+            throw new IllegalArgumentException("Received empty arrays as input.");
+        }
+
+        if (gamma < 0 || gamma > 1){
+            throw new IllegalArgumentException("gamma must be between 0 and 1.");
+        }
         this.sumOfLabelsInLabeledNeighborhood = sumOfLabelsInLabeledNeighborhood;
         this.labeledNeighborhoodSize = labeledNeighborhoodSize;
         this.gamma = gamma;

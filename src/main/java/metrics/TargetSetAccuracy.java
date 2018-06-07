@@ -12,12 +12,12 @@ public class TargetSetAccuracy implements MetricStorage {
     /**
      * Number of targets retrieved so far
      */
-    private int numberOfTargetsRetrieved;
+    private final int numberOfTargetsRetrieved;
 
     /**
      * Total number of targets in the dataset
      */
-    private int totalNumberOfTargets;
+    private final int totalNumberOfTargets;
 
     public TargetSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
         if (numberOfTargetsRetrieved < 0){

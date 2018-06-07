@@ -10,7 +10,7 @@ public class ExplorationMetrics {
     /**
      * List of metrics retrieved at each iteration of the exploration process
      */
-    private List<Metrics> metrics;
+    private final List<Metrics> metrics;
 
     /**
      * Initializes an empty list of metrics

@@ -14,8 +14,15 @@ import libsvm.*;
  *  @author luciano
  */
 public class SvmClassifier implements Classifier {
-    private boolean hasProbability;
-    private svm_model model;
+    /**
+     * Whether probabilistic SVM was computed
+     */
+    private final boolean hasProbability;
+
+    /**
+     * internal SVM model class from libsvm
+     */
+    private final svm_model model;
 
     /**
      * Instantiate SVM classifier from its parameters.
@@ -42,7 +49,6 @@ public class SvmClassifier implements Classifier {
             throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
 
         }
-
         double[] probas = new double[2];
         svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(point), probas);
         return probas[0];
@@ -64,7 +70,7 @@ public class SvmClassifier implements Classifier {
 
     /**
      * @param point: data point
-     * @return sample's signed distance to svm's decision boundary
+     * @return sample's signed distance of point to svm's decision boundary
      */
     public double margin(double[] point){
         double[] margin = new double[1];
@@ -75,7 +81,7 @@ public class SvmClassifier implements Classifier {
     /**
      * @param data: data point
      * @param row : row index
-     * @return sample's signed distance to svm's decision boundary
+     * @return sample's signed distance of data[row] to svm's decision boundary
      */
     public double margin(LabeledData data, int row){
         return margin(data.getRow(row));

@@ -25,17 +25,17 @@ public class Explore {
     /**
      * Number of iteration to run in the active learning exploration process.
      */
-    private int budget;
+    private final int budget;
 
     /**
      * Initial sampler. It randomly chooses an initial batch of positive and negative points to be labeled.
      */
-    private StratifiedSampler initialSampler;
+    private final StratifiedSampler initialSampler;
 
     /**
      * metric calculators
      */
-    private Collection<MetricCalculator> metricCalculators;
+    private final Collection<MetricCalculator> metricCalculators;
 
     /**
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
@@ -150,14 +150,14 @@ public class Explore {
 
     private Metrics runSingleIteration(LabeledData data, ActiveLearner activeLearner){
         Metrics metrics = new Metrics();
-        activeLearner = new TimedActiveLearner(activeLearner, metrics);  // Apply timing decorator
+        activeLearner = new TimedActiveLearner(activeLearner, metrics);  // TODO: remove TimingDecorator ?
 
         // find next points to label
         int[] rows = getNextPointToLabel(data, activeLearner);
 
         // update labeled set
         data.addLabeledRow(rows);
-        metrics.add("labeledRow", (double) rows[0]);
+        metrics.add("labeledRow", (double) rows[0]);  //TODO: how to store rows ?
 
         // retrain model
         Classifier classifier = activeLearner.fit(data);

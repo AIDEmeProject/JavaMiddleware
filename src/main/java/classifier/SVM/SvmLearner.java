@@ -1,8 +1,8 @@
 package classifier.SVM;
 
-import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledData;
+import exceptions.EmptyLabeledSetException;
 import libsvm.svm;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
@@ -15,9 +15,13 @@ import libsvm.svm_problem;
  */
 public class SvmLearner implements Learner {
 
-    private SvmParameterAdapter parameter;
+    /**
+     * SVM training parameters
+     */
+    private final SvmParameterAdapter parameter;
+
+    // Disables libsvm's training output
     static {
-        // Disables svm output
         svm.svm_set_print_string_function(s -> {});
     }
 
@@ -36,6 +40,10 @@ public class SvmLearner implements Learner {
      */
     @Override
     public SvmClassifier fit(LabeledData data) {
+        if (data.getNumLabeledRows() == 0){
+            throw new EmptyLabeledSetException();
+        }
+
         svm_problem prob = buildSvmProblem(data);
         svm_parameter param = parameter.build();
 

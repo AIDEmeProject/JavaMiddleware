@@ -1,8 +1,15 @@
 package sampling;
 
 public class StratifiedSampler {
-    private int positiveSamples;
-    private int negativeSamples;
+    /**
+     * number of positive samples to be sampled
+     */
+    private final int positiveSamples;
+
+    /**
+     * number of negative samples to be sampled
+     */
+    private final int negativeSamples;
 
     public StratifiedSampler(int positiveSamples, int negativeSamples) {
         if (positiveSamples < 0){

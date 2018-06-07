@@ -2,7 +2,6 @@ package metrics;
 
 import classifier.Classifier;
 import data.LabeledData;
-import learner.ActiveLearner;
 
 /**
  * This is an interface for all classes specialized in computing metrics from labeled data.

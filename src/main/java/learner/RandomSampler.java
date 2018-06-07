@@ -15,9 +15,9 @@ import sampling.ReservoirSampler;
 public class RandomSampler implements ActiveLearner {
 
     /**
-     * A classifier used for fitting and predicting labels
+     * Classifier training algorithm
      */
-    private Learner learner;
+    private final Learner learner;
 
     /**
      * @param learner: classifier used for training and prediction. RandomSampler has no default classification algorithm.

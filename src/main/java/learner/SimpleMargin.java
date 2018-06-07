@@ -1,7 +1,6 @@
 package learner;
 
 import classifier.Classifier;
-import classifier.Learner;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmLearner;
 import data.LabeledData;
@@ -19,8 +18,15 @@ import data.LabeledData;
  * @see <a href="http://www.jmlr.org/papers/volume2/tong01a/tong01a.pdf">Original paper</a>
  */
 public class SimpleMargin implements ActiveLearner {
-    private SvmClassifier svm;
-    private SvmLearner learner;
+    /**
+     * SVM training algorithm
+     */
+    private final SvmLearner learner;
+
+    /**
+     * SVM classifier
+     */
+    private SvmClassifier classifier;
 
     public SimpleMargin(SvmLearner learner) {
         this.learner = learner;
@@ -28,8 +34,8 @@ public class SimpleMargin implements ActiveLearner {
 
     @Override
     public Classifier fit(LabeledData data) {
-        svm = learner.fit(data);
-        return svm;
+        classifier = learner.fit(data);
+        return classifier;
     }
 
     /**
@@ -39,6 +45,6 @@ public class SimpleMargin implements ActiveLearner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(svm.margin(dt, row)));
+        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(classifier.margin(dt, row)));
     }
 }

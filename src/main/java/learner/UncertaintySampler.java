@@ -14,10 +14,14 @@ import data.LabeledData;
 public class UncertaintySampler implements ActiveLearner {
 
     /**
-     * classifier used for fitting and predicting labels
+     * Training algorithm
+     */
+    private final Learner learner;
+
+    /**
+     * internal classifier used for predicting probabilities
      */
     private Classifier classifier;
-    private Learner learner;
 
     public UncertaintySampler(Learner learner) {
         this.learner = learner;

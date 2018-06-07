@@ -22,17 +22,17 @@ public class LabeledData {
     /**
      * collection of data points
      */
-    private double[][] X;
+    private final double[][] X;
 
     /**
      * collection of labels
      */
-    private int[] y;
+    private final int[] y;
 
     /**
      * collection of labeled rows
      */
-    private LinkedHashSet<Integer> labeledRows;
+    private final LinkedHashSet<Integer> labeledRows;
 
     /**
      * @param X: features matrix

@@ -12,7 +12,7 @@ import java.util.function.Predicate;
  */
 public class ReservoirSampler {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     /**
      * Set the seed for the internal random generator. Used when one wants reproducibility.

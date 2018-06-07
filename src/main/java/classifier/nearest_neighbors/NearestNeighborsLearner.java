@@ -14,12 +14,12 @@ public class NearestNeighborsLearner implements BoundedLearner {
     /**
      * Probability smoothing parameter
      */
-    private double gamma;
+    private final double gamma;
 
     /**
      * indexes[i] contains the indexes of the k-Nearest neighbors of X[i]. No particular ordering can be assumed.
      */
-    private int[][] indexes;
+    private final int[][] indexes;
 
     /**
      * @param X: collection of all unlabeled data points. KD-tree will be built over this collection.
@@ -31,8 +31,12 @@ public class NearestNeighborsLearner implements BoundedLearner {
             throw new IllegalArgumentException("Number of neighbors must be positive.");
         }
 
-        this.indexes = computeNeighbors(X, k);
+        if (gamma < 0 || gamma > 1){
+            throw new IllegalArgumentException("gamma must be between 0 and 1.");
+        }
+
         this.gamma = gamma;
+        this.indexes = computeNeighbors(X, k);
     }
 
     private int[][] computeNeighbors(double[][] X, int k){
@@ -69,12 +73,8 @@ public class NearestNeighborsLearner implements BoundedLearner {
         int[] labeledNeighborhoodSize = new int[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {
-            // reset any previous values
-            sumOfLabelsInLabeledNeighborhood[i] = 0;
-            labeledNeighborhoodSize[i] = 0;
-
             for(int labeledIndex : data.getLabeledRows()){
-                // if labeledIndex is between the k-closest neighbors, increment counters
+                // if labeledIndex is one of the k-closest neighbors, increment counters
                 if(Arrays.binarySearch(indexes[i], labeledIndex) >= 0){
                     sumOfLabelsInLabeledNeighborhood[i] += data.getLabel(labeledIndex);
                     labeledNeighborhoodSize[i]++;

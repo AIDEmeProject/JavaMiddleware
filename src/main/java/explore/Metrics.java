@@ -18,7 +18,7 @@ public class Metrics {
     /**
      * Collection of metrics to be stored
      */
-    private Map<String, Double> metrics;
+    private final Map<String, Double> metrics;
 
     /**
      * Initialize an empty metric collection

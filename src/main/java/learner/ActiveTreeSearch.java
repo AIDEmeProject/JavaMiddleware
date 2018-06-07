@@ -32,21 +32,21 @@ import exceptions.EmptyUnlabeledSetException;
 public class ActiveTreeSearch implements ActiveLearner {
 
     /**
-     * classifier with positive class probability with future labeled data
+     * Classifier training algorithm
      */
-    private BoundedLearner learner;
+    private final BoundedLearner learner;
 
     /**
      * number of steps to look into the future
      */
-    private int lookahead;
+    private final int lookahead;
 
     /**
      * @param learner k-Nearest-Neighbors classifier
      * @param lookahead: number of steps to look into the future at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
-        if (lookahead < 1){
+        if (lookahead <= 0){
             throw new IllegalArgumentException("Lookahead must be a positive number.");
         }
         this.learner = learner;

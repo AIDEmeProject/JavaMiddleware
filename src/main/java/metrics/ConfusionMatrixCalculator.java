@@ -2,7 +2,6 @@ package metrics;
 
 import classifier.Classifier;
 import data.LabeledData;
-import learner.ActiveLearner;
 
 /**
  * This module is a factory for ConfusionMatrix objects.

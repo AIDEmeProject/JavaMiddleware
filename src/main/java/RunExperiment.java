@@ -67,7 +67,7 @@ public class RunExperiment {
         ActiveLearner activeLearner;
         //activeLearner = new RandomSampler(learner);
         //activeLearner = new UncertaintySampler(learner);
-        activeLearner = new ActiveTreeSearch(new NearestNeighborsLearner(X, 5, 0.1), 1);
+        activeLearner = new ActiveTreeSearch(new NearestNeighborsLearner(X, 5, 0.1), 2);
         //activeLearner = new SimpleMargin(new SvmLearner(params));
 
         // METRICS
