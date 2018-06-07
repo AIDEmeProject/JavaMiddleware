@@ -83,16 +83,14 @@ public class Explore {
         // set random seed
         setSeed(seed);
 
-        // TODO: maybe we should pass the labeledData instance directly as parameter ?
-        List<Map<String, Double>> metrics = new ArrayList<>();
-        LabeledData data = new LabeledData(X, y);
+        ExplorationMetrics metrics = new ExplorationMetrics();
+        LabeledData data = new LabeledData(X, y); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
             metrics.add(runSingleIteration(data, learner));
         }
 
-        // TODO: return labeledData object or labeled rows indexes only?
-        return new ExplorationMetrics(metrics);
+        return metrics;
     }
 
     /**
@@ -103,29 +101,6 @@ public class Explore {
      */
     public ExplorationMetrics run(double[][] X, int[] y, Learner learner){
         return run(X, y, learner, System.nanoTime());
-    }
-
-    /**
-     * Run the exploration process several times (with random seeds) and average resulting metrics.
-     * @param X: features matrix
-     * @param y: labels array
-     * @param learner: active learner object
-     * @param runs: number of runs to perform
-     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
-     * TODO: can we remove the duplication between this method and the below? (i.e. how to choose "random" seeds?)
-     */
-    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs){
-        if (runs <= 0){
-            throw new IllegalArgumentException("Runs must be positive.");
-        }
-
-        ExplorationMetrics metrics = run(X, y, learner);
-
-        for (int i = 1; i < runs; i++) {
-            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner));
-        }
-
-        return ExplorationMetrics.divideByNumber(metrics, runs);
     }
 
     /**
@@ -145,6 +120,29 @@ public class Explore {
 
         for (int i = 1; i < runs; i++) {
             metrics = ExplorationMetrics.sum(metrics, run(X, y, learner, seeds[i]));
+        }
+
+        return ExplorationMetrics.divideByNumber(metrics, runs);
+    }
+
+    /**
+     * Run the exploration process several times (with random seeds) and average resulting metrics.
+     * @param X: features matrix
+     * @param y: labels array
+     * @param learner: active learner object
+     * @param runs: number of runs to perform
+     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
+     * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
+     */
+    public ExplorationMetrics averageRun(double[][] X, int[] y, Learner learner, int runs){
+        if (runs <= 0){
+            throw new IllegalArgumentException("Runs must be positive.");
+        }
+
+        ExplorationMetrics metrics = run(X, y, learner);
+
+        for (int i = 1; i < runs; i++) {
+            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner));
         }
 
         return ExplorationMetrics.divideByNumber(metrics, runs);

@@ -9,12 +9,20 @@ import java.util.*;
 public class ExplorationMetrics {
     private List<Map<String, Double>> metrics;
 
-    public ExplorationMetrics(List<Map<String, Double>> metrics) {
+    public ExplorationMetrics(){
+        this.metrics = new ArrayList<>();
+    }
+
+    private ExplorationMetrics(List<Map<String, Double>> metrics) {
         this.metrics = metrics;
     }
 
     public List<Map<String, Double>> getMetrics() {
         return metrics;
+    }
+
+    public void add(Map<String, Double> map){
+        metrics.add(map);
     }
 
     public static ExplorationMetrics sum(ExplorationMetrics metrics1, ExplorationMetrics metrics2){
