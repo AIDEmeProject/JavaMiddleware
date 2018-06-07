@@ -119,10 +119,10 @@ public class Explore {
         ExplorationMetrics metrics = run(X, y, learner, seeds[0]);
 
         for (int i = 1; i < runs; i++) {
-            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner, seeds[i]));
+            metrics = metrics.sum(run(X, y, learner, seeds[i]));
         }
 
-        return ExplorationMetrics.divideByNumber(metrics, runs);
+        return metrics.divideByNumber(runs);
     }
 
     /**
@@ -142,14 +142,14 @@ public class Explore {
         ExplorationMetrics metrics = run(X, y, learner);
 
         for (int i = 1; i < runs; i++) {
-            metrics = ExplorationMetrics.sum(metrics, run(X, y, learner));
+            metrics = metrics.sum(run(X, y, learner));
         }
 
-        return ExplorationMetrics.divideByNumber(metrics, runs);
+        return metrics.divideByNumber(runs);
     }
 
-    private Map<String, Double> runSingleIteration(LabeledData data, Learner learner){
-        Map<String, Double> metrics = new HashMap<>();
+    private IterationMetrics runSingleIteration(LabeledData data, Learner learner){
+        IterationMetrics metrics = new IterationMetrics();
         learner = new TimedLearner(learner, metrics);  // Apply timing decorator
 
         // find next points to label
@@ -157,14 +157,14 @@ public class Explore {
 
         // update labeled set
         data.addLabeledRow(rows);
-        metrics.put("labeledRow", (double) rows[0]);
+        metrics.add("labeledRow", (double) rows[0]);
 
         // retrain model
         learner.fit(data);
 
         // compute accuracy metrics
         for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.putAll(metricCalculator.compute(data, learner).getMetrics());
+            metrics.addAll(metricCalculator.compute(data, learner).getMetrics());
         }
 
         return metrics;

@@ -5,6 +5,7 @@ import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
 import explore.ExplorationMetrics;
 import explore.Explore;
+import explore.IterationMetrics;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -77,8 +78,6 @@ public class RunExperiment {
         ExplorationMetrics metrics = explore.averageRun(X, y, learner, 5, new long[] {1,2,3,4,5});
 
         // METRICS
-        for (Map<String, Double> metric : metrics.getMetrics()){
-            System.out.println(metric);
-        }
+        System.out.println(metrics);
     }
 }

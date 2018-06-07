@@ -1,6 +1,7 @@
 package learner;
 
 import data.LabeledData;
+import explore.IterationMetrics;
 
 import java.util.Map;
 
@@ -11,9 +12,9 @@ import java.util.Map;
 public class TimedLearner implements Learner {
 
     private Learner learner;
-    private Map<String, Double> metrics;
+    private IterationMetrics metrics;
 
-    public TimedLearner(Learner learner, Map<String, Double> metrics) {
+    public TimedLearner(Learner learner, IterationMetrics metrics) {
         this.learner = learner;
         this.metrics = metrics;
     }
@@ -22,7 +23,7 @@ public class TimedLearner implements Learner {
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
         long initialInstant = System.nanoTime();
         int row = learner.retrieveMostInformativeUnlabeledPoint(data);
-        metrics.put("retrieveMostInformativeUnlabeledPointTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
+        metrics.add("retrieveMostInformativeUnlabeledPointTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
         return row;
     }
 
@@ -30,14 +31,14 @@ public class TimedLearner implements Learner {
     public void fit(LabeledData data) {
         long initialInstant = System.nanoTime();
         learner.fit(data);
-        metrics.put("fitTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
+        metrics.add("fitTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
     }
 
     @Override
     public int[] predict(LabeledData data) {
         long initialInstant = System.nanoTime();
         int[] prediction = learner.predict(data);
-        metrics.put("predictTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
+        metrics.add("predictTimeMillis", (System.nanoTime() - initialInstant) / 100000.0);
         return prediction;
     }
 
