@@ -3,7 +3,6 @@ package explore;
 import classifier.Classifier;
 import data.LabeledData;
 import active.ActiveLearner;
-import active.TimedActiveLearner;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -149,23 +148,29 @@ public class Explore {
     }
 
     private Metrics runSingleIteration(LabeledData data, ActiveLearner activeLearner){
+        long initialTime;
         Metrics metrics = new Metrics();
-        activeLearner = new TimedActiveLearner(activeLearner, metrics);  // TODO: remove TimingDecorator ?
 
         // find next points to label
+        initialTime = System.nanoTime();
         int[] rows = getNextPointToLabel(data, activeLearner);
+        metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         // update labeled set
         data.addLabeledRow(rows);
         metrics.add("labeledRow", (double) rows[0]);  //TODO: how to store rows ?
 
         // retrain model
+        initialTime = System.nanoTime();
         Classifier classifier = activeLearner.fit(data);
+        metrics.add("fitTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         // compute accuracy metrics
+        initialTime = System.nanoTime();
         for (MetricCalculator metricCalculator : metricCalculators){
             metrics.addAll(metricCalculator.compute(data, classifier).getMetrics());
         }
+        metrics.add("accuracyComputationTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         return metrics;
     }

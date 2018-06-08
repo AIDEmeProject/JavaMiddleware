@@ -43,18 +43,22 @@ public class ActiveTreeSearch implements ActiveLearner {
     private final int lookahead;
 
     /**
-     * Tree search pruner
+     * maximum utility upper bound calculator
      */
     private UpperBoundCalculator calculator;
 
     /**
      * @param learner k-Nearest-Neighbors classifier
-     * @param lookahead: number of steps to look into the future at every iteration. Usually 1 and 2 work fine.
+     * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
         this(learner, lookahead, new BoundedClassifierUpperBoundCalculator(learner));
     }
 
+    /**
+     * @param learner any classifier training algorithm
+     * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
+     */
     public ActiveTreeSearch(Learner learner, int lookahead) {
         this(learner, lookahead, new DummyUpperBoundCalculator());
     }
@@ -115,11 +119,9 @@ public class ActiveTreeSearch implements ActiveLearner {
 
         calculator.fit(data, steps);
 
-        int count = 0;
         for (int row = 0; row < data.getNumRows(); row++) {
             // skip labeled points and those not meeting the threshold
             if (data.isInLabeledSet(row) || calculator.upperBound(probas[row]) <= optimalUtility){
-                count++;
                 continue;
             }
 
@@ -131,7 +133,7 @@ public class ActiveTreeSearch implements ActiveLearner {
                 optimalRow = row;
             }
         }
-        System.out.println(count);
+
         return new UtilityResult(optimalRow, optimalUtility);
     }
 
