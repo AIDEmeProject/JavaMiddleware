@@ -1,7 +1,11 @@
+import active.activelearning.RandomSampler;
+import active.activelearning.UncertaintySampler;
+import classifier.BoundedLearner;
 import classifier.Learner;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmParameterAdapter;
+import classifier.nearest_neighbors.NearestNeighborsLearner;
 import explore.ExplorationMetrics;
 import explore.Explore;
 import active.activesearch.ActiveTreeSearch;
@@ -53,6 +57,8 @@ public class RunExperiment {
         int[] y = generateY(X);
 
         // CLASSIFIER
+
+        // svm
         SvmParameterAdapter params = new SvmParameterAdapter();
         params = params
                 .C(1000)
@@ -60,11 +66,14 @@ public class RunExperiment {
                 .probability(true);
         Learner learner = new SvmLearner(params);
 
+        // knn
+        BoundedLearner boundedLearner = new NearestNeighborsLearner(X, 5, 0.1);
+
         // LEARNER
         ActiveLearner activeLearner;
-        //activeLearner = new RandomSampler(active);
-        //activeLearner = new UncertaintySampler(active);
-        activeLearner = new ActiveTreeSearch(learner, 1);
+        //activeLearner = new RandomSampler(learner);
+        //activeLearner = new UncertaintySampler(learner);
+        activeLearner = new ActiveTreeSearch(boundedLearner, 2);
         //activeLearner = new SimpleMargin(new SvmLearner(params));
 
         // METRICS

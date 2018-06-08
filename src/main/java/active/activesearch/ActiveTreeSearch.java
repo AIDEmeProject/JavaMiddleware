@@ -115,9 +115,11 @@ public class ActiveTreeSearch implements ActiveLearner {
 
         calculator.fit(data, steps);
 
+        int count = 0;
         for (int row = 0; row < data.getNumRows(); row++) {
             // skip labeled points and those not meeting the threshold
             if (data.isInLabeledSet(row) || calculator.upperBound(probas[row]) <= optimalUtility){
+                count++;
                 continue;
             }
 
@@ -129,7 +131,7 @@ public class ActiveTreeSearch implements ActiveLearner {
                 optimalRow = row;
             }
         }
-
+        System.out.println(count);
         return new UtilityResult(optimalRow, optimalUtility);
     }
 
