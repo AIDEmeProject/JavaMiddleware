@@ -1,13 +1,14 @@
-package learner;
+package active.activelearning;
 
 import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
+import active.ActiveLearner;
 import sampling.ReservoirSampler;
 
 /**
- * The RandomSampler is the most used baseline learner. Basically, at every iteration it randomly samples one point from
+ * The RandomSampler is the most used baseline active. Basically, at every iteration it randomly samples one point from
  * the unlabeled set at random. It should only be used for comparison with new algorithms, never in any serious settings.
  *
  * @author luciano

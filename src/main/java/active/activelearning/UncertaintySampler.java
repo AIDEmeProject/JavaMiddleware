@@ -1,8 +1,9 @@
-package learner;
+package active.activelearning;
 
 import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledData;
+import active.ActiveLearner;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class

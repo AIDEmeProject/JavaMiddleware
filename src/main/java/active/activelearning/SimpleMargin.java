@@ -1,9 +1,10 @@
-package learner;
+package active.activelearning;
 
 import classifier.Classifier;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmLearner;
 import data.LabeledData;
+import active.ActiveLearner;
 
 /**
  * Simple Margin is a Active Learning technique introduced in [1]. It approximates a version space cutting technique

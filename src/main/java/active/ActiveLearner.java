@@ -1,4 +1,4 @@
-package learner;
+package active;
 
 import classifier.Learner;
 import data.LabeledData;

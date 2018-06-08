@@ -1,18 +1,15 @@
-import classifier.Classifier;
 import classifier.Learner;
 import classifier.SVM.SvmLearner;
-import classifier.nearest_neighbors.NearestNeighborsClassifier;
 import classifier.SVM.Kernel;
-import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmParameterAdapter;
-import classifier.nearest_neighbors.NearestNeighborsLearner;
 import explore.ExplorationMetrics;
 import explore.Explore;
+import active.activesearch.ActiveTreeSearch;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
 import sampling.StratifiedSampler;
-import learner.*;
+import active.*;
 
 import java.util.*;
 
@@ -60,14 +57,14 @@ public class RunExperiment {
         params = params
                 .C(1000)
                 .kernel(new Kernel())
-                .probability(false);
+                .probability(true);
         Learner learner = new SvmLearner(params);
 
         // LEARNER
         ActiveLearner activeLearner;
-        //activeLearner = new RandomSampler(learner);
-        //activeLearner = new UncertaintySampler(learner);
-        activeLearner = new ActiveTreeSearch((Learner) new NearestNeighborsLearner(X, 5, 0.1), 2);
+        //activeLearner = new RandomSampler(active);
+        //activeLearner = new UncertaintySampler(active);
+        activeLearner = new ActiveTreeSearch(learner, 1);
         //activeLearner = new SimpleMargin(new SvmLearner(params));
 
         // METRICS

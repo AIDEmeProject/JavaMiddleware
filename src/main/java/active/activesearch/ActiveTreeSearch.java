@@ -1,10 +1,11 @@
-package learner;
+package active.activesearch;
 
 import classifier.BoundedLearner;
 import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
+import active.ActiveLearner;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:

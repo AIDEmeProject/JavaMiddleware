@@ -2,8 +2,8 @@ package explore;
 
 import classifier.Classifier;
 import data.LabeledData;
-import learner.ActiveLearner;
-import learner.TimedActiveLearner;
+import active.ActiveLearner;
+import active.TimedActiveLearner;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;

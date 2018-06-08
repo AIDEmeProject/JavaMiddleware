@@ -1,4 +1,4 @@
-package learner;
+package active.activesearch;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
