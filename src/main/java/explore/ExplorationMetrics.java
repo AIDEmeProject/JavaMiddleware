@@ -19,6 +19,10 @@ public class ExplorationMetrics {
         this.metrics = new ArrayList<>();
     }
 
+    public Collection<String> getNames(){
+        return metrics.get(0).names();
+    }
+
     /**
      * @return return number of metrics in store
      */
