@@ -59,16 +59,66 @@ public class ActiveTreeSearch implements ActiveLearner {
     }
 
     /**
-     * Helper class used for storing the results of Utility computation: row number / index and utility value.
+     * Retrieves the unlabeled point which is expected to return the largest number of positive points in average, in
+     * the l-next future steps.
+     *
+     * @param data: labeled data object
+     * @return row index of most informative unlabeled point
      */
-    private class UtilityResult {
-        int index;
-        double utility;
+    @Override
+    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
 
-        UtilityResult(int index, double utility) {
-            this.index = index;
-            this.utility = utility;
+        int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
+
+        if (steps == 0){
+            throw new EmptyUnlabeledSetException();
         }
+
+        return utility(data, steps).index;
+    }
+
+    /**
+     * Core function computing the maximum l-steps utility. Refer to [1] and [2] for details.
+     * @param data: labeled data
+     * @param steps: number of steps to look into the future
+     * @return optimal utility index and value
+     */
+    private UtilityResult utility(LabeledData data, int steps){
+        // compute class probabilities
+        BoundedClassifier classifier = learner.fit(data);
+        double[] probas = classifier.probability(data);
+
+        // get unlabeled point of maximum probability
+        int optimalRow = data.retrieveMinimizerOverUnlabeledData((dt, row) -> -probas[row]);
+        double optimalUtility = probas[optimalRow];
+
+        // in 1-step case, just return point we are most certain of being positive (greedy approach)
+        if (steps <= 1){
+            return new UtilityResult(optimalRow, optimalUtility);
+        }
+
+        // warm starting: start at most probable point of being positive
+        optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
+
+        UpperBoundCalculator calculator = new UpperBoundCalculator();
+        calculator.fit(data, classifier, steps);
+
+        for (int row = 0; row < data.getNumRows(); row++) {
+            // skip labeled points and those not meeting the threshold
+            if (data.isInLabeledSet(row) || calculator.upperBound(probas[row]) <= optimalUtility){
+                continue;
+            }
+
+            // compute and update optimal utility
+            double util = optimalUtilityGivenPoint(data, steps, row, probas[row]);
+
+            if (util > optimalUtility){
+                optimalUtility = util;
+                optimalRow = row;
+            }
+        }
+
+        return new UtilityResult(optimalRow, optimalUtility);
     }
 
     /**
@@ -107,85 +157,16 @@ public class ActiveTreeSearch implements ActiveLearner {
     }
 
     /**
-     * Helper function for computing the upper bound on the utility. It is also a recursive function, but it only needs to
-     * be computed once, and not for every point in the unlabeled set. Refer to [2] for details.
-     * @param steps: remaining steps to run
-     * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
-     * @return upper bound on optimal utility
+     * Helper class used for storing the results of Utility computation: row number / index and utility value.
      */
-    private double optimalUtilityUpperBound(LabeledData data, BoundedClassifier classifier, int steps, int maxLabeledPoints){
-        double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
+    private class UtilityResult {
+        int index;
 
-        if (steps <= 1){
-            return pStar;
+        double utility;
+        UtilityResult(int index, double utility) {
+            this.index = index;
+            this.utility = utility;
         }
 
-        double positiveUpperBound = optimalUtilityUpperBound(data, classifier, steps - 1, maxLabeledPoints + 1);
-        double negativeUpperBound = optimalUtilityUpperBound(data, classifier, steps - 1, maxLabeledPoints);
-
-        return (positiveUpperBound + 1) * pStar + negativeUpperBound * (1 - pStar);
-    }
-
-    /**
-     * Core function computing the maximum l-steps utility. Refer to [1] and [2] for details.
-     * @param data: labeled data
-     * @param steps: number of steps to look into the future
-     * @return optimal utility index and value
-     */
-    private UtilityResult utility(LabeledData data, int steps){
-        // compute class probabilities
-        BoundedClassifier classifier = learner.fit(data);
-        double[] probas = classifier.probability(data);
-
-        // get unlabeled point of maximum probability
-        int optimalRow = data.retrieveMinimizerOverUnlabeledData((dt, row) -> -probas[row]);
-        double optimalUtility = probas[optimalRow];
-
-        // in 1-step case, just return point we are most certain of being positive (greedy approach)
-        if (steps <= 1){
-            return new UtilityResult(optimalRow, optimalUtility);
-        }
-
-        // warm starting: start at most probable point of being positive
-        optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
-
-        double u0 = optimalUtilityUpperBound(data, classifier,steps-1, 0);
-        double u1 = optimalUtilityUpperBound(data, classifier,steps-1, 1);
-
-        for (int row = 0; row < data.getNumRows(); row++) {
-            // skip labeled points and those not meeting the threshold
-            if (data.isInLabeledSet(row) || (u1 + 1) * probas[row] + u0 * (1 - probas[row]) <= optimalUtility){
-                continue;
-            }
-
-            // compute and update optimal utility
-            double util = optimalUtilityGivenPoint(data, steps, row, probas[row]);
-
-            if (util > optimalUtility){
-                optimalUtility = util;
-                optimalRow = row;
-            }
-        }
-
-        return new UtilityResult(optimalRow, optimalUtility);
-    }
-
-    /**
-     * Retrieves the unlabeled point which is expected to return the largest number of positive points in average, in
-     * the l-next future steps.
-     *
-     * @param data: labeled data object
-     * @return row index of most informative unlabeled point
-     */
-    @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-
-        int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
-
-        if (steps == 0){
-            throw new EmptyUnlabeledSetException();
-        }
-
-        return utility(data, steps).index;
     }
 }
