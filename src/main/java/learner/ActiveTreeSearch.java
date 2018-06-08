@@ -1,8 +1,8 @@
 package learner;
 
-import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
 import classifier.Classifier;
+import classifier.Learner;
 import data.LabeledData;
 import exceptions.EmptyUnlabeledSetException;
 
@@ -34,7 +34,7 @@ public class ActiveTreeSearch implements ActiveLearner {
     /**
      * Classifier training algorithm
      */
-    private final BoundedLearner learner;
+    private final Learner learner;
 
     /**
      * number of steps to look into the future
@@ -42,15 +42,29 @@ public class ActiveTreeSearch implements ActiveLearner {
     private final int lookahead;
 
     /**
+     * Tree search pruner
+     */
+    private UpperBoundCalculator calculator;
+
+    /**
      * @param learner k-Nearest-Neighbors classifier
      * @param lookahead: number of steps to look into the future at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
+        this(learner, lookahead, new BoundedClassifierUpperBoundCalculator(learner));
+    }
+
+    public ActiveTreeSearch(Learner learner, int lookahead) {
+        this(learner, lookahead, new DummyUpperBoundCalculator());
+    }
+
+    private ActiveTreeSearch(Learner learner, int lookahead, UpperBoundCalculator calculator) {
         if (lookahead <= 0){
             throw new IllegalArgumentException("Lookahead must be a positive number.");
         }
         this.learner = learner;
         this.lookahead = lookahead;
+        this.calculator = calculator;
     }
 
     @Override
@@ -67,7 +81,6 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     @Override
     public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-
         int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
 
         if (steps == 0){
@@ -85,8 +98,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     private UtilityResult utility(LabeledData data, int steps){
         // compute class probabilities
-        BoundedClassifier classifier = learner.fit(data);
-        double[] probas = classifier.probability(data);
+        double[] probas = learner.fit(data).probability(data);
 
         // get unlabeled point of maximum probability
         int optimalRow = data.retrieveMinimizerOverUnlabeledData((dt, row) -> -probas[row]);
@@ -100,8 +112,7 @@ public class ActiveTreeSearch implements ActiveLearner {
         // warm starting: start at most probable point of being positive
         optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
 
-        UpperBoundCalculator calculator = new UpperBoundCalculator();
-        calculator.fit(data, classifier, steps);
+        calculator.fit(data, steps);
 
         for (int row = 0; row < data.getNumRows(); row++) {
             // skip labeled points and those not meeting the threshold
@@ -167,6 +178,5 @@ public class ActiveTreeSearch implements ActiveLearner {
             this.index = index;
             this.utility = utility;
         }
-
     }
 }
