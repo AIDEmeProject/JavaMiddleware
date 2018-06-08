@@ -15,6 +15,8 @@ public interface ActiveLearner extends Learner{
      * @param data: labeled data object
      * @return index of the next unlabeled point to label
      * @throws exceptions.EmptyUnlabeledSetException if unlabeled set is empty
+     * TODO: change return type to int[] or collection of int?
+     * TODO: add subsampling for faster computation
      */
     int retrieveMostInformativeUnlabeledPoint(LabeledData data);
 }

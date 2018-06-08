@@ -4,6 +4,7 @@ import exceptions.IncompatibleMetricsException;
 import exceptions.MetricAlreadyExistsException;
 import exceptions.MetricNotFoundException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +86,10 @@ public class Metrics {
      */
     public Set<String> names(){
         return metrics.keySet();
+    }
+
+    public Collection<Double> values() {
+        return metrics.values();
     }
 
     /**

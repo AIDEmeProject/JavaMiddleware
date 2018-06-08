@@ -9,6 +9,7 @@ import classifier.nearest_neighbors.NearestNeighborsLearner;
 import explore.ExplorationMetrics;
 import explore.Explore;
 import active.activesearch.ActiveTreeSearch;
+import io.MetricWriter;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -57,7 +58,6 @@ public class RunExperiment {
         int[] y = generateY(X);
 
         // CLASSIFIER
-
         // svm
         SvmParameterAdapter params = new SvmParameterAdapter();
         params = params
@@ -90,5 +90,6 @@ public class RunExperiment {
 
         // METRICS
         System.out.println(metrics);
+        MetricWriter.write(metrics, "./test.csv");
     }
 }
