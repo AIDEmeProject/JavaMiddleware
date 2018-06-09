@@ -1,4 +1,5 @@
 import active.activelearning.RandomSampler;
+import active.activelearning.SimpleMargin;
 import active.activelearning.UncertaintySampler;
 import classifier.BoundedLearner;
 import classifier.Learner;
@@ -70,11 +71,12 @@ public class RunExperiment {
         BoundedLearner boundedLearner = new NearestNeighborsLearner(X, 5, 0.1);
 
         // LEARNER
-        ActiveLearner activeLearner;
-        //activeLearner = new RandomSampler(learner);
-        //activeLearner = new UncertaintySampler(learner);
-        activeLearner = new ActiveTreeSearch(boundedLearner, 2);
-        //activeLearner = new SimpleMargin(new SvmLearner(params));
+        Map<String, ActiveLearner> activeLearners = new HashMap<>();
+        activeLearners.put("Random Learner kNN", new RandomSampler(boundedLearner));
+        activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(boundedLearner));
+        activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(boundedLearner, 1));
+        activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(boundedLearner, 2));
+        //activeLearners.add(new SimpleMargin(new SvmLearner(params)));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -86,10 +88,10 @@ public class RunExperiment {
 
         // EXPLORE
         Explore explore = new Explore(initialSampler, 100, metricCalculators);
-        ExplorationMetrics metrics = explore.averageRun(X, y, activeLearner, 1, new long[] {1,2,3,4,5});
 
-        // METRICS
-        System.out.println(metrics);
-        MetricWriter.write(metrics, "./test.csv");
+        for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
+            ExplorationMetrics metrics = explore.averageRun(X, y, entry.getValue(), 10); //, new long[]{1, 2, 3, 4, 5,}
+            MetricWriter.write(metrics, "./" + entry.getKey() + ".csv");
+        }
     }
 }
