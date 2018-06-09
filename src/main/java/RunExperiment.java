@@ -91,7 +91,7 @@ public class RunExperiment {
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             ExplorationMetrics metrics = explore.averageRun(X, y, entry.getValue(), 10); //, new long[]{1, 2, 3, 4, 5,}
-            MetricWriter.write(metrics, "./" + entry.getKey() + ".csv");
+            MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
         }
     }
 }
