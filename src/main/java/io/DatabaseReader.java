@@ -6,14 +6,15 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * This module is responsible for reading data from a database. We make the following assumptions about the data being read:
+ * This module is responsible for reading data from a database using JDBC. We make the following assumptions about the
+ * data being read:
  *
  *      - The columns being read are numerical values
- *      - There is an ID column, containing an unique value per row, of type Long
+ *      - There is an ID column, which contains an unique value per row, of type Long
  */
 public class DatabaseReader {
     /**
-     * database connection string. Usually on the format: driver://URL:port/database
+     * database connection string. Usually on the format: driver://address:port/database
      */
     private final String connectionString;
 
@@ -23,10 +24,16 @@ public class DatabaseReader {
     private final String user;
 
     /**
-     * user password
+     * user's password
      */
     private final String password;
 
+    /**
+     * @param url: connection string header, on the format:  driver://address:port
+     * @param database: database to connect to
+     * @param user: database username
+     * @param password: user's database password
+     */
     public DatabaseReader(String url, String database, String user, String password) {
         this.connectionString = url + '/' + database;
         this.user = user;
@@ -84,6 +91,7 @@ public class DatabaseReader {
             }
 
         } catch (SQLException ex) {
+            // TODO: maybe it's better to bubble up this exception ?
             ex.printStackTrace();
             throw new RuntimeException("Couldn't read data from database.");
         }
