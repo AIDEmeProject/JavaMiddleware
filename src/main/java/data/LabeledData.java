@@ -214,41 +214,4 @@ public class LabeledData {
 
         return minRow;
     }
-
-    private class UnlabeledIterator<T> implements Iterator<T>{
-
-        private int pos;
-        private T[] array;
-
-        UnlabeledIterator(T[] array) {
-            this.array = array;
-            this.pos = 0;
-            movePosition();
-        }
-
-        private void movePosition(){
-            while (labeledRows.contains(pos) && pos < array.length){
-                pos++;
-            }
-        }
-
-        public boolean hasNext() {
-            return array.length > pos;
-        }
-
-        public T next() {
-            T value = array[pos];
-            movePosition();
-            return value;
-        }
-    }
-
-    public Iterator<double[]> iteratorUnlabeledX(){
-        return new UnlabeledIterator<>(X);
-    }
-
-    public UnlabeledIterator<Integer> iteratorUnlabeledY(){
-        Integer[] boxedY = Arrays.stream(y).boxed().toArray( Integer[]::new );
-        return new UnlabeledIterator<>(boxedY);
-    }
 }
