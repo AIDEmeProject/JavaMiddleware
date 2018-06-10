@@ -35,7 +35,7 @@ public class DatabaseReader {
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL)
         ) {
-            int size = rs.getMetaData().getColumnCount();
+            int size = rs.getMetaData().getColumnCount() - 1;
             double[] row = new double[size];
 
             // readTable all records
@@ -44,8 +44,8 @@ public class DatabaseReader {
                 keys.add(rs.getLong(1));
 
                 // store rows
-                for (int i = 1; i < size; i++) {
-                    row[i-1] = rs.getDouble(i+1);
+                for (int i = 0; i < size; i++) {
+                    row[i] = rs.getDouble(i+2);
                 }
 
                 X.add(row);

@@ -43,7 +43,40 @@ public class RunExperiment {
 //        double[][] X = generateX(250, 2, 1);
 //        int[] y = generateY(X);
 //
-//        // CLASSIFIER
+
+        IniConfigurationParser parser = new IniConfigurationParser("tasks");
+        Map<String, String> taskConfig = parser.read("sdss_Q1_0.1%");
+        String[] columns = taskConfig.get("columns").split(",");
+
+        parser = new IniConfigurationParser("datasets");
+        Map<String, String> datasetConfig = parser.read(taskConfig.get("dataset"));
+
+        parser = new IniConfigurationParser("connections");
+        Map<String, String> connectionConfig = parser.read(datasetConfig.get("connection"));
+
+        DatabaseReader reader = new DatabaseReader(
+                connectionConfig.get("url"),
+                datasetConfig.get("database"),
+                connectionConfig.get("user"),
+                connectionConfig.get("password"));
+
+        IndexedDataset data = reader.readTable(
+                datasetConfig.get("table"),
+                datasetConfig.get("key"),
+                columns);
+
+        Set<Long> positiveKeys = reader.readKeys(datasetConfig.get("table"), datasetConfig.get("key"), taskConfig.get("predicate"));
+
+        double[][] X = data.getData();
+
+        int[] y = new int[X.length];
+
+        int i = 0;
+        for (Long key : data.getIndexes()) {
+            y[i++] = positiveKeys.contains(key) ? 1 : 0;
+        }
+        
+        //        // CLASSIFIER
 //        // svm
 //        SvmParameterAdapter params = new SvmParameterAdapter();
 //        params = params
@@ -79,40 +112,6 @@ public class RunExperiment {
 //            MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
 //        }
 //
-        String dataset = "sdss_random_sample";
-        String predicate = "rowc > 662.5 AND rowc < 702.5 AND colc > 991.5 AND colc < 1053.5";
-        ArrayList<String> columns = new ArrayList<>();
-        columns.add("rowc");
-        columns.add("colc");
-
-        IniConfigurationParser parser = new IniConfigurationParser("datasets");
-        Map<String, String> datasetConfig = parser.read(dataset);
-        columns.add(datasetConfig.get("key"));
-
-        parser = new IniConfigurationParser("connections");
-        Map<String, String> connectionConfig = parser.read(datasetConfig.get("connection"));
-
-        DatabaseReader reader = new DatabaseReader(
-                connectionConfig.get("url"),
-                datasetConfig.get("database"),
-                connectionConfig.get("user"),
-                connectionConfig.get("password"));
-
-        IndexedDataset data = reader.readTable(
-                datasetConfig.get("table"),
-                datasetConfig.get("key"),
-                columns.toArray(new String[columns.size()]));
-
-        Set<Long> positiveKeys = reader.readKeys(datasetConfig.get("table"), datasetConfig.get("key"), predicate);
-
-        double[][] X = data.getData();
-
-        int[] y = new int[X.length];
-
-        int i = 0;
-        for (Long key : data.getIndexes()) {
-            y[i++] = positiveKeys.contains(key) ? 1 : 0;
-        }
 
     }
 }
