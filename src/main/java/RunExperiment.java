@@ -79,10 +79,14 @@ public class RunExperiment {
 //        }
 //
         String dataset = "sdss_random_sample";
-        String[] columns = new String[] {"rowc", "colc"};
+        String predicate = "rowc > 662.5 AND rowc < 702.5 AND colc > 991.5 AND colc < 1053.5";
+        ArrayList<String> columns = new ArrayList<>();
+        columns.add("rowc");
+        columns.add("colc");
 
         IniConfigurationParser parser = new IniConfigurationParser("datasets");
         Map<String, String> datasetConfig = parser.read(dataset);
+        columns.add(datasetConfig.get("key"));
 
         parser = new IniConfigurationParser("connections");
         Map<String, String> connectionConfig = parser.read(datasetConfig.get("connection"));
@@ -92,12 +96,19 @@ public class RunExperiment {
                 datasetConfig.get("database"),
                 connectionConfig.get("user"),
                 connectionConfig.get("password"));
-        double[][] X = reader.read(datasetConfig.get("table"), columns);
+
+        double[][] X = reader.read(datasetConfig.get("table"), columns.toArray(new String[columns.size()]));
+        Set<Long> positiveKeys = reader.readKeys(datasetConfig.get("table"), datasetConfig.get("key"), predicate);
+        int[] y = new int[X.length];
+        for (int i = 0; i < X.length; i++) {
+            y[i] = positiveKeys.contains((long) X[i][2]) ? 1 : 0;
+        }
 
         System.out.println(datasetConfig);
         System.out.println(connectionConfig);
         System.out.println(X.length);
         System.out.println(X[0].length);
+        System.out.println(positiveKeys.size());
         //System.out.println(Arrays.deepToString(X));
     }
 }
