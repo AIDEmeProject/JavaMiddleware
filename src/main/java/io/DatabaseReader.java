@@ -1,10 +1,9 @@
 package io;
 
+import data.IndexedDataset;
+
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class DatabaseReader {
     private final String connectionString;
@@ -17,13 +16,19 @@ public class DatabaseReader {
         this.password = password;
     }
 
-    public double[][] read(String table, String[] columns){
-        return read(table, columns, "");
+    public IndexedDataset readTable(String table, String key, String[] columns){
+        return readTable(table, key, columns, "");
     }
 
-    public double[][] read(String table, String[] columns, String predicate){
+    public Set<Long> readKeys(String table, String key, String predicate){
+        return readTable(table, key, new String[] {}, predicate).getIndexes();
+    }
+
+    private IndexedDataset readTable(String table, String key, String[] columns, String predicate){
+        LinkedHashSet<Long> keys = new LinkedHashSet<>();
         ArrayList<double[]> X = new ArrayList<>();
-        String SQL = buildSQLString(table, columns, predicate);
+
+        String SQL = buildSQLString(table, key, columns, predicate);
 
         try (
                 Connection conn = connect();
@@ -32,9 +37,15 @@ public class DatabaseReader {
         ) {
             int size = rs.getMetaData().getColumnCount();
             double[] row = new double[size];
+
+            // readTable all records
             while(rs.next()) {
-                for (int i = 0; i < size; i++) {
-                    row[i] = rs.getDouble(i + 1);
+                // store key
+                keys.add(rs.getLong(1));
+
+                // store rows
+                for (int i = 1; i < size; i++) {
+                    row[i-1] = rs.getDouble(i+1);
                 }
 
                 X.add(row);
@@ -45,44 +56,25 @@ public class DatabaseReader {
             throw new RuntimeException("Couldn't read data from database.");
         }
 
-        return X.toArray(new double[X.size()][]);
-    }
-
-    public Set<Long> readKeys(String table, String key, String predicate){
-        Set<Long> keys = new HashSet<>();
-        String SQL = buildSQLString(table, new String[] {key}, predicate);
-        
-        try (
-                Connection conn = connect();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(SQL)
-        ) {
-            while(rs.next()) {
-                keys.add(rs.getLong(1));
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Couldn't read key from database.");
-        }
-
-        return keys;
-
+        return new IndexedDataset(keys, X.toArray(new double[X.size()][]));
     }
 
     private Connection connect() throws SQLException {
         return DriverManager.getConnection("jdbc:" + connectionString, user, password);
     }
 
-    private String buildSQLString(String table, String[] columns, String predicate){
+    private String buildSQLString(String table, String key, String[] columns, String predicate){
         StringBuilder sqlBuilder = new StringBuilder();
 
-        sqlBuilder.append("SELECT DISTINCT ");
+        sqlBuilder.append("SELECT ");
 
-        // add selected columns
-        String cols = Arrays.toString(columns);
-        cols = cols.substring(1, cols.length()-1);  // remove brackets from string's start and end
-        sqlBuilder.append(cols);
+        // add columns
+        sqlBuilder.append(key);  // add key
+
+        for (String col : columns){
+            sqlBuilder.append(',');
+            sqlBuilder.append(col);
+        }
 
         // add FROM clause
         sqlBuilder.append(" FROM ");
