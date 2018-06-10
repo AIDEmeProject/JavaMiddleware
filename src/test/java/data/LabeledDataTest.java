@@ -177,4 +177,29 @@ class LabeledDataTest {
         data.addLabeledRow(0);
         assertEquals(1, data.retrieveMinimizerOverUnlabeledData((dt, i) -> (double) i));
     }
+
+    @Test
+    void sample_zeroSampleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> data.sample(0));
+    }
+
+    @Test
+    void sample_negativeSampleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> data.sample(-1));
+    }
+
+    @Test
+    void sample_sampleSizeEqualsToNumUnlabeledPoints_theOwnObjectIsReturned() {
+        assertTrue(data == data.sample(data.getNumUnlabeledRows()));
+    }
+
+    @Test
+    void sample_sampleSizeLargerThanNumUnlabeledPoints_theOwnObjectIsReturned() {
+        assertTrue(data == data.sample(data.getNumUnlabeledRows() + 1));
+    }
+
+    @Test
+    void sample_sampleSizeEqualsInfinity_theOwnObjectIsReturned() {
+        assertTrue(data == data.sample(Integer.MAX_VALUE));
+    }
 }

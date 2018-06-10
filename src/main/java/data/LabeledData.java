@@ -1,10 +1,11 @@
 package data;
 
 import exceptions.EmptyUnlabeledSetException;
+import sampling.ReservoirSampler;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * This module is responsible for storing the data points X, the "unknown" labels y, and the collection of labeled
@@ -40,6 +41,10 @@ public class LabeledData {
      * @throws IllegalArgumentException if either X.length or X[0].length is 0, or if X and y have different sizes
      */
     public LabeledData(double[][] X, int[] y) {
+        this(X, y, new LinkedHashSet<>());
+    }
+
+    private LabeledData(double[][] X, int[] y, LinkedHashSet<Integer> labeledRows) {
         if (X.length != y.length){
             throw new IllegalArgumentException("X and y must have the same number of elements.");
         }
@@ -56,7 +61,7 @@ public class LabeledData {
 
         this.X = X;
         this.y = y;
-        labeledRows = new LinkedHashSet<>();
+        this.labeledRows = labeledRows;
     }
 
     public double[][] getX() {
@@ -213,5 +218,45 @@ public class LabeledData {
         }
 
         return minRow;
+    }
+
+    /**
+     * Create a new LabeledData instance by subsampling the unlabeled set. If sample size is larger than number of unlabeled
+     * points remaining, this own object is returned.
+     * @param size: sample size
+     * @return new LabeledData object whose unlabeled set is restricted to a sample.
+     * @throws IllegalArgumentException is size not positive
+     */
+    public LabeledData sample(int size){
+        if (size <= 0){
+            throw new IllegalArgumentException("Size must be positive.");
+        }
+
+        if (size >= getNumUnlabeledRows()){
+            return this;
+        }
+
+        // sample indexes
+        int sampleSize = getNumLabeledRows() + size;
+        double[][] sampleX = new double[sampleSize][getDim()];
+        int[] sampleY = new int[sampleSize];
+        LinkedHashSet<Integer> rows = new LinkedHashSet<>();
+
+        int i = 0;
+        for (int row : labeledRows){
+            sampleX[i] = X[row];
+            sampleY[i] = y[row];
+            rows.add(i);
+            i++;
+        }
+
+        int[] indexes = ReservoirSampler.sample(getNumRows(), size, this::isInLabeledSet);
+        for (int row : indexes){
+            sampleX[i] = X[row];
+            sampleY[i] = y[row];
+            i++;
+        }
+
+        return new LabeledData(sampleX, sampleY, rows);
     }
 }

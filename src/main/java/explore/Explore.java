@@ -36,6 +36,8 @@ public class Explore {
      */
     private final Collection<MetricCalculator> metricCalculators;
 
+    private final int subsampleSize;
+
     /**
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
@@ -43,7 +45,7 @@ public class Explore {
      * @throws NullPointerException if initialSampler is null
      * @throws IllegalArgumentException if budget is not positive
      */
-    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
+    public Explore(StratifiedSampler initialSampler, int budget, int subsampleSize, Collection<MetricCalculator> metricCalculators) {
         if (initialSampler == null){
             throw new NullPointerException("Initial Sampler cannot be null.");
         }
@@ -55,6 +57,7 @@ public class Explore {
         this.initialSampler = initialSampler;
         this.budget = budget;
         this.metricCalculators = metricCalculators;
+        this.subsampleSize = subsampleSize;
     }
 
     /**
@@ -63,7 +66,11 @@ public class Explore {
      * @param budget: number of iterations in the active learning exploration process
      */
     public Explore(StratifiedSampler initialSampler, int budget) {
-        this(initialSampler, budget, new ArrayList<>());
+        this(initialSampler, budget, Integer.MAX_VALUE, new ArrayList<>());
+    }
+
+    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
+        this(initialSampler, budget, Integer.MAX_VALUE, metricCalculators);
     }
 
     private void setSeed(long seed){
@@ -182,6 +189,6 @@ public class Explore {
         }
 
         // retrieve most informative point according to model
-        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data)};
+        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.sample(subsampleSize))};
     }
 }

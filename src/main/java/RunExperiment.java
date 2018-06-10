@@ -87,7 +87,7 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        Explore explore = new Explore(initialSampler, 100, metricCalculators);
+        Explore explore = new Explore(initialSampler, 100, 10, metricCalculators);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             ExplorationMetrics metrics = explore.averageRun(X, y, entry.getValue(), 10); //, new long[]{1, 2, 3, 4, 5,}
