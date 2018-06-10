@@ -1,0 +1,6 @@
+[dataset_name]
+connection = postgres  # name of connection defined on connections.ini file
+database = sdss   # database name
+table = sdss_random_sample  # table to read
+
+

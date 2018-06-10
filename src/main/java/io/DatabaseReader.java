@@ -5,24 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DatabaseReader {
-    private final String url;
+    private final String connectionString;
     private final String user;
     private final String password;
 
-    public DatabaseReader(String url, String user, String password) {
-        this.url = url;
+    public DatabaseReader(String url, String database, String user, String password) {
+        this.connectionString = url + "/" + database;
         this.user = user;
         this.password = password;
-    }
-
-    private String buildSQLString(String table, String[] columns){
-        String cols = Arrays.toString(columns);
-
-        return "SELECT DISTINCT " + cols.substring(1, cols.length()-1) + " FROM " + table + ';';
-    }
-
-    private Connection connect() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
     }
 
     public double[][] read(String table, String[] columns){
@@ -50,5 +40,15 @@ public class DatabaseReader {
         }
 
         return X.toArray(new double[X.size()][]);
+    }
+
+    private Connection connect() throws SQLException {
+        return DriverManager.getConnection("jdbc:" + connectionString, user, password);
+    }
+
+    private String buildSQLString(String table, String[] columns){
+        String cols = Arrays.toString(columns);
+        cols = cols.substring(1, cols.length()-1);  // remove brackets from string's start and end
+        return "SELECT DISTINCT " + cols + " FROM " + table + ';';
     }
 }

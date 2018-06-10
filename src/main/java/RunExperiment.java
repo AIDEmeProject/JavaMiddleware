@@ -1,4 +1,5 @@
 import io.DatabaseReader;
+import io.IniConfigurationParser;
 
 import java.util.*;
 
@@ -76,8 +77,25 @@ public class RunExperiment {
 //            ExplorationMetrics metrics = explore.averageRun(X, y, entry.getValue(), 10); //, new long[]{1, 2, 3, 4, 5,}
 //            MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
 //        }
-        DatabaseReader rd = new DatabaseReader("jdbc:postgresql://localhost:5432/sdss", "luciano", "");
-        double[][] X = rd.read("sdss_random_sample", new String[]{"rowc", "colc"});
+//
+        String dataset = "sdss_random_sample";
+        String[] columns = new String[] {"rowc", "colc"};
+
+        IniConfigurationParser parser = new IniConfigurationParser("datasets");
+        Map<String, String> datasetConfig = parser.read(dataset);
+
+        parser = new IniConfigurationParser("connections");
+        Map<String, String> connectionConfig = parser.read(datasetConfig.get("connection"));
+
+        DatabaseReader reader = new DatabaseReader(
+                connectionConfig.get("url"),
+                datasetConfig.get("database"),
+                connectionConfig.get("user"),
+                connectionConfig.get("password"));
+        double[][] X = reader.read(datasetConfig.get("table"), columns);
+
+        System.out.println(datasetConfig);
+        System.out.println(connectionConfig);
         System.out.println(X.length);
         System.out.println(X[0].length);
         //System.out.println(Arrays.deepToString(X));

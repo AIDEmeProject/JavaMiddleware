@@ -1,0 +1,4 @@
+[postgres]
+url = postgresql://localhost:5432  # database connection string: driver://host:port
+user = postgres   # your username (avoid using postgres user!)
+password = postgres  # your password
