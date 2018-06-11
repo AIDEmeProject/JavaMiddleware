@@ -86,7 +86,7 @@ public class TaskReader {
             IniConfigurationParser parser = new IniConfigurationParser("datasets");
             Map<String, String> config = parser.read(dataset);
             this.connection = config.get("connection");
-            this.database = config.get("table");
+            this.database = config.get("database");
             this.table = config.get("table");
             this.key = config.get("key");
         }

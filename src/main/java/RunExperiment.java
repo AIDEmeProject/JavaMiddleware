@@ -17,6 +17,7 @@ import io.TaskReader;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
+import preprocessing.StandardScaler;
 import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
@@ -71,6 +72,11 @@ public class RunExperiment {
 
         double[][] X = data.getData();
         User user = new DummyUser(data.getIndexes(), positiveKeys);
+
+        // SCALING
+        StandardScaler scaler = new StandardScaler();
+        scaler.fit(X);
+        X = scaler.transform(X);
 
         // CLASSIFIER
         // svm
