@@ -6,7 +6,6 @@ import active.ActiveLearner;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
-import user.DummyUser;
 import user.User;
 
 import java.util.*;
@@ -187,7 +186,7 @@ public class Explore {
     private int[] getNextPointToLabel(LabeledData data, User user, ActiveLearner activeLearner){
         // initial sampling
         if (data.getNumLabeledRows() == 0){
-            return initialSampler.sample(user.getY());
+            return initialSampler.sample(user.getAllLabels(data));
         }
 
         // retrieve most informative point according to model

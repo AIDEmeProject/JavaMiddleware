@@ -18,7 +18,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      */
     @Override
     public MetricStorage compute(LabeledData data, User user, Classifier classifier) {
-        return compute(user.getY(), classifier.predict(data));
+        return compute(user.getAllLabels(data), classifier.predict(data));
     }
 
     /**
