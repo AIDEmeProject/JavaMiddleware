@@ -1,5 +1,6 @@
 import active.ActiveLearner;
 import active.activelearning.RandomSampler;
+import active.activelearning.SimpleMargin;
 import active.activelearning.UncertaintySampler;
 import active.activesearch.ActiveTreeSearch;
 import classifier.BoundedLearner;
@@ -11,9 +12,8 @@ import classifier.nearest_neighbors.NearestNeighborsLearner;
 import data.IndexedDataset;
 import explore.ExplorationMetrics;
 import explore.Explore;
-import io.DatabaseReader;
-import io.IniConfigurationParser;
 import io.MetricWriter;
+import io.TaskReader;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -39,10 +39,6 @@ public class RunExperiment {
         return X;
     }
 
-    private static double norm(double a, double b){
-        return Math.sqrt(a*a + b*b);
-    }
-
     private static int[] generateY(double[][] X){
         int[] y = new int[X.length];
 
@@ -57,47 +53,26 @@ public class RunExperiment {
         return y;
     }
 
+    private static double norm(double a, double b){
+        return Math.sqrt(a*a + b*b);
+    }
+
     public static void main(String[] args){
-//        // DATA
+        // DATA and USER
+        // simple example
 //        double[][] X = generateX(250, 2, 1);
 //        int[] y = generateY(X);
+//        User user = new DummyUser(y);
 
-
-        IniConfigurationParser parser = new IniConfigurationParser("tasks");
-        Map<String, String> taskConfig = parser.read("sdss_Q1_0.1%");
-        String[] columns = taskConfig.get("columns").split(",");
-
-        parser = new IniConfigurationParser("datasets");
-        Map<String, String> datasetConfig = parser.read(taskConfig.get("dataset"));
-
-        parser = new IniConfigurationParser("connections");
-        Map<String, String> connectionConfig = parser.read(datasetConfig.get("connection"));
-
-        DatabaseReader reader = new DatabaseReader(
-                connectionConfig.get("url"),
-                datasetConfig.get("database"),
-                connectionConfig.get("user"),
-                connectionConfig.get("password"));
-
-        IndexedDataset data = reader.readTable(
-                datasetConfig.get("table"),
-                datasetConfig.get("key"),
-                columns);
-
-        Set<Long> positiveKeys = reader.readKeys(datasetConfig.get("table"), datasetConfig.get("key"), taskConfig.get("predicate"));
+        // sdss
+        TaskReader reader = new TaskReader("sdss_Q1_0.1%");
+        IndexedDataset data = reader.readData();
+        Set<Long> positiveKeys = reader.readTargetSetKeys();
 
         double[][] X = data.getData();
+        User user = new DummyUser(data.getIndexes(), positiveKeys);
 
-        int[] y = new int[X.length];
-
-        int i = 0;
-        for (Long key : data.getIndexes()) {
-            y[i++] = positiveKeys.contains(key) ? 1 : 0;
-        }
-
-        User user = new DummyUser(y);
-
-                // CLASSIFIER
+        // CLASSIFIER
         // svm
         SvmParameterAdapter params = new SvmParameterAdapter();
         params = params
@@ -109,13 +84,13 @@ public class RunExperiment {
         // knn
         BoundedLearner boundedLearner = new NearestNeighborsLearner(X, 10, 0.1);
 
-        // LEARNER
+        // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
         activeLearners.put("Random Learner kNN", new RandomSampler(boundedLearner));
         activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(boundedLearner));
         activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(boundedLearner, 1));
         //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(boundedLearner, 2));
-        //activeLearners.add(new SimpleMargin(new SvmLearner(params)));
+        //activeLearners.put("Simple Margin C=1000", new SimpleMargin(learner));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -133,7 +108,5 @@ public class RunExperiment {
             ExplorationMetrics metrics = explore.averageRun(X, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
             MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
         }
-
-
     }
 }

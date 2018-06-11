@@ -4,6 +4,11 @@ import data.LabeledData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DummyUserTest {
@@ -29,6 +34,16 @@ class DummyUserTest {
     }
 
     @Test
+    void constructor_allZerosLabels_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {0,0,0,0}));
+    }
+
+    @Test
+    void constructor_allOnesLabels_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {1,1,1,1}));
+    }
+
+    @Test
     void getLabel_rowIndexOutOfBounds_throwsException() {
         assertThrows(IndexOutOfBoundsException.class, () -> user.getLabel(data, -1));
         assertThrows(IndexOutOfBoundsException.class, () -> user.getLabel(data, labels.length));
@@ -43,6 +58,22 @@ class DummyUserTest {
 
     @Test
     void getAllLabels_callGetAllLabels_returnsLabelsArray() {
+        assertArrayEquals(labels, user.getAllLabels(data));
+    }
+
+    @Test
+    void getAllLabels_usingIndexesConstructor_returnsCorrectLabels() {
+        Collection<Long> indexes = new ArrayList<>();
+        indexes.add((long) 0);
+        indexes.add((long) 1);
+        indexes.add((long) 2);
+        indexes.add((long) 3);
+
+        Set<Long> positiveSetIndexes = new HashSet<>();
+        positiveSetIndexes.add((long) 1);
+        positiveSetIndexes.add((long) 2);
+        
+        user = new DummyUser(indexes, positiveSetIndexes);
         assertArrayEquals(labels, user.getAllLabels(data));
     }
 }
