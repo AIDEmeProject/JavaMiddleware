@@ -1,6 +1,8 @@
 import data.IndexedDataset;
 import io.DatabaseReader;
 import io.IniConfigurationParser;
+import user.DummyUser;
+import user.User;
 
 import java.util.*;
 
@@ -75,6 +77,8 @@ public class RunExperiment {
         for (Long key : data.getIndexes()) {
             y[i++] = positiveKeys.contains(key) ? 1 : 0;
         }
+
+        User user = new DummyUser(y);
 
         //        // CLASSIFIER
 //        // svm
