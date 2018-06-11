@@ -2,6 +2,7 @@ package metrics;
 
 import classifier.Classifier;
 import data.LabeledData;
+import user.User;
 
 /**
  * This module is a factory for ConfusionMatrix objects.
@@ -16,8 +17,8 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * @return a confusion matrix
      */
     @Override
-    public MetricStorage compute(LabeledData data, Classifier classifier) {
-        return compute(data.getY(), classifier.predict(data));
+    public MetricStorage compute(LabeledData data, User user, Classifier classifier) {
+        return compute(user.getY(), classifier.predict(data));
     }
 
     /**

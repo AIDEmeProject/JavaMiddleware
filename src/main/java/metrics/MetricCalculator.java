@@ -2,6 +2,7 @@ package metrics;
 
 import classifier.Classifier;
 import data.LabeledData;
+import user.User;
 
 /**
  * This is an interface for all classes specialized in computing metrics from labeled data.
@@ -13,5 +14,5 @@ public interface MetricCalculator {
      * @param classifier: classifier
      * @return computed metric
      */
-    MetricStorage compute(LabeledData data, Classifier classifier);
+    MetricStorage compute(LabeledData data, User user, Classifier classifier);
 }

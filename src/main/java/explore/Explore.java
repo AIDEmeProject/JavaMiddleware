@@ -92,7 +92,7 @@ public class Explore {
         setSeed(seed);
 
         ExplorationMetrics metrics = new ExplorationMetrics();
-        LabeledData data = new LabeledData(X, user.getY()); // TODO: maybe we should pass the labeledData instance directly as parameter ?
+        LabeledData data = new LabeledData(X); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
             metrics.add(runSingleIteration(data, user, activeLearner));
@@ -166,7 +166,7 @@ public class Explore {
         metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         // update labeled set
-        data.addLabeledRow(rows);
+        data.addLabeledRow(rows, user.getLabel(data, rows));
         metrics.add("labeledRow", (double) rows[0]);  //TODO: how to store rows ?
 
         // retrain model
@@ -177,7 +177,7 @@ public class Explore {
         // compute accuracy metrics
         initialTime = System.nanoTime();
         for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.addAll(metricCalculator.compute(data, classifier).getMetrics());
+            metrics.addAll(metricCalculator.compute(data, user, classifier).getMetrics());
         }
         metrics.add("accuracyComputationTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 

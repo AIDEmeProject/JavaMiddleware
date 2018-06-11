@@ -151,14 +151,8 @@ public class ActiveTreeSearch implements ActiveLearner {
             return proba;
         }
 
-        // store label
-        int label = data.getLabel(rowNumber);
-
-        // add rowNumber to labeled set
-        data.addLabeledRow(rowNumber);
-
         // positive label branch
-        data.setLabel(rowNumber, 1);
+        data.addLabeledRow(rowNumber, 1);
         double positiveUtility = utility(data, steps-1).utility;
 
         // negative label branch
@@ -166,7 +160,6 @@ public class ActiveTreeSearch implements ActiveLearner {
         double negativeUtility = utility(data, steps-1).utility;
 
         // restore previous state
-        data.setLabel(rowNumber, label);
         data.removeLabeledRow(rowNumber);
 
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);

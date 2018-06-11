@@ -2,6 +2,7 @@ package metrics;
 
 import classifier.Classifier;
 import data.LabeledData;
+import user.User;
 
 import java.util.Collection;
 
@@ -32,7 +33,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledData data, Classifier classifier) {
-        return compute(data.getLabeledRows(), data.getY());
+    public MetricStorage compute(LabeledData data, User user, Classifier classifier) {
+        return compute(data.getLabeledRows(), user.getY());
     }
 }

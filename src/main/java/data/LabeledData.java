@@ -4,17 +4,18 @@ import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
- * This module is responsible for storing the data points X, the "unknown" labels y, and the collection of labeled
- * rows. It also controls data access, updating labels, and adding / removing labeled rows.
+ * This module is responsible for storing the data points X, and the collection of labeled rows so far. It also provides
+ * methods for accessing data, updating labels, and adding / removing labeled rows.
  *
  * Some observations on the behavior of adding / removing labeled rows:
  *
- *  1) If the same labeled row is added twice, the second insertion will be ignored.
- *  2) If attempting to remove a labeled row which was not actually labeled, nothing happens.
+ *  1) If the same labeled row is added twice, an exception will be thrown.
+ *  3) If attempting to remove a labeled row which was not actually labeled, an exception is also thrown.
  *
  * @author luciano
  */
@@ -26,29 +27,19 @@ public class LabeledData {
     private final double[][] X;
 
     /**
-     * collection of labels
-     */
-    private final int[] y;
-
-    /**
      * collection of labeled rows
      */
-    private final LinkedHashSet<Integer> labeledRows;
+    private final LinkedHashMap<Integer, Integer> labeledRows;
 
     /**
      * @param X: features matrix
-     * @param y: labels array
-     * @throws IllegalArgumentException if either X.length or X[0].length is 0, or if X and y have different sizes
+     * @throws IllegalArgumentException if either X.length or X[0].length is 0
      */
-    public LabeledData(double[][] X, int[] y) {
-        this(X, y, new LinkedHashSet<>());
+    public LabeledData(double[][] X) {
+        this(X, new LinkedHashMap<>());
     }
 
-    private LabeledData(double[][] X, int[] y, LinkedHashSet<Integer> labeledRows) {
-        if (X.length != y.length){
-            throw new IllegalArgumentException("X and y must have the same number of elements.");
-        }
-
+    private LabeledData(double[][] X, LinkedHashMap<Integer, Integer> labeledRows) {
         if (X.length == 0){
             throw new IllegalArgumentException("Data must contain at least one data point.");
         }
@@ -57,32 +48,26 @@ public class LabeledData {
             throw new IllegalArgumentException("Data points have no dimension.");
         }
 
-        validateLabels(y);
-
         this.X = X;
-        this.y = y;
         this.labeledRows = labeledRows;
-    }
-
-    public double[][] getX() {
-        return X;
-    }
-
-    public int[] getY() {
-        return y;
-    }
-
-    private static void validateLabels(int[] y){
-        for (int label : y) {
-            if (label < 0 || label > 1) {
-                throw new IllegalArgumentException("Labels must be either 0 or 1.");
-            }
-        }
     }
 
     private void validateRowIndex(int row){
         if (row < 0 || row >= getNumRows()){
             throw new IndexOutOfBoundsException("Row index " + row + " out of bounds.");
+        }
+    }
+
+    private void validateLabeledRowIndex(int row){
+        validateRowIndex(row);
+        if (!labeledRows.containsKey(row)){
+            throw new IllegalArgumentException("Row number " + row + " is not in labeled set.");
+        }
+    }
+
+    private void validateLabel(int label){
+        if (label < 0 || label > 1){
+            throw new IllegalArgumentException("Only 0 or 1 labels supported.");
         }
     }
 
@@ -97,34 +82,35 @@ public class LabeledData {
     }
 
     /**
-     * Retrieve the selected label from y.
-     * @param row: row to retrieve
-     * @return label at specified index
+     * Retrieve the label of a given labeled row
+     * @param row: labeled row of interest
+     * @return label of specified row
      * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     * @throws IllegalArgumentException if row is not in labeled set
      */
     public int getLabel(int row){
-        return y[row];
+        validateLabeledRowIndex(row);
+        return labeledRows.get(row);
     }
 
     /**
-     * Sets a new label to the given position
-     * @param row: row to retrieve
-     * @param label: label to set
+     * Sets a new label for a given labeled row
+     * @param row: labeled row of interest
+     * @param label: new label to set
      * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
-     * @throws IllegalArgumentException if label is not 0 or 1
+     * @throws IllegalArgumentException if row not in labeled set, or if label is not 0 or 1
      */
     public void setLabel(int row, int label){
-        if (label < 0 || label > 1){
-            throw new IllegalArgumentException("Only 0 or 1 labels supported.");
-        }
-        y[row] = label;
+        validateLabeledRowIndex(row);
+        validateLabel(label);
+        labeledRows.put(row, label);
     }
 
     /**
-     * Returns the collection of labeled rows so far
+     * @return The collection of labeled rows so far
      */
     public Collection<Integer> getLabeledRows() {
-        return labeledRows;
+        return labeledRows.keySet();
     }
 
     /**
@@ -158,37 +144,55 @@ public class LabeledData {
     /**
      * @param row: index to check
      * @return whether row is in labeled set or not
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
      */
     public boolean isInLabeledSet(int row){
         validateRowIndex(row);
-        return labeledRows.contains(row);
+        return labeledRows.containsKey(row);
     }
 
     /**
      * Add new index to labeled rows collection. If element is already in set, nothing happens (as if value was discarded).
      * @param row: index of labeled point to add
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     * @throws IllegalArgumentException row is already in labeled set, or label is different from 0 or 1
      */
-    public void addLabeledRow(int row){
+    public void addLabeledRow(int row, int label){
         validateRowIndex(row);
-        labeledRows.add(row);
+        validateLabel(label);
+
+        if (labeledRows.containsKey(row)){
+            throw new IllegalArgumentException("Key already in labeled set.");
+        }
+
+        labeledRows.put(row, label);
     }
 
     /**
      * Add all rows in array to labeled rows. If any element is already in set, nothing happens (as if value was discarded).
-     * @param rows: collection of indexes to add
+     * @param rows: collection of row numbers to add
+     * @param labels: collection of the respective labels for each row number
+     * @throws IndexOutOfBoundsException if any row satisfies row &lt; 0 or row &gt; len(X) - 1
+     * @throws IllegalArgumentException if arrays have incompatible sizes, a row is already in labeled set, or if any labels if different from 0 or 1
      */
-    public void addLabeledRow(int[] rows){
-        for (int row : rows) {
-            addLabeledRow(row);
+    public void addLabeledRow(int[] rows, int[] labels){
+        if (rows.length != labels.length){
+            throw new IllegalArgumentException("rows and labels have incompatible sizes.");
+        }
+
+        for (int i = 0; i < rows.length; i++) {
+            addLabeledRow(rows[i], labels[i]);
         }
     }
 
     /**
-     * Removes an index from the labeled row collection. If not in set, nothing happens.
+     * Removes a (row, label) pair from the labeled row collection.
      * @param row: index of labeled point to remove.
+     * @throws IndexOutOfBoundsException if row &lt; 0 or row &gt; len(X) - 1
+     * @throws IllegalArgumentException if row to remove is not in labeled set
      */
     public void removeLabeledRow(int row){
-        validateRowIndex(row);
+        validateLabeledRowIndex(row);
         labeledRows.remove(row);
     }
 
@@ -204,7 +208,6 @@ public class LabeledData {
         double minScore = Double.POSITIVE_INFINITY;
         int minRow = -1;
 
-        // TODO: maybe its better to create a single iterator over unlabeled points (index, x[index], y[index]) ?
         for(int i=0; i < getNumRows(); i++){
             if(isInLabeledSet(i)){
                 continue;
@@ -239,24 +242,21 @@ public class LabeledData {
         // sample indexes
         int sampleSize = getNumLabeledRows() + size;
         double[][] sampleX = new double[sampleSize][getDim()];
-        int[] sampleY = new int[sampleSize];
-        LinkedHashSet<Integer> rows = new LinkedHashSet<>();
+        LinkedHashMap<Integer, Integer> rows = new LinkedHashMap<>();
 
         int i = 0;
-        for (int row : labeledRows){
-            sampleX[i] = X[row];
-            sampleY[i] = y[row];
-            rows.add(i);
+        for (Map.Entry<Integer, Integer> entry : labeledRows.entrySet()){
+            sampleX[i] = X[entry.getKey()];
+            rows.put(i, entry.getValue());
             i++;
         }
 
         int[] indexes = ReservoirSampler.sample(getNumRows(), size, this::isInLabeledSet);
         for (int row : indexes){
             sampleX[i] = X[row];
-            sampleY[i] = y[row];
             i++;
         }
 
-        return new LabeledData(sampleX, sampleY, rows);
+        return new LabeledData(sampleX, rows);
     }
 }
