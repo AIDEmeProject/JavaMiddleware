@@ -64,15 +64,15 @@ class DummyUserTest {
     @Test
     void getAllLabels_usingIndexesConstructor_returnsCorrectLabels() {
         Collection<Long> indexes = new ArrayList<>();
-        indexes.add((long) 0);
-        indexes.add((long) 1);
-        indexes.add((long) 2);
-        indexes.add((long) 3);
+        indexes.add(0L);
+        indexes.add(1L);
+        indexes.add(2L);
+        indexes.add(3L);
 
         Set<Long> positiveSetIndexes = new HashSet<>();
-        positiveSetIndexes.add((long) 1);
-        positiveSetIndexes.add((long) 2);
-        
+        positiveSetIndexes.add(1L);
+        positiveSetIndexes.add(2L);
+
         user = new DummyUser(indexes, positiveSetIndexes);
         assertArrayEquals(labels, user.getAllLabels(data));
     }
