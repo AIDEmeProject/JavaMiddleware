@@ -6,6 +6,8 @@ import active.ActiveLearner;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
+import user.DummyUser;
+import user.User;
 
 import java.util.*;
 
@@ -80,20 +82,20 @@ public class Explore {
     /**
      * Run the exploration process.
      * @param X: features matrix
-     * @param y: labels array
+     * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
      * @return metrics collected during each iteration.
      */
-    public ExplorationMetrics run(double[][] X, int[] y, ActiveLearner activeLearner, long seed){
+    public ExplorationMetrics run(double[][] X, User user, ActiveLearner activeLearner, long seed){
         // set random seed
         setSeed(seed);
 
         ExplorationMetrics metrics = new ExplorationMetrics();
-        LabeledData data = new LabeledData(X, y); // TODO: maybe we should pass the labeledData instance directly as parameter ?
+        LabeledData data = new LabeledData(X, user.getY()); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
-            metrics.add(runSingleIteration(data, activeLearner));
+            metrics.add(runSingleIteration(data, user, activeLearner));
         }
 
         return metrics;
@@ -102,30 +104,30 @@ public class Explore {
     /**
      * Run the exploration process with a random seed.
      * @param X: features matrix
-     * @param y: labels array
+     * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      */
-    public ExplorationMetrics run(double[][] X, int[] y, ActiveLearner activeLearner){
-        return run(X, y, activeLearner, System.nanoTime());
+    public ExplorationMetrics run(double[][] X, User user, ActiveLearner activeLearner){
+        return run(X, user, activeLearner, System.nanoTime());
     }
 
     /**
      * Run the exploration process several times (with specified seeds) and average resulting metrics.
      * @param X: features matrix
-     * @param y: labels array
+     * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      */
-    public ExplorationMetrics averageRun(double[][] X, int[] y, ActiveLearner activeLearner, int runs, long[] seeds){
+    public ExplorationMetrics averageRun(double[][] X, User user, ActiveLearner activeLearner, int runs, long[] seeds){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
 
-        ExplorationMetrics metrics = run(X, y, activeLearner, seeds[0]);
+        ExplorationMetrics metrics = run(X, user, activeLearner, seeds[0]);
 
         for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, y, activeLearner, seeds[i]));
+            metrics = metrics.sum(run(X, user, activeLearner, seeds[i]));
         }
 
         return metrics.divideByNumber(runs);
@@ -134,33 +136,33 @@ public class Explore {
     /**
      * Run the exploration process several times (with random seeds) and average resulting metrics.
      * @param X: features matrix
-     * @param y: labels array
+     * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
      */
-    public ExplorationMetrics averageRun(double[][] X, int[] y, ActiveLearner activeLearner, int runs){
+    public ExplorationMetrics averageRun(double[][] X, User user, ActiveLearner activeLearner, int runs){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
 
-        ExplorationMetrics metrics = run(X, y, activeLearner);
+        ExplorationMetrics metrics = run(X, user, activeLearner);
 
         for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, y, activeLearner));
+            metrics = metrics.sum(run(X, user, activeLearner));
         }
 
         return metrics.divideByNumber(runs);
     }
 
-    private Metrics runSingleIteration(LabeledData data, ActiveLearner activeLearner){
+    private Metrics runSingleIteration(LabeledData data, User user, ActiveLearner activeLearner){
         long initialTime;
         Metrics metrics = new Metrics();
 
         // find next points to label
         initialTime = System.nanoTime();
-        int[] rows = getNextPointToLabel(data, activeLearner);
+        int[] rows = getNextPointToLabel(data, user, activeLearner);
         metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         // update labeled set
@@ -182,10 +184,10 @@ public class Explore {
         return metrics;
     }
 
-    private int[] getNextPointToLabel(LabeledData data, ActiveLearner activeLearner){
+    private int[] getNextPointToLabel(LabeledData data, User user, ActiveLearner activeLearner){
         // initial sampling
         if (data.getNumLabeledRows() == 0){
-            return initialSampler.sample(data.getY());
+            return initialSampler.sample(user.getY());
         }
 
         // retrieve most informative point according to model

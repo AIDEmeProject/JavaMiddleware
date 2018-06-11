@@ -13,4 +13,9 @@ public class DummyUser implements User {
     public int getLabel(LabeledData data, int row) {
         return labels[row];
     }
+
+    @Override
+    public int[] getY() {
+        return labels;
+    }
 }
