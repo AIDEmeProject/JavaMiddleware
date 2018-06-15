@@ -4,8 +4,11 @@ import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledDataset;
+import data.LabeledPoint;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
+
+import java.util.Collection;
 
 /**
  * The RandomSampler is the most used baseline active. Basically, at every iteration it randomly samples one point from
@@ -28,8 +31,8 @@ public class RandomSampler implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledDataset data) {
-        return learner.fit(data);
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        return learner.fit(labeledPoints);
     }
     /**
      * Randomly pick a point from the unlabeled set.

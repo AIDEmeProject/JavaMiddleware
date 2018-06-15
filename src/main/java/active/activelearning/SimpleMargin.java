@@ -5,6 +5,9 @@ import classifier.Classifier;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmLearner;
 import data.LabeledDataset;
+import data.LabeledPoint;
+
+import java.util.Collection;
 
 /**
  * Simple Margin is a Active Learning technique introduced in [1]. It approximates a version space cutting technique
@@ -34,8 +37,8 @@ public class SimpleMargin implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledDataset data) {
-        classifier = learner.fit(data);
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        classifier = learner.fit(labeledPoints);
         return classifier;
     }
 

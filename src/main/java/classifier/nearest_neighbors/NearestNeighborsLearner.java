@@ -2,13 +2,13 @@ package classifier.nearest_neighbors;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
-import data.LabeledDataset;
 import data.LabeledPoint;
 import exceptions.EmptyLabeledSetException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class NearestNeighborsLearner implements BoundedLearner {
 
@@ -62,19 +62,20 @@ public class NearestNeighborsLearner implements BoundedLearner {
     /**
      * Fit kNN classifier over labeled data. We assume data.X is the same collection of points passed as argument in the
      * constructor.
-     * @param data: collection of labeled points
+     * @param labeledPoints: collection of labeled points
      */
     @Override
-    public BoundedClassifier fit(LabeledDataset data) {
-        if (data.getNumLabeledRows() == 0){
+    public BoundedClassifier fit(Collection<LabeledPoint> labeledPoints) {
+        if (labeledPoints.isEmpty()){
             throw new EmptyLabeledSetException();
         }
 
-        int[] sumOfLabelsInLabeledNeighborhood = new int[data.getNumRows()];
-        int[] labeledNeighborhoodSize = new int[data.getNumRows()];
+        int size = indexes.length;
+        int[] sumOfLabelsInLabeledNeighborhood = new int[size];
+        int[] labeledNeighborhoodSize = new int[size];
 
-        for (int i = 0; i < data.getNumRows(); i++) {
-            for(LabeledPoint point : data.getLabeledPoints()){
+        for (int i = 0; i < size; i++) {
+            for(LabeledPoint point : labeledPoints){
                 // if labeledIndex is one of the k-closest neighbors, increment counters
                 if(Arrays.binarySearch(indexes[i], point.getId()) >= 0){
                     sumOfLabelsInLabeledNeighborhood[i] += point.getLabel();

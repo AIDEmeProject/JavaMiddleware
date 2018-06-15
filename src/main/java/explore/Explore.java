@@ -171,7 +171,7 @@ public class Explore {
 
         // retrain model
         initialTime = System.nanoTime();
-        Classifier classifier = activeLearner.fit(data);
+        Classifier classifier = activeLearner.fit(data.getLabeledPoints());
         metrics.add("fitTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
 
         // compute accuracy metrics

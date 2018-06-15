@@ -6,7 +6,10 @@ import classifier.Classifier;
 import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
+import data.LabeledPoint;
 import exceptions.EmptyUnlabeledSetException;
+
+import java.util.Collection;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:
@@ -74,8 +77,8 @@ public class ActiveTreeSearch implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledDataset data) {
-        return learner.fit(data);
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        return learner.fit(labeledPoints);
     }
 
     /**
@@ -104,7 +107,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     private UtilityResult utility(LabeledDataset data, int steps){
         // compute class probabilities
-        double[] probas = learner.fit(data).probability(data);
+        double[] probas = learner.fit(data.getLabeledPoints()).probability(data);
 
         // get unlabeled point of maximum probability
         int optimalRow = data.retrieveMinimizerOverUnlabeledData(pt -> -probas[pt.getId()]);

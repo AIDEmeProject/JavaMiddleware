@@ -4,6 +4,9 @@ import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
 import data.LabeledDataset;
+import data.LabeledPoint;
+
+import java.util.Collection;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class
@@ -29,8 +32,8 @@ public class UncertaintySampler implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledDataset data) {
-        classifier = learner.fit(data);
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        classifier = learner.fit(labeledPoints);
         return classifier;
     }
 

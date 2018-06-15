@@ -1,13 +1,14 @@
 package classifier.SVM;
 
 import classifier.Learner;
-import data.LabeledDataset;
 import data.LabeledPoint;
 import exceptions.EmptyLabeledSetException;
 import libsvm.svm;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
+
+import java.util.Collection;
 
 /**
  * This module is responsible for training an SVM classifier over labeled data.
@@ -36,16 +37,16 @@ public class SvmLearner implements Learner {
 
     /**
      * Trains a SVM classifier over the labeled data.
-     * @param data: labeled data
+     * @param labeledPoints: labeled data
      * @return SVM classifier instance
      */
     @Override
-    public SvmClassifier fit(LabeledDataset data) {
-        if (data.getNumLabeledRows() == 0){
+    public SvmClassifier fit(Collection<LabeledPoint> labeledPoints) {
+        if (labeledPoints.isEmpty()){
             throw new EmptyLabeledSetException();
         }
 
-        svm_problem prob = buildSvmProblem(data);
+        svm_problem prob = buildSvmProblem(labeledPoints);
         svm_parameter param = parameter.build();
 
         // use default gamma if needed
@@ -56,17 +57,18 @@ public class SvmLearner implements Learner {
         return new SvmClassifier(svm.svm_train(prob, param));
     }
 
-    private svm_problem buildSvmProblem(LabeledDataset data){
+    private svm_problem buildSvmProblem(Collection<LabeledPoint> labeledPoints){
         svm_problem prob = new svm_problem();
 
-        prob.l = data.getNumLabeledRows();
+        prob.l = labeledPoints.size();
         prob.x = new svm_node[prob.l][];
         prob.y = new double[prob.l];
 
         int i = 0;
-        for (LabeledPoint point : data.getLabeledPoints()) {
+        for (LabeledPoint point : labeledPoints) {
             prob.x[i] = SvmNodeConverter.toSvmNodeArray(point.getData());
-            prob.y[i++] = point.getLabel();
+            prob.y[i] = point.getLabel();
+            i++;
         }
 
         return prob;

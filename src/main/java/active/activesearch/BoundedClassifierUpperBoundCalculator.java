@@ -22,7 +22,7 @@ class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
     }
 
     public void fit(LabeledDataset data, int steps){
-        BoundedClassifier classifier = learner.fit(data);
+        BoundedClassifier classifier = learner.fit(data.getLabeledPoints());
         u0 = optimalUtilityUpperBound(data, classifier, steps-1, 0);
         u1 = optimalUtilityUpperBound(data, classifier,  steps-1, 1);
     }
