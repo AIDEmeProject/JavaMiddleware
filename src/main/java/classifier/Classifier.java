@@ -13,12 +13,9 @@ public interface Classifier {
 
     /**
      * Return class probability estimation for a particular point in the dataset.
-     * @param data: collection of data points
-     * @param row: row index of point of interest
-     * @return probability of given point being positive
+     * @param point: data point
+     * @return probability of point being positive
      */
-    double probability(LabeledDataset data, int row);
-
     double probability(DataPoint point);
 
     /**
@@ -30,7 +27,7 @@ public interface Classifier {
         double[] probas = new double[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {
-            probas[i] = probability(data, i);
+            probas[i] = probability(data.getRow(i));
         }
 
         return probas;
@@ -38,12 +35,11 @@ public interface Classifier {
 
     /**
      * Return the predicted label for a particular point in the dataset.
-     * @param data: collection of data points
-     * @param row: row index of point of interest
+     * @param point: data point
      * @return class label of given point
      */
-    default int predict(LabeledDataset data, int row){
-        return probability(data, row) > 0.5 ? 1 : 0;
+    default int predict(DataPoint point){
+        return probability(point) > 0.5 ? 1 : 0;
     }
 
     /**
@@ -55,7 +51,7 @@ public interface Classifier {
         int[] labels = new int[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {
-            labels[i] = predict(data, i);
+            labels[i] = predict(data.getRow(i));
         }
 
         return labels;

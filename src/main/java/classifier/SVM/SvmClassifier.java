@@ -2,7 +2,6 @@ package classifier.SVM;
 
 import classifier.Classifier;
 import data.DataPoint;
-import data.LabeledDataset;
 import libsvm.svm;
 import libsvm.svm_model;
 
@@ -61,18 +60,13 @@ public class SvmClassifier implements Classifier {
         return probability(point.getData());
     }
 
-    @Override
-    public double probability(LabeledDataset data, int row) {
-        return probability(data.getRow(row));
-    }
-
     public int predict(double[] point) {
         return margin(point) > 0 ? 1 : 0;
     }
 
     @Override
-    public int predict(LabeledDataset data, int row) {
-        return predict(data.getRow(row).getData());
+    public int predict(DataPoint point) {
+        return predict(point.getData());
     }
 
     /**
@@ -85,19 +79,14 @@ public class SvmClassifier implements Classifier {
         return margin[0];
     }
 
+    /**
+     * @param point: data point
+     * @return sample's signed distance of data point to svm's decision boundary
+     */
     public double margin(DataPoint point){
         double[] margin = new double[1];
         svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(point.getData()), margin);
         return margin[0];
-    }
-
-    /**
-     * @param data: data point
-     * @param row : row index
-     * @return sample's signed distance of data[row] to svm's decision boundary
-     */
-    public double margin(LabeledDataset data, int row){
-        return margin(data.getRow(row).getData());
     }
 
     private svm_model buildSvmModel(double bias, double[] alpha, Kernel kernel, double[][] supportVectors){

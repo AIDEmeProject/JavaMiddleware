@@ -57,11 +57,6 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
     }
 
     @Override
-    public double probability(LabeledDataset data, int row){
-        return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
-    }
-
-    @Override
     public double probability(DataPoint point) {
         int row = point.getId();
         return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
@@ -80,8 +75,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
         double value;
 
         for (DataPoint point : data.getUnlabeledPoints()) {
-            int i = point.getId();
-            value = (gamma + sumOfLabelsInLabeledNeighborhood[i] + maxPositivePoints) / (1 + labeledNeighborhoodSize[i] + maxPositivePoints);
+            value = probability(point);
 
             if (value > maxValue){
                 maxValue = value;
