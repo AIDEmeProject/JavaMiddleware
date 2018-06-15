@@ -1,6 +1,6 @@
 package user;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 import java.util.Collection;
 import java.util.Set;
@@ -62,7 +62,7 @@ public class DummyUser implements User {
      * Simply returns labels[row]
      */
     @Override
-    public int getLabel(LabeledData data, int row) {
+    public int getLabel(LabeledDataset data, int row) {
         return labels[row];
     }
 
@@ -70,7 +70,7 @@ public class DummyUser implements User {
      * Simply returns the internal labels array
      */
     @Override
-    public int[] getAllLabels(LabeledData data) {
+    public int[] getAllLabels(LabeledDataset data) {
         return labels;
     }
 }

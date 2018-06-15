@@ -1,7 +1,7 @@
 package classifier;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 public interface BoundedLearner extends Learner {
-    BoundedClassifier fit(LabeledData data);
+    BoundedClassifier fit(LabeledDataset data);
 }

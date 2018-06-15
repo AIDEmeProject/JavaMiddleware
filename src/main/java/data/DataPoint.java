@@ -5,21 +5,24 @@ package data;
  */
 public class DataPoint {
     /**
-     * data point's unique id
+     * data point's row number
      */
-    private long id;
+    private int id;
 
     /**
      * data point's values
      */
     private double[] data;
 
-    public DataPoint(long id, double[] data) {
+    public DataPoint(int id, double[] data) {
+        if (data.length == 0){
+            throw new IllegalArgumentException("Data point must be non-empty.");
+        }
         this.id = id;
         this.data = data;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

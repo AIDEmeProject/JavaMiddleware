@@ -1,6 +1,6 @@
 package user;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * An User represents the "oracle" of Active Learning scenario: an expert or human annotator capable of, given a data point,
@@ -13,7 +13,7 @@ public interface User {
      * @param row: row to label
      * @return label of data[row]
      */
-    int getLabel(LabeledData data, int row);
+    int getLabel(LabeledDataset data, int row);
 
     /**
      * Return the labels of a batch of rows
@@ -21,7 +21,7 @@ public interface User {
      * @param rows: collection of rows to request labels
      * @return an array containing the labels of each requested row
      */
-    default int[] getLabel(LabeledData data, int[] rows){
+    default int[] getLabel(LabeledDataset data, int[] rows){
         int[] labels = new int[rows.length];
         for (int i = 0; i < rows.length; i++) {
             labels[i] = getLabel(data, rows[i]);
@@ -34,5 +34,5 @@ public interface User {
      * @return labels of all data points
      * TODO: should be removed from the general interface once a "real user" class is added
      */
-    int[] getAllLabels(LabeledData data);
+    int[] getAllLabels(LabeledDataset data);
 }

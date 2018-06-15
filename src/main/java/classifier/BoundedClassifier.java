@@ -1,6 +1,6 @@
 package classifier;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * In [1], they introduce the concept of p* function, which is used for bounding the probability of any point being a
@@ -20,5 +20,5 @@ public interface BoundedClassifier extends Classifier {
      * @param maxPositivePoints: maximum number of positive labeled points
      * @return upper bound
      */
-    double computeProbabilityUpperBound(LabeledData data, int maxPositivePoints);
+    double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints);
 }

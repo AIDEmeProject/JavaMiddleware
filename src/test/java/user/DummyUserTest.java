@@ -1,6 +1,6 @@
 package user;
 
-import data.LabeledData;
+import data.LabeledDataset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,13 +12,13 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DummyUserTest {
-    private LabeledData data;
+    private LabeledDataset data;
     private int[] labels;
     private DummyUser user;
 
     @BeforeEach
     void setUp() {
-        data = new LabeledData(new double[][]{{1}, {2}, {3}, {4}});
+        data = new LabeledDataset(new double[][]{{1}, {2}, {3}, {4}});
         labels = new int[] {0,1,1,0};
         user = new DummyUser(labels);
     }

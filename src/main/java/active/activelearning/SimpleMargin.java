@@ -1,10 +1,10 @@
 package active.activelearning;
 
+import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmLearner;
-import data.LabeledData;
-import active.ActiveLearner;
+import data.LabeledDataset;
 
 /**
  * Simple Margin is a Active Learning technique introduced in [1]. It approximates a version space cutting technique
@@ -34,7 +34,7 @@ public class SimpleMargin implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledData data) {
+    public Classifier fit(LabeledDataset data) {
         classifier = learner.fit(data);
         return classifier;
     }
@@ -45,7 +45,7 @@ public class SimpleMargin implements ActiveLearner {
      * @return row index of unlabeled point closest to decision boundary
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(classifier.margin(dt, row)));
+    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        return data.retrieveMinimizerOverUnlabeledData(pt -> Math.abs(classifier.margin(pt)));
     }
 }

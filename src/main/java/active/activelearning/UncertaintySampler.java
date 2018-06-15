@@ -1,9 +1,9 @@
 package active.activelearning;
 
+import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
-import data.LabeledData;
-import active.ActiveLearner;
+import data.LabeledDataset;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class
@@ -29,7 +29,7 @@ public class UncertaintySampler implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledData data) {
+    public Classifier fit(LabeledDataset data) {
         classifier = learner.fit(data);
         return classifier;
     }
@@ -40,7 +40,7 @@ public class UncertaintySampler implements ActiveLearner {
      * @return most informative point in unlabeled set
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
-        return data.retrieveMinimizerOverUnlabeledData((dt,row) -> Math.abs(classifier.probability(dt, row) - 0.5));
+    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        return data.retrieveMinimizerOverUnlabeledData(pt -> Math.abs(classifier.probability(pt) - 0.5));
     }
 }

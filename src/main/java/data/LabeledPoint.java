@@ -3,14 +3,13 @@ package data;
 public class LabeledPoint extends DataPoint {
     private int label;
 
-    public LabeledPoint(long id, double[] data, int label) {
+    public LabeledPoint(int id, double[] data, int label) {
         super(id, data);
         setLabel(label);
     }
 
     public LabeledPoint(DataPoint point, int label) {
-        super(point.getId(), point.getData());
-        this.label = label;
+        this(point.getId(), point.getData(), label);
     }
 
     public int getLabel() {

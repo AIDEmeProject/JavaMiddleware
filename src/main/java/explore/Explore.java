@@ -1,14 +1,15 @@
 package explore;
 
-import classifier.Classifier;
-import data.LabeledData;
 import active.ActiveLearner;
+import classifier.Classifier;
+import data.LabeledDataset;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 import user.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 /**
@@ -91,7 +92,7 @@ public class Explore {
         setSeed(seed);
 
         ExplorationMetrics metrics = new ExplorationMetrics();
-        LabeledData data = new LabeledData(X); // TODO: maybe we should pass the labeledData instance directly as parameter ?
+        LabeledDataset data = new LabeledDataset(X); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
         for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
             metrics.add(runSingleIteration(data, user, activeLearner));
@@ -155,7 +156,7 @@ public class Explore {
         return metrics.divideByNumber(runs);
     }
 
-    private Metrics runSingleIteration(LabeledData data, User user, ActiveLearner activeLearner){
+    private Metrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
         long initialTime;
         Metrics metrics = new Metrics();
 
@@ -183,13 +184,13 @@ public class Explore {
         return metrics;
     }
 
-    private int[] getNextPointToLabel(LabeledData data, User user, ActiveLearner activeLearner){
+    private int[] getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
         // initial sampling
         if (data.getNumLabeledRows() == 0){
             return initialSampler.sample(user.getAllLabels(data));
         }
 
         // retrieve most informative point according to model
-        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.sample(subsampleSize))};
+        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize))};
     }
 }

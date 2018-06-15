@@ -1,7 +1,8 @@
 package classifier;
 
 
-import data.LabeledData;
+import data.DataPoint;
+import data.LabeledDataset;
 
 /**
  * A classifier is any object capable of "learning from training data" and "make predictions for new data points".
@@ -16,14 +17,16 @@ public interface Classifier {
      * @param row: row index of point of interest
      * @return probability of given point being positive
      */
-    double probability(LabeledData data, int row);
+    double probability(LabeledDataset data, int row);
+
+    double probability(DataPoint point);
 
     /**
      * Return class probability estimation for each point in the dataset.
      * @param data: collection of data points
      * @return probability estimation array
      */
-    default double[] probability(LabeledData data){
+    default double[] probability(LabeledDataset data){
         double[] probas = new double[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {
@@ -39,7 +42,7 @@ public interface Classifier {
      * @param row: row index of point of interest
      * @return class label of given point
      */
-    default int predict(LabeledData data, int row){
+    default int predict(LabeledDataset data, int row){
         return probability(data, row) > 0.5 ? 1 : 0;
     }
 
@@ -48,7 +51,7 @@ public interface Classifier {
      * @param data: collection of data points
      * @return predicted class labels
      */
-    default int[] predict(LabeledData data){
+    default int[] predict(LabeledDataset data){
         int[] labels = new int[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {

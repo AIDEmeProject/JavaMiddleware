@@ -1,7 +1,7 @@
 package metrics;
 
 import classifier.Classifier;
-import data.LabeledData;
+import data.LabeledDataset;
 import user.User;
 
 /**
@@ -17,7 +17,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * @return a confusion matrix
      */
     @Override
-    public MetricStorage compute(LabeledData data, User user, Classifier classifier) {
+    public MetricStorage compute(LabeledDataset data, User user, Classifier classifier) {
         return compute(user.getAllLabels(data), classifier.predict(data));
     }
 

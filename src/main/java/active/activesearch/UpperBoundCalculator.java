@@ -1,6 +1,6 @@
 package active.activesearch;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * Utility module used for pruning the tree search in the ActiveTreeSearch algorithm.
@@ -11,7 +11,7 @@ interface UpperBoundCalculator {
      * @param data: labeled data
      * @param steps: number of lookahead steps remaining
      */
-    void fit(LabeledData data, int steps);
+    void fit(LabeledDataset data, int steps);
 
     /**
      * Compute upper bound on maximum utility

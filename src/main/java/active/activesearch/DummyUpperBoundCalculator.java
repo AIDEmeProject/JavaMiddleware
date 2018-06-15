@@ -1,13 +1,13 @@
 package active.activesearch;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * Dummy class used for general classifiers / learners. Basically, it lets the full tree search to be performed.
  */
 class DummyUpperBoundCalculator implements UpperBoundCalculator{
 
-    public void fit(LabeledData data, int steps){
+    public void fit(LabeledDataset data, int steps){
         // do nothing
     }
 

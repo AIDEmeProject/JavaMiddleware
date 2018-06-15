@@ -1,7 +1,8 @@
 package classifier.nearest_neighbors;
 
 import classifier.BoundedClassifier;
-import data.LabeledData;
+import data.DataPoint;
+import data.LabeledDataset;
 
 
 /**
@@ -56,7 +57,13 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
     }
 
     @Override
-    public double probability(LabeledData data, int row){
+    public double probability(LabeledDataset data, int row){
+        return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
+    }
+
+    @Override
+    public double probability(DataPoint point) {
+        int row = point.getId();
         return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
     }
 
@@ -68,15 +75,12 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      * @param maxPositivePoints: maximum number of positive labeled points
      * @return probability upper bound
      */
-    public double computeProbabilityUpperBound(LabeledData data, int maxPositivePoints){
+    public double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
         double maxValue = Double.NEGATIVE_INFINITY;
         double value;
 
-        for (int i = 0; i < labeledNeighborhoodSize.length; i++) {
-            if (data.isInLabeledSet(i)){
-                continue;
-            }
-
+        for (DataPoint point : data.getUnlabeledPoints()) {
+            int i = point.getId();
             value = (gamma + sumOfLabelsInLabeledNeighborhood[i] + maxPositivePoints) / (1 + labeledNeighborhoodSize[i] + maxPositivePoints);
 
             if (value > maxValue){

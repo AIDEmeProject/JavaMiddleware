@@ -3,8 +3,10 @@ package data;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class LabeledDataset {
     private final int size;
@@ -12,10 +14,14 @@ public class LabeledDataset {
     private final Map<Integer, DataPoint> unlabeled;
 
     public LabeledDataset(double[][] X) {
+        if (X.length == 0){
+            throw new IllegalArgumentException("Dataset cannot be empty.");
+        }
+
         size = X.length;
         labeled = new HashMap<>();
-        unlabeled = new HashMap<>();
 
+        unlabeled = new HashMap<>();
         for (int i = 0; i < X.length; i++) {
             unlabeled.put(i, new DataPoint(i, X[i]));
         }
@@ -27,26 +33,30 @@ public class LabeledDataset {
         this.unlabeled = unlabeled;
     }
 
+    /**
+     * @return Collection of labeled points
+     */
     public Collection<LabeledPoint> getLabeledPoints() {
         return labeled.values();
     }
 
+    /**
+     * @return Collection of unlabeled points
+     */
     public Collection<DataPoint> getUnlabeledPoints() {
         return unlabeled.values();
     }
 
-    /**
-     * Retrieve the label of a given labeled row
-     * @param row: labeled row of interest
-     * @return label of specified row
-     * @throws IllegalArgumentException if row is not in labeled set
-     */
-    public int getLabel(int row){
-        LabeledPoint point = labeled.get(row);
-        if (point == null){
-            throw new IllegalArgumentException("Row " + row + " is not in labeled set.");
+    public DataPoint getRow(int i){
+        if (unlabeled.containsKey(i)){
+            return unlabeled.get(i);
         }
-        return point.getLabel();
+
+        if (labeled.containsKey(i)){
+            return labeled.get(i);
+        }
+
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -57,9 +67,10 @@ public class LabeledDataset {
      */
     public void setLabel(int row, int label) {
         LabeledPoint point = labeled.get(row);
-        if (point != null){
-            point.setLabel(label);
+        if (point == null){
+            throw new IllegalArgumentException();
         }
+        point.setLabel(label);
     }
 
     /**
@@ -93,9 +104,11 @@ public class LabeledDataset {
     public void addLabeledRow(int row, int label) {
         DataPoint point = unlabeled.remove(row);
 
-        if (point != null) {
-            labeled.put(row, new LabeledPoint(point, label));
+        if (point == null){
+            throw new IllegalArgumentException();
         }
+
+        labeled.put(row, new LabeledPoint(point, label));
     }
 
     /**
@@ -125,16 +138,18 @@ public class LabeledDataset {
     public void removeLabeledRow(int row) {
         LabeledPoint point = labeled.remove(row);
 
-        if (point != null) {
-            unlabeled.put(row, point);
+        if (point == null) {
+            throw new IllegalArgumentException();
         }
+
+        unlabeled.put(row, point);
     }
 
     /**
      * @param scoreFunction: computes the score of data[row]
      * @return unlabeled row minimizing the score function
      */
-    public int retrieveMinimizerOverUnlabeledData(BiFunction<DataPoint, Integer, Double> scoreFunction) {
+    public int retrieveMinimizerOverUnlabeledData(Function<DataPoint, Double> scoreFunction) {
         if (getNumUnlabeledRows() == 0) {
             throw new EmptyUnlabeledSetException();
         }
@@ -143,7 +158,7 @@ public class LabeledDataset {
         int minRow = -1;
 
         for (Map.Entry<Integer, DataPoint> entry : unlabeled.entrySet()) {
-            double score = scoreFunction.apply(entry.getValue(), entry.getKey());
+            double score = scoreFunction.apply(entry.getValue());
             if (score < minScore) {
                 minScore = score;
                 minRow = entry.getKey();
@@ -154,11 +169,11 @@ public class LabeledDataset {
     }
 
     /**
-     * Create a new LabeledData instance by subsampling the unlabeled set. If sample size is larger than number of unlabeled
+     * Create a new LabeledDataset instance by subsampling the unlabeled set. If sample size is larger than number of unlabeled
      * points remaining, this own object is returned.
      *
      * @param sampleSize: sample size
-     * @return new LabeledData object whose unlabeled set is restricted to a sample.
+     * @return new LabeledDataset object whose unlabeled set is restricted to a sample.
      * @throws IllegalArgumentException is size not positive
      */
     public LabeledDataset subsampleUnlabeledSet(int sampleSize) {

@@ -1,7 +1,8 @@
 package metrics;
 
 import classifier.Classifier;
-import data.LabeledData;
+import data.LabeledDataset;
+import data.LabeledPoint;
 import user.User;
 
 import java.util.Collection;
@@ -14,14 +15,14 @@ import java.util.Collection;
 public class TargetSetAccuracyCalculator implements MetricCalculator {
     /**
      * Compute target set accuracy from the true labels array and the collection of labeled rows so far.
-     * @param rows: collection of labeled rows so far
+     * @param labeledPoints: collection of labeled points
      * @param y: true labels array
      * @return TargetSetAccuracy object
      */
-    public TargetSetAccuracy compute(Collection<Integer> rows, int[] y){
+    public TargetSetAccuracy compute(Collection<LabeledPoint> labeledPoints, int[] y){
         int numberOfTargetsRetrieved = 0;
-        for (Integer row : rows){
-            numberOfTargetsRetrieved += y[row];
+        for (LabeledPoint point : labeledPoints){
+            numberOfTargetsRetrieved += point.getLabel();
         }
 
         int totalNumberOfTargets = 0;
@@ -33,7 +34,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledData data, User user, Classifier classifier) {
-        return compute(data.getLabeledRows(), user.getAllLabels(data));
+    public MetricStorage compute(LabeledDataset data, User user, Classifier classifier) {
+        return compute(data.getLabeledPoints(), user.getAllLabels(data));
     }
 }

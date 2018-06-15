@@ -1,6 +1,6 @@
 package classifier;
 
-import data.LabeledData;
+import data.LabeledDataset;
 
 public interface Learner {
     /**
@@ -8,5 +8,5 @@ public interface Learner {
      * @param data: collection of labeled points
      * @throws exceptions.EmptyUnlabeledSetException if labeled set is empty
      */
-    Classifier fit(LabeledData data);
+    Classifier fit(LabeledDataset data);
 }

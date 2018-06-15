@@ -1,11 +1,12 @@
 package active.activesearch;
 
+import active.ActiveLearner;
 import classifier.BoundedLearner;
 import classifier.Classifier;
 import classifier.Learner;
-import data.LabeledData;
+import data.DataPoint;
+import data.LabeledDataset;
 import exceptions.EmptyUnlabeledSetException;
-import active.ActiveLearner;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:
@@ -73,7 +74,7 @@ public class ActiveTreeSearch implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledData data) {
+    public Classifier fit(LabeledDataset data) {
         return learner.fit(data);
     }
 
@@ -85,7 +86,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @return row index of most informative unlabeled point
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
+    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
         int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
 
         if (steps == 0){
@@ -101,12 +102,12 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param steps: number of steps to look into the future
      * @return optimal utility index and value
      */
-    private UtilityResult utility(LabeledData data, int steps){
+    private UtilityResult utility(LabeledDataset data, int steps){
         // compute class probabilities
         double[] probas = learner.fit(data).probability(data);
 
         // get unlabeled point of maximum probability
-        int optimalRow = data.retrieveMinimizerOverUnlabeledData((dt, row) -> -probas[row]);
+        int optimalRow = data.retrieveMinimizerOverUnlabeledData(pt -> -probas[pt.getId()]);
         double optimalUtility = probas[optimalRow];
 
         // in 1-step case, just return point we are most certain of being positive (greedy approach)
@@ -119,9 +120,11 @@ public class ActiveTreeSearch implements ActiveLearner {
 
         calculator.fit(data, steps);
 
-        for (int row = 0; row < data.getNumRows(); row++) {
+        for (DataPoint point : data.getUnlabeledPoints()) {
+            int row = point.getId();
+
             // skip labeled points and those not meeting the threshold
-            if (data.isInLabeledSet(row) || calculator.upperBound(probas[row]) <= optimalUtility){
+            if (calculator.upperBound(probas[row]) <= optimalUtility){
                 continue;
             }
 
@@ -146,7 +149,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param proba: probability of X[i] being 1
      * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
      */
-    private double optimalUtilityGivenPoint(LabeledData data, int steps, int rowNumber, double proba){
+    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, int rowNumber, double proba){
         if (steps <= 1){
             return proba;
         }

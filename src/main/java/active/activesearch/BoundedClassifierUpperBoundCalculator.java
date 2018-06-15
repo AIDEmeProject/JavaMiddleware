@@ -2,7 +2,7 @@ package active.activesearch;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * Tree Search optimization method described in [1]. The optimization consists of pruning the tree search by
@@ -21,7 +21,7 @@ class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
         this.learner = learner;
     }
 
-    public void fit(LabeledData data, int steps){
+    public void fit(LabeledDataset data, int steps){
         BoundedClassifier classifier = learner.fit(data);
         u0 = optimalUtilityUpperBound(data, classifier, steps-1, 0);
         u1 = optimalUtilityUpperBound(data, classifier,  steps-1, 1);
@@ -34,7 +34,7 @@ class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
      * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
      * @return upper bound on optimal utility
      */
-    private double optimalUtilityUpperBound(LabeledData data, BoundedClassifier classifier, int steps, int maxLabeledPoints){
+    private double optimalUtilityUpperBound(LabeledDataset data, BoundedClassifier classifier, int steps, int maxLabeledPoints){
         double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
 
         if (steps <= 1){

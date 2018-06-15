@@ -1,7 +1,7 @@
 package metrics;
 
 import classifier.Classifier;
-import data.LabeledData;
+import data.LabeledDataset;
 import user.User;
 
 /**
@@ -14,5 +14,5 @@ public interface MetricCalculator {
      * @param classifier: classifier
      * @return computed metric
      */
-    MetricStorage compute(LabeledData data, User user, Classifier classifier);
+    MetricStorage compute(LabeledDataset data, User user, Classifier classifier);
 }

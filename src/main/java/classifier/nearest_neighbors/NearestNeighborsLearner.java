@@ -2,7 +2,8 @@ package classifier.nearest_neighbors;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
-import data.LabeledData;
+import data.LabeledDataset;
+import data.LabeledPoint;
 import exceptions.EmptyLabeledSetException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
@@ -64,7 +65,7 @@ public class NearestNeighborsLearner implements BoundedLearner {
      * @param data: collection of labeled points
      */
     @Override
-    public BoundedClassifier fit(LabeledData data) {
+    public BoundedClassifier fit(LabeledDataset data) {
         if (data.getNumLabeledRows() == 0){
             throw new EmptyLabeledSetException();
         }
@@ -73,10 +74,10 @@ public class NearestNeighborsLearner implements BoundedLearner {
         int[] labeledNeighborhoodSize = new int[data.getNumRows()];
 
         for (int i = 0; i < data.getNumRows(); i++) {
-            for(int labeledIndex : data.getLabeledRows()){
+            for(LabeledPoint point : data.getLabeledPoints()){
                 // if labeledIndex is one of the k-closest neighbors, increment counters
-                if(Arrays.binarySearch(indexes[i], labeledIndex) >= 0){
-                    sumOfLabelsInLabeledNeighborhood[i] += data.getLabel(labeledIndex);
+                if(Arrays.binarySearch(indexes[i], point.getId()) >= 0){
+                    sumOfLabelsInLabeledNeighborhood[i] += point.getLabel();
                     labeledNeighborhoodSize[i]++;
                 }
             }

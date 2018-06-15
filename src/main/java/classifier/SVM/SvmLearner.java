@@ -1,7 +1,8 @@
 package classifier.SVM;
 
 import classifier.Learner;
-import data.LabeledData;
+import data.LabeledDataset;
+import data.LabeledPoint;
 import exceptions.EmptyLabeledSetException;
 import libsvm.svm;
 import libsvm.svm_node;
@@ -39,7 +40,7 @@ public class SvmLearner implements Learner {
      * @return SVM classifier instance
      */
     @Override
-    public SvmClassifier fit(LabeledData data) {
+    public SvmClassifier fit(LabeledDataset data) {
         if (data.getNumLabeledRows() == 0){
             throw new EmptyLabeledSetException();
         }
@@ -55,7 +56,7 @@ public class SvmLearner implements Learner {
         return new SvmClassifier(svm.svm_train(prob, param));
     }
 
-    private svm_problem buildSvmProblem(LabeledData data){
+    private svm_problem buildSvmProblem(LabeledDataset data){
         svm_problem prob = new svm_problem();
 
         prob.l = data.getNumLabeledRows();
@@ -63,10 +64,9 @@ public class SvmLearner implements Learner {
         prob.y = new double[prob.l];
 
         int i = 0;
-        for (Integer row : data.getLabeledRows()) {
-            prob.x[i] = SvmNodeConverter.toSvmNodeArray(data.getRow(row));
-            prob.y[i] = data.getLabel(row);
-            i++;
+        for (LabeledPoint point : data.getLabeledPoints()) {
+            prob.x[i] = SvmNodeConverter.toSvmNodeArray(point.getData());
+            prob.y[i++] = point.getLabel();
         }
 
         return prob;

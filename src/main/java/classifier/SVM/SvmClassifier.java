@@ -1,8 +1,10 @@
 package classifier.SVM;
 
 import classifier.Classifier;
-import data.LabeledData;
-import libsvm.*;
+import data.DataPoint;
+import data.LabeledDataset;
+import libsvm.svm;
+import libsvm.svm_model;
 
 /**
  *  This module represents a trained SVM classifier. It's an immutable object used for predicting labels over new data instances.
@@ -55,7 +57,12 @@ public class SvmClassifier implements Classifier {
     }
 
     @Override
-    public double probability(LabeledData data, int row) {
+    public double probability(DataPoint point) {
+        return probability(point.getData());
+    }
+
+    @Override
+    public double probability(LabeledDataset data, int row) {
         return probability(data.getRow(row));
     }
 
@@ -64,8 +71,8 @@ public class SvmClassifier implements Classifier {
     }
 
     @Override
-    public int predict(LabeledData data, int row) {
-        return predict(data.getRow(row));
+    public int predict(LabeledDataset data, int row) {
+        return predict(data.getRow(row).getData());
     }
 
     /**
@@ -78,13 +85,19 @@ public class SvmClassifier implements Classifier {
         return margin[0];
     }
 
+    public double margin(DataPoint point){
+        double[] margin = new double[1];
+        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(point.getData()), margin);
+        return margin[0];
+    }
+
     /**
      * @param data: data point
      * @param row : row index
      * @return sample's signed distance of data[row] to svm's decision boundary
      */
-    public double margin(LabeledData data, int row){
-        return margin(data.getRow(row));
+    public double margin(LabeledDataset data, int row){
+        return margin(data.getRow(row).getData());
     }
 
     private svm_model buildSvmModel(double bias, double[] alpha, Kernel kernel, double[][] supportVectors){

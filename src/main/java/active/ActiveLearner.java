@@ -1,7 +1,7 @@
 package active;
 
 import classifier.Learner;
-import data.LabeledData;
+import data.LabeledDataset;
 
 /**
  * ActiveLearner represents a classifier adapted to the Active Learning scenario. It is augmented with the capacity of
@@ -18,5 +18,5 @@ public interface ActiveLearner extends Learner{
      * TODO: change return type to int[] or collection of int?
      * TODO: add subsampling for faster computation
      */
-    int retrieveMostInformativeUnlabeledPoint(LabeledData data);
+    int retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
 }

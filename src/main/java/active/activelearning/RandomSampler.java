@@ -1,10 +1,10 @@
 package active.activelearning;
 
+import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
-import data.LabeledData;
+import data.LabeledDataset;
 import exceptions.EmptyUnlabeledSetException;
-import active.ActiveLearner;
 import sampling.ReservoirSampler;
 
 /**
@@ -28,7 +28,7 @@ public class RandomSampler implements ActiveLearner {
     }
 
     @Override
-    public Classifier fit(LabeledData data) {
+    public Classifier fit(LabeledDataset data) {
         return learner.fit(data);
     }
     /**
@@ -37,12 +37,12 @@ public class RandomSampler implements ActiveLearner {
      * @return random unlabeled point index
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledData data) {
+    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
         if (data.getNumUnlabeledRows() == 0){
             throw new EmptyUnlabeledSetException();
         }
 
         // sample an index between 0 and data.getNumRows(), excluding labeled points
-        return ReservoirSampler.sample(data.getNumRows(), data::isInLabeledSet);
+        return ReservoirSampler.sample(data.getNumRows(), data.getLabeledPoints()::contains);
     }
 }
