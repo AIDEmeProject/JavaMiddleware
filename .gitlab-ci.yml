@@ -1,0 +1,42 @@
+# stages: used to group jobs together.
+# Once all jobs in one stage are finished it advances to the next one. In case of errors, by default it will not execute
+# the next stage
+stages:
+    - build
+    - test
+
+# image: Docker image used to create a container in each job (anything from Docker Hub)
+# We choose a maven image with Java 8. The alpine distribution is more lightweight
+image : maven:3.5.3-jdk-8-alpine
+
+# compile project and build jar
+compiling:
+    # set this job as part of the "build" stage
+    stage: build
+
+    # restrict the jobs to be triggered only on pushed and merges to the master branch
+    only:
+        - master
+
+    # files to cache between stages. We cache the target/ folder, containing our app's binaries
+    cache:
+        paths:
+            - target/
+
+    # removes any previous builds any compiles
+    script:
+        - "mvn clean"
+        - "mvn compile"
+
+# run unit tests
+unit_tests:
+    # set this job as part of the "test" stage
+    stage: test
+
+    # restrict the jobs to be triggered only on pushed and merges to the master branch
+    only:
+        - master
+
+     # run unit tests
+    script:
+        - "mvn test"
