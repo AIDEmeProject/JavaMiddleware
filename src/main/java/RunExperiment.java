@@ -61,17 +61,18 @@ public class RunExperiment {
     public static void main(String[] args){
         // DATA and USER
         // simple example
-//        double[][] X = generateX(250, 2, 1);
-//        int[] y = generateY(X);
-//        User user = new DummyUser(y);
+        double[][] X = generateX(250, 2, 1);
+        int[] y = generateY(X);
+        User user = new DummyUser(y);
+        System.out.println(RunExperiment.class.getName());
 
         // sdss
-        TaskReader reader = new TaskReader("sdss_Q1_0.1%");
-        IndexedDataset data = reader.readData();
-        Set<Long> positiveKeys = reader.readTargetSetKeys();
-
-        double[][] X = data.getData();
-        User user = new DummyUser(data.getIndexes(), positiveKeys);
+//        TaskReader reader = new TaskReader("sdss_Q1_0.1%");
+//        IndexedDataset data = reader.readData();
+//        Set<Long> positiveKeys = reader.readTargetSetKeys();
+//
+//        double[][] X = data.getData();
+//        User user = new DummyUser(data.getIndexes(), positiveKeys);
 
         // SCALING
         StandardScaler scaler = new StandardScaler();
