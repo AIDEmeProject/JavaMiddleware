@@ -37,6 +37,16 @@ public class DataPoint {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DataPoint)) return false;
+
+        DataPoint dataPoint = (DataPoint) o;
+
+        return id == dataPoint.id && Arrays.equals(data, dataPoint.data);
+    }
+
+    @Override
     public String toString() {
         return "(id=" + id + ", data=" + Arrays.toString(data) + ')';
     }

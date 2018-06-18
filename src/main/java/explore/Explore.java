@@ -95,7 +95,7 @@ public class Explore {
         ExplorationMetrics metrics = new ExplorationMetrics();
         LabeledDataset data = new LabeledDataset(X); // TODO: maybe we should pass the labeledData instance directly as parameter ?
 
-        for (int iter = 0; iter < budget && data.getNumUnlabeledRows() > 0; iter++){
+        for (int iter = 0; iter < budget && data.getNumUnlabeledPoints() > 0; iter++){
             metrics.add(runSingleIteration(data, user, activeLearner));
         }
 
@@ -168,7 +168,7 @@ public class Explore {
 
         // update labeled set
         int[] labels = user.getLabel(points);
-        data.addLabeledRow(points, labels);
+        data.putOnLabeledSet(points, labels);
         metrics.add("labeledRow", (double) points.iterator().next().getId());  //TODO: how to store rows ?
 
         // retrain model
@@ -190,7 +190,7 @@ public class Explore {
         ArrayList<DataPoint> result = new ArrayList<>();
 
         // initial sampling
-        if (data.getNumLabeledRows() == 0){
+        if (data.getNumLabeledPoints() == 0){
             result.addAll(initialSampler.sample(data.getUnlabeledPoints(), user));
         }
         // retrieve most informative point according to model

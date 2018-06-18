@@ -42,7 +42,7 @@ public class RandomSampler implements ActiveLearner {
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        if (data.getNumUnlabeledRows() == 0){
+        if (data.getNumUnlabeledPoints() == 0){
             throw new EmptyUnlabeledSetException();
         }
 

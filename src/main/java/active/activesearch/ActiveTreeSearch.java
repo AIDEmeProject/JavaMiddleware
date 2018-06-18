@@ -91,7 +91,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
+        int steps = Math.min(data.getNumUnlabeledPoints(), this.lookahead);
 
         if (steps == 0){
             throw new EmptyUnlabeledSetException();
@@ -132,14 +132,14 @@ public class ActiveTreeSearch implements ActiveLearner {
         }
 
         // positive label branch
-        data.addLabeledRow(point, 1);
+        data.putOnLabeledSet(point, 1);
         double positiveUtility = utility(data, steps-1).getValue();
-        data.removeLabeledRow(point);
+        data.removeFromLabeledSet(point);
 
         // negative label branch
-        data.addLabeledRow(point, 0);
+        data.putOnLabeledSet(point, 0);
         double negativeUtility = utility(data, steps-1).getValue();
-        data.removeLabeledRow(point);
+        data.removeFromLabeledSet(point);
 
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
     }

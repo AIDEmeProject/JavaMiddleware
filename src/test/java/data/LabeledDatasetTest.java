@@ -1,9 +1,12 @@
 package data;
 
+import exceptions.EmptyUnlabeledSetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,16 +14,38 @@ class LabeledDatasetTest {
     private double[][] X;
     private int[] y;
     private LabeledDataset data;
+    private ArrayList<DataPoint> points;
 
     @BeforeEach
     void setUp() {
         X = new double[][] {{1}, {2}, {3}, {4}};
         y = new int[] {0,0,1,1};
         data = new LabeledDataset(X);
+
+        points = new ArrayList<>(4);
+        for (int i = 0; i < X.length; i++) {
+            points.add(new DataPoint(i, X[i]));
+        }
+    }
+
+    private void assertUnlabeledCollectionsAreEqual(Collection<DataPoint> collection1, Collection<DataPoint> collection2){
+        assertEquals(collection1.size(), collection2.size());
+        for (DataPoint point : collection1){
+            assertTrue(collection2.contains(point));
+        }
+    }
+
+    private void assertLabeledCollectionsAreEqual(Collection<LabeledPoint> collection1, Collection<LabeledPoint> collection2){
+        assertEquals(collection1.size(), collection2.size());
+
+        Iterator<LabeledPoint> it = collection2.iterator();
+        for (DataPoint point : collection1){
+            assertEquals(point, it.next());
+        }
     }
 
     private void labelAll(){
-        data.addLabeledRow(data.getAllPoints(), y);
+        data.putOnLabeledSet(points, y);
     }
 
     @Test
@@ -29,79 +54,139 @@ class LabeledDatasetTest {
     }
 
     @Test
-    void constructor_zeroDimensionDataMatrix_throwsException() {
+    void constructor_zeroDimensionalDataMatrix_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(new double[][] {{},{}}));
     }
 
     @Test
+    void constructor_rowsOfDifferentLengths_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(new double[][] {{1},{1,2}}));
+    }
+
+    @Test
+    void getLabeledPoints_noPointsLabeled_returnsEmptyCollection() {
+        assertTrue(data.getLabeledPoints().isEmpty());
+    }
+
+    @Test
+    void getLabeledPoints_fewPointsLabeled_returnsExpectedCollection() {
+        Collection<LabeledPoint> labeledPoints = new ArrayList<>();
+
+        for (int index : new int[] {0,2}) {
+            data.putOnLabeledSet(points.get(index), y[index]);
+            labeledPoints.add(new LabeledPoint(points.get(index), y[index]));
+        }
+
+        assertLabeledCollectionsAreEqual(labeledPoints, data.getLabeledPoints());
+    }
+
+    @Test
+    void getUnlabeledPoints_noLabeledPointsAdded_returnsAllPoints() {
+        assertUnlabeledCollectionsAreEqual(points, data.getUnlabeledPoints());
+    }
+
+    @Test
+    void getUnlabeledPoints_fewPointsLabeled_returnsExpectedCollection() {
+        int[] indexes = new int[] {0,2};
+        for (int index : indexes) {
+            data.putOnLabeledSet(points.get(index), y[index]);
+            points.remove(points.get(index));
+        }
+
+        assertUnlabeledCollectionsAreEqual(points, data.getUnlabeledPoints());
+    }
+
+    @Test
     void getNumLabeledRows_noLabeledPointsAdded_returnsZero() {
-        assertEquals(0, data.getNumLabeledRows());
+        assertEquals(0, data.getNumLabeledPoints());
     }
 
     @Test
     void getNumLabeledRows_addedLabeledPoints_returnsCorrectNumber() {
-        data.addLabeledRow(new DataPoint(0, X[0]), 0);
-        data.addLabeledRow(new DataPoint(2, X[2]), 0);
-        assertEquals(2, data.getNumLabeledRows());
+        data.putOnLabeledSet(points.get(0), y[0]);
+        data.putOnLabeledSet(points.get(2), y[2]);
+        assertEquals(2, data.getNumLabeledPoints());
     }
 
     @Test
     void getNumUnlabeledRows_noLabeledPointsAdded_returnNumOfDataPoints() {
-        assertEquals(X.length, data.getNumUnlabeledRows());
+        assertEquals(X.length, data.getNumUnlabeledPoints());
     }
 
     @Test
     void getNumUnlabeledRows_addedLabeledPoints_returnNumOfUnlabeledPoints() {
-        data.addLabeledRow(new DataPoint(0, X[0]), 0);
-        data.addLabeledRow(new DataPoint(3, X[3]), 0);
-        assertEquals(X.length - 2, data.getNumUnlabeledRows());
+        data.putOnLabeledSet(points.get(0), y[0]);
+        data.putOnLabeledSet(points.get(3), y[3]);
+        assertEquals(X.length - 2, data.getNumUnlabeledPoints());
     }
 
     @Test
-    void addLabeledRow_addDuplicatedLabeledRow_throwsException() {
+    void putOnLabeledSet_addSamePointTwice_throwsException() {
         labelAll();
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new DataPoint(0, X[0]),0));
+        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(points.get(0),y[0]));
     }
 
     @Test
-    void addLabeledRow_invalidLabel_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new DataPoint(0, X[0]), -1));
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new DataPoint(0, X[0]), 2));
+    void putOnLabeledSet_invalidLabel_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(points.get(0), -1));
+        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(points.get(0), 2));
     }
 
     @Test
-    void addLabeledRow_incompatibleSizes_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new ArrayList<>(), new int[]{0, 1}));
+    void putOnLabeledSet_incompatibleSizes_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(new ArrayList<>(), new int[]{0, 1}));
     }
 
     @Test
-    void removeLabeledRow_removeRowNotInLabeledSet_throwsException() {
-       assertThrows(IllegalArgumentException.class, () -> data.removeLabeledRow(new DataPoint(0, X[0])));
+    void putOnLabeledSet_addPoint_inLabeledSetButNotInUnlabeledSet() {
+        data.putOnLabeledSet(points.get(0), y[0]);
+        assertTrue(data.getLabeledPoints().contains(points.get(0)));
+        assertFalse(data.getUnlabeledPoints().contains(points.get(0)));
     }
 
     @Test
-    void sample_zeroSampleSize_throwsException() {
+    void removeFromLabeledSet_removeRowNotInLabeledSet_throwsException() {
+       assertThrows(IllegalArgumentException.class, () -> data.removeFromLabeledSet(points.get(0)));
+    }
+
+    @Test
+    void removeFromLabeledSet_addAndRemoveSamePoint_inUnlabeledSetButNotInLabeledSet() {
+        DataPoint point = points.get(0);
+        data.putOnLabeledSet(point, y[0]);
+        data.removeFromLabeledSet(point);
+        assertFalse(data.getLabeledPoints().contains(point));
+        assertTrue(data.getUnlabeledPoints().contains(point));
+    }
+
+    @Test
+    void subsampleUnlabeledSet_zeroSampleSize_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(0));
     }
 
     @Test
-    void sample_negativeSampleSize_throwsException() {
+    void subsampleUnlabeledSet_negativeSampleSize_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(-1));
     }
 
     @Test
-    void sample_sampleSizeEqualsToNumUnlabeledPoints_theOwnObjectIsReturned() {
+    void subsampleUnlabeledSet_sampleSizeEqualsToNumUnlabeledPoints_theOwnObjectIsReturned() {
         data = new LabeledDataset(X);
-        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledRows()));
+        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledPoints()));
     }
 
     @Test
-    void sample_sampleSizeLargerThanNumUnlabeledPoints_theOwnObjectIsReturned() {
-        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledRows() + 1));
+    void subsampleUnlabeledSet_sampleSizeLargerThanNumUnlabeledPoints_theOwnObjectIsReturned() {
+        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledPoints() + 1));
     }
 
     @Test
-    void sample_sampleSizeEqualsInfinity_theOwnObjectIsReturned() {
+    void subsampleUnlabeledSet_sampleSizeEqualsInfinity_theOwnObjectIsReturned() {
         assertTrue(data == data.subsampleUnlabeledSet(Integer.MAX_VALUE));
+    }
+
+    @Test
+    void subsampleUnlabeledSet_emptyUnlabeledSet_throwsException() {
+        labelAll();
+        assertThrows(EmptyUnlabeledSetException.class, () -> data.subsampleUnlabeledSet(1));
     }
 }
