@@ -4,7 +4,6 @@ import active.ActiveLearner;
 import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
-import data.LabeledPoint;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -188,15 +187,15 @@ public class Explore {
     }
 
     private Collection<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
-        int[] rows = data.getNumLabeledRows() == 0 ?
-                     initialSampler.sample(user.getLabel(data.getUnlabeledPoints())) :
-                     new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize))};
+        ArrayList<DataPoint> result = new ArrayList<>();
 
-        Collection<DataPoint> points = new ArrayList<>(rows.length);
-        for (int row : rows){
-            points.add(data.getRow(row));
+        if (data.getNumLabeledRows() == 0){
+            result.addAll(initialSampler.sample(data.getUnlabeledPoints(), user));
+        }
+        else{
+            result.add(activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize)));
         }
 
-        return points;
+        return result;
     }
 }

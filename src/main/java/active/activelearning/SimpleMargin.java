@@ -4,8 +4,10 @@ import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.SVM.SvmClassifier;
 import classifier.SVM.SvmLearner;
+import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import utils.OptimumFinder;
 
 import java.util.Collection;
 
@@ -48,7 +50,7 @@ public class SimpleMargin implements ActiveLearner {
      * @return row index of unlabeled point closest to decision boundary
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        return data.retrieveMinimizerOverUnlabeledData(pt -> Math.abs(classifier.margin(pt)));
+    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.margin(pt))).getOptimum();
     }
 }

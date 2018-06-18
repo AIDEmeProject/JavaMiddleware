@@ -1,10 +1,8 @@
 package data;
 
-import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class LabeledDataset {
     private final Map<Integer, LabeledPoint> labeled;
@@ -47,18 +45,6 @@ public class LabeledDataset {
      */
     public Collection<DataPoint> getUnlabeledPoints() {
         return new HashMap<>(unlabeled).values();
-    }
-
-    public DataPoint getRow(int i){
-        if (unlabeled.containsKey(i)){
-            return unlabeled.get(i);
-        }
-
-        if (labeled.containsKey(i)){
-            return labeled.get(i);
-        }
-
-        throw new IllegalArgumentException();
     }
 
     /**
@@ -147,29 +133,6 @@ public class LabeledDataset {
         }
 
         unlabeled.put(row, point);
-    }
-
-    /**
-     * @param scoreFunction: computes the score of data[row]
-     * @return unlabeled row minimizing the score function
-     */
-    public int retrieveMinimizerOverUnlabeledData(Function<DataPoint, Double> scoreFunction) {
-        if (getNumUnlabeledRows() == 0) {
-            throw new EmptyUnlabeledSetException();
-        }
-
-        double minScore = Double.POSITIVE_INFINITY;
-        int minRow = -1;
-
-        for (Map.Entry<Integer, DataPoint> entry : unlabeled.entrySet()) {
-            double score = scoreFunction.apply(entry.getValue());
-            if (score < minScore) {
-                minScore = score;
-                minRow = entry.getKey();
-            }
-        }
-
-        return minRow;
     }
 
     /**

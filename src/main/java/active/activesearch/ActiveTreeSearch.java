@@ -90,14 +90,14 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @return row index of most informative unlabeled point
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
         int steps = Math.min(data.getNumUnlabeledRows(), this.lookahead);
 
         if (steps == 0){
             throw new EmptyUnlabeledSetException();
         }
 
-        return utility(data, steps).getOptimum().getId();
+        return utility(data, steps).getOptimum();
     }
 
     /**

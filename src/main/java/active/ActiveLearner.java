@@ -1,7 +1,10 @@
 package active;
 
 import classifier.Learner;
+import data.DataPoint;
 import data.LabeledDataset;
+
+import java.util.Collection;
 
 /**
  * ActiveLearner represents a classifier adapted to the Active Learning scenario. It is augmented with the capacity of
@@ -15,8 +18,6 @@ public interface ActiveLearner extends Learner{
      * @param data: labeled data object
      * @return index of the next unlabeled point to label
      * @throws exceptions.EmptyUnlabeledSetException if unlabeled set is empty
-     * TODO: change return type to int[] or collection of int?
-     * TODO: add subsampling for faster computation
      */
-    int retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
+    DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
 }

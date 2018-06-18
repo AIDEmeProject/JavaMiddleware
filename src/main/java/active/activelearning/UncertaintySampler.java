@@ -3,8 +3,10 @@ package active.activelearning;
 import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
+import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import utils.OptimumFinder;
 
 import java.util.Collection;
 
@@ -43,7 +45,7 @@ public class UncertaintySampler implements ActiveLearner {
      * @return most informative point in unlabeled set
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        return data.retrieveMinimizerOverUnlabeledData(pt -> Math.abs(classifier.probability(pt) - 0.5));
+    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.probability(pt) - 0.5)).getOptimum();
     }
 }

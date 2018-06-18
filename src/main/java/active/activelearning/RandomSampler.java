@@ -3,6 +3,7 @@ package active.activelearning;
 import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
+import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import exceptions.EmptyUnlabeledSetException;
@@ -40,11 +41,11 @@ public class RandomSampler implements ActiveLearner {
      * @return random unlabeled point index
      */
     @Override
-    public int retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
         if (data.getNumUnlabeledRows() == 0){
             throw new EmptyUnlabeledSetException();
         }
 
-        return ReservoirSampler.sample(data.getUnlabeledPoints()).getId();
+        return ReservoirSampler.sample(data.getUnlabeledPoints());
     }
 }

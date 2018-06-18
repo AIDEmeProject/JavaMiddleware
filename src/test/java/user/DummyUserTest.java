@@ -1,5 +1,6 @@
 package user;
 
+import data.DataPoint;
 import data.LabeledDataset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,15 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DummyUserTest {
-    private LabeledDataset data;
+    private double[][] X;
     private int[] labels;
+    private LabeledDataset data;
     private DummyUser user;
 
     @BeforeEach
     void setUp() {
-        data = new LabeledDataset(new double[][]{{1}, {2}, {3}, {4}});
+        X = new double[][]{{1}, {2}, {3}, {4}};
+        data = new LabeledDataset(X);
         labels = new int[] {0,1,1,0};
         user = new DummyUser(labels);
     }
@@ -46,7 +49,7 @@ class DummyUserTest {
     @Test
     void getLabel_rowIndexIsValid_returnsCorrectLabels() {
         for (int i = 0; i < labels.length; i++) {
-            assertEquals(labels[i], user.getLabel(data.getRow(i)));
+            assertEquals(labels[i], user.getLabel(new DataPoint(i, X[i])));
         }
     }
 

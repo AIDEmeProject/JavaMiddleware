@@ -1,5 +1,7 @@
 package sampling;
 
+import data.DataPoint;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -69,15 +71,7 @@ public class ReservoirSampler {
         return result;
     }
 
-    /**
-     * Sample a number of elements uniformly from a collection
-     * @param collection: collection to sample from
-     * @param sampleSize: random subset size
-     * @return sample from collection
-     * @throws IllegalArgumentException if length is not positive
-     * @throws IllegalArgumentException if there are less than 'subsetSize' elements in collection
-     */
-    public static <T> Collection<T> sample(Collection<T> collection, int sampleSize){
+    public static <T> Collection<T> sample(Collection<T> collection, int sampleSize, Predicate<T> filter){
         if (sampleSize <= 0){
             throw new IllegalArgumentException("Subset size must be positive: " + sampleSize);
         }
@@ -90,6 +84,10 @@ public class ReservoirSampler {
         ArrayList<T> result = new ArrayList<>(sampleSize);
 
         for (T elem : collection) {
+            if (filter.test(elem)){
+                continue;
+            }
+
             if (index < sampleSize){
                 result.add(elem);
             }
@@ -105,6 +103,18 @@ public class ReservoirSampler {
         }
 
         return result;
+    }
+
+    /**
+     * Sample a number of elements uniformly from a collection
+     * @param collection: collection to sample from
+     * @param sampleSize: random subset size
+     * @return sample from collection
+     * @throws IllegalArgumentException if length is not positive
+     * @throws IllegalArgumentException if there are less than 'subsetSize' elements in collection
+     */
+    public static <T> Collection<T> sample(Collection<T> collection, int sampleSize){
+        return sample(collection, sampleSize, pt -> false);
     }
 
     /**

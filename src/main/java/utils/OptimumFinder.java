@@ -28,8 +28,8 @@ public class OptimumFinder {
         return new OptimumResult<>(minimizer, score);
     }
 
-    public static <T> OptimumResult<T> branchAndBoundMaximizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> lowerBound){
-        OptimumResult<T> result = branchAndBoundMinimizer(collection, x -> -function.apply(x), x -> -lowerBound.apply(x));
+    public static <T> OptimumResult<T> branchAndBoundMaximizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> upperBound){
+        OptimumResult<T> result = branchAndBoundMinimizer(collection, x -> -function.apply(x), x -> -upperBound.apply(x));
         return new OptimumResult<>(result.optimum, -result.value);
     }
 
