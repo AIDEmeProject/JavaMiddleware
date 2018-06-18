@@ -93,10 +93,10 @@ public class RunExperiment {
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
-        activeLearners.put("Random Learner kNN", new RandomSampler(boundedLearner));
-        activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(boundedLearner));
-        activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(boundedLearner, 1));
-        //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(boundedLearner, 2));
+        //activeLearners.put("Random Learner kNN", new RandomSampler(boundedLearner));
+        //activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(boundedLearner));
+        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(boundedLearner, 1));
+        activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(boundedLearner, 2));
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(learner));
 
         // METRICS

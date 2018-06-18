@@ -1,5 +1,8 @@
 package active.activesearch;
 
+import classifier.Classifier;
+import classifier.Learner;
+import data.DataPoint;
 import data.LabeledDataset;
 
 /**
@@ -7,11 +10,18 @@ import data.LabeledDataset;
  */
 class DummyUpperBoundCalculator implements UpperBoundCalculator{
 
-    public void fit(LabeledDataset data, int steps){
-        // do nothing
+    private final Learner learner;
+
+    public DummyUpperBoundCalculator(Learner learner) {
+        this.learner = learner;
     }
 
-    public double upperBound(double proba){
+    public Classifier fit(LabeledDataset data, int steps){
+        return learner.fit(data.getLabeledPoints());
+    }
+
+    @Override
+    public double upperBound(DataPoint point) {
         return Double.POSITIVE_INFINITY;
     }
 }

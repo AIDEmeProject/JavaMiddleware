@@ -3,10 +3,7 @@ package data;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class LabeledDataset {
@@ -31,18 +28,25 @@ public class LabeledDataset {
         this.unlabeled = unlabeled;
     }
 
+    public Collection<DataPoint> getAllPoints() {
+        Collection<DataPoint> result = new ArrayList<>(getNumRows());
+        result.addAll(unlabeled.values());
+        result.addAll(labeled.values());
+        return result;
+    }
+
     /**
      * @return Collection of labeled points
      */
     public Collection<LabeledPoint> getLabeledPoints() {
-        return labeled.values();
+        return new HashMap<>(labeled).values();
     }
 
     /**
      * @return Collection of unlabeled points
      */
     public Collection<DataPoint> getUnlabeledPoints() {
-        return unlabeled.values();
+        return new HashMap<>(unlabeled).values();
     }
 
     public DataPoint getRow(int i){
@@ -96,34 +100,36 @@ public class LabeledDataset {
      * Add specified row to labeled rows collection and remove it from unlabeled collection. If element is already in set,
      * nothing happens (as if value were discarded).
      *
-     * @param row: index of labeled point to add
+     * @param point: point to add
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
-    public void addLabeledRow(int row, int label) {
-        DataPoint point = unlabeled.remove(row);
+    public void addLabeledRow(DataPoint point, int label) {
+        int row = point.getId();
+        DataPoint pop = unlabeled.remove(row);
 
-        if (point == null){
+        if (pop == null){
             throw new IllegalArgumentException();
         }
 
-        labeled.put(row, new LabeledPoint(point, label));
+        labeled.put(row, new LabeledPoint(pop, label));
     }
 
     /**
      * Add all rows in array to labeled rows collection, and remove then from unlabeled collection. If any element is
      * already in set, nothing happens (as if value were discarded).
      *
-     * @param rows:   collection of row numbers to add
+     * @param points:   collection of points to add
      * @param labels: collection of the respective labels for each row number
      * @throws IllegalArgumentException  if arrays have incompatible sizes, or if any label if different from 0 or 1
      */
-    public void addLabeledRow(int[] rows, int[] labels) {
-        if (rows.length != labels.length) {
+    public void addLabeledRow(Collection<DataPoint> points, int[] labels) {
+        if (points.size() != labels.length) {
             throw new IllegalArgumentException("rows and labels have incompatible sizes.");
         }
 
-        for (int i = 0; i < rows.length; i++) {
-            addLabeledRow(rows[i], labels[i]);
+        int i = 0;
+        for (DataPoint point : points) {
+            addLabeledRow(point, labels[i++]);
         }
     }
 

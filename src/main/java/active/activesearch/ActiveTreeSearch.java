@@ -8,6 +8,7 @@ import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import exceptions.EmptyUnlabeledSetException;
+import utils.OptimumFinder;
 
 import java.util.Collection;
 
@@ -64,7 +65,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(Learner learner, int lookahead) {
-        this(learner, lookahead, new DummyUpperBoundCalculator());
+        this(learner, lookahead, new DummyUpperBoundCalculator(learner));
     }
 
     private ActiveTreeSearch(Learner learner, int lookahead, UpperBoundCalculator calculator) {
@@ -96,7 +97,7 @@ public class ActiveTreeSearch implements ActiveLearner {
             throw new EmptyUnlabeledSetException();
         }
 
-        return utility(data, steps).index;
+        return utility(data, steps).getOptimum().getId();
     }
 
     /**
@@ -105,42 +106,13 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param steps: number of steps to look into the future
      * @return optimal utility index and value
      */
-    private UtilityResult utility(LabeledDataset data, int steps){
-        // compute class probabilities
-        double[] probas = learner.fit(data.getLabeledPoints()).probability(data);
+    private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
+        Classifier clf = calculator.fit(data, steps);
 
-        // get unlabeled point of maximum probability
-        int optimalRow = data.retrieveMinimizerOverUnlabeledData(pt -> -probas[pt.getId()]);
-        double optimalUtility = probas[optimalRow];
-
-        // in 1-step case, just return point we are most certain of being positive (greedy approach)
-        if (steps <= 1){
-            return new UtilityResult(optimalRow, optimalUtility);
-        }
-
-        // warm starting: start at most probable point of being positive
-        optimalUtility = optimalUtilityGivenPoint(data, steps, optimalRow, probas[optimalRow]);
-
-        calculator.fit(data, steps);
-
-        for (DataPoint point : data.getUnlabeledPoints()) {
-            int row = point.getId();
-
-            // skip labeled points and those not meeting the threshold
-            if (calculator.upperBound(probas[row]) <= optimalUtility){
-                continue;
-            }
-
-            // compute and update optimal utility
-            double util = optimalUtilityGivenPoint(data, steps, row, probas[row]);
-
-            if (util > optimalUtility){
-                optimalUtility = util;
-                optimalRow = row;
-            }
-        }
-
-        return new UtilityResult(optimalRow, optimalUtility);
+        return OptimumFinder.branchAndBoundMaximizer(
+                data.getUnlabeledPoints(),
+                pt -> optimalUtilityGivenPoint(data, steps, clf, pt),
+                calculator::upperBound);
     }
 
     /**
@@ -148,39 +120,30 @@ public class ActiveTreeSearch implements ActiveLearner {
      * This function if computed recursively, calling the utility() method twice. Refer to [2] for details.
      * @param data: labeled data so far
      * @param steps: number to future steps remaining
-     * @param rowNumber: row number of starting point
-     * @param proba: probability of X[i] being 1
+     * @param clf: classifier fit on data
+     * @param point: point to compute the utility
      * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
      */
-    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, int rowNumber, double proba){
+    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, Classifier clf, DataPoint point){
+        double proba = clf.probability(point);
+
         if (steps <= 1){
             return proba;
         }
 
+        int rowNumber = point.getId();
+
         // positive label branch
-        data.addLabeledRow(rowNumber, 1);
-        double positiveUtility = utility(data, steps-1).utility;
+        data.addLabeledRow(point, 1);
+        double positiveUtility = utility(data, steps-1).getValue();
 
         // negative label branch
         data.setLabel(rowNumber, 0);
-        double negativeUtility = utility(data, steps-1).utility;
+        double negativeUtility = utility(data, steps-1).getValue();
 
         // restore previous state
         data.removeLabeledRow(rowNumber);
 
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
-    }
-
-    /**
-     * Helper class used for storing the results of Utility computation: row number / index and utility value.
-     */
-    private class UtilityResult {
-        int index;
-        double utility;
-
-        UtilityResult(int index, double utility) {
-            this.index = index;
-            this.utility = utility;
-        }
     }
 }

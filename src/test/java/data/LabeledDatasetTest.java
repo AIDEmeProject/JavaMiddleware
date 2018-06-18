@@ -4,12 +4,15 @@ import exceptions.EmptyUnlabeledSetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LabeledDatasetTest {
     private double[][] X;
     private int[] y;
     private LabeledDataset data;
+    private DataPoint point;
 
     @BeforeEach
     void setUp() {
@@ -19,7 +22,7 @@ class LabeledDatasetTest {
     }
 
     private void labelAll(){
-        data.addLabeledRow(new int[] {0,1,2,3}, y);
+        data.addLabeledRow(data.getAllPoints(), y);
     }
 
     @Test
@@ -70,8 +73,8 @@ class LabeledDatasetTest {
 
     @Test
     void getNumLabeledRows_addedLabeledPoints_returnsCorrectNumber() {
-        data.addLabeledRow(0, 0);
-        data.addLabeledRow(3, 0);
+        data.addLabeledRow(data.getRow(0), 0);
+        data.addLabeledRow(data.getRow(2), 0);
         assertEquals(2, data.getNumLabeledRows());
     }
 
@@ -82,40 +85,27 @@ class LabeledDatasetTest {
 
     @Test
     void getNumUnlabeledRows_addedLabeledPoints_returnNumOfUnlabeledPoints() {
-        data.addLabeledRow(0, 0);
-        data.addLabeledRow(3, 0);
+        data.addLabeledRow(data.getRow(0), 0);
+        data.addLabeledRow(data.getRow(3), 0);
         assertEquals(X.length - 2, data.getNumUnlabeledRows());
-    }
-
-    @Test
-    void addLabeledRow_outOfBoundsRow_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(X.length, 0));
     }
 
     @Test
     void addLabeledRow_addDuplicatedLabeledRow_throwsException() {
         labelAll();
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(0,0));
+        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(data.getRow(0),0));
     }
 
     @Test
     void addLabeledRow_invalidLabel_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(0, 2));
+        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(data.getRow(0), -1));
+        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(data.getRow(0), 2));
     }
 
     @Test
     void addLabeledRow_incompatibleSizes_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new int[]{0}, new int[]{0, 1}));
+        assertThrows(IllegalArgumentException.class, () -> data.addLabeledRow(new ArrayList<>(), new int[]{0, 1}));
     }
-
-//    @Test
-//    void removeLabeledRow_removeLabeledPoint_pointNotInLabeledSetAnymore() {
-//        data.addLabeledRow(0, 0);
-//        data.removeLabeledRow(0);
-//        assertFalse(data.getLabeledPoints().contains(0));
-//    }
 
     @Test
     void removeLabeledRow_rowIndexOutOfBounds_throwsException() {
@@ -143,7 +133,7 @@ class LabeledDatasetTest {
     @Test
     void retrieveMinimizerOverUnlabeledData_nonEmptyLabeledSetAndDummyScoreFunction_returnsCorrectMinimizer() {
         data = new LabeledDataset(X);
-        data.addLabeledRow(0, 0);
+        data.addLabeledRow(data.getRow(0), 0);
         assertEquals(1, data.retrieveMinimizerOverUnlabeledData(pt -> (double) pt.getId()));
     }
 

@@ -2,6 +2,8 @@ package active.activesearch;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
+import classifier.Classifier;
+import data.DataPoint;
 import data.LabeledDataset;
 
 /**
@@ -16,15 +18,17 @@ import data.LabeledDataset;
 class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
     private double u0, u1;
     private BoundedLearner learner;
+    private BoundedClassifier classifier;
 
     public BoundedClassifierUpperBoundCalculator(BoundedLearner learner) {
         this.learner = learner;
     }
 
-    public void fit(LabeledDataset data, int steps){
-        BoundedClassifier classifier = learner.fit(data.getLabeledPoints());
+    public Classifier fit(LabeledDataset data, int steps){
+        classifier = learner.fit(data.getLabeledPoints());
         u0 = optimalUtilityUpperBound(data, classifier, steps-1, 0);
         u1 = optimalUtilityUpperBound(data, classifier,  steps-1, 1);
+        return classifier;
     }
 
     /**
@@ -47,7 +51,8 @@ class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
         return (positiveUpperBound + 1) * pStar + negativeUpperBound * (1 - pStar);
     }
 
-    public double upperBound(double proba){
+    public double upperBound(DataPoint point){
+        double proba = classifier.probability(point);
         return (u1 + 1) * proba + u0 * (1 - proba);
     }
 }

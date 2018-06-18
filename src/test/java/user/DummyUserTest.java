@@ -44,21 +44,15 @@ class DummyUserTest {
     }
 
     @Test
-    void getLabel_rowIndexOutOfBounds_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> user.getLabel(data, -1));
-        assertThrows(IndexOutOfBoundsException.class, () -> user.getLabel(data, labels.length));
-    }
-
-    @Test
     void getLabel_rowIndexIsValid_returnsCorrectLabels() {
         for (int i = 0; i < labels.length; i++) {
-            assertEquals(labels[i], user.getLabel(data, i));
+            assertEquals(labels[i], user.getLabel(data.getRow(i)));
         }
     }
 
     @Test
     void getAllLabels_callGetAllLabels_returnsLabelsArray() {
-        assertArrayEquals(labels, user.getAllLabels(data));
+        assertArrayEquals(labels, user.getLabel(data.getAllPoints()));
     }
 
     @Test
@@ -74,6 +68,6 @@ class DummyUserTest {
         positiveSetIndexes.add(2L);
 
         user = new DummyUser(indexes, positiveSetIndexes);
-        assertArrayEquals(labels, user.getAllLabels(data));
+        assertArrayEquals(labels, user.getLabel(data.getAllPoints()));
     }
 }

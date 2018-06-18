@@ -2,7 +2,9 @@ package classifier;
 
 
 import data.DataPoint;
-import data.LabeledDataset;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A classifier is any object capable of "learning from training data" and "make predictions for new data points".
@@ -20,14 +22,15 @@ public interface Classifier {
 
     /**
      * Return class probability estimation for each point in the dataset.
-     * @param data: collection of data points
+     * @param points: collection of data points
      * @return probability estimation array
      */
-    default double[] probability(LabeledDataset data){
-        double[] probas = new double[data.getNumRows()];
+    default double[] probability(Collection<DataPoint> points){
+        double[] probas = new double[points.size()];
 
-        for (int i = 0; i < data.getNumRows(); i++) {
-            probas[i] = probability(data.getRow(i));
+        int i = 0;
+        for (DataPoint point : points) {
+            probas[i++] = probability(point);
         }
 
         return probas;
@@ -44,14 +47,15 @@ public interface Classifier {
 
     /**
      * Return predicted class labels for each point in the dataset.
-     * @param data: collection of data points
+     * @param points: collection of data points
      * @return predicted class labels
      */
-    default int[] predict(LabeledDataset data){
-        int[] labels = new int[data.getNumRows()];
+    default int[] predict(Collection<DataPoint> points){
+        int[] labels = new int[points.size()];
 
-        for (int i = 0; i < data.getNumRows(); i++) {
-            labels[i] = predict(data.getRow(i));
+        int i = 0;
+        for (DataPoint point : points) {
+            labels[i++] = predict(point);
         }
 
         return labels;

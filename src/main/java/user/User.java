@@ -1,6 +1,9 @@
 package user;
 
+import data.DataPoint;
 import data.LabeledDataset;
+
+import java.util.Collection;
 
 /**
  * An User represents the "oracle" of Active Learning scenario: an expert or human annotator capable of, given a data point,
@@ -9,30 +12,24 @@ import data.LabeledDataset;
 public interface User {
     /**
      * Given a dataset and a row, return the label of data[row]
-     * @param data: collection of data points
-     * @param row: row to label
+     * @param point: point to label
      * @return label of data[row]
      */
-    int getLabel(LabeledDataset data, int row);
+    int getLabel(DataPoint point);
 
     /**
      * Return the labels of a batch of rows
-     * @param data: collection of data points
-     * @param rows: collection of rows to request labels
+     * @param points: collection of data points
      * @return an array containing the labels of each requested row
      */
-    default int[] getLabel(LabeledDataset data, int[] rows){
-        int[] labels = new int[rows.length];
-        for (int i = 0; i < rows.length; i++) {
-            labels[i] = getLabel(data, rows[i]);
+    default int[] getLabel(Collection<DataPoint> points){
+        int[] labels = new int[points.size()];
+
+        int i = 0;
+        for (DataPoint point : points){
+            labels[i++] = getLabel(point);
         }
+
         return labels;
     }
-
-    /**
-     * Returns the labels for the entire dataset. This is an utility method used when computing accuracy metrics in experiments.
-     * @return labels of all data points
-     * TODO: should be removed from the general interface once a "real user" class is added
-     */
-    int[] getAllLabels(LabeledDataset data);
 }

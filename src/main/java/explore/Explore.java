@@ -2,7 +2,9 @@ package explore;
 
 import active.ActiveLearner;
 import classifier.Classifier;
+import data.DataPoint;
 import data.LabeledDataset;
+import data.LabeledPoint;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -162,12 +164,13 @@ public class Explore {
 
         // find next points to label
         initialTime = System.nanoTime();
-        int[] rows = getNextPointToLabel(data, user, activeLearner);
+        Collection<DataPoint> points = getNextPointToLabel(data, user, activeLearner);
         metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled set
-        data.addLabeledRow(rows, user.getLabel(data, rows));
-        metrics.add("labeledRow", (double) rows[0]);  //TODO: how to store rows ?
+        int[] labels = user.getLabel(points);
+        data.addLabeledRow(points, labels);
+        metrics.add("labeledRow", (double) points.iterator().next().getId());  //TODO: how to store rows ?
 
         // retrain model
         initialTime = System.nanoTime();
@@ -184,13 +187,16 @@ public class Explore {
         return metrics;
     }
 
-    private int[] getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
-        // initial sampling
-        if (data.getNumLabeledRows() == 0){
-            return initialSampler.sample(user.getAllLabels(data));
+    private Collection<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
+        int[] rows = data.getNumLabeledRows() == 0 ?
+                     initialSampler.sample(user.getLabel(data.getUnlabeledPoints())) :
+                     new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize))};
+
+        Collection<DataPoint> points = new ArrayList<>(rows.length);
+        for (int row : rows){
+            points.add(data.getRow(row));
         }
 
-        // retrieve most informative point according to model
-        return new int[] {activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize))};
+        return points;
     }
 }

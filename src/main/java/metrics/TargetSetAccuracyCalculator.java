@@ -35,6 +35,6 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
 
     @Override
     public MetricStorage compute(LabeledDataset data, User user, Classifier classifier) {
-        return compute(data.getLabeledPoints(), user.getAllLabels(data));
+        return compute(data.getLabeledPoints(), user.getLabel(data.getAllPoints()));
     }
 }
