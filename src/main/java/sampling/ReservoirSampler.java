@@ -1,8 +1,8 @@
 package sampling;
 
-import data.DataPoint;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
 import java.util.function.Predicate;
 
 /**
@@ -25,59 +25,17 @@ public class ReservoirSampler {
     }
 
     /**
-     * Sample k elements uniformly from {i: 0 &lt; i &lt; length - 1, filter(i) == false}
-     * @param length: array size
-     * @param subsetSize: random subset size
-     * @param filter: predicate which filters any index returning true
+     * Extracts a random sample from a collection. We can also specify a filter function for
+     * @param collection: collection of elements
+     * @param sampleSize: sample size
+     * @param filter: predicate which filters any element returning true
      * @return random index
      * @throws IllegalArgumentException if length is not positive
-     * @throws RuntimeException if there are less than k non-filtered elements
+     * @throws IllegalArgumentException if sample size is larger than filtered collection
      */
-    public static int[] sample(int length, int subsetSize, Predicate<Integer> filter){
-        if (length <= 0){
-            throw new IllegalArgumentException("Length must be positive: " + length);
-        }
-
-        if (subsetSize <= 0){
-            throw new IllegalArgumentException("Subset size must be positive: " + subsetSize);
-        }
-
-        int index = 0;
-        int[] result = new int[subsetSize];
-
-        for (int i = 0; i < length; i++) {
-            if (filter.test(i)){
-                continue;
-            }
-
-            if (index < subsetSize){
-                result[index] = i;
-            }
-            else {
-                int j = random.nextInt(index+1);
-
-                if (j < subsetSize) {
-                    result[j] = i;
-                }
-            }
-
-            index++;
-        }
-
-        if (index < subsetSize){
-            throw new RuntimeException("Sampling failed. There are less than " + subsetSize + " non-filtered elements in array.");
-        }
-
-        return result;
-    }
-
     public static <T> Collection<T> sample(Collection<T> collection, int sampleSize, Predicate<T> filter){
         if (sampleSize <= 0){
             throw new IllegalArgumentException("Subset size must be positive: " + sampleSize);
-        }
-
-        if (collection.size() < sampleSize){
-            throw new IllegalArgumentException("There are less than " + sampleSize + " elements in collection.");
         }
 
         int index = 0;
@@ -110,12 +68,12 @@ public class ReservoirSampler {
     }
 
     /**
-     * Sample a number of elements uniformly from a collection
+     * Extracts a random sample from a collection.
      * @param collection: collection to sample from
      * @param sampleSize: random subset size
      * @return sample from collection
      * @throws IllegalArgumentException if length is not positive
-     * @throws IllegalArgumentException if there are less than 'subsetSize' elements in collection
+     * @throws IllegalArgumentException sample size is larger than collection
      */
     public static <T> Collection<T> sample(Collection<T> collection, int sampleSize){
         return sample(collection, sampleSize, pt -> false);
@@ -125,8 +83,7 @@ public class ReservoirSampler {
      * Sample one single element from a collection
      * @param collection: collection of elements
      * @return random index
-     * @throws IllegalArgumentException if length is not positive
-     * @throws RuntimeException if collection is empty
+     * @throws IllegalArgumentException if collection is empty
      */
     public static <T> T sample(Collection<T> collection){
         return sample(collection, 1).iterator().next();

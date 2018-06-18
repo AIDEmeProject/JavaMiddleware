@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ReservoirSamplerTest {
-    private Collection<Integer> values;
+    private List<Integer> values;
 
     @BeforeEach
     void setUp() {
@@ -19,33 +20,8 @@ class ReservoirSamplerTest {
     }
 
     @Test
-    void sample_negativeLength_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(-1, 1, i -> false));
-    }
-
-    @Test
-    void sample_zeroLength_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(0, 1, i -> false));
-    }
-
-    @Test
-    void sample_negativeSubsetSize_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(1, -1, i -> false));
-    }
-
-    @Test
-    void sample_zeroSubsetSize_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(1, 0, i -> false));
-    }
-
-    @Test
-    void sample_subsetSizeLargerThanLength_throwsException() {
-        assertThrows(RuntimeException.class, () -> ReservoirSampler.sample(1, 2, i -> false));
-    }
-
-    @Test
     void sample_emptyCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(new ArrayList<Integer>(), 1));
+        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(new ArrayList<>()));
     }
 
     @Test
@@ -68,8 +44,15 @@ class ReservoirSamplerTest {
         assertEquals(values, ReservoirSampler.sample(values, values.size()));
     }
 
-    //    @Test
-//    void sample_filterIndex0_0IsNeverSampled() {
-//        assertEquals(1, ReservoirSampler.sample(2, i -> i==0));
-//    }
+    @Test
+    void sample_filteredCollectionSizeSmallerThanSampleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(values, 3, x -> x >= 3));
+    }
+
+    @Test
+    void sample_filteredAllElementsButOne_ReturnsRemainingElement() {
+        ArrayList<Integer> result = new ArrayList<>();
+        result.add(1);
+        assertEquals(result, ReservoirSampler.sample(values, 1, x -> x >= 2));
+    }
 }
