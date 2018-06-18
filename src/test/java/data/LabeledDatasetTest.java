@@ -34,23 +34,6 @@ class LabeledDatasetTest {
     }
 
     @Test
-    void setLabel_invalidRowIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.setLabel(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> data.setLabel(y.length, 0));
-    }
-
-    @Test
-    void setLabel_rowNotInLabeledSet_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.setLabel(0, 0));
-    }
-
-    @Test
-    void setLabel_invalidLabel_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.setLabel(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> data.setLabel(0, 2));
-    }
-
-    @Test
     void getNumLabeledRows_noLabeledPointsAdded_returnsZero() {
         assertEquals(0, data.getNumLabeledRows());
     }
@@ -92,14 +75,8 @@ class LabeledDatasetTest {
     }
 
     @Test
-    void removeLabeledRow_rowIndexOutOfBounds_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.removeLabeledRow(-1));
-        assertThrows(IllegalArgumentException.class, () -> data.removeLabeledRow(X.length));
-    }
-
-    @Test
     void removeLabeledRow_removeRowNotInLabeledSet_throwsException() {
-       assertThrows(IllegalArgumentException.class, () -> data.removeLabeledRow(0));
+       assertThrows(IllegalArgumentException.class, () -> data.removeLabeledRow(new DataPoint(0, X[0])));
     }
 
     @Test

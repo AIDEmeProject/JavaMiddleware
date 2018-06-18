@@ -131,18 +131,15 @@ public class ActiveTreeSearch implements ActiveLearner {
             return proba;
         }
 
-        int rowNumber = point.getId();
-
         // positive label branch
         data.addLabeledRow(point, 1);
         double positiveUtility = utility(data, steps-1).getValue();
+        data.removeLabeledRow(point);
 
         // negative label branch
-        data.setLabel(rowNumber, 0);
+        data.addLabeledRow(point, 0);
         double negativeUtility = utility(data, steps-1).getValue();
-
-        // restore previous state
-        data.removeLabeledRow(rowNumber);
+        data.removeLabeledRow(point);
 
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
     }

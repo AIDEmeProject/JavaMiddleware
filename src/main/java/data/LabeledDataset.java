@@ -48,20 +48,6 @@ public class LabeledDataset {
     }
 
     /**
-     * Sets a new label for a given labeled row
-     *
-     * @param row:   labeled row of interest
-     * @param label: new label to set
-     */
-    public void setLabel(int row, int label) {
-        LabeledPoint point = labeled.get(row);
-        if (point == null){
-            throw new IllegalArgumentException();
-        }
-        point.setLabel(label);
-    }
-
-    /**
      * @return Number of rows in data matrix X
      */
     public int getNumRows() {
@@ -123,16 +109,16 @@ public class LabeledDataset {
      * Removes a (row, label) pair from the labeled row collection, putting it back on unlabeled set. If row is not in
      * labeled set, nothing happens (as if this method were never called).
      *
-     * @param row: index of labeled point to remove.
+     * @param point: index of labeled point to remove.
      */
-    public void removeLabeledRow(int row) {
-        LabeledPoint point = labeled.remove(row);
+    public void removeLabeledRow(DataPoint point) {
+        LabeledPoint excluded = labeled.remove(point.getId());
 
-        if (point == null) {
+        if (excluded == null) {
             throw new IllegalArgumentException();
         }
 
-        unlabeled.put(row, point);
+        unlabeled.put(point.getId(), excluded);
     }
 
     /**
