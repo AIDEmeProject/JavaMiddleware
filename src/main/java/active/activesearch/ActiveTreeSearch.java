@@ -176,8 +176,8 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     private class UtilityResult {
         int index;
-
         double utility;
+
         UtilityResult(int index, double utility) {
             this.index = index;
             this.utility = utility;

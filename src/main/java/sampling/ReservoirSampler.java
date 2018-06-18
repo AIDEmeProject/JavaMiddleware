@@ -1,6 +1,6 @@
 package sampling;
 
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -70,14 +70,51 @@ public class ReservoirSampler {
     }
 
     /**
-     * Sample one single element from {i: 0 &lt; i &lt; length - 1, filter(i) == true}
-     * @param length: array size
-     * @param filter: predicate which filters any index which returns true
+     * Sample a number of elements uniformly from a collection
+     * @param collection: collection to sample from
+     * @param sampleSize: random subset size
+     * @return sample from collection
+     * @throws IllegalArgumentException if length is not positive
+     * @throws IllegalArgumentException if there are less than 'subsetSize' elements in collection
+     */
+    public static <T> Collection<T> sample(Collection<T> collection, int sampleSize){
+        if (sampleSize <= 0){
+            throw new IllegalArgumentException("Subset size must be positive: " + sampleSize);
+        }
+
+        if (collection.size() < sampleSize){
+            throw new IllegalArgumentException("There are less than " + sampleSize + " elements in collection.");
+        }
+
+        int index = 0;
+        ArrayList<T> result = new ArrayList<>(sampleSize);
+
+        for (T elem : collection) {
+            if (index < sampleSize){
+                result.add(elem);
+            }
+            else {
+                int j = random.nextInt(index+1);
+
+                if (j < sampleSize) {
+                    result.set(j, elem);
+                }
+            }
+
+            index++;
+        }
+
+        return result;
+    }
+
+    /**
+     * Sample one single element from a collection
+     * @param collection: collection of elements
      * @return random index
      * @throws IllegalArgumentException if length is not positive
-     * @throws RuntimeException if all elements are filtered
+     * @throws RuntimeException if collection is empty
      */
-    public static int sample(int length, Predicate<Integer> filter){
-        return sample(length, 1, filter)[0];
+    public static <T> T sample(Collection<T> collection){
+        return sample(collection, 1).iterator().next();
     }
 }

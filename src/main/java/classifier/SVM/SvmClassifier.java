@@ -27,7 +27,7 @@ public class SvmClassifier implements Classifier {
 
     /**
      * Instantiate SVM classifier from its parameters.
-     * @param bias: bias parameter "b"
+     * @param bias: bias parameter
      * @param alpha: weight parameters
      * @param kernel: kernel function
      * @param supportVectors: collection of support vectors
@@ -45,38 +45,20 @@ public class SvmClassifier implements Classifier {
         this.hasProbability = svm.svm_check_probability_model(model) == 1;
     }
 
-    public double probability(double[] point) {
+    @Override
+    public double probability(DataPoint point) {
         if (!hasProbability){
             throw new RuntimeException("Attempting to compute estimate probability, but probability flag is false!");
-
         }
+
         double[] probas = new double[2];
-        svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(point), probas);
+        svm.svm_predict_probability(model, SvmNodeConverter.toSvmNodeArray(point.getData()), probas);
         return probas[0];
     }
 
     @Override
-    public double probability(DataPoint point) {
-        return probability(point.getData());
-    }
-
-    public int predict(double[] point) {
-        return margin(point) > 0 ? 1 : 0;
-    }
-
-    @Override
     public int predict(DataPoint point) {
-        return predict(point.getData());
-    }
-
-    /**
-     * @param point: data point
-     * @return sample's signed distance of point to svm's decision boundary
-     */
-    public double margin(double[] point){
-        double[] margin = new double[1];
-        svm.svm_predict_values(model, SvmNodeConverter.toSvmNodeArray(point), margin);
-        return margin[0];
+        return margin(point) > 0 ? 1 : 0;
     }
 
     /**

@@ -45,7 +45,6 @@ public class RandomSampler implements ActiveLearner {
             throw new EmptyUnlabeledSetException();
         }
 
-        // sample an index between 0 and data.getNumRows(), excluding labeled points
-        return ReservoirSampler.sample(data.getNumRows(), data.getLabeledPoints()::contains);
+        return ReservoirSampler.sample(data.getUnlabeledPoints()).getId();
     }
 }

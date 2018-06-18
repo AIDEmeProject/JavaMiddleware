@@ -163,7 +163,7 @@ public class Explore {
         // find next points to label
         initialTime = System.nanoTime();
         int[] rows = getNextPointToLabel(data, user, activeLearner);
-        metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
+        metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled set
         data.addLabeledRow(rows, user.getLabel(data, rows));
@@ -172,14 +172,14 @@ public class Explore {
         // retrain model
         initialTime = System.nanoTime();
         Classifier classifier = activeLearner.fit(data.getLabeledPoints());
-        metrics.add("fitTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
+        metrics.add("fitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // compute accuracy metrics
         initialTime = System.nanoTime();
         for (MetricCalculator metricCalculator : metricCalculators){
             metrics.addAll(metricCalculator.compute(data, user, classifier).getMetrics());
         }
-        metrics.add("accuracyComputationTimeMillis", (System.nanoTime() - initialTime) / 1000000.);
+        metrics.add("accuracyComputationTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         return metrics;
     }

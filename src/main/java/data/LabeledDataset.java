@@ -5,11 +5,11 @@ import sampling.ReservoirSampler;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 public class LabeledDataset {
-    private final int size;
     private final Map<Integer, LabeledPoint> labeled;
     private final Map<Integer, DataPoint> unlabeled;
 
@@ -18,8 +18,7 @@ public class LabeledDataset {
             throw new IllegalArgumentException("Dataset cannot be empty.");
         }
 
-        size = X.length;
-        labeled = new HashMap<>();
+        labeled = new LinkedHashMap<>();  // preserve insertion order
 
         unlabeled = new HashMap<>();
         for (int i = 0; i < X.length; i++) {
@@ -27,8 +26,7 @@ public class LabeledDataset {
         }
     }
 
-    private LabeledDataset(int size, Map<Integer, LabeledPoint> labeled, Map<Integer, DataPoint> unlabeled) {
-        this.size = size;
+    private LabeledDataset(Map<Integer, LabeledPoint> labeled, Map<Integer, DataPoint> unlabeled) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;
     }
@@ -77,7 +75,7 @@ public class LabeledDataset {
      * @return Number of rows in data matrix X
      */
     public int getNumRows() {
-        return size;
+        return labeled.size() + unlabeled.size();
     }
 
     /**
@@ -185,13 +183,16 @@ public class LabeledDataset {
             return this;
         }
 
-        Map<Integer, DataPoint> sample = new HashMap<>(sampleSize);
+        // sample keys
+        Collection<Integer> rows = ReservoirSampler.sample(unlabeled.keySet(), sampleSize);
 
-        int[] indexes = ReservoirSampler.sample(getNumRows(), sampleSize, labeled.keySet()::contains);
-        for (int row : indexes) {
+        // copy (key, value) pairs to sample
+        Map<Integer, DataPoint> sample = new HashMap<>(sampleSize);
+        for (Integer row : rows){
             sample.put(row, unlabeled.get(row));
         }
 
-        return new LabeledDataset(getNumLabeledRows() + sampleSize, labeled, sample);
+
+        return new LabeledDataset(labeled, sample);
     }
 }

@@ -1,5 +1,6 @@
 package classifier.SVM;
 
+import data.DataPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +20,13 @@ class SvmClassifierTest {
 
     @Test
     void margin_ComputeMarginOfAttributeValueArray_CorrectMarginComputed() {
-        double[] point = new double[] {0,1};
+        DataPoint point = new DataPoint(0, new double[] {0,1});
         assertEquals(-1, classifier.margin(point));
     }
 
     @Test
     void margin_PredictLabelOfAttributeValueArray_ExpectedLabelPredicted() {
-        double[] point = new double[] {0,1};
+        DataPoint point = new DataPoint(0, new double[] {0,1});
         assertEquals(0, classifier.predict(point));
     }
 }
