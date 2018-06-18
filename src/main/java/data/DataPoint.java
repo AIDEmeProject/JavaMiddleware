@@ -46,6 +46,15 @@ public class DataPoint {
         return id == dataPoint.id && Arrays.equals(data, dataPoint.data);
     }
 
+    /**
+     * We only use the point's id in order to set the hashcode. Implicitly we are assuming each point id is unique in our
+     * datasets (which we try to guarantee).
+     */
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return "(id=" + id + ", data=" + Arrays.toString(data) + ')';

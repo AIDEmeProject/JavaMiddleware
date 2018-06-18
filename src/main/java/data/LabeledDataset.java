@@ -3,41 +3,43 @@ package data;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class LabeledDataset {
     /**
      * collection of labeled points
      */
-    private final Map<Integer, LabeledPoint> labeled;
+    private final Set<LabeledPoint> labeled;
 
     /**
      * collection of unlabeled points
      */
-    private final Map<Integer, DataPoint> unlabeled;
+    private final Set<DataPoint> unlabeled;
 
     /**
      * @param X: data matrix
      * @throws IllegalArgumentException if X is empty, or points are zero-dimensional
-     * TODO: throw exception if any two rows have different dimensions
      */
     public LabeledDataset(double[][] X) {
         if (X.length == 0){
             throw new IllegalArgumentException("Dataset cannot be empty.");
         }
 
-        labeled = new LinkedHashMap<>();  // preserve insertion order
+        labeled = new LinkedHashSet<>();  // preserve insertion order
 
-        unlabeled = new HashMap<>();  // insertion order is not important
+        unlabeled = new HashSet<>();  // insertion order is not important
         for (int i = 0; i < X.length; i++) {
             if (X[i].length != X[0].length){
                 throw new IllegalArgumentException("Found rows of different lengths: expected " + X[0].length + ", obtained " + X[i].length);
             }
-            unlabeled.put(i, new DataPoint(i, X[i]));
+            unlabeled.add(new DataPoint(i, X[i]));
         }
     }
 
-    private LabeledDataset(Map<Integer, LabeledPoint> labeled, Map<Integer, DataPoint> unlabeled) {
+    private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;
     }
@@ -46,9 +48,9 @@ public class LabeledDataset {
      * @return collection containing all points
      */
     public Collection<DataPoint> getAllPoints() {
-        Collection<DataPoint> result = new ArrayList<>(getNumPoints());
-        result.addAll(unlabeled.values());
-        result.addAll(labeled.values());
+        Collection<DataPoint> result = new HashSet<>(getNumPoints());
+        result.addAll(unlabeled);
+        result.addAll(labeled);
         return result;
     }
 
@@ -56,14 +58,14 @@ public class LabeledDataset {
      * @return Collection of labeled points
      */
     public Collection<LabeledPoint> getLabeledPoints() {
-        return new HashMap<>(labeled).values();
+        return new HashSet<>(labeled);
     }
 
     /**
      * @return Collection of unlabeled points
      */
     public Collection<DataPoint> getUnlabeledPoints() {
-        return new HashMap<>(unlabeled).values();
+        return new HashSet<>(unlabeled);
     }
 
     /**
@@ -95,14 +97,13 @@ public class LabeledDataset {
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
     public void putOnLabeledSet(DataPoint point, int label) {
-        int row = point.getId();
-        DataPoint removed = unlabeled.remove(row);
+        boolean removed = unlabeled.remove(point);
 
-        if (removed == null){
+        if (!removed){
             throw new IllegalArgumentException("Point " + point + " is not in unlabeled set.");
         }
 
-        labeled.put(row, new LabeledPoint(removed, label));
+        labeled.add(new LabeledPoint(point, label));
     }
 
     /**
@@ -132,13 +133,13 @@ public class LabeledDataset {
      * @throws IllegalArgumentException if point is not in labeled set
      */
     public void removeFromLabeledSet(DataPoint point) {
-        LabeledPoint removed = labeled.remove(point.getId());
+        boolean removed = labeled.remove(point);
 
-        if (removed == null) {
+        if (!removed) {
             throw new IllegalArgumentException("Point " + point + " is not in labeled set.");
         }
 
-        unlabeled.put(point.getId(), removed);
+        unlabeled.add(point);
     }
 
     /**
@@ -164,13 +165,11 @@ public class LabeledDataset {
         }
 
         // sample keys
-        Collection<Integer> points = ReservoirSampler.sample(unlabeled.keySet(), sampleSize);
+        Collection<DataPoint> points = ReservoirSampler.sample(unlabeled, sampleSize);
 
-        // copy (key, value) pairs to sample
-        Map<Integer, DataPoint> sample = new HashMap<>(sampleSize);
-        for (Integer row : points){
-            sample.put(row, unlabeled.get(row));
-        }
+        // copy sample to set
+        Set<DataPoint> sample = new HashSet<>(sampleSize);
+        sample.addAll(points);
 
         return new LabeledDataset(labeled, sample);
     }
