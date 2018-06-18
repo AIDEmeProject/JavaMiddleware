@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Arrays;
+
 /**
  * This class stores a single data points, together with its unique id.
  */
@@ -32,5 +34,10 @@ public class DataPoint {
 
     public int getDim(){
         return data.length;
+    }
+
+    @Override
+    public String toString() {
+        return "(id=" + id + ", data=" + Arrays.toString(data) + ')';
     }
 }

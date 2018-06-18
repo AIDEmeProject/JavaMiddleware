@@ -102,6 +102,10 @@ public class ReservoirSampler {
             index++;
         }
 
+        if (index < sampleSize){
+            throw new IllegalArgumentException("There are less than " + sampleSize + " elements in collection after filtering.");
+        }
+
         return result;
     }
 

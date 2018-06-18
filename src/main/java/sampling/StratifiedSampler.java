@@ -30,27 +30,6 @@ public class StratifiedSampler {
         this.negativeSamples = negativeSamples;
     }
 
-    /**
-     * Sample from labels array
-     * @param labels: array to sample positive and negative samples
-     * @return row index of samples
-     */
-    public int[] sample(int[] labels){
-        int[] samples = new int[positiveSamples + negativeSamples];
-
-        if (positiveSamples > 0){
-            int[] positiveIndexes = ReservoirSampler.sample(labels.length, positiveSamples, i -> labels[i] != 1);
-            System.arraycopy(positiveIndexes, 0, samples, 0, positiveSamples);
-        }
-
-        if (negativeSamples > 0){
-            int[] negativeIndexes = ReservoirSampler.sample(labels.length, negativeSamples, i -> labels[i] == 1);
-            System.arraycopy(negativeIndexes, 0, samples, positiveSamples, negativeSamples);
-        }
-
-        return samples;
-    }
-
     public Collection<DataPoint> sample(Collection<DataPoint> points, User user){
         Collection<DataPoint> samples = new ArrayList<>(positiveSamples + negativeSamples);
 

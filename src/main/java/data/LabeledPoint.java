@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Arrays;
+
 public class LabeledPoint extends DataPoint {
     private int label;
 
@@ -21,5 +23,10 @@ public class LabeledPoint extends DataPoint {
             throw new IllegalArgumentException();
         }
         this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return "(id=" + getId() + ", data=" + Arrays.toString(getData()) + ", label=" + label + ')';
     }
 }

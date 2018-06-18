@@ -189,11 +189,14 @@ public class Explore {
     private Collection<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
         ArrayList<DataPoint> result = new ArrayList<>();
 
+        // initial sampling
         if (data.getNumLabeledRows() == 0){
             result.addAll(initialSampler.sample(data.getUnlabeledPoints(), user));
         }
+        // retrieve most informative point according to model
         else{
-            result.add(activeLearner.retrieveMostInformativeUnlabeledPoint(data.subsampleUnlabeledSet(subsampleSize)));
+            LabeledDataset sample = data.subsampleUnlabeledSet(subsampleSize);
+            result.add(activeLearner.retrieveMostInformativeUnlabeledPoint(sample));
         }
 
         return result;
