@@ -3,13 +3,14 @@ package classifier.nearest_neighbors;
 import classifier.BoundedClassifier;
 import data.DataPoint;
 import data.LabeledDataset;
+import utils.OptimumFinder;
 
 
 /**
  * A variant of the usual Nearest Neighbors classifier, as described in the paper "Bayesian Optimal Active Search and Surveying".
  * This classifier differs from the usual kNN on two main points:
  *
- *  1) A KD-Tree is first fitted over all unlabeled points, and not only labeled data
+ *  1) A KD-Tree is first fitted over all data points, and not only labeled data
  *
  *  2) They add a smoothing parameter gamma for predicting class probabilities:
  *
@@ -18,7 +19,7 @@ import data.LabeledDataset;
  *     Where L-kNN(x) is the intersection between the k-nearest neighbors of x (as computed above) and the current
  *     labeled set.
  *
- *  One limitation of this classifier is it cannot be reused with different datasets X; you must create a new instance.
+ *  One limitation of this classifier is it cannot be reused with different datasets X.
  *  TODO: can we remove this limitation ?
  */
 public class NearestNeighborsClassifier implements BoundedClassifier {
@@ -58,29 +59,26 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
 
     @Override
     public double probability(DataPoint point) {
-        int row = point.getId();
-        return (gamma + sumOfLabelsInLabeledNeighborhood[row]) / (1 + labeledNeighborhoodSize[row]);
+        return futureProbabilityUpperBound(point, 0);
     }
 
     /**
      * Upper bound on "future probabilities". As described in the paper:
-     *      p*(D, n) = (gamma + n + \sum_{y \in L-kNN(x)} y) / (1 + n + \sum_{y \in L-kNN(x)} 1)
+     *      p*(D, n) = \max_{x in unlabeled set} (gamma + n + \sum_{y \in L-kNN(x)} y) / (1 + n + \sum_{y \in L-kNN(x)} 1)
      *
      * @param data: labeled data
      * @param maxPositivePoints: maximum number of positive labeled points
      * @return probability upper bound
      */
     public double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
-        double maxValue = Double.NEGATIVE_INFINITY;
-        double value;
-
-        for (DataPoint point : data.getUnlabeledPoints()) {
-            value = probability(point);
-
-            if (value > maxValue){
-                maxValue = value;
-            }
+        if (maxPositivePoints < 0){
+            throw new IllegalArgumentException("MaxPositivePoints must be non-negative, found " + maxPositivePoints);
         }
-        return maxValue;
+        return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getValue();
+    }
+
+    private double futureProbabilityUpperBound(DataPoint point, int maxPositivePoints){
+        int row = point.getId();
+        return (gamma + sumOfLabelsInLabeledNeighborhood[row] + maxPositivePoints) / (1 + labeledNeighborhoodSize[row] + maxPositivePoints);
     }
 }

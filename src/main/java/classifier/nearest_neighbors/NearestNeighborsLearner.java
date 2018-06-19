@@ -10,6 +10,22 @@ import smile.neighbor.Neighbor;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * This class is responsible for training a Nearest Neighbors classifier, as described in the paper "Bayesian Optimal
+ * Active Search and Surveying". The trained classifier differs from the usual kNN on two main points:
+ *
+ *  1) A KD-Tree is first fitted over all data points, and not only labeled data
+ *
+ *  2) They add a smoothing parameter gamma for predicting class probabilities:
+ *
+ *      P(y = 1 | x, D) = (gamma + \sum_{y \in L-kNN(x)} y) / (1 + \sum_{y \in L-kNN(x)} 1)
+ *
+ *     Where L-kNN(x) is the intersection between the k-nearest neighbors of x (as computed above) and the current
+ *     labeled set.
+ *
+ *  One limitation of this class is each learner is constrained to be used with a single dataset.
+ *  TODO: can we remove this limitation ?
+ */
 public class NearestNeighborsLearner implements BoundedLearner {
 
     /**

@@ -1,7 +1,6 @@
 package user;
 
 import data.DataPoint;
-import data.LabeledDataset;
 
 import java.util.Collection;
 
