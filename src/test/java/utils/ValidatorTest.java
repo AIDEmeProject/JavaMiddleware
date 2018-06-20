@@ -7,42 +7,42 @@ import static org.junit.jupiter.api.Assertions.*;
 class ValidatorTest {
     @Test
     void assertIsNotEmpty_emptyIntegerArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Validator.assertIsNotEmpty(new int[] {}));
+        assertThrows(IllegalArgumentException.class, () -> Validator.assertNotEmpty(new int[] {}));
     }
 
     @Test
     void assertIsNotEmpty_nonEmptyIntegerArray_doNotThrowException() {
-        Validator.assertIsNotEmpty(new int[] {1});
+        Validator.assertNotEmpty(new int[] {1});
     }
 
     @Test
     void assertIsNotEmpty_emptyLongArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Validator.assertIsNotEmpty(new long[] {}));
+        assertThrows(IllegalArgumentException.class, () -> Validator.assertNotEmpty(new long[] {}));
     }
 
     @Test
     void assertIsNotEmpty_nonEmptyLongArray_doNotThrowException() {
-        Validator.assertIsNotEmpty(new long[] {1L});
+        Validator.assertNotEmpty(new long[] {1L});
     }
 
     @Test
     void assertIsNotEmpty_emptyDoubleArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Validator.assertIsNotEmpty(new double[] {}));
+        assertThrows(IllegalArgumentException.class, () -> Validator.assertNotEmpty(new double[] {}));
     }
 
     @Test
     void assertIsNotEmpty_nonEmptyDoubleArray_doNotThrowException() {
-        Validator.assertIsNotEmpty(new double[] {1.});
+        Validator.assertNotEmpty(new double[] {1.});
     }
 
     @Test
     void assertIsNotEmpty_emptyDoubleMatrix_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Validator.assertIsNotEmpty(new double[][] {}));
+        assertThrows(IllegalArgumentException.class, () -> Validator.assertNotEmpty(new double[][] {}));
     }
 
     @Test
     void assertIsNotEmpty_nonEmptyDoubleMatrix_doNotThrowException() {
-        Validator.assertIsNotEmpty(new double[][] {{1.}});
+        Validator.assertNotEmpty(new double[][] {{1.}});
     }
 
     @Test

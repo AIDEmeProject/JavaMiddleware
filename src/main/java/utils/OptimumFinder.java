@@ -3,11 +3,20 @@ package utils;
 import java.util.Collection;
 import java.util.function.Function;
 
+/**
+ * Utility class for finding the minimum / maximum values of a function over a collection.
+ */
 public class OptimumFinder {
-    public static <T> OptimumResult<T> branchAndBoundMinimizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> lowerBound){
-        if (collection.isEmpty()){
-            throw new IllegalArgumentException("Cannot find minimum over empty collection");
-        }
+    /**
+     *  Finds the minimizer of a function over a collection.
+     * @param collection: collection of elements to find minimizer
+     * @param function: score function returning a double value for each
+     * @param lowerBound: lower bound on function. Used for avoiding evaluating the real function if it is very expensive to compute.
+     * @return an object containing both the minimum function value and the an element achieving the minimum.
+     * @throws IllegalArgumentException if collection is emtpy
+     */
+    public static <T> OptimumResult<T> minimizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> lowerBound){
+        Validator.assertNotEmpty(collection);
 
         double score = Double.POSITIVE_INFINITY;
         T minimizer = null;
@@ -28,35 +37,60 @@ public class OptimumFinder {
         return new OptimumResult<>(minimizer, score);
     }
 
-    public static <T> OptimumResult<T> branchAndBoundMaximizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> upperBound){
-        OptimumResult<T> result = branchAndBoundMinimizer(collection, x -> -function.apply(x), x -> -upperBound.apply(x));
-        return new OptimumResult<>(result.optimum, -result.value);
-    }
-
+    /**
+     * Finds the minimizer of a function over a collection.
+     * @param collection: collection of elements to find minimizer
+     * @param function: score function returning a double value for each
+     * @return an object containing both the minimum function value and the an element achieving the minimum.
+     * @throws IllegalArgumentException if collection is emtpy
+     */
     public static <T> OptimumResult<T> minimizer(Collection<T> collection, Function<T, Double> function){
-        return branchAndBoundMinimizer(collection, function, x -> Double.NEGATIVE_INFINITY);
+        return minimizer(collection, function, x -> Double.NEGATIVE_INFINITY);
     }
 
+    /**
+     * Finds the maximizer of a function over a collection.
+     * @param collection: collection of elements to find maximizer
+     * @param function: score function returning a double value for each
+     * @param upperBound: upper bound on function. Used for avoiding evaluating the real function if it is very expensive to compute.
+     * @return an object containing both the minimum function value and the an element achieving the maximum.
+     * @throws IllegalArgumentException if collection is emtpy
+     */
+    public static <T> OptimumResult<T> maximizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> upperBound){
+        OptimumResult<T> result = minimizer(collection, x -> -function.apply(x), x -> -upperBound.apply(x));
+        return new OptimumResult<>(result.optimizer, -result.score);
+    }
+
+    /**
+     * Finds the maximizer of a function over a collection.
+     * @param collection: collection of elements to find maximizer
+     * @param function: score function returning a double value for each
+     * @return an object containing both the minimum function value and the an element achieving the maximum.
+     * @throws IllegalArgumentException if collection is emtpy
+     */
     public static <T> OptimumResult<T> maximizer(Collection<T> collection, Function<T, Double> function){
         OptimumResult<T> result = minimizer(collection, x -> -function.apply(x));
-        return new OptimumResult<>(result.optimum, -result.value);
+        return new OptimumResult<>(result.optimizer, -result.score);
     }
 
+    /**
+     * This class stores the optimal function value and the element attaining this optimum.
+     */
     public static class OptimumResult<T> {
-        private T optimum;
-        private Double value;
+        private T optimizer;
+        private Double score;
 
-        public OptimumResult(T optimum, Double value) {
-            this.optimum = optimum;
-            this.value = value;
+        OptimumResult(T optimizer, Double score) {
+            this.optimizer = optimizer;
+            this.score = score;
         }
 
-        public T getOptimum() {
-            return optimum;
+        public T getOptimizer() {
+            return optimizer;
         }
 
-        public Double getValue() {
-            return value;
+        public Double getScore() {
+            return score;
         }
     }
 }

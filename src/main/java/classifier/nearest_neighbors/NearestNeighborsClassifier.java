@@ -74,7 +74,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
         if (maxPositivePoints < 0){
             throw new IllegalArgumentException("MaxPositivePoints must be non-negative, found " + maxPositivePoints);
         }
-        return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getValue();
+        return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getScore();
     }
 
     private double futureProbabilityUpperBound(DataPoint point, int maxPositivePoints){

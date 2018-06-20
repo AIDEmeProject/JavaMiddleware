@@ -97,7 +97,7 @@ public class ActiveTreeSearch implements ActiveLearner {
             throw new EmptyUnlabeledSetException();
         }
 
-        return utility(data, steps).getOptimum();
+        return utility(data, steps).getOptimizer();
     }
 
     /**
@@ -109,7 +109,7 @@ public class ActiveTreeSearch implements ActiveLearner {
     private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
         Classifier clf = calculator.fit(data, steps);
 
-        return OptimumFinder.branchAndBoundMaximizer(
+        return OptimumFinder.maximizer(
                 data.getUnlabeledPoints(),
                 pt -> optimalUtilityGivenPoint(data, steps, clf, pt),
                 calculator::upperBound);
@@ -133,12 +133,12 @@ public class ActiveTreeSearch implements ActiveLearner {
 
         // positive label branch
         data.putOnLabeledSet(point, 1);
-        double positiveUtility = utility(data, steps-1).getValue();
+        double positiveUtility = utility(data, steps-1).getScore();
         data.removeFromLabeledSet(point);
 
         // negative label branch
         data.putOnLabeledSet(point, 0);
-        double negativeUtility = utility(data, steps-1).getValue();
+        double negativeUtility = utility(data, steps-1).getScore();
         data.removeFromLabeledSet(point);
 
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);

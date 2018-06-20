@@ -46,6 +46,6 @@ public class UncertaintySampler implements ActiveLearner {
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.probability(pt) - 0.5)).getOptimum();
+        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.probability(pt) - 0.5)).getOptimizer();
     }
 }

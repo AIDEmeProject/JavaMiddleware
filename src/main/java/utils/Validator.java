@@ -1,15 +1,28 @@
 package utils;
 
+import java.util.Collection;
+
 /**
  * This utility class encloses several data validation checks used throughout our modules.
  */
 public class Validator {
     /**
+     * Raises an exception if collection is emtpy
+     * @param data: data vector
+     * @throws IllegalArgumentException if data vector is empty
+     */
+    public static <T> void assertNotEmpty(Collection<T> data){
+        if (data.size() == 0){
+            throw new IllegalArgumentException("Data must contain at least one feature.");
+        }
+    }
+
+    /**
      * Raises an exception if data vector is emtpy
      * @param data: data vector
      * @throws IllegalArgumentException if data vector is empty
      */
-    public static void assertIsNotEmpty(int[] data){
+    public static void assertNotEmpty(int[] data){
         if (data.length == 0){
             throw new IllegalArgumentException("Data must contain at least one feature.");
         }
@@ -20,7 +33,7 @@ public class Validator {
      * @param data: data vector
      * @throws IllegalArgumentException if data vector is empty
      */
-    public static void assertIsNotEmpty(long[] data){
+    public static void assertNotEmpty(long[] data){
         if (data.length == 0){
             throw new IllegalArgumentException("Data must contain at least one feature.");
         }
@@ -31,7 +44,7 @@ public class Validator {
      * @param data: data vector
      * @throws IllegalArgumentException if data vector is empty
      */
-    public static void assertIsNotEmpty(double[] data){
+    public static void assertNotEmpty(double[] data){
         if (data.length == 0){
             throw new IllegalArgumentException("Data must contain at least one feature.");
         }
@@ -42,7 +55,7 @@ public class Validator {
      * @param data: data matrix
      * @throws IllegalArgumentException if data matrix is empty
      */
-    public static void assertIsNotEmpty(double[][] data){
+    public static void assertNotEmpty(double[][] data){
         if (data.length == 0){
             throw new IllegalArgumentException("Data must contain at least one data point.");
         }
@@ -70,10 +83,10 @@ public class Validator {
      * @throws IllegalArgumentException if any of the above conditions is not met.
      */
     public static void validateMatrix(double[][] data, boolean checkDim){
-        assertIsNotEmpty(data);
+        assertNotEmpty(data);
         assertAllRowsHaveSameDimension(data);
         if (checkDim){
-            assertIsNotEmpty(data[0]);
+            assertNotEmpty(data[0]);
         }
     }
 
