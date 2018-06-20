@@ -2,6 +2,7 @@ package classifier;
 
 
 import data.DataPoint;
+import data.LabeledDataset;
 
 import java.util.Collection;
 
@@ -58,5 +59,16 @@ public interface Classifier {
         }
 
         return labels;
+    }
+
+    /**
+     * Upper bound on "future probabilities".
+     *
+     * @param data: labeled data
+     * @param maxPositivePoints: maximum number of positive labeled points
+     * @return probability upper bound
+     */
+    default double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
+        return Double.POSITIVE_INFINITY;
     }
 }

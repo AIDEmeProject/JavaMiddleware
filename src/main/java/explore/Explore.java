@@ -156,7 +156,7 @@ public class Explore {
         initialTime = System.nanoTime();
         Collection<DataPoint> points = getNextPointToLabel(data, user, activeLearner);
         metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
-        System.out.println(metrics);
+
         // update labeled set
         int[] labels = user.getLabel(points);
         data.putOnLabeledSet(points, labels);

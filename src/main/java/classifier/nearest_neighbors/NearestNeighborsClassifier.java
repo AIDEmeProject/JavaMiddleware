@@ -1,6 +1,6 @@
 package classifier.nearest_neighbors;
 
-import classifier.BoundedClassifier;
+import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import utils.OptimumFinder;
@@ -23,7 +23,7 @@ import utils.Validator;
  *  One limitation of this classifier is it cannot be reused with different datasets X.
  *  TODO: can we remove this limitation ?
  */
-public class NearestNeighborsClassifier implements BoundedClassifier {
+public class NearestNeighborsClassifier implements Classifier {
 
     /**
      * Probability smoothing parameter
@@ -64,6 +64,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      * @param maxPositivePoints: maximum number of positive labeled points
      * @return probability upper bound
      */
+    @Override
     public double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
         Validator.assertNonNegative(maxPositivePoints);
         return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getScore();

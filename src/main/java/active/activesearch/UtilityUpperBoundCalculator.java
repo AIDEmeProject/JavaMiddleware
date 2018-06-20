@@ -1,9 +1,6 @@
 package active.activesearch;
 
-import classifier.BoundedClassifier;
-import classifier.BoundedLearner;
 import classifier.Classifier;
-import data.DataPoint;
 import data.LabeledDataset;
 
 /**
@@ -15,19 +12,12 @@ import data.LabeledDataset;
  *        Bayesian Optimal Active Search and Surveying
  *        ICML, 2012
  */
-class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
+class UtilityUpperBoundCalculator {
     private double u0, u1;
-    private BoundedLearner learner;
 
-    public BoundedClassifierUpperBoundCalculator(BoundedLearner learner) {
-        this.learner = learner;
-    }
-
-    public void fit(LabeledDataset data, int steps){
-        BoundedClassifier classifier = learner.fit(data.getLabeledPoints());
+    public void fit(LabeledDataset data, Classifier classifier, int steps){
         u0 = optimalUtilityUpperBound(data, classifier, steps-1, 0);
         u1 = optimalUtilityUpperBound(data, classifier,  steps-1, 1);
-        //return classifier;
     }
 
     /**
@@ -37,10 +27,10 @@ class BoundedClassifierUpperBoundCalculator implements UpperBoundCalculator {
      * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
      * @return upper bound on optimal utility
      */
-    private double optimalUtilityUpperBound(LabeledDataset data, BoundedClassifier classifier, int steps, int maxLabeledPoints){
+    private double optimalUtilityUpperBound(LabeledDataset data, Classifier classifier, int steps, int maxLabeledPoints){
         double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
 
-        if (steps <= 1){
+        if (steps <= 1 || pStar == Double.POSITIVE_INFINITY){
             return pStar;
         }
 

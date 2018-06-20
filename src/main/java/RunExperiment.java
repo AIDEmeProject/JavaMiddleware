@@ -1,9 +1,5 @@
 import active.ActiveLearner;
-import active.activelearning.RandomSampler;
-import active.activelearning.SimpleMargin;
-import active.activelearning.UncertaintySampler;
 import active.activesearch.ActiveTreeSearch;
-import classifier.BoundedLearner;
 import classifier.Learner;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
@@ -13,7 +9,6 @@ import data.DataPoint;
 import explore.ExplorationMetrics;
 import explore.Explore;
 import io.MetricWriter;
-import io.TaskReader;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -65,7 +60,7 @@ public class RunExperiment {
     public static void main(String[] args){
         // DATA and USER
         // simple example
-        Collection<DataPoint> points = generateX(250, 2, 1);
+        Collection<DataPoint> points = generateX(25000, 2, 1);
         Set<Long> y = generateY(points);
         User user = new DummyUser(y);
 
@@ -86,19 +81,19 @@ public class RunExperiment {
         params = params
                 .C(1000)
                 .kernel(new Kernel())
-                .probability(false);
-        Learner learner = new SvmLearner(params);
+                .probability(true);
+        SvmLearner svm = new SvmLearner(params);
 
         // knn
-        BoundedLearner boundedLearner = new NearestNeighborsLearner(points, 10, 0.1);
+        NearestNeighborsLearner knn = new NearestNeighborsLearner(points, 10, 0.1);
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
-        //activeLearners.put("Random Learner kNN", new RandomSampler(boundedLearner));
-        //activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(boundedLearner));
-        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(boundedLearner, 1));
-        activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(boundedLearner, 2));
-        //activeLearners.put("Simple Margin C=1000", new SimpleMargin(learner));
+        //activeLearners.put("Random Learner kNN", new RandomSampler(knn));
+        //activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
+        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
+        activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(knn, 2));
+        //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -109,12 +104,13 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        Explore explore = new Explore(initialSampler, 200, metricCalculators);
+        Explore explore = new Explore(initialSampler, 50, metricCalculators);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
             ExplorationMetrics metrics = explore.averageRun(points, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
             MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
+            System.out.println(metrics);
         }
     }
 }

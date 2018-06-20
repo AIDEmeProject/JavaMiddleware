@@ -1,7 +1,7 @@
 package classifier.nearest_neighbors;
 
-import classifier.BoundedClassifier;
-import classifier.BoundedLearner;
+import classifier.Classifier;
+import classifier.Learner;
 import data.DataPoint;
 import data.LabeledPoint;
 import smile.neighbor.KDTree;
@@ -27,7 +27,7 @@ import java.util.Collection;
  *  One limitation of this class is each learner is constrained to be used with a single dataset.
  *  TODO: can we remove this limitation ?
  */
-public class NearestNeighborsLearner implements BoundedLearner {
+public class NearestNeighborsLearner implements Learner {
 
     /**
      * Probability smoothing parameter
@@ -87,7 +87,7 @@ public class NearestNeighborsLearner implements BoundedLearner {
      * @param labeledPoints: collection of labeled points
      */
     @Override
-    public BoundedClassifier fit(Collection<LabeledPoint> labeledPoints) {
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
         Validator.assertNotEmpty(labeledPoints);
 
         int size = indexes.length;

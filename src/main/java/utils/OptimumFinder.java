@@ -23,7 +23,7 @@ public class OptimumFinder {
         Double score = start == null ? Double.POSITIVE_INFINITY : function.apply(start);
 
         for (T point : collection) {
-            if (lowerBound.apply(point) > score) {
+            if (lowerBound.apply(point) > score || point == start) {
                 continue;
             }
 
