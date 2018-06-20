@@ -3,10 +3,7 @@ package data;
 import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class LabeledDataset {
     /**
@@ -19,27 +16,9 @@ public class LabeledDataset {
      */
     private final Set<DataPoint> unlabeled;
 
-    /**
-     * @param X: data matrix
-     * @throws IllegalArgumentException if X is empty, or points are zero-dimensional
-     */
-    public LabeledDataset(double[][] X) {
-        if (X.length == 0){
-            throw new IllegalArgumentException("Dataset cannot be empty.");
-        }
-
-        labeled = new LinkedHashSet<>();  // preserve insertion order
-
-        unlabeled = new HashSet<>();  // insertion order is not important
-        for (int i = 0; i < X.length; i++) {
-            if (X[i].length != X[0].length){
-                throw new IllegalArgumentException("Found rows of different lengths: expected " + X[0].length + ", obtained " + X[i].length);
-            }
-            unlabeled.add(new DataPoint(i, X[i]));
-        }
-    }
-
     public LabeledDataset(Collection<DataPoint> points){
+        validateInput(points);
+
         labeled = new LinkedHashSet<>();  // preserve insertion order
 
         unlabeled = new HashSet<>();  // insertion order is not important
@@ -49,6 +28,23 @@ public class LabeledDataset {
     private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;
+    }
+
+    private void validateInput(Collection<DataPoint> points){
+        Iterator<DataPoint> it = points.iterator();
+
+        if (!it.hasNext()){
+            throw new IllegalArgumentException("Found empty points collection.");
+        }
+
+        int dim = it.next().getDim();
+        it.forEachRemaining(pt -> assertEquals(dim, pt.getDim()));
+    }
+
+    private void assertEquals(int val1, int val2){
+        if (val1 != val2){
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
