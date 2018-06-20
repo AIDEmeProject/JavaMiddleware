@@ -17,7 +17,7 @@ public interface ActiveLearner extends Learner{
      * Retrieve the most informative point for labeling from the unlabeled set.
      * @param data: labeled data object
      * @return index of the next unlabeled point to label
-     * @throws exceptions.EmptyUnlabeledSetException if unlabeled set is empty
+     * @throws IllegalArgumentException if unlabeled set is empty
      */
     DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
 }

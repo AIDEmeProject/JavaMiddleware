@@ -3,6 +3,7 @@ package metrics;
 import classifier.Classifier;
 import data.LabeledDataset;
 import user.User;
+import utils.Validator;
 
 /**
  * This module is a factory for ConfusionMatrix objects.
@@ -31,14 +32,11 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * different from 1 or 0.
      */
     public ConfusionMatrix compute(int[] trueLabels, int[] predictedLabels){
-        if(trueLabels.length != predictedLabels.length){
-            throw new IllegalArgumentException("Incompatible sizes: " + trueLabels.length + ", " + predictedLabels.length);
-        }
+        // validate input
+        Validator.assertEqualLengths(trueLabels, predictedLabels);
+        Validator.assertNotEmpty(trueLabels);
 
-        if(trueLabels.length == 0){
-            throw new IllegalArgumentException("Received empty array as input.");
-        }
-
+        // compute metrics
         int truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
 
         for(int i=0; i < trueLabels.length; i++){

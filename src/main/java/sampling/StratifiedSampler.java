@@ -2,6 +2,7 @@ package sampling;
 
 import data.DataPoint;
 import user.User;
+import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,13 +19,8 @@ public class StratifiedSampler {
     private final int negativeSamples;
 
     public StratifiedSampler(int positiveSamples, int negativeSamples) {
-        if (positiveSamples < 0){
-            throw new IllegalArgumentException("positiveSamples must be positive: " + positiveSamples);
-        }
-
-        if (negativeSamples < 0){
-            throw new IllegalArgumentException("negativeSamples must be positive: " + negativeSamples);
-        }
+        Validator.assertPositive(positiveSamples);
+        Validator.assertPositive(negativeSamples);
 
         this.positiveSamples = positiveSamples;
         this.negativeSamples = negativeSamples;

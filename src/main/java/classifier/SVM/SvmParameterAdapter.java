@@ -1,6 +1,7 @@
 package classifier.SVM;
 
 import libsvm.svm_parameter;
+import utils.Validator;
 
 /**
  * Adaptor class for svm_parameter module in LibSVM. It constructs an svm_parameter object through the Builder pattern.
@@ -36,9 +37,7 @@ public class SvmParameterAdapter {
      * @throws IllegalArgumentException if C is negative
      */
     public SvmParameterAdapter C(double C){
-        if(C <= 0){
-            throw new IllegalArgumentException("C must be a positive number.");
-        }
+        Validator.assertPositive(C);
         this.C = C;
         return this;
     }
@@ -56,9 +55,6 @@ public class SvmParameterAdapter {
      * @return this
      */
     public SvmParameterAdapter kernel(Kernel kernel){
-        if(kernel == null){
-            throw new NullPointerException("Kernel cannot be null.");
-        }
         this.kernel = kernel;
         return this;
     }
@@ -77,9 +73,7 @@ public class SvmParameterAdapter {
      * @throws IllegalArgumentException if cacheSize is negative
      */
     public SvmParameterAdapter cacheSize(int cacheSize){
-        if(cacheSize <= 0){
-            throw new IllegalArgumentException("Cache size must be a positive number.");
-        }
+        Validator.assertPositive(cacheSize);
         this.cacheSize = cacheSize;
         return this;
     }
@@ -98,9 +92,7 @@ public class SvmParameterAdapter {
      * @throws IllegalArgumentException if tolerance is negative
      */
     public SvmParameterAdapter tolerance(double tolerance){
-        if(tolerance <= 0){
-            throw new IllegalArgumentException("Tolerance must be a positive number.");
-        }
+        Validator.assertPositive(tolerance);
         this.tolerance = tolerance;
         return this;
     }
@@ -158,9 +150,8 @@ public class SvmParameterAdapter {
             throw new IllegalArgumentException("Expected 2 class weights, received " + classWeights.length);
         }
 
-        if(classWeights[0] <= 0 || classWeights[1] <= 0){
-            throw new IllegalArgumentException("All class weights must be positive.");
-        }
+        Validator.assertPositive(classWeights[0]);
+        Validator.assertPositive(classWeights[1]);
 
         this.classWeights = classWeights;
         return this;

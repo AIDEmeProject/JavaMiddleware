@@ -18,11 +18,6 @@ class KernelTest {
     }
 
     @Test
-    void kernelType_ReceivesNull_ThrowsException() {
-        assertThrows(NullPointerException.class, () -> kernel.kernelType(null));
-    }
-
-    @Test
     void gamma_NegativeValue_ThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> kernel.gamma(-1));
     }

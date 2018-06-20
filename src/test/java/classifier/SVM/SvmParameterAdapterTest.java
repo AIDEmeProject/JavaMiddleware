@@ -21,11 +21,6 @@ class SvmParameterAdapterTest {
     }
 
     @Test
-    void kernel_NullValue_ThrowsException() {
-        assertThrows(NullPointerException.class, () -> param.kernel(null));
-    }
-
-    @Test
     void cacheSize_NegativeValue_ThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> param.cacheSize(-1));
     }

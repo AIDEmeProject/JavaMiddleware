@@ -8,6 +8,7 @@ import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 import user.User;
+import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,13 +50,7 @@ public class Explore {
      * @throws IllegalArgumentException if budget is not positive
      */
     public Explore(StratifiedSampler initialSampler, int budget, int subsampleSize, Collection<MetricCalculator> metricCalculators) {
-        if (initialSampler == null){
-            throw new NullPointerException("Initial Sampler cannot be null.");
-        }
-
-        if (budget <= 0){
-            throw new IllegalArgumentException("Budget must be a positive number.");
-        }
+        Validator.assertPositive(budget);
 
         this.initialSampler = initialSampler;
         this.budget = budget;
@@ -121,9 +116,7 @@ public class Explore {
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      */
     public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs, long[] seeds){
-        if (runs <= 0){
-            throw new IllegalArgumentException("Runs must be positive.");
-        }
+        Validator.assertPositive(runs);
 
         ExplorationMetrics metrics = run(X, user, activeLearner, seeds[0]);
 
@@ -144,9 +137,7 @@ public class Explore {
      * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
      */
     public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs){
-        if (runs <= 0){
-            throw new IllegalArgumentException("Runs must be positive.");
-        }
+        Validator.assertPositive(runs);
 
         ExplorationMetrics metrics = run(X, user, activeLearner);
 

@@ -1,6 +1,7 @@
 package preprocessing;
 
 import data.DataPoint;
+import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +44,7 @@ public class StandardScaler {
      * @param points: data matrix to fit
      */
     public void fit(Collection<DataPoint> points){
-        if (points.isEmpty()){
-            throw new IllegalArgumentException("Cannot fit empty collection.");
-        }
+        Validator.assertNotEmpty(points);
 
         Iterator<DataPoint> pointIterator = points.iterator();
 
@@ -69,9 +68,7 @@ public class StandardScaler {
     }
 
     private void updateMeanAndStd(double[] values){
-        if (mean.length != values.length){
-            throw new IllegalArgumentException("Incompatible input dimension. Expected " + mean.length + ", but obtained " + values.length);
-        }
+        Validator.assertEqualLengths(mean, values);
 
         counter++;
 
@@ -103,14 +100,8 @@ public class StandardScaler {
         return scaled;
     }
 
-    public DataPoint transform(DataPoint point){
-        if (!isFit()){
-            throw new RuntimeException("Object was not fit; remember to call fit() before calling transform().");
-        }
-
-        if (point.getDim() != mean.length){
-            throw new IllegalArgumentException("Incompatible input dimension. Expected " + mean.length + ", but obtained " + point.getDim());
-        }
+    DataPoint transform(DataPoint point){
+        Validator.assertEquals(point.getDim(), mean.length);
 
         double[] data = point.getData();
         double[] scaledData = new double[data.length];

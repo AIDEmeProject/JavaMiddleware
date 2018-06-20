@@ -7,8 +7,8 @@ import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import exceptions.EmptyUnlabeledSetException;
 import utils.OptimumFinder;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -69,9 +69,7 @@ public class ActiveTreeSearch implements ActiveLearner {
     }
 
     private ActiveTreeSearch(Learner learner, int lookahead, UpperBoundCalculator calculator) {
-        if (lookahead <= 0){
-            throw new IllegalArgumentException("Lookahead must be a positive number.");
-        }
+        Validator.assertPositive(lookahead);
         this.learner = learner;
         this.lookahead = lookahead;
         this.calculator = calculator;
@@ -84,18 +82,16 @@ public class ActiveTreeSearch implements ActiveLearner {
 
     /**
      * Retrieves the unlabeled point which is expected to return the largest number of positive points in average, in
-     * the l-next future steps.
+     * the l-next future steps. If there are less than l unlabeled points remaining, we restrict l = # unlabeled points.
      *
      * @param data: labeled data object
      * @return row index of most informative unlabeled point
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        int steps = Math.min(data.getNumUnlabeledPoints(), this.lookahead);
+        Validator.assertNotEmpty(data.getUnlabeledPoints());
 
-        if (steps == 0){
-            throw new EmptyUnlabeledSetException();
-        }
+        int steps = Math.min(data.getNumUnlabeledPoints(), this.lookahead);
 
         return utility(data, steps).getOptimizer();
     }

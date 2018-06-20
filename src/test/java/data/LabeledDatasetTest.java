@@ -1,6 +1,5 @@
 package data;
 
-import exceptions.EmptyUnlabeledSetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -185,6 +184,6 @@ class LabeledDatasetTest {
     @Test
     void subsampleUnlabeledSet_emptyUnlabeledSet_throwsException() {
         labelAll();
-        assertThrows(EmptyUnlabeledSetException.class, () -> data.subsampleUnlabeledSet(1));
+        assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(1));
     }
 }

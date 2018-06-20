@@ -4,11 +4,10 @@ import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
 import data.DataPoint;
 import data.LabeledPoint;
-import exceptions.EmptyLabeledSetException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
+import utils.Validator;
 
-import javax.xml.crypto.Data;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -46,13 +45,8 @@ public class NearestNeighborsLearner implements BoundedLearner {
      * @throws IllegalArgumentException if gamma not in [0,1], or if k is not positive
      */
     public NearestNeighborsLearner(Collection<DataPoint> points, int k, double gamma) {
-        if (k <= 0){
-            throw new IllegalArgumentException("Number of neighbors must be positive.");
-        }
-
-        if (gamma < 0 || gamma > 1){
-            throw new IllegalArgumentException("gamma must be between 0 and 1.");
-        }
+        Validator.assertPositive(k);
+        Validator.assertInRange(gamma, 0, 1);
 
         this.gamma = gamma;
 
@@ -94,9 +88,7 @@ public class NearestNeighborsLearner implements BoundedLearner {
      */
     @Override
     public BoundedClassifier fit(Collection<LabeledPoint> labeledPoints) {
-        if (labeledPoints.isEmpty()){
-            throw new EmptyLabeledSetException();
-        }
+        Validator.assertNotEmpty(labeledPoints);
 
         int size = indexes.length;
         int[] sumOfLabelsInLabeledNeighborhood = new int[size];

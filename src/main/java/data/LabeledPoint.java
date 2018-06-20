@@ -1,5 +1,7 @@
 package data;
 
+import utils.Validator;
+
 import java.util.Arrays;
 
 /**
@@ -26,12 +28,23 @@ public class LabeledPoint extends DataPoint {
      */
     public LabeledPoint(int row, long id, double[] data, int label) {
         super(row, id, data);
-        setLabel(label);
+
+        if (label < 0 || label > 1) {
+            throw new IllegalArgumentException("Only 1 and 0 labels are supported, received " + label);
+        }
+
+        this.label = label;
     }
 
+    /**
+     * @param row: row number of data point. It will also be used as id.
+     * @param data: values array
+     * @param label: data point's label
+     * @throws IllegalArgumentException if data is empty
+     * @throws IllegalArgumentException if label is different from 0 or 1
+     */
     public LabeledPoint(int row, double[] data, int label) {
-        super(row, data);
-        setLabel(label);
+        this(row, row, data, label);
     }
 
     public LabeledPoint(DataPoint point, int label) {
@@ -40,13 +53,6 @@ public class LabeledPoint extends DataPoint {
 
     public int getLabel() {
         return label;
-    }
-
-    private void setLabel(int label) {
-        if (label < 0 || label > 1){
-            throw new IllegalArgumentException();
-        }
-        this.label = label;
     }
 
     @Override

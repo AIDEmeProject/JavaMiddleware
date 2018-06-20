@@ -6,8 +6,8 @@ import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -33,19 +33,17 @@ public class RandomSampler implements ActiveLearner {
 
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        Validator.assertNotEmpty(labeledPoints);
         return learner.fit(labeledPoints);
     }
     /**
      * Randomly pick a point from the unlabeled set.
      * @param data: labeled data object
      * @return random unlabeled point index
+     * @throws IllegalArgumentException if unlabeled set is empty
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        if (data.getNumUnlabeledPoints() == 0){
-            throw new EmptyUnlabeledSetException();
-        }
-
         return ReservoirSampler.sample(data.getUnlabeledPoints());
     }
 }

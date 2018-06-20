@@ -1,5 +1,7 @@
 package explore;
 
+import utils.Validator;
+
 import java.util.*;
 
 /**
@@ -53,17 +55,14 @@ public class ExplorationMetrics {
      * @throws IllegalArgumentException if objects have a different number of elements
      */
     public static ExplorationMetrics sum(ExplorationMetrics metrics1, ExplorationMetrics metrics2){
+        Validator.assertEquals(metrics1.size(), metrics2.size());
+
         ExplorationMetrics result = new ExplorationMetrics();
         Iterator<Metrics> it1 = metrics1.iterator();
         Iterator<Metrics> it2 = metrics2.iterator();
 
         while (it1.hasNext() && it2.hasNext()){
             result.add(Metrics.sum(it1.next(), it2.next()));
-        }
-
-        // if lists have different lengths, one of the iterators will still have elements remaining
-        if (it1.hasNext() || it2.hasNext()){
-            throw new IllegalArgumentException("Lists should have the same number of elements.");
         }
 
         return result;

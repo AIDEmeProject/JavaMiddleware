@@ -2,11 +2,11 @@ package classifier.SVM;
 
 import classifier.Learner;
 import data.LabeledPoint;
-import exceptions.EmptyLabeledSetException;
 import libsvm.svm;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -42,10 +42,6 @@ public class SvmLearner implements Learner {
      */
     @Override
     public SvmClassifier fit(Collection<LabeledPoint> labeledPoints) {
-        if (labeledPoints.isEmpty()){
-            throw new EmptyLabeledSetException();
-        }
-
         svm_problem prob = buildSvmProblem(labeledPoints);
         svm_parameter param = parameter.build();
 
@@ -58,6 +54,8 @@ public class SvmLearner implements Learner {
     }
 
     private svm_problem buildSvmProblem(Collection<LabeledPoint> labeledPoints){
+        Validator.assertNotEmpty(labeledPoints);
+
         svm_problem prob = new svm_problem();
 
         prob.l = labeledPoints.size();

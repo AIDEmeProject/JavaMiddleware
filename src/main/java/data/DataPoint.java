@@ -1,5 +1,7 @@
 package data;
 
+import utils.Validator;
+
 import java.util.Arrays;
 
 /**
@@ -26,9 +28,8 @@ public class DataPoint {
     private double[] data;
 
     public DataPoint(int row, long id, double[] data) {
-        if (data.length == 0){
-            throw new IllegalArgumentException("Data point must be non-empty.");
-        }
+        Validator.assertNotEmpty(data);
+
         this.row = row;
         this.id = id;
         this.data = data;

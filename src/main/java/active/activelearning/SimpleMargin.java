@@ -8,6 +8,7 @@ import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import utils.OptimumFinder;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -48,9 +49,11 @@ public class SimpleMargin implements ActiveLearner {
      * Retrieve point closest to the decision boundary
      * @param data: labeled data object
      * @return row index of unlabeled point closest to decision boundary
+     * @throws IllegalArgumentException if unlabeled set is empty
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        Validator.assertNotEmpty(data.getUnlabeledPoints());
         return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.margin(pt))).getOptimizer();
     }
 }

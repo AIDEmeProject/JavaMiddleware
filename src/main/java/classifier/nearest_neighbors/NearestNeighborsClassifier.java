@@ -4,6 +4,7 @@ import classifier.BoundedClassifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import utils.OptimumFinder;
+import utils.Validator;
 
 
 /**
@@ -41,17 +42,10 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
 
 
     public NearestNeighborsClassifier(int[] sumOfLabelsInLabeledNeighborhood, int[] labeledNeighborhoodSize, double gamma) {
-        if (sumOfLabelsInLabeledNeighborhood.length != labeledNeighborhoodSize.length){
-            throw new IllegalArgumentException("Arrays have incompatible sizes.");
-        }
+        Validator.assertEqualLengths(sumOfLabelsInLabeledNeighborhood, labeledNeighborhoodSize);
+        Validator.assertNotEmpty(sumOfLabelsInLabeledNeighborhood);
+        Validator.assertInRange(gamma, 0, 1);
 
-        if (sumOfLabelsInLabeledNeighborhood.length == 0){
-            throw new IllegalArgumentException("Received empty arrays as input.");
-        }
-
-        if (gamma < 0 || gamma > 1){
-            throw new IllegalArgumentException("gamma must be between 0 and 1.");
-        }
         this.sumOfLabelsInLabeledNeighborhood = sumOfLabelsInLabeledNeighborhood;
         this.labeledNeighborhoodSize = labeledNeighborhoodSize;
         this.gamma = gamma;
@@ -71,9 +65,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
      * @return probability upper bound
      */
     public double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
-        if (maxPositivePoints < 0){
-            throw new IllegalArgumentException("MaxPositivePoints must be non-negative, found " + maxPositivePoints);
-        }
+        Validator.assertNonNegative(maxPositivePoints);
         return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getScore();
     }
 

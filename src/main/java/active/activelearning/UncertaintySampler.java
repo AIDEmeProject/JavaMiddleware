@@ -7,6 +7,7 @@ import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import utils.OptimumFinder;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -46,6 +47,7 @@ public class UncertaintySampler implements ActiveLearner {
      */
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
+        Validator.assertNotEmpty(data.getUnlabeledPoints());
         return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.probability(pt) - 0.5)).getOptimizer();
     }
 }

@@ -1,5 +1,7 @@
 package sampling;
 
+import utils.Validator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -30,13 +32,13 @@ public class ReservoirSampler {
      * @param sampleSize: sample size
      * @param filter: predicate which filters any element returning true
      * @return random index
-     * @throws IllegalArgumentException if length is not positive
-     * @throws IllegalArgumentException if sample size is larger than filtered collection
+     * @throws IllegalArgumentException if collection is empty
+     * @throws IllegalArgumentException if sampleSize is not positive
+     * @throws IllegalArgumentException if sample size is larger than the filtered collection's size
      */
     public static <T> Collection<T> sample(Collection<T> collection, int sampleSize, Predicate<T> filter){
-        if (sampleSize <= 0){
-            throw new IllegalArgumentException("Subset size must be positive: " + sampleSize);
-        }
+        Validator.assertNotEmpty(collection);
+        Validator.assertPositive(sampleSize);
 
         int index = 0;
         ArrayList<T> result = new ArrayList<>(sampleSize);
@@ -71,7 +73,7 @@ public class ReservoirSampler {
      * Extracts a random sample from a collection.
      * @param collection: collection to sample from
      * @param sampleSize: random subset size
-     * @return sample from collection
+     * @return a sample from the collection
      * @throws IllegalArgumentException if length is not positive
      * @throws IllegalArgumentException sample size is larger than collection
      */

@@ -1,7 +1,7 @@
 package data;
 
-import exceptions.EmptyUnlabeledSetException;
 import sampling.ReservoirSampler;
+import utils.Validator;
 
 import java.util.*;
 
@@ -16,8 +16,11 @@ public class LabeledDataset {
      */
     private final Set<DataPoint> unlabeled;
 
+    /**
+     * @param points collection of data points to be used as initial unlabeled data pool
+     */
     public LabeledDataset(Collection<DataPoint> points){
-        validateInput(points);
+        validateDataPointCollection(points);
 
         labeled = new LinkedHashSet<>();  // preserve insertion order
 
@@ -30,29 +33,24 @@ public class LabeledDataset {
         this.unlabeled = unlabeled;
     }
 
-    private void validateInput(Collection<DataPoint> points){
+    /**
+     * Asserts a collection of data points is non-empty, and that all elements have the same dimension.
+     * @param points: collection of data points
+     */
+    private static void validateDataPointCollection(Collection<DataPoint> points){
+        Validator.assertNotEmpty(points);
+
         Iterator<DataPoint> it = points.iterator();
 
-        if (!it.hasNext()){
-            throw new IllegalArgumentException("Found empty points collection.");
-        }
-
         int dim = it.next().getDim();
-        it.forEachRemaining(pt -> assertEquals(dim, pt.getDim()));
-    }
-
-    private void assertEquals(int val1, int val2){
-        if (val1 != val2){
-            throw new IllegalArgumentException();
-        }
+        it.forEachRemaining(pt -> Validator.assertEquals(dim, pt.getDim()));
     }
 
     /**
      * @return collection containing all points
      */
     public Collection<DataPoint> getAllPoints() {
-        Collection<DataPoint> result = new HashSet<>(getNumPoints());
-        result.addAll(unlabeled);
+        Collection<DataPoint> result = new HashSet<>(unlabeled);
         result.addAll(labeled);
         return result;
     }
@@ -119,8 +117,8 @@ public class LabeledDataset {
      * @throws IllegalArgumentException if any label is invalid (i.e. different from 0 or 1)
      */
     public void putOnLabeledSet(Collection<DataPoint> points, int[] labels) {
-        if (points.size() != labels.length) {
-            throw new IllegalArgumentException("Points and labels have incompatible sizes.");
+        if (points.size() != labels.length){
+            throw new IllegalArgumentException("Points and labels have incompatible dimensions.");
         }
 
         int i = 0;
@@ -155,13 +153,8 @@ public class LabeledDataset {
      * @throws EmptyUnlabeledSetException if unlabeled set is empty
      */
     public LabeledDataset subsampleUnlabeledSet(int sampleSize) {
-        if (sampleSize <= 0) {
-            throw new IllegalArgumentException("Size must be positive.");
-        }
-
-        if (unlabeled.isEmpty()){
-            throw new EmptyUnlabeledSetException();
-        }
+        Validator.assertPositive(sampleSize);
+        Validator.assertNotEmpty(unlabeled);
 
         if (sampleSize >= getNumUnlabeledPoints()) {
             return this;

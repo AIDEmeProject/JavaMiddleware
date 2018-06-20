@@ -1,6 +1,8 @@
 package classifier.SVM;
 
 
+import utils.Validator;
+
 /**
  * This class encapsulates the choice of kernel for SVM classifier. Four choices are avaiable: linear, polynomial, gaussian
  * (RBF), and sigmoid. In most applications, linear or gaussian kernels are enough.
@@ -43,9 +45,6 @@ public class Kernel {
      * @throws NullPointerException is kernelType is null
      */
     public Kernel kernelType(KernelType kernelType){
-        if(kernelType == null){
-            throw new NullPointerException("Kernel type cannot be null.");
-        }
         this.kernelType = kernelType;
         return this;
     }
@@ -57,9 +56,7 @@ public class Kernel {
      * @throws IllegalArgumentException is gamma is negative
      */
     public Kernel gamma(double gamma){
-        if(gamma <= 0){
-            throw new IllegalArgumentException("Gamma must be a positive number.");
-        }
+        Validator.assertPositive(gamma);
         this.gamma = gamma;
         return this;
     }
@@ -71,9 +68,7 @@ public class Kernel {
      * @throws IllegalArgumentException is coef0 is non-positive
      */
     public Kernel coef0(double coef0){
-        if(coef0 < 0){
-            throw new IllegalArgumentException("Coef0 must be a non-negative number.");
-        }
+        Validator.assertNonNegative(coef0);
         this.coef0 = coef0;
         return this;
     }
@@ -85,9 +80,7 @@ public class Kernel {
      * @throws IllegalArgumentException is degree is negative
      */
     public Kernel degree(int degree){
-        if(degree <= 0){
-            throw new IllegalArgumentException("Degree must be a positive integer.");
-        }
+        Validator.assertPositive(degree);
         this.degree = degree;
         return this;
     }
@@ -100,9 +93,7 @@ public class Kernel {
      * @throws IllegalArgumentException if x and y have different sizes
      */
     public double compute(double[] x, double[] y){
-        if(x.length != y.length){
-            throw new IllegalArgumentException("Both parameters must have the same dimensions!");
-        }
+        Validator.assertEqualLengths(x, y);
 
         // use default gamma if needed
         double gamma = (this.gamma > 0) ? this.gamma : 1.0 / x.length;

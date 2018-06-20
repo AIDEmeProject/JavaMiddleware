@@ -1,6 +1,7 @@
 package metrics;
 
 import explore.Metrics;
+import utils.Validator;
 
 /**
  * This module stores the number of target elements retrieved so far, as well as the total number of targets in the dataset.
@@ -20,12 +21,9 @@ public class TargetSetAccuracy implements MetricStorage {
     private final int totalNumberOfTargets;
 
     public TargetSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
-        if (numberOfTargetsRetrieved < 0){
-            throw new IllegalArgumentException("Number of targets retrieved must be non-negative.");
-        }
-        if (totalNumberOfTargets <= 0){
-            throw new IllegalArgumentException("Target set size must be positive.");
-        }
+        Validator.assertNonNegative(numberOfTargetsRetrieved);
+        Validator.assertPositive(totalNumberOfTargets);
+
         if (numberOfTargetsRetrieved > totalNumberOfTargets){
             throw new IllegalArgumentException("Number of retrieved targets is larger than target set size.");
         }
