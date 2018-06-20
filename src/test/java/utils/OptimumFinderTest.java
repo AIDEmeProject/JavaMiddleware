@@ -104,8 +104,8 @@ class OptimumFinderTest {
     @Test
     void minimizer_quadraticScoreFunctionWithLowerBoundAndStartingPoint_correctNumberOfFunctionCalls() {
         FakeFunction lower = new FakeFunction(x -> x*x - 1);
-        OptimumFinder.minimizer(elems, score, lower, -1.);
-        assertEquals(2, score.getCounter());
+        OptimumFinder.minimizer(elems, score, lower, elems.get(1));
+        assertEquals(1, score.getCounter());
         assertEquals(elems.size(), lower.getCounter());
     }
 
@@ -113,8 +113,8 @@ class OptimumFinderTest {
     void maximizer_quadraticScoreFunctionWithUpperBoundAndStartingPoint_correctNumberOfFunctionCalls() {
         FakeFunction upper = new FakeFunction(x -> x*x + 1);
 
-        OptimumFinder.maximizer(elems, score, upper, -3.);
-        assertEquals(2, score.getCounter());
+        OptimumFinder.maximizer(elems, score, upper, elems.get(0));
+        assertEquals(1, score.getCounter());
         assertEquals(elems.size(), upper.getCounter());
     }
 }
