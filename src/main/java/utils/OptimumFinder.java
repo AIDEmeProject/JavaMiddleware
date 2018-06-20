@@ -18,7 +18,7 @@ public class OptimumFinder {
     public static <T> OptimumResult<T> minimizer(Collection<T> collection, Function<T, Double> function, Function<T, Double> lowerBound){
         Validator.assertNotEmpty(collection);
 
-        double score = Double.POSITIVE_INFINITY;
+        Double score = Double.POSITIVE_INFINITY;
         T minimizer = null;
 
         for (T point : collection) {

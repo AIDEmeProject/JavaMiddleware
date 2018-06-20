@@ -57,7 +57,8 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
-        this(learner, lookahead, new BoundedClassifierUpperBoundCalculator(learner));
+        this(learner, lookahead,
+                lookahead == 1 ? new DummyUpperBoundCalculator(learner) : new BoundedClassifierUpperBoundCalculator(learner));
     }
 
     /**
