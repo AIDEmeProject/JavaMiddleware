@@ -58,7 +58,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      */
     public ActiveTreeSearch(BoundedLearner learner, int lookahead) {
         this(learner, lookahead,
-                lookahead == 1 ? new DummyUpperBoundCalculator(learner) : new BoundedClassifierUpperBoundCalculator(learner));
+                lookahead == 1 ? new DummyUpperBoundCalculator() : new BoundedClassifierUpperBoundCalculator(learner));
     }
 
     /**
@@ -66,7 +66,7 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(Learner learner, int lookahead) {
-        this(learner, lookahead, new DummyUpperBoundCalculator(learner));
+        this(learner, lookahead, new DummyUpperBoundCalculator());
     }
 
     private ActiveTreeSearch(Learner learner, int lookahead, UpperBoundCalculator calculator) {
@@ -104,12 +104,22 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @return optimal utility index and value
      */
     private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
-        Classifier clf = calculator.fit(data, steps);
+        // compute class probabilities
+        double[] probas = learner.fit(data.getLabeledPoints()).probability(data.getAllPoints());
 
-        return OptimumFinder.maximizer(
-                data.getUnlabeledPoints(),
-                pt -> optimalUtilityGivenPoint(data, steps, clf, pt),
-                calculator::upperBound);
+        OptimumFinder.OptimumResult<DataPoint> opt = OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> probas[pt.getRow()]);
+
+        // in 1-step case, just return point we are most certain of being positive (greedy approach)
+        if (steps <= 1){
+            return opt;
+        }
+
+        calculator.fit(data, steps);
+
+        return OptimumFinder.maximizer(data.getUnlabeledPoints(),
+                pt -> optimalUtilityGivenPoint(data, steps, pt, probas[pt.getRow()]),
+                pt -> calculator.upperBound(probas[pt.getRow()]),
+                opt.getOptimizer());
     }
 
     /**
@@ -117,17 +127,11 @@ public class ActiveTreeSearch implements ActiveLearner {
      * This function if computed recursively, calling the utility() method twice. Refer to [2] for details.
      * @param data: labeled data so far
      * @param steps: number to future steps remaining
-     * @param clf: classifier fit on data
-     * @param point: point to compute the utility
+     * @param point: row number of starting point
+     * @param proba: probability of X[i] being 1
      * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
      */
-    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, Classifier clf, DataPoint point){
-        double proba = clf.probability(point);
-
-        if (steps <= 1){
-            return proba;
-        }
-
+    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, DataPoint point, double proba){
         // positive label branch
         data.putOnLabeledSet(point, 1);
         double positiveUtility = utility(data, steps-1).getScore();
@@ -138,6 +142,65 @@ public class ActiveTreeSearch implements ActiveLearner {
         double negativeUtility = utility(data, steps-1).getScore();
         data.removeFromLabeledSet(point);
 
+        // return utility
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
     }
+
+    /**
+     * Helper class used for storing the results of Utility computation: row number / index and utility value.
+     */
+    private class UtilityResult {
+        int index;
+        double utility;
+        DataPoint point;
+        UtilityResult(int index, double utility, DataPoint point) {
+            this.index = index;
+            this.utility = utility;
+            this.point = point;
+        }
+    }
+
+//    /**
+//     * Core function computing the maximum l-steps utility. Refer to [1] and [2] for details.
+//     * @param data: labeled data
+//     * @param steps: number of steps to look into the future
+//     * @return optimal utility index and value
+//     */
+//    private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
+//        Classifier clf = calculator.fit(data, steps);
+//
+//        return OptimumFinder.maximizer(
+//                data.getUnlabeledPoints(),
+//                pt -> optimalUtilityGivenPoint(data, steps, clf, pt),
+//                calculator::upperBound);
+//    }
+//
+//    /**
+//     * Helper function for computing the expected number of labeled points to be retrieved if we start at a particular point.
+//     * This function if computed recursively, calling the utility() method twice. Refer to [2] for details.
+//     * @param data: labeled data so far
+//     * @param steps: number to future steps remaining
+//     * @param clf: classifier fit on data
+//     * @param point: point to compute the utility
+//     * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
+//     */
+//    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, Classifier clf, DataPoint point){
+//        double proba = clf.probability(point);
+//
+//        if (steps <= 1){
+//            return proba;
+//        }
+//
+//        // positive label branch
+//        data.putOnLabeledSet(point, 1);
+//        double positiveUtility = utility(data, steps-1).getScore();
+//        data.removeFromLabeledSet(point);
+//
+//        // negative label branch
+//        data.putOnLabeledSet(point, 0);
+//        double negativeUtility = utility(data, steps-1).getScore();
+//        data.removeFromLabeledSet(point);
+//
+//        return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
+//    }
 }

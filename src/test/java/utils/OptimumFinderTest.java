@@ -39,7 +39,7 @@ class OptimumFinderTest {
 
     @BeforeEach
     void setUp() {
-        elems = Arrays.asList(-3.,-1., 2.);
+        elems = Arrays.asList(-3.,-1., 2., 1.5, -2.5);
         score = new FakeFunction(x -> x*x);
     }
 
@@ -85,19 +85,36 @@ class OptimumFinderTest {
     }
 
     @Test
-    void minimizer_quadraticScoreFunctionWithLowerBound_correctNumberOfFunction() {
+    void minimizer_quadraticScoreFunctionWithLowerBound_correctNumberOfFunctionCalls() {
         FakeFunction lower = new FakeFunction(x -> x*x - 1);
-        OptimumFinder.OptimumResult result = OptimumFinder.minimizer(elems, score, lower);
+        OptimumFinder.minimizer(elems, score, lower);
         assertEquals(2, score.getCounter());
-        assertEquals(3, lower.getCounter());
+        assertEquals(elems.size(), lower.getCounter());
     }
 
     @Test
-    void maximizer_quadraticScoreFunctionWithUpperBound_correctNumberOfFunction() {
+    void maximizer_quadraticScoreFunctionWithUpperBound_correctNumberOfFunctionCalls() {
         FakeFunction upper = new FakeFunction(x -> x*x + 1);
 
         OptimumFinder.maximizer(elems, score, upper);
         assertEquals(1, score.getCounter());
-        assertEquals(3, upper.getCounter());
+        assertEquals(elems.size(), upper.getCounter());
+    }
+
+    @Test
+    void minimizer_quadraticScoreFunctionWithLowerBoundAndStartingPoint_correctNumberOfFunctionCalls() {
+        FakeFunction lower = new FakeFunction(x -> x*x - 1);
+        OptimumFinder.minimizer(elems, score, lower, -1.);
+        assertEquals(2, score.getCounter());
+        assertEquals(elems.size(), lower.getCounter());
+    }
+
+    @Test
+    void maximizer_quadraticScoreFunctionWithUpperBoundAndStartingPoint_correctNumberOfFunctionCalls() {
+        FakeFunction upper = new FakeFunction(x -> x*x + 1);
+
+        OptimumFinder.maximizer(elems, score, upper, -3.);
+        assertEquals(2, score.getCounter());
+        assertEquals(elems.size(), upper.getCounter());
     }
 }

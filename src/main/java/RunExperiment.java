@@ -86,7 +86,7 @@ public class RunExperiment {
         params = params
                 .C(1000)
                 .kernel(new Kernel())
-                .probability(true);
+                .probability(false);
         Learner learner = new SvmLearner(params);
 
         // knn
@@ -109,7 +109,7 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        Explore explore = new Explore(initialSampler, 100, metricCalculators);
+        Explore explore = new Explore(initialSampler, 200, metricCalculators);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());

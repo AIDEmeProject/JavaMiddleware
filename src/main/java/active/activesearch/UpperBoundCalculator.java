@@ -1,7 +1,5 @@
 package active.activesearch;
 
-import classifier.Classifier;
-import data.DataPoint;
 import data.LabeledDataset;
 
 /**
@@ -13,13 +11,13 @@ interface UpperBoundCalculator {
      * @param data: labeled data
      * @param steps: number of lookahead steps remaining
      */
-    Classifier fit(LabeledDataset data, int steps);
+    void fit(LabeledDataset data, int steps);
 
     /**
      * Compute upper bound on maximum utility
-     * @param point: data point
+     * @param proba: data point
      * @return maximum utility upper bound
      */
-    double upperBound(DataPoint point);
+    double upperBound(double proba);
 }
 
