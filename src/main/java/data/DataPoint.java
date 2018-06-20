@@ -3,28 +3,49 @@ package data;
 import java.util.Arrays;
 
 /**
- * This class stores a single data points, together with its unique id.
+ * This class stores a data point. It contains:
+ *
+ *   - row: row number in the original dataset
+ *   - id: data point's id (i.e. database id). If not specified, the own row number is used
+ *   - data: array of values contained in array
  */
 public class DataPoint {
     /**
      * data point's row number
      */
-    private int id;
+    private int row;
+
+    /**
+     * data point's id
+     */
+    private long id;
 
     /**
      * data point's values
      */
     private double[] data;
 
-    public DataPoint(int id, double[] data) {
+    public DataPoint(int row, long id, double[] data) {
         if (data.length == 0){
             throw new IllegalArgumentException("Data point must be non-empty.");
         }
+        this.row = row;
         this.id = id;
         this.data = data;
     }
 
-    public int getId() {
+    /**
+     * Initializes data point with identical row and id values.
+     */
+    public DataPoint(int row, double[] data) {
+        this(row, row, data);
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -32,6 +53,9 @@ public class DataPoint {
         return data;
     }
 
+    /**
+     * @return data point's dimension (i.e. number of features)
+     */
     public int getDim(){
         return data.length;
     }
@@ -43,20 +67,19 @@ public class DataPoint {
 
         DataPoint dataPoint = (DataPoint) o;
 
-        return id == dataPoint.id && Arrays.equals(data, dataPoint.data);
+        return row == dataPoint.row && id == dataPoint.id && Arrays.equals(data, dataPoint.data);
     }
 
     /**
-     * We only use the point's id in order to set the hashcode. Implicitly we are assuming each point id is unique in our
-     * datasets (which we try to guarantee).
+     * We return the own row number of the point, since it is (in theory) unique give a database.
      */
     @Override
     public int hashCode() {
-        return id;
+        return row;
     }
 
     @Override
     public String toString() {
-        return "(id=" + id + ", data=" + Arrays.toString(data) + ')';
+        return "(row=" + row + ", id=" + id + ", data=" + Arrays.toString(data) + ')';
     }
 }

@@ -78,7 +78,7 @@ public class NearestNeighborsClassifier implements BoundedClassifier {
     }
 
     private double futureProbabilityUpperBound(DataPoint point, int maxPositivePoints){
-        int row = point.getId();
+        int row = point.getRow();
         return (gamma + sumOfLabelsInLabeledNeighborhood[row] + maxPositivePoints) / (1 + labeledNeighborhoodSize[row] + maxPositivePoints);
     }
 }

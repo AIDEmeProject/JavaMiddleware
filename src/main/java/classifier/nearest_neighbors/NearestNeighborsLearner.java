@@ -2,11 +2,13 @@ package classifier.nearest_neighbors;
 
 import classifier.BoundedClassifier;
 import classifier.BoundedLearner;
+import data.DataPoint;
 import data.LabeledPoint;
 import exceptions.EmptyLabeledSetException;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
 
+import javax.xml.crypto.Data;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -39,11 +41,11 @@ public class NearestNeighborsLearner implements BoundedLearner {
     private final int[][] indexes;
 
     /**
-     * @param X: collection of all unlabeled data points. KD-tree will be built over this collection.
+     * @param points: collection of all unlabeled data points. KD-tree will be built over this collection.
      * @param k: neighborhood size
      * @throws IllegalArgumentException if gamma not in [0,1], or if k is not positive
      */
-    public NearestNeighborsLearner(double[][] X, int k, double gamma) {
+    public NearestNeighborsLearner(Collection<DataPoint> points, int k, double gamma) {
         if (k <= 0){
             throw new IllegalArgumentException("Number of neighbors must be positive.");
         }
@@ -53,6 +55,12 @@ public class NearestNeighborsLearner implements BoundedLearner {
         }
 
         this.gamma = gamma;
+
+        double[][] X = new double[points.size()][];
+        for (DataPoint point : points){
+            X[point.getRow()] = point.getData();
+        }
+
         this.indexes = computeNeighbors(X, k);
     }
 
@@ -75,6 +83,10 @@ public class NearestNeighborsLearner implements BoundedLearner {
         return indexes;
     }
 
+    public int[][] getIndexes() {
+        return indexes;
+    }
+
     /**
      * Fit kNN classifier over labeled data. We assume data.X is the same collection of points passed as argument in the
      * constructor.
@@ -93,7 +105,7 @@ public class NearestNeighborsLearner implements BoundedLearner {
         for (int i = 0; i < size; i++) {
             for(LabeledPoint point : labeledPoints){
                 // if labeledIndex is one of the k-closest neighbors, increment counters
-                if(Arrays.binarySearch(indexes[i], point.getId()) >= 0){
+                if(Arrays.binarySearch(indexes[i], point.getRow()) >= 0){
                     sumOfLabelsInLabeledNeighborhood[i] += point.getLabel();
                     labeledNeighborhoodSize[i]++;
                 }

@@ -9,7 +9,7 @@ import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
 import classifier.nearest_neighbors.NearestNeighborsLearner;
-import data.IndexedDataset;
+import data.DataPoint;
 import explore.ExplorationMetrics;
 import explore.Explore;
 import io.MetricWriter;
@@ -26,32 +26,36 @@ import java.util.*;
 
 public class RunExperiment {
 
-    private static double[][] generateX(int numRows, int dim, int seed) {
-        double[][] X = new double[numRows][dim];
+    private static Collection<DataPoint> generateX(int numRows, int dim, int seed) {
+        Collection<DataPoint> points = new ArrayList<>(numRows);
 
         Random rand = new Random(seed);
 
         for (int i=0; i < numRows; i++){
+            double[] point = new double[dim];
             for (int j=0; j < dim ; j++){
-                X[i][j] = rand.nextDouble();
+                point[j] = rand.nextDouble();
             }
+            points.add(new DataPoint(i, point));
         }
 
-        return X;
+        return points;
     }
 
-    private static int[] generateY(double[][] X){
-        int[] y = new int[X.length];
+    private static Set<Long> generateY(Collection<DataPoint> points){
+        Set<Long> keys = new HashSet<>();
 
-        for (int i=0; i < y.length; i++){
-            double a = X[i][0], b = X[i][1];
+        for (DataPoint point : points){
+            double[] data = point.getData();
+
+            double a = data[0], b = data[1];
+
             if(norm(a, b) < 0.25 || norm(a, 1-b) < 0.25 || norm(1-a, b) < 0.25 || norm(1-a, 1-b) < 0.25 || norm(a-0.5, b-0.5) < 0.25){
-                y[i] = 1;
+                keys.add(point.getId());
             }
-
         }
 
-        return y;
+        return keys;
     }
 
     private static double norm(double a, double b){
@@ -61,23 +65,20 @@ public class RunExperiment {
     public static void main(String[] args){
         // DATA and USER
         // simple example
-        double[][] X = generateX(250, 2, 1);
-        int[] y = generateY(X);
+        Collection<DataPoint> points = generateX(250, 2, 1);
+        Set<Long> y = generateY(points);
         User user = new DummyUser(y);
-        System.out.println(RunExperiment.class.getName());
 
         // sdss
 //        TaskReader reader = new TaskReader("sdss_Q1_0.1%");
-//        IndexedDataset data = reader.readData();
+//        Collection<DataPoint> data = reader.readData();
 //        Set<Long> positiveKeys = reader.readTargetSetKeys();
-//
-//        double[][] X = data.getData();
-//        User user = new DummyUser(data.getIndexes(), positiveKeys);
+//        User user = new DummyUser(positiveKeys);
 
         // SCALING
         StandardScaler scaler = new StandardScaler();
-        scaler.fit(X);
-        X = scaler.transform(X);
+        scaler.fit(points);
+        points = scaler.transform(points);
 
         // CLASSIFIER
         // svm
@@ -89,7 +90,7 @@ public class RunExperiment {
         Learner learner = new SvmLearner(params);
 
         // knn
-        BoundedLearner boundedLearner = new NearestNeighborsLearner(X, 10, 0.1);
+        BoundedLearner boundedLearner = new NearestNeighborsLearner(points, 10, 0.1);
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
@@ -112,7 +113,7 @@ public class RunExperiment {
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
-            ExplorationMetrics metrics = explore.averageRun(X, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
+            ExplorationMetrics metrics = explore.averageRun(points, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
             MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
         }
     }

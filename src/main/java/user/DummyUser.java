@@ -6,63 +6,31 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * The DummyUser is a special kind of annotator. It knows the labels of all data points in advance, returning them when
- * prompted. It is useful when developing new algorithms and making benchmarks over known datasets.
+ * The DummyUser is a special kind of annotator. It knows the which data points are positive in advance.
+ * It is useful when developing new algorithms and making benchmarks over known datasets.
  */
 public class DummyUser implements User {
     /**
      * true labels
      */
-    private int[] labels;
+    private Set<Long> positiveKeys;
 
     /**
-     * @param labels true labels array. Should only contain 0 or 1 values.
-     * @throws IllegalArgumentException if array is empty, contains any number different from 0 or 1, or all labels are identical
-     */
-    public DummyUser(int[] labels) {
-        this.labels = labels;
-        validateLabels();
-    }
-
-    /**
-     * @param indexes: collection of all data point's indexes
      * @param positiveKeys: set of data point's indexes in the target set
      * @throws IllegalArgumentException if array is empty, contains any number different from 0 or 1, or all labels are identical
      */
-    public DummyUser(Collection<Long> indexes, Set<Long> positiveKeys) {
-        labels = new int[indexes.size()];
-
-        int i = 0;
-        for (Long key : indexes) {
-            labels[i++] = positiveKeys.contains(key) ? 1 : 0;
+    public DummyUser(Set<Long> positiveKeys) {
+        if (positiveKeys.isEmpty()){
+            throw new IllegalArgumentException("Positive key set cannot be empty.");
         }
-
-        validateLabels();
-    }
-
-    private void validateLabels(){
-        if (labels.length == 0){
-            throw new IllegalArgumentException("Labels array is empty.");
-        }
-
-        long sum = 0;
-        for (int label : labels) {
-            if (label < 0 || label > 1) {
-                throw new IllegalArgumentException("Labels must be either 0 or 1.");
-            }
-            sum += label;
-        }
-
-        if (sum == 0 || sum == labels.length){
-            throw new IllegalArgumentException("All labels are identical.");
-        }
+        this.positiveKeys = positiveKeys;
     }
 
     /**
-     * Simply returns labels[row]
+     * @return 1 if positiveKeys contains data point's id; else 0
      */
     @Override
     public int getLabel(DataPoint point) {
-        return labels[point.getId()];
+        return positiveKeys.contains(point.getId()) ? 1 : 0;
     }
 }

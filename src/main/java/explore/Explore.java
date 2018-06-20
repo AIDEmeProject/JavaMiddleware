@@ -88,7 +88,7 @@ public class Explore {
      * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
      * @return metrics collected during each iteration.
      */
-    public ExplorationMetrics run(double[][] X, User user, ActiveLearner activeLearner, long seed){
+    public ExplorationMetrics run(Collection<DataPoint> X, User user, ActiveLearner activeLearner, long seed){
         // set random seed
         setSeed(seed);
 
@@ -108,7 +108,7 @@ public class Explore {
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      */
-    public ExplorationMetrics run(double[][] X, User user, ActiveLearner activeLearner){
+    public ExplorationMetrics run(Collection<DataPoint> X, User user, ActiveLearner activeLearner){
         return run(X, user, activeLearner, System.nanoTime());
     }
 
@@ -120,7 +120,7 @@ public class Explore {
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      */
-    public ExplorationMetrics averageRun(double[][] X, User user, ActiveLearner activeLearner, int runs, long[] seeds){
+    public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs, long[] seeds){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
@@ -143,7 +143,7 @@ public class Explore {
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
      */
-    public ExplorationMetrics averageRun(double[][] X, User user, ActiveLearner activeLearner, int runs){
+    public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs){
         if (runs <= 0){
             throw new IllegalArgumentException("Runs must be positive.");
         }
@@ -169,7 +169,7 @@ public class Explore {
         // update labeled set
         int[] labels = user.getLabel(points);
         data.putOnLabeledSet(points, labels);
-        metrics.add("labeledRow", (double) points.iterator().next().getId());  //TODO: how to store rows ?
+        metrics.add("labeledRow", (double) points.iterator().next().getRow());  //TODO: how to store rows ?
 
         // retrain model
         initialTime = System.nanoTime();

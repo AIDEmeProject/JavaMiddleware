@@ -8,6 +8,8 @@ import user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,13 +41,21 @@ class StratifiedSamplerTest {
 
     @Test
     void sample_sampleMorePositivePointsThanPossible_throwsException() {
-        user = new DummyUser(new int[]{0,0,0,1});
+        Set<Long> keys = new HashSet<>();
+        keys.add(3L);
+        user = new DummyUser(keys);
+
         assertThrows(RuntimeException.class, () -> sampler.sample(points, user));
     }
 
     @Test
     void sample_sampleMoreNegativePointsThanPossible_throwsException() {
-        user = new DummyUser(new int[]{0,1,1,1});
+        Set<Long> keys = new HashSet<>();
+        keys.add(0L);
+        keys.add(1L);
+        keys.add(2L);
+        user = new DummyUser(keys);
+
         assertThrows(RuntimeException.class, () -> sampler.sample(points, user));
     }
 }

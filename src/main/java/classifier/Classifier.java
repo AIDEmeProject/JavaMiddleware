@@ -3,7 +3,6 @@ package classifier;
 
 import data.DataPoint;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**

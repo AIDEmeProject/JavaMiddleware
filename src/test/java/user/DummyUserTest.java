@@ -1,7 +1,6 @@
 package user;
 
 import data.DataPoint;
-import data.LabeledDataset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,64 +12,42 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DummyUserTest {
-    private double[][] X;
-    private int[] labels;
-    private LabeledDataset data;
+    private Collection<DataPoint> points;
     private DummyUser user;
 
     @BeforeEach
     void setUp() {
-        X = new double[][]{{1}, {2}, {3}, {4}};
-        data = new LabeledDataset(X);
-        labels = new int[] {0,1,1,0};
-        user = new DummyUser(labels);
+        points = new ArrayList<>();
+
+        for (int i = 0; i < 4; i++) {
+            points.add(new DataPoint(i, new double[]{i+1}));
+        }
+
+        Set<Long> positiveKeys = new HashSet<>();
+        positiveKeys.add(1L);
+        positiveKeys.add(2L);
+
+        user = new DummyUser(positiveKeys);
     }
 
     @Test
-    void constructor_emptyLabelsArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {}));
+    void constructor_emptyKeySet_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new HashSet<>()));
     }
 
     @Test
-    void constructor_labelsArrayContainsInvalidLabel_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {0,-1,1,0}));
-    }
-
-    @Test
-    void constructor_allZerosLabels_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {0,0,0,0}));
-    }
-
-    @Test
-    void constructor_allOnesLabels_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new int[] {1,1,1,1}));
-    }
-
-    @Test
-    void getLabel_rowIndexIsValid_returnsCorrectLabels() {
-        for (int i = 0; i < labels.length; i++) {
-            assertEquals(labels[i], user.getLabel(new DataPoint(i, X[i])));
+    void getLabel_testAllIndexes_returnsCorrectLabels() {
+        int i = 0;
+        for (DataPoint point : points) {
+            int label = (i == 1 || i == 2) ? 1 : 0;
+            assertEquals(label, user.getLabel(point));
+            i++;
         }
     }
 
     @Test
     void getAllLabels_callGetAllLabels_returnsLabelsArray() {
-        assertArrayEquals(labels, user.getLabel(data.getAllPoints()));
+        assertArrayEquals(new int[] {0,1,1,0}, user.getLabel(points));
     }
 
-    @Test
-    void getAllLabels_usingIndexesConstructor_returnsCorrectLabels() {
-        Collection<Long> indexes = new ArrayList<>();
-        indexes.add(0L);
-        indexes.add(1L);
-        indexes.add(2L);
-        indexes.add(3L);
-
-        Set<Long> positiveSetIndexes = new HashSet<>();
-        positiveSetIndexes.add(1L);
-        positiveSetIndexes.add(2L);
-
-        user = new DummyUser(indexes, positiveSetIndexes);
-        assertArrayEquals(labels, user.getLabel(data.getAllPoints()));
-    }
 }

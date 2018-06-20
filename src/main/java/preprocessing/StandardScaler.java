@@ -1,6 +1,11 @@
 package preprocessing;
 
+import data.DataPoint;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * This class is responsible for standardizing each column of a double matrix; in other words, after processing, each
@@ -21,6 +26,11 @@ public class StandardScaler {
     private double[] std;
 
     /**
+     * number of points being fit
+     */
+    private int counter;
+
+    /**
      * @return whether the fit() method was already called
      */
     public boolean isFit(){
@@ -30,67 +40,85 @@ public class StandardScaler {
     /**
      * Fit the object to a particular data matrix. Basically, we compute and store the mean and standard deviation of
      * each column of the input matrix.
-     * @param X: data matrix to fit
+     * @param points: data matrix to fit
      */
-    public void fit(double[][] X){
-        validateMatrix(X);
-
-        int dim = X[0].length;
-        mean = Arrays.copyOf(X[0], dim);
-        std = new double[dim];
-
-        for (int i = 1; i < X.length; i++) {
-            for (int j = 0; j < dim; j++) {
-                double diff = X[i][j] - mean[j];
-                mean[j] += diff / (i+1);
-                std[j] += diff * (X[i][j] - mean[j]);
-            }
+    public void fit(Collection<DataPoint> points){
+        if (points.isEmpty()){
+            throw new IllegalArgumentException("Cannot fit empty collection.");
         }
 
-        for (int j = 0; j < dim; j++) {
+        Iterator<DataPoint> pointIterator = points.iterator();
+
+        // initialize mean and std
+        DataPoint point = pointIterator.next();
+        mean = Arrays.copyOf(point.getData(), point.getDim());
+        std = new double[point.getDim()];
+
+        // update mean and variance
+        counter = 1;
+        pointIterator.forEachRemaining(pt -> updateMeanAndStd(pt.getData()));
+
+        // compute std from variance
+        for (int j = 0; j < std.length; j++) {
             if (std[j] == 0){
-                throw new IllegalArgumentException("Found a zero-standard deviation column.");
+                throw new IllegalArgumentException("Column number " + j + "has zero standard deviation.");
             }
 
-            std[j] = Math.sqrt(std[j] / X.length);
+            std[j] = Math.sqrt(std[j] / counter);
+        }
+    }
+
+    private void updateMeanAndStd(double[] values){
+        if (mean.length != values.length){
+            throw new IllegalArgumentException("Incompatible input dimension. Expected " + mean.length + ", but obtained " + values.length);
+        }
+
+        counter++;
+
+        for (int j = 0; j < values.length; j++) {
+            double diff = values[j] - mean[j];
+            mean[j] += diff / counter;
+            std[j] += diff * (values[j] - mean[j]);
         }
     }
 
     /**
-     * Standardize a given matrix. The input matrix won't change, a new matrix is returned. The fit() method must be
-     * called beforehand.
+     * Standardize a given collection of data points. The fit() method must have been called beforehand.
      * @param X: data to standardize
-     * @return standardized matrix
+     * @return a new standardized collection of points
+     * @throws RuntimeException if object was not fit beforehand
+     * @throws IllegalArgumentException if data points have different dimension from expected
      */
-    public double[][] transform(double[][] X){
+    public Collection<DataPoint> transform(Collection<DataPoint> X){
         if (!isFit()){
             throw new RuntimeException("Object was not fit; remember to call fit() before calling transform().");
         }
 
-        validateMatrix(X);
+        Collection<DataPoint> scaled = new ArrayList<>(X.size());
 
-        if (X[0].length != mean.length){
-            throw new IllegalArgumentException("Input matrix has a incompatible number of dimensions: expected " + mean.length + " but obtained " + X[0].length);
-        }
-
-        double[][] scaled = new double[X.length][X[0].length];
-
-        for (int i = 0; i < X.length; i++) {
-            for (int j = 0; j < X[0].length; j++) {
-                scaled[i][j] = (X[i][j] - mean[j]) / std[j];
-            }
+        for (DataPoint point : X){
+            scaled.add(transform(point));
         }
 
         return scaled;
     }
 
-    private void validateMatrix(double[][] X){
-        if (X.length == 0){
-            throw new IllegalArgumentException("Received empty data matrix.");
+    public DataPoint transform(DataPoint point){
+        if (!isFit()){
+            throw new RuntimeException("Object was not fit; remember to call fit() before calling transform().");
         }
 
-        if (X[0].length == 0){
-            throw new IllegalArgumentException("Data points have zero dimension.");
+        if (point.getDim() != mean.length){
+            throw new IllegalArgumentException("Incompatible input dimension. Expected " + mean.length + ", but obtained " + point.getDim());
         }
+
+        double[] data = point.getData();
+        double[] scaledData = new double[data.length];
+
+        for (int j = 0; j < data.length; j++) {
+            scaledData[j] = (data[j] - mean[j]) / std[j];
+        }
+
+        return new DataPoint(point.getRow(), point.getId(), scaledData);
     }
 }

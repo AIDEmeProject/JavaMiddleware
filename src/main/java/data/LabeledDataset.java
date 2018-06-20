@@ -39,6 +39,13 @@ public class LabeledDataset {
         }
     }
 
+    public LabeledDataset(Collection<DataPoint> points){
+        labeled = new LinkedHashSet<>();  // preserve insertion order
+
+        unlabeled = new HashSet<>();  // insertion order is not important
+        unlabeled.addAll(points);
+    }
+
     private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;

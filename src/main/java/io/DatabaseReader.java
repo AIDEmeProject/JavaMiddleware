@@ -1,9 +1,12 @@
 package io;
 
-import data.IndexedDataset;
+import data.DataPoint;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This module is responsible for reading data from a database using JDBC. We make the following assumptions about the
@@ -47,8 +50,44 @@ public class DatabaseReader {
      * @param columns: list of data columns to read. Must be of numeric type.
      * @return Indexes dataset instance containing both the keys and the data read from the database
      */
-    public IndexedDataset readTable(String table, String key, String[] columns){
-        return read(table, key, columns, "");
+    public Collection<DataPoint> readTable(String table, String key, String[] columns){
+        Collection<DataPoint> points = new ArrayList<>();
+
+        // build SQL query
+        String SQL = buildSQLString(table, key, columns, "");
+
+        try (
+                Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(SQL)
+        ) {
+            // row number
+            int row = 0;
+
+            // number of features
+            int size = rs.getMetaData().getColumnCount() - 1;
+
+            // read all records
+            while(rs.next()) {
+                // store point id
+                long id = rs.getLong(1);
+
+                // store rows
+                double[] data = new double[size];
+                for (int i = 0; i < size; i++) {
+                    data[i] = rs.getDouble(i+2);
+                }
+
+                points.add(new DataPoint(row, id, data));
+                row++;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Couldn't read data from database.");
+        }
+
+        return points;
     }
 
     /**
@@ -59,48 +98,27 @@ public class DatabaseReader {
      * @return a set containing all the row keys satisfying the given predicate
      */
     public Set<Long> readKeys(String table, String key, String predicate){
-        return read(table, key, new String[] {}, predicate).getIndexes();
-    }
-
-    private IndexedDataset read(String table, String key, String[] columns, String predicate){
-        LinkedHashSet<Long> keys = new LinkedHashSet<>();
-        ArrayList<double[]> X = new ArrayList<>();
+        Set<Long> keys = new HashSet<>();
 
         // build SQL query
-        String SQL = buildSQLString(table, key, columns, predicate);
+        String SQL = buildSQLString(table, key, new String[] {}, predicate);
 
         try (
                 Connection conn = connect();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL)
         ) {
-            // number of features
-            int size = rs.getMetaData().getColumnCount() - 1;
-
-            // read all records
+            // read all keys
             while(rs.next()) {
-                // store key
                 keys.add(rs.getLong(1));
-
-                // store rows
-                double[] row = new double[size];
-                for (int i = 0; i < size; i++) {
-                    row[i] = rs.getDouble(i+2);
-                }
-                X.add(row);
             }
 
         } catch (SQLException ex) {
-            // TODO: maybe it's better to bubble up this exception ?
             ex.printStackTrace();
             throw new RuntimeException("Couldn't read data from database.");
         }
 
-        if (keys.size() != X.size()){
-            throw new IllegalArgumentException("Key column is not unique.");
-        }
-
-        return new IndexedDataset(keys, X.toArray(new double[X.size()][]));
+        return keys;
     }
 
     private Connection connect() throws SQLException {
