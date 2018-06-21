@@ -24,24 +24,19 @@ import java.util.Collection;
  *
  * @see <a href="http://www.jmlr.org/papers/volume2/tong01a/tong01a.pdf">Original paper</a>
  */
-public class SimpleMargin implements ActiveLearner {
-    /**
-     * SVM training algorithm
-     */
-    private final SvmLearner learner;
-
+public class SimpleMargin extends ActiveLearner {
     /**
      * SVM classifier
      */
     private SvmClassifier classifier;
 
     public SimpleMargin(SvmLearner learner) {
-        this.learner = learner;
+        super(learner);
     }
 
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        classifier = learner.fit(labeledPoints);
+        classifier = (SvmClassifier) super.fit(labeledPoints);
         return classifier;
     }
 

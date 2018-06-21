@@ -30,6 +30,11 @@ import java.util.Collection;
 public class NearestNeighborsLearner implements Learner {
 
     /**
+     * Neighborhood size
+     */
+    private final int k;
+
+    /**
      * Probability smoothing parameter
      */
     private final double gamma;
@@ -37,31 +42,36 @@ public class NearestNeighborsLearner implements Learner {
     /**
      * indexes[i] contains the indexes of the k-Nearest neighbors of X[i]. No particular ordering can be assumed.
      */
-    private final int[][] indexes;
+    private int[][] indexes;
 
     /**
-     * @param points: collection of all unlabeled data points. KD-tree will be built over this collection.
      * @param k: neighborhood size
      * @throws IllegalArgumentException if gamma not in [0,1], or if k is not positive
      */
-    public NearestNeighborsLearner(Collection<DataPoint> points, int k, double gamma) {
+    public NearestNeighborsLearner(int k, double gamma) {
         Validator.assertPositive(k);
         Validator.assertInRange(gamma, 0, 1);
 
         this.gamma = gamma;
+        this.k = k;
+    }
 
+    /**
+     * Computes a KD-tree over a collection of data points (for easily finding the k-nearest neighbors)
+     * @param points: data points
+     */
+    @Override
+    public void initialize(Collection<DataPoint> points) {
+        // convert do double[][] matrix
         double[][] X = new double[points.size()][];
         for (DataPoint point : points){
             X[point.getRow()] = point.getData();
         }
 
-        this.indexes = computeNeighbors(X, k);
-    }
-
-    private int[][] computeNeighbors(double[][] X, int k){
-        int [][] indexes = new int[X.length][k];
+        indexes = new int[X.length][k];
 
         KDTree<double[]> tree = new KDTree<>(X, X);
+
         for (int i=0; i < X.length; i++) {
             // compute neighborhood of X[i]
             Neighbor<double[], double[]>[] neighbors = tree.knn(X[i], k);
@@ -73,11 +83,9 @@ public class NearestNeighborsLearner implements Learner {
             // sort indexes so we can perform binary search when looking for labeled neighbors
             Arrays.sort(indexes[i]);
         }
-
-        return indexes;
     }
 
-    public int[][] getIndexes() {
+    int[][] getIndexes() {
         return indexes;
     }
 
@@ -85,10 +93,13 @@ public class NearestNeighborsLearner implements Learner {
      * Fit kNN classifier over labeled data. We assume data.X is the same collection of points passed as argument in the
      * constructor.
      * @param labeledPoints: collection of labeled points
+     * @return KNN classifier
+     * @throws IllegalArgumentException if labeledPoints is empty or initialize() was not called beforehand.
      */
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
         Validator.assertNotEmpty(labeledPoints);
+        Validator.assertNotNull(indexes);
 
         int size = indexes.length;
         int[] sumOfLabelsInLabeledNeighborhood = new int[size];

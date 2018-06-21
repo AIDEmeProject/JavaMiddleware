@@ -34,13 +34,7 @@ import java.util.Collection;
  *        Bayesian Optimal Active Search and Surveying
  *        ICML, 2012
  */
-public class ActiveTreeSearch implements ActiveLearner {
-
-    /**
-     * Classifier training algorithm
-     */
-    private final Learner learner;
-
+public class ActiveTreeSearch extends ActiveLearner {
     /**
      * number of steps to look into the future
      */
@@ -56,15 +50,11 @@ public class ActiveTreeSearch implements ActiveLearner {
      * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(Learner learner, int lookahead) {
+        super(learner);
+
         Validator.assertPositive(lookahead);
-        this.learner = learner;
         this.lookahead = lookahead;
         this.calculator = new UtilityUpperBoundCalculator();
-    }
-
-    @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        return learner.fit(labeledPoints);
     }
 
     /**

@@ -18,25 +18,19 @@ import java.util.Collection;
  *
  * @author luciano
  */
-public class UncertaintySampler implements ActiveLearner {
-
-    /**
-     * Training algorithm
-     */
-    private final Learner learner;
-
+public class UncertaintySampler extends ActiveLearner {
     /**
      * internal classifier used for predicting probabilities
      */
     private Classifier classifier;
 
     public UncertaintySampler(Learner learner) {
-        this.learner = learner;
+        super(learner);
     }
 
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        classifier = learner.fit(labeledPoints);
+        classifier = super.fit(labeledPoints);
         return classifier;
     }
 

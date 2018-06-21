@@ -7,13 +7,24 @@ import java.util.Collection;
  */
 public class Validator {
     /**
+     * Raises an exception if object is null
+     * @param object: any object
+     * @throws IllegalArgumentException if object is null
+     */
+    public static <T> void assertNotNull(Object object){
+        if (object == null){
+            throw new IllegalArgumentException("Object must not be null.");
+        }
+    }
+
+    /**
      * Raises an exception if collection is emtpy
      * @param data: data vector
      * @throws IllegalArgumentException if data vector is empty
      */
     public static <T> void assertNotEmpty(Collection<T> data){
         if (data.size() == 0){
-            throw new IllegalArgumentException("Data must contain at least one feature.");
+            throw new IllegalArgumentException("Collection must contain at least one element.");
         }
     }
 
@@ -24,7 +35,7 @@ public class Validator {
      */
     public static void assertNotEmpty(int[] data){
         if (data.length == 0){
-            throw new IllegalArgumentException("Data must contain at least one feature.");
+            throw new IllegalArgumentException("Array must contain at least one element.");
         }
     }
 
@@ -35,7 +46,7 @@ public class Validator {
      */
     public static void assertNotEmpty(double[] data){
         if (data.length == 0){
-            throw new IllegalArgumentException("Data must contain at least one feature.");
+            throw new IllegalArgumentException("Array must contain at least one element.");
         }
     }
 

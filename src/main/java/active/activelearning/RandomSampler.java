@@ -17,25 +17,15 @@ import java.util.Collection;
  *
  * @author luciano
  */
-public class RandomSampler implements ActiveLearner {
-
-    /**
-     * Classifier training algorithm
-     */
-    private final Learner learner;
+public class RandomSampler extends ActiveLearner {
 
     /**
      * @param learner: classifier used for training and prediction. RandomSampler has no default classification algorithm.
      */
     public RandomSampler(Learner learner) {
-        this.learner = learner;
+        super(learner);
     }
 
-    @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        Validator.assertNotEmpty(labeledPoints);
-        return learner.fit(labeledPoints);
-    }
     /**
      * Randomly pick a point from the unlabeled set.
      * @param data: labeled data object

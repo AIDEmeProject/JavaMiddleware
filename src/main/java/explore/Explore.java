@@ -40,13 +40,16 @@ public class Explore {
      */
     private final Collection<MetricCalculator> metricCalculators;
 
+    /**
+     * Size of unlabeled set sample taken at every iteration
+     */
     private final int subsampleSize;
 
     /**
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
+     * @param subsampleSize: size of sample to restrict unlabeled set at every iteration (speeds up computation)
      * @param metricCalculators: collection of metrics to be calculated
-     * @throws NullPointerException if initialSampler is null
      * @throws IllegalArgumentException if budget is not positive
      */
     public Explore(StratifiedSampler initialSampler, int budget, int subsampleSize, Collection<MetricCalculator> metricCalculators) {
@@ -59,7 +62,19 @@ public class Explore {
     }
 
     /**
-     * Sets no metrics to calculate. Only time measurements will be provided in result.
+     * Through this constructor, no subsampling is performed.
+     * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
+     * @param budget: number of iterations in the active learning exploration process
+     * @param metricCalculators: collection of metrics to be calculated
+     * @throws IllegalArgumentException if budget is not positive
+     */
+    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
+        this(initialSampler, budget, Integer.MAX_VALUE, metricCalculators);
+    }
+
+    /**
+     * Through this constructor, no subsampling is performed and no additional metrics will be computed.
+     * Only time measurements and the set of labeled rows will be provided in result.
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
      */
@@ -67,61 +82,30 @@ public class Explore {
         this(initialSampler, budget, Integer.MAX_VALUE, new ArrayList<>());
     }
 
-    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
-        this(initialSampler, budget, Integer.MAX_VALUE, metricCalculators);
-    }
-
-    private void setSeed(long seed){
-        ReservoirSampler.setSeed(seed);
-    }
-
-    /**
-     * Run the exploration process.
-     * @param X: features matrix
-     * @param user: user or oracle
-     * @param activeLearner: active activeLearner object
-     * @param seed: random seed to be used throughout exploration. Allows experiments to be reproducible.
-     * @return metrics collected during each iteration.
-     */
-    public ExplorationMetrics run(Collection<DataPoint> X, User user, ActiveLearner activeLearner, long seed){
-        // set random seed
-        setSeed(seed);
-
-        ExplorationMetrics metrics = new ExplorationMetrics();
-        LabeledDataset data = new LabeledDataset(X); // TODO: maybe we should pass the labeledData instance directly as parameter ?
-
-        for (int iter = 0; iter < budget && data.getNumUnlabeledPoints() > 0; iter++){
-            metrics.add(runSingleIteration(data, user, activeLearner));
-        }
-
-        return metrics;
-    }
-
-    /**
-     * Run the exploration process with a random seed.
-     * @param X: features matrix
-     * @param user: user or oracle
-     * @param activeLearner: active activeLearner object
-     */
-    public ExplorationMetrics run(Collection<DataPoint> X, User user, ActiveLearner activeLearner){
-        return run(X, user, activeLearner, System.nanoTime());
-    }
-
     /**
      * Run the exploration process several times (with specified seeds) and average resulting metrics.
-     * @param X: features matrix
+     * @param data: data points
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
+     * @throws IllegalArgumentException if runs is not positive and if seeds.length differs from runs
      */
-    public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs, long[] seeds){
+    public ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds){
         Validator.assertPositive(runs);
 
-        ExplorationMetrics metrics = run(X, user, activeLearner, seeds[0]);
+        if (seeds != null){
+            Validator.assertEquals(runs, seeds.length);
+        }
+
+        // initializes active learners internal data structures
+        activeLearner.initialize(data);
+
+        // run exploration and compute average of metrics
+        ExplorationMetrics metrics = run(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[0]);
 
         for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, user, activeLearner, seeds[i]));
+            metrics = metrics.sum(run(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]));
         }
 
         return metrics.divideByNumber(runs);
@@ -129,25 +113,37 @@ public class Explore {
 
     /**
      * Run the exploration process several times (with random seeds) and average resulting metrics.
-     * @param X: features matrix
+     * @param data: data points
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
      * @return ExplorationMetrics object containing the average value of each metrics of all runs.
-     * TODO: can we remove the duplication between this method and other averageRun? (i.e. how to choose "random" seeds?)
+     * @throws IllegalArgumentException if runs is not positive
      */
-    public ExplorationMetrics averageRun(Collection<DataPoint> X, User user, ActiveLearner activeLearner, int runs){
-        Validator.assertPositive(runs);
-
-        ExplorationMetrics metrics = run(X, user, activeLearner);
-
-        for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(X, user, activeLearner));
-        }
-
-        return metrics.divideByNumber(runs);
+    public ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs){
+        return run(data, user, activeLearner, runs, null);
     }
 
+    /**
+     * Runs a single exploration process.
+     */
+    private ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
+        // set random seed
+        setSeed(seed);
+
+        ExplorationMetrics metrics = new ExplorationMetrics();
+        LabeledDataset labeledDataset = new LabeledDataset(data);
+
+        for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++){
+            metrics.add(runSingleIteration(labeledDataset, user, activeLearner));
+        }
+
+        return metrics;
+    }
+
+    /**
+     * Run a single iteration of the exploration process, computing the necessary metrics.
+     */
     private Metrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
         long initialTime;
         Metrics metrics = new Metrics();
@@ -177,6 +173,9 @@ public class Explore {
         return metrics;
     }
 
+    /**
+     * Retrieves the next points to labeled, either through the initial sampling or using the active learning model.
+     */
     private Collection<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
         ArrayList<DataPoint> result = new ArrayList<>();
 
@@ -191,5 +190,13 @@ public class Explore {
         }
 
         return result;
+    }
+
+    /**
+     * Sets the random seed for reproducibility.
+     * @param seed: random seed value
+     */
+    private void setSeed(long seed){
+        ReservoirSampler.setSeed(seed);
     }
 }

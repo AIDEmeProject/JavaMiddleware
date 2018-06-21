@@ -1,8 +1,11 @@
 package active;
 
+import classifier.Classifier;
 import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
+import data.LabeledPoint;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -12,12 +15,29 @@ import java.util.Collection;
  *
  * @author luciano
  */
-public interface ActiveLearner extends Learner{
+public abstract class ActiveLearner implements Learner{
+    protected final Learner learner;
+
+    public ActiveLearner(Learner learner) {
+        this.learner = learner;
+    }
+
+    @Override
+    public void initialize(Collection<DataPoint> points) {
+        learner.initialize(points);
+    }
+
+    @Override
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        Validator.assertNotEmpty(labeledPoints);
+        return learner.fit(labeledPoints);
+    }
+
     /**
      * Retrieve the most informative point for labeling from the unlabeled set.
      * @param data: labeled data object
      * @return index of the next unlabeled point to label
      * @throws IllegalArgumentException if unlabeled set is empty
      */
-    DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
+    public abstract DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
 }
