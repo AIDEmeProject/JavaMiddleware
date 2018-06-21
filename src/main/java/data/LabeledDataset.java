@@ -17,6 +17,11 @@ public class LabeledDataset {
     private final Set<DataPoint> unlabeled;
 
     /**
+     * Reference to the initial collection of points
+     */
+    private final Collection<DataPoint> allPoints;
+
+    /**
      * @param points collection of data points to be used as initial unlabeled data pool
      */
     public LabeledDataset(Collection<DataPoint> points){
@@ -24,13 +29,16 @@ public class LabeledDataset {
 
         labeled = new LinkedHashSet<>();  // preserve insertion order
 
-        unlabeled = new HashSet<>();  // insertion order is not important
+        unlabeled = new LinkedHashSet<>();  // insertion order is not important
         unlabeled.addAll(points);
+
+        allPoints = points;
     }
 
-    private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled) {
+    private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled, Collection<DataPoint> allPoints) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;
+        this.allPoints = allPoints;
     }
 
     /**
@@ -50,30 +58,28 @@ public class LabeledDataset {
      * @return collection containing all points
      */
     public Collection<DataPoint> getAllPoints() {
-        Collection<DataPoint> result = new HashSet<>(unlabeled);
-        result.addAll(labeled);
-        return result;
+        return allPoints;
     }
 
     /**
      * @return Collection of labeled points
      */
     public Collection<LabeledPoint> getLabeledPoints() {
-        return new HashSet<>(labeled);
+        return new LinkedHashSet<>(labeled);
     }
 
     /**
      * @return Collection of unlabeled points
      */
     public Collection<DataPoint> getUnlabeledPoints() {
-        return new HashSet<>(unlabeled);
+        return new LinkedHashSet<>(unlabeled);
     }
 
     /**
      * @return total number of points
      */
     public int getNumPoints() {
-        return labeled.size() + unlabeled.size();
+        return allPoints.size();
     }
 
     /**
@@ -150,7 +156,7 @@ public class LabeledDataset {
      * @param sampleSize: sample size
      * @return new LabeledDataset object whose unlabeled set is restricted to a sample.
      * @throws IllegalArgumentException is size not positive
-     * @throws EmptyUnlabeledSetException if unlabeled set is empty
+     * @throws IllegalArgumentException if unlabeled set is empty
      */
     public LabeledDataset subsampleUnlabeledSet(int sampleSize) {
         Validator.assertPositive(sampleSize);
@@ -167,6 +173,6 @@ public class LabeledDataset {
         Set<DataPoint> sample = new HashSet<>(sampleSize);
         sample.addAll(points);
 
-        return new LabeledDataset(labeled, sample);
+        return new LabeledDataset(labeled, sample, allPoints);
     }
 }
