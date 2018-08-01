@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface MetricStorage {
     /**
-     * @return all metrics contained in the object in a Metrics object.
+     * @return all metrics contained in the object in a Map object.
      */
     Map<String, Double> getMetrics();
 }

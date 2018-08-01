@@ -33,7 +33,7 @@ public class MetricWriter {
         }
     }
 
-    public void write(IterationMetrics metrics){
+    public void write(Metrics metrics){
         write(metrics.toString());
     }
 }

@@ -4,16 +4,12 @@ import data.LabeledPoint;
 
 import java.util.*;
 
-public class IterationMetrics{
-    private Collection<LabeledPoint> labeledPoints = Collections.emptyList();
+public class Metrics {
     private Map<String, Double> metrics;
+    private Collection<LabeledPoint> labeledPoints = Collections.emptyList();
 
-    public IterationMetrics() {
+    public Metrics() {
         metrics = new HashMap<>();
-    }
-
-    public void setLabeledPoints(Collection<LabeledPoint> labeledPoints){
-        this.labeledPoints = labeledPoints;
     }
 
     public void put(String name, Double value){
@@ -26,11 +22,15 @@ public class IterationMetrics{
         }
     }
 
+    public void setLabeledPoints(Collection<LabeledPoint> labeledPoints){
+        this.labeledPoints = labeledPoints;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        // opening bracket
+        // JSON opening bracket
         builder.append('{');
 
         // labeled points
@@ -57,7 +57,7 @@ public class IterationMetrics{
             builder.append(entry.getValue());
         }
 
-        // closing bracket
+        // JSON closing bracket
         builder.append('}');
 
         return builder.toString();

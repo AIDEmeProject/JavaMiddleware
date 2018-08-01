@@ -5,7 +5,7 @@ import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import io.IterationMetrics;
+import io.Metrics;
 import io.MetricWriter;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
@@ -15,7 +15,6 @@ import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 
 /**
@@ -141,9 +140,9 @@ public class Explore {
     /**
      * Run a single iteration of the exploration process, computing the necessary metrics.
      */
-    private IterationMetrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
+    private Metrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
         long initialTime, start;
-        IterationMetrics metrics = new IterationMetrics();
+        Metrics metrics = new Metrics();
 
         // find next points to label
         initialTime = System.nanoTime();
