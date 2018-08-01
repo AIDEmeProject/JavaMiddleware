@@ -28,7 +28,7 @@ public class IterationMetrics{
         builder.append('{');
 
         // labeled points
-        builder.append("\"points\" : [");
+        builder.append("\"points\": [");
 
         Iterator<LabeledPoint> labeledPointIterator = labeledPoints.iterator();
 
@@ -47,7 +47,7 @@ public class IterationMetrics{
         for (Map.Entry<String, Double> entry : metrics.entrySet()){
             builder.append(", \"");
             builder.append(entry.getKey());
-            builder.append("\" : ");
+            builder.append("\": ");
             builder.append(entry.getValue());
         }
 
