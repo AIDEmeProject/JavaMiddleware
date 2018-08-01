@@ -2,43 +2,22 @@ package io;
 
 import data.LabeledPoint;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 public class IterationMetrics{
     private Collection<LabeledPoint> labeledPoints = Collections.emptyList();
-    private double getNextTimeMillis;
-    private double userTimeMillis;
-    private double fitTimeMillis;
-    private double accuracyComputationTimeMillis;
-    private double iterTimeMillis;
+    private Map<String, Double> metrics;
 
     public IterationMetrics() {
+        metrics = new HashMap<>();
     }
 
     public void setLabeledPoints(Collection<LabeledPoint> labeledPoints){
         this.labeledPoints = labeledPoints;
     }
 
-    public void setGetNextTimeMillis(double getNextTimeMillis) {
-        this.getNextTimeMillis = getNextTimeMillis;
-    }
-
-    public void setUserTimeMillis(double userTimeMillis) {
-        this.userTimeMillis = userTimeMillis;
-    }
-
-    public void setFitTimeMillis(double fitTimeMillis) {
-        this.fitTimeMillis = fitTimeMillis;
-    }
-
-    public void setAccuracyComputationTimeMillis(double accuracyComputationTimeMillis) {
-        this.accuracyComputationTimeMillis = accuracyComputationTimeMillis;
-    }
-
-    public void setIterTimeMillis(double iterTimeMillis) {
-        this.iterTimeMillis = iterTimeMillis;
+    public void add(String name, Double value){
+        metrics.put(name, value);
     }
 
     @Override
@@ -64,21 +43,13 @@ public class IterationMetrics{
 
         builder.append(']');
 
-        // time measurements
-        builder.append(", \"getNextTimeMillis\" : ");
-        builder.append(getNextTimeMillis);
-
-        builder.append(", \"userTimeMillis\" : ");
-        builder.append(userTimeMillis);
-
-        builder.append(", \"fitTimeMillis\" : ");
-        builder.append(fitTimeMillis);
-
-        builder.append(", \"accuracyComputationTimeMillis\" : ");
-        builder.append(accuracyComputationTimeMillis);
-
-        builder.append(", \"iterTimeMillis\" : ");
-        builder.append(iterTimeMillis);
+        // metrics
+        for (Map.Entry<String, Double> entry : metrics.entrySet()){
+            builder.append(", \"");
+            builder.append(entry.getKey());
+            builder.append("\" : ");
+            builder.append(entry.getValue());
+        }
 
         // closing bracket
         builder.append('}');

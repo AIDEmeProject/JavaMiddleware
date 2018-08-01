@@ -5,9 +5,7 @@ import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
 import classifier.nearest_neighbors.NearestNeighborsLearner;
 import data.DataPoint;
-import explore.ExplorationMetrics;
 import explore.Explore;
-import io.MetricWriter;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -90,8 +88,8 @@ public class RunExperiment {
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
         //activeLearners.put("Random Learner kNN", new RandomSampler(knn));
         //activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
-        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
-        activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(svm, 2));
+        activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
+        //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(svm, 2));
 
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
@@ -108,9 +106,7 @@ public class RunExperiment {
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
-            ExplorationMetrics metrics = explore.run(points, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
-            MetricWriter.write(metrics, "./experiment/" + entry.getKey() + ".csv");
-            System.out.println(metrics);
+            explore.run(points, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
         }
     }
 }

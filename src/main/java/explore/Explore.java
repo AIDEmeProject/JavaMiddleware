@@ -4,7 +4,11 @@ import active.ActiveLearner;
 import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
+import data.LabeledPoint;
+import io.IterationMetrics;
+import io.MetricLogger;
 import metrics.MetricCalculator;
+import metrics.MetricStorage;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 import user.User;
@@ -26,7 +30,7 @@ import java.util.Collection;
  */
 public class Explore {
     /**
-     * Number of iteration to run in the active learning exploration process.
+     * Number of iteration to runSingle in the active learning exploration process.
      */
     private final int budget;
 
@@ -83,15 +87,26 @@ public class Explore {
     }
 
     /**
+     * Run the exploration process several times (with random seeds), saving all exploration metrics to disk.
+     * @param data: data points
+     * @param user: user or oracle
+     * @param activeLearner: active activeLearner object
+     * @param runs: number of runs to perform
+     * @throws IllegalArgumentException if runs is not positive
+     */
+    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs){
+        run(data, user, activeLearner, runs, null);
+    }
+
+    /**
      * Run the exploration process several times (with specified seeds) and average resulting metrics.
      * @param data: data points
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
-     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
      * @throws IllegalArgumentException if runs is not positive and if seeds.length differs from runs
      */
-    public ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds){
+    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds){
         Validator.assertPositive(runs);
 
         if (seeds != null){
@@ -101,75 +116,72 @@ public class Explore {
         // initializes active learners internal data structures
         activeLearner.initialize(data);
 
-        // run exploration and compute average of metrics
-        ExplorationMetrics metrics = run(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[0]);
-
-        for (int i = 1; i < runs; i++) {
-            metrics = metrics.sum(run(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]));
+        for (int i = 0; i < runs; i++) {
+            runSingle(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]);
         }
-
-        return metrics.divideByNumber(runs);
     }
 
     /**
-     * Run the exploration process several times (with random seeds) and average resulting metrics.
-     * @param data: data points
-     * @param user: user or oracle
-     * @param activeLearner: active activeLearner object
-     * @param runs: number of runs to perform
-     * @return ExplorationMetrics object containing the average value of each metrics of all runs.
-     * @throws IllegalArgumentException if runs is not positive
+     * Runs a single exploration process. Metrics will be logged to disk as soon as each iteration finishes.
      */
-    public ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs){
-        return run(data, user, activeLearner, runs, null);
-    }
-
-    /**
-     * Runs a single exploration process.
-     */
-    private ExplorationMetrics run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
+    private void runSingle(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
         // set random seed
         setSeed(seed);
 
-        ExplorationMetrics metrics = new ExplorationMetrics();
         LabeledDataset labeledDataset = new LabeledDataset(data);
+        MetricLogger logger = new MetricLogger(System.nanoTime() + ".jsonl");
 
         for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++){
-            metrics.add(runSingleIteration(labeledDataset, user, activeLearner));
+            logger.writeMetric(runSingleIteration(labeledDataset, user, activeLearner));
         }
 
-        return metrics;
+        logger.close();
     }
 
     /**
      * Run a single iteration of the exploration process, computing the necessary metrics.
      */
-    private Metrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
-        long initialTime;
-        Metrics metrics = new Metrics();
+    private IterationMetrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
+        long initialTime, start;
+        IterationMetrics metrics = new IterationMetrics();
 
         // find next points to label
         initialTime = System.nanoTime();
+        start = initialTime;
         Collection<DataPoint> points = getNextPointToLabel(data, user, activeLearner);
-        metrics.add("getNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.add("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled set
+        initialTime = System.nanoTime();
         int[] labels = user.getLabel(points);
+        metrics.add("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+
         data.putOnLabeledSet(points, labels);
-        metrics.add("labeledRow", (double) points.iterator().next().getRow());  //TODO: how to store rows ?
+
+        Collection<LabeledPoint> labeledPoints = new ArrayList<>();
+        int i = 0;
+        for (DataPoint point : points){
+            labeledPoints.add(new LabeledPoint(point, labels[i++]));
+        }
+
+        metrics.setLabeledPoints(labeledPoints);
 
         // retrain model
         initialTime = System.nanoTime();
         Classifier classifier = activeLearner.fit(data.getLabeledPoints());
-        metrics.add("fitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.add("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // compute accuracy metrics
         initialTime = System.nanoTime();
         for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.addAll(metricCalculator.compute(data, user, classifier).getMetrics());
+            Metrics storage = metricCalculator.compute(data, user, classifier).getMetrics();
+            for (String name : storage.names()){
+                metrics.add(name, storage.get(name));
+            }
         }
-        metrics.add("accuracyComputationTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.add("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
 
+        metrics.add("IterTimeMillis",(System.nanoTime() - start) / 1e6);
         return metrics;
     }
 
