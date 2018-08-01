@@ -5,14 +5,15 @@ import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import io.Metrics;
-import io.MetricWriter;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 import user.User;
 import utils.Validator;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,7 +30,7 @@ import java.util.Collection;
  */
 public class Explore {
     /**
-     * Number of iteration to runSingle in the active learning exploration process.
+     * Number of iteration to runSingleExploration in the active learning exploration process.
      */
     private final int budget;
 
@@ -116,25 +117,32 @@ public class Explore {
         activeLearner.initialize(data);
 
         for (int i = 0; i < runs; i++) {
-            runSingle(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]);
+            runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]);
         }
     }
 
     /**
      * Runs a single exploration process. Metrics will be logged to disk as soon as each iteration finishes.
      */
-    private void runSingle(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
+    private void runSingleExploration(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
         // set random seed
         setSeed(seed);
 
         LabeledDataset labeledDataset = new LabeledDataset(data);
-        MetricWriter logger = new MetricWriter(System.nanoTime() + ".jsonl");
 
-        for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++){
-            logger.write(runSingleIteration(labeledDataset, user, activeLearner));
+        try (FileWriter fileWriter = new FileWriter(System.nanoTime() + ".jsonl", true)) {
+            BufferedWriter writer = new BufferedWriter(fileWriter);
+
+            for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++) {
+                writer.write(runSingleIteration(labeledDataset, user, activeLearner).toString());
+                writer.newLine();
+                writer.flush();
+            }
         }
-
-        logger.close();
+        catch (IOException ex){
+            //TODO: log this error
+            ex.printStackTrace();
+        }
     }
 
     /**
