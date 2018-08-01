@@ -46,7 +46,7 @@ public class LabeledPoint extends DataPoint {
     }
 
     public LabeledPoint(DataPoint point, int label) {
-        this(point.getRow(), point.getId(), point.getData(), label);
+        this(point.row, point.id, point.data, label);
     }
 
     public int getLabel() {
@@ -55,6 +55,6 @@ public class LabeledPoint extends DataPoint {
 
     @Override
     public String toString() {
-        return "{\"row\" : " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + ", \"label\": " + label + '}';
+        return "{\"row\" : " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';
     }
 }
