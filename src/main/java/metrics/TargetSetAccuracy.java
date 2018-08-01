@@ -50,8 +50,8 @@ public class TargetSetAccuracy implements MetricStorage {
     @Override
     public Metrics getMetrics() {
         Metrics metrics = new Metrics();
-        metrics.add("numberOfTargetsRetrieved", (double) getNumberOfTargetsRetrieved());
-        metrics.add("targetSetAccuracy", targetSetAccuracy());
+        metrics.add("NumberOfTargetsRetrieved", (double) getNumberOfTargetsRetrieved());
+        metrics.add("TargetSetAccuracy", targetSetAccuracy());
         return metrics;
     }
 }

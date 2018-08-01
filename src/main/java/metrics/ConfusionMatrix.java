@@ -89,13 +89,13 @@ public class ConfusionMatrix implements MetricStorage {
      */
     public Metrics getMetrics(){
         Metrics metrics = new Metrics();
-        metrics.add("truePositives", (double) truePositives());
-        metrics.add("trueNegatives", (double) trueNegatives());
-        metrics.add("falsePositives", (double) falsePositives());
-        metrics.add("falseNegatives", (double) falseNegatives());
-        metrics.add("precision", precision());
-        metrics.add("recall", recall());
-        metrics.add("fscore", fscore());
+        metrics.add("TruePositives", (double) truePositives());
+        metrics.add("TrueNegatives", (double) trueNegatives());
+        metrics.add("FalsePositives", (double) falsePositives());
+        metrics.add("FalseNegatives", (double) falseNegatives());
+        metrics.add("Precision", precision());
+        metrics.add("Recall", recall());
+        metrics.add("Fscore", fscore());
         return metrics;
     }
 }
