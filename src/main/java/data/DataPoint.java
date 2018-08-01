@@ -15,17 +15,17 @@ public class DataPoint {
     /**
      * data point's row number
      */
-    private int row;
+    protected int row;
 
     /**
      * data point's id
      */
-    private long id;
+    protected long id;
 
     /**
      * data point's values
      */
-    private double[] data;
+    protected double[] data;
 
     public DataPoint(int row, long id, double[] data) {
         Validator.assertNotEmpty(data);
@@ -81,6 +81,6 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "(row=" + row + ", id=" + id + ", data=" + Arrays.toString(data) + ')';
+        return "{\"row\" : " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
     }
 }
