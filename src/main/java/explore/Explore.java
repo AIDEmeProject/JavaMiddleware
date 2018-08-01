@@ -6,9 +6,8 @@ import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import io.IterationMetrics;
-import io.MetricLogger;
+import io.MetricWriter;
 import metrics.MetricCalculator;
-import metrics.MetricStorage;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
 import user.User;
@@ -129,10 +128,10 @@ public class Explore {
         setSeed(seed);
 
         LabeledDataset labeledDataset = new LabeledDataset(data);
-        MetricLogger logger = new MetricLogger(System.nanoTime() + ".jsonl");
+        MetricWriter logger = new MetricWriter(System.nanoTime() + ".jsonl");
 
         for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++){
-            logger.writeMetric(runSingleIteration(labeledDataset, user, activeLearner));
+            logger.write(runSingleIteration(labeledDataset, user, activeLearner));
         }
 
         logger.close();

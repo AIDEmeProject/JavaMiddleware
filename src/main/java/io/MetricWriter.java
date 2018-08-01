@@ -4,10 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class MetricLogger{
+public class MetricWriter {
     private BufferedWriter writer;
 
-    public MetricLogger(String path) {
+    public MetricWriter(String path) {
         try{
             this.writer = new BufferedWriter(new FileWriter(path, true));
         } catch (IOException ex){
@@ -33,7 +33,7 @@ public class MetricLogger{
         }
     }
 
-    public void writeMetric(IterationMetrics metrics){
+    public void write(IterationMetrics metrics){
         write(metrics.toString());
     }
 }
