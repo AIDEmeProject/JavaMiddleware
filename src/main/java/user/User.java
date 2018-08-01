@@ -1,7 +1,9 @@
 package user;
 
 import data.DataPoint;
+import data.LabeledPoint;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -30,5 +32,19 @@ public interface User {
         }
 
         return labels;
+    }
+
+    default LabeledPoint getLabeledPoint(DataPoint point){
+        return new LabeledPoint(point, getLabel(point));
+    }
+
+    default Collection<LabeledPoint> getLabeledPoint(Collection<DataPoint> points){
+        Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.size());
+
+        for (DataPoint point : points){
+            labeledPoints.add(getLabeledPoint(point));
+        }
+
+        return labeledPoints;
     }
 }

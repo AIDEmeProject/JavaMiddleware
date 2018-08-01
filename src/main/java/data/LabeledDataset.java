@@ -99,37 +99,44 @@ public class LabeledDataset {
     /**
      * Add point to labeled points collection and remove it from unlabeled collection.
      *
-     * @param point: point to add
+     * @param point: labeled point to add
      * @throws IllegalArgumentException if point is not in unlabeled set
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
-    public void putOnLabeledSet(DataPoint point, int label) {
+    public void putOnLabeledSet(LabeledPoint point) {
         boolean removed = unlabeled.remove(point);
 
         if (!removed){
             throw new IllegalArgumentException("Point " + point + " is not in unlabeled set.");
         }
 
-        labeled.add(new LabeledPoint(point, label));
+        labeled.add(point);
+    }
+
+    public void putOnLabeledSet(DataPoint point, int label) {
+        putOnLabeledSet(new LabeledPoint(point, label));
     }
 
     /**
      * Add all points in collection to labeled points set, removing then from the unlabeled set.
      *
-     * @param points: collection of points to add
-     * @param labels: collection of the respective labels for each row number
+     * @param points: collection of labeled points to add
      * @throws IllegalArgumentException if any point is not in unlabeled set
      * @throws IllegalArgumentException if points and labels have different sizes
      * @throws IllegalArgumentException if any label is invalid (i.e. different from 0 or 1)
      */
-    public void putOnLabeledSet(Collection<DataPoint> points, int[] labels) {
-        if (points.size() != labels.length){
-            throw new IllegalArgumentException("Points and labels have incompatible dimensions.");
+    public void putOnLabeledSet(Collection<LabeledPoint> points) {
+        for (LabeledPoint point : points) {
+            putOnLabeledSet(point);
         }
+    }
+
+    public void putOnLabeledSet(Collection<DataPoint> points, int[] label) {
+        Validator.assertEquals(points.size(), label.length);
 
         int i = 0;
-        for (DataPoint point : points) {
-            putOnLabeledSet(point, labels[i++]);
+        for (DataPoint point : points){
+            putOnLabeledSet(point, label[i++]);
         }
     }
 

@@ -81,6 +81,6 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "{\"row\" : " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
+        return "{\"row\": " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
     }
 }

@@ -152,18 +152,11 @@ public class Explore {
 
         // update labeled set
         initialTime = System.nanoTime();
-        int[] labels = user.getLabel(points);
+        Collection<LabeledPoint> labeledPoints = user.getLabeledPoint(points);
         metrics.add("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
-
-        data.putOnLabeledSet(points, labels);
-
-        Collection<LabeledPoint> labeledPoints = new ArrayList<>();
-        int i = 0;
-        for (DataPoint point : points){
-            labeledPoints.add(new LabeledPoint(point, labels[i++]));
-        }
-
         metrics.setLabeledPoints(labeledPoints);
+
+        data.putOnLabeledSet(labeledPoints);
 
         // retrain model
         initialTime = System.nanoTime();

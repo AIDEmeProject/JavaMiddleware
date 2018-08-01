@@ -55,6 +55,6 @@ public class LabeledPoint extends DataPoint {
 
     @Override
     public String toString() {
-        return "{\"row\" : " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';
+        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';
     }
 }
