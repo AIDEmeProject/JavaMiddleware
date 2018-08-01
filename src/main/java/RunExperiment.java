@@ -1,4 +1,6 @@
 import active.ActiveLearner;
+import active.activelearning.RandomSampler;
+import active.activelearning.UncertaintySampler;
 import active.activesearch.ActiveTreeSearch;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
@@ -6,6 +8,7 @@ import classifier.SVM.SvmParameterAdapter;
 import classifier.nearest_neighbors.NearestNeighborsLearner;
 import data.DataPoint;
 import explore.Explore;
+import io.FolderManager;
 import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
@@ -14,6 +17,7 @@ import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
 
+import java.io.File;
 import java.util.*;
 
 public class RunExperiment {
@@ -57,12 +61,14 @@ public class RunExperiment {
     public static void main(String[] args){
         // DATA and USER
         // simple example
+        String task = "simple";
         Collection<DataPoint> points = generateX(250, 2, 1);
         Set<Long> y = generateY(points);
         User user = new DummyUser(y);
 
         // sdss
-//        TaskReader reader = new TaskReader("sdss_Q1_0.1%");
+        //String task = "sdss_Q1_0.1%";
+//        TaskReader reader = new TaskReader(task);
 //        Collection<DataPoint> data = reader.readData();
 //        Set<Long> positiveKeys = reader.readTargetSetKeys();
 //        User user = new DummyUser(positiveKeys);
@@ -86,10 +92,10 @@ public class RunExperiment {
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new HashMap<>();
-        //activeLearners.put("Random Learner kNN", new RandomSampler(knn));
-        //activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
-        activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
-        //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(svm, 2));
+        activeLearners.put("Random Learner kNN", new RandomSampler(knn));
+        activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
+        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
+        //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(knn, 2));
 
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
@@ -106,7 +112,13 @@ public class RunExperiment {
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
-            explore.run(points, user, entry.getValue(), 1); //, new long[]{1, 2, 3, 4, 5,}
+            try {
+                FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
+                explore.run(points, user, entry.getValue(), 2, folder); //, new long[]{1, 2, 3, 4, 5,}
+                //TODO: average metrics
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 }

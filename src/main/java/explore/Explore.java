@@ -5,6 +5,7 @@ import classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import io.FolderManager;
 import metrics.MetricCalculator;
 import sampling.ReservoirSampler;
 import sampling.StratifiedSampler;
@@ -12,6 +13,7 @@ import user.User;
 import utils.Validator;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,11 +28,11 @@ import java.util.Collection;
  *  2) Label is retrieved and labeled set is updated
  *  3) We retrain our model over the current labeled set of points
  *
- * This process is repeated during a pre-defined number of operations.
+ * This process is repeated during a predefined number of operations.
  */
 public class Explore {
     /**
-     * Number of iteration to runSingleExploration in the active learning exploration process.
+     * Number of iteration to run in the active learning exploration process.
      */
     private final int budget;
 
@@ -94,8 +96,8 @@ public class Explore {
      * @param runs: number of runs to perform
      * @throws IllegalArgumentException if runs is not positive
      */
-    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs){
-        run(data, user, activeLearner, runs, null);
+    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, FolderManager folder){
+        run(data, user, activeLearner, runs, null, folder);
     }
 
     /**
@@ -106,31 +108,32 @@ public class Explore {
      * @param runs: number of runs to perform
      * @throws IllegalArgumentException if runs is not positive and if seeds.length differs from runs
      */
-    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds){
+    public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds, FolderManager folder){
         Validator.assertPositive(runs);
+        Validator.assertNotNull(folder);
 
         if (seeds != null){
             Validator.assertEquals(runs, seeds.length);
         }
 
-        // initializes active learners internal data structures
+        // initializes active learner internal data structures
         activeLearner.initialize(data);
 
         for (int i = 0; i < runs; i++) {
-            runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i]);
+            runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i], folder.createNewFile());
         }
     }
 
     /**
-     * Runs a single exploration process. Metrics will be logged to disk as soon as each iteration finishes.
+     * Runs a single exploration process. Metrics will be logged to file as soon as each iteration finishes.
      */
-    private void runSingleExploration(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed){
+    private void runSingleExploration(Collection<DataPoint> data, User user, ActiveLearner activeLearner, long seed, File file){
         // set random seed
         setSeed(seed);
 
         LabeledDataset labeledDataset = new LabeledDataset(data);
 
-        try (FileWriter fileWriter = new FileWriter(System.nanoTime() + ".jsonl", true)) {
+        try (FileWriter fileWriter = new FileWriter(file, true)) {
             BufferedWriter writer = new BufferedWriter(fileWriter);
 
             for (int iter = 0; iter < budget && labeledDataset.getNumUnlabeledPoints() > 0; iter++) {
