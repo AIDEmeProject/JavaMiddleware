@@ -78,7 +78,7 @@ public class RunExperiment {
         params = params
                 .C(1000)
                 .kernel(new Kernel())
-                .probability(true);
+                .probability(false);
         SvmLearner svm = new SvmLearner(params);
 
         // knn

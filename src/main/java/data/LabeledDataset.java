@@ -99,7 +99,7 @@ public class LabeledDataset {
     /**
      * Add point to labeled points collection and remove it from unlabeled collection.
      *
-     * @param point: labeled point to add
+     * @param point: labeled point to put
      * @throws IllegalArgumentException if point is not in unlabeled set
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
@@ -120,7 +120,7 @@ public class LabeledDataset {
     /**
      * Add all points in collection to labeled points set, removing then from the unlabeled set.
      *
-     * @param points: collection of labeled points to add
+     * @param points: collection of labeled points to put
      * @throws IllegalArgumentException if any point is not in unlabeled set
      * @throws IllegalArgumentException if points and labels have different sizes
      * @throws IllegalArgumentException if any label is invalid (i.e. different from 0 or 1)

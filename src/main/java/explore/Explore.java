@@ -15,6 +15,7 @@ import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -148,12 +149,12 @@ public class Explore {
         initialTime = System.nanoTime();
         start = initialTime;
         Collection<DataPoint> points = getNextPointToLabel(data, user, activeLearner);
-        metrics.add("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.put("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled set
         initialTime = System.nanoTime();
         Collection<LabeledPoint> labeledPoints = user.getLabeledPoint(points);
-        metrics.add("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.put("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
         metrics.setLabeledPoints(labeledPoints);
 
         data.putOnLabeledSet(labeledPoints);
@@ -161,19 +162,16 @@ public class Explore {
         // retrain model
         initialTime = System.nanoTime();
         Classifier classifier = activeLearner.fit(data.getLabeledPoints());
-        metrics.add("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
+        metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // compute accuracy metrics
         initialTime = System.nanoTime();
         for (MetricCalculator metricCalculator : metricCalculators){
-            Metrics storage = metricCalculator.compute(data, user, classifier).getMetrics();
-            for (String name : storage.names()){
-                metrics.add(name, storage.get(name));
-            }
+            metrics.putAll(metricCalculator.compute(data, user, classifier).getMetrics());
         }
-        metrics.add("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
+        metrics.put("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
 
-        metrics.add("IterTimeMillis",(System.nanoTime() - start) / 1e6);
+        metrics.put("IterTimeMillis",(System.nanoTime() - start) / 1e6);
         return metrics;
     }
 

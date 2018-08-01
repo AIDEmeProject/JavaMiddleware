@@ -1,6 +1,7 @@
 package metrics;
 
-import explore.Metrics;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This module is responsible for storing the confusion matrix values. In particular, we provide methods for computing
@@ -87,15 +88,15 @@ public class ConfusionMatrix implements MetricStorage {
     /**
      * @return Map object containing all metrics stored in the ConfusionMatrix object.
      */
-    public Metrics getMetrics(){
-        Metrics metrics = new Metrics();
-        metrics.add("TruePositives", (double) truePositives());
-        metrics.add("TrueNegatives", (double) trueNegatives());
-        metrics.add("FalsePositives", (double) falsePositives());
-        metrics.add("FalseNegatives", (double) falseNegatives());
-        metrics.add("Precision", precision());
-        metrics.add("Recall", recall());
-        metrics.add("Fscore", fscore());
+    public Map<String, Double> getMetrics(){
+        HashMap<String, Double> metrics = new HashMap<>();
+        metrics.put("TruePositives", (double) truePositives());
+        metrics.put("TrueNegatives", (double) trueNegatives());
+        metrics.put("FalsePositives", (double) falsePositives());
+        metrics.put("FalseNegatives", (double) falseNegatives());
+        metrics.put("Precision", precision());
+        metrics.put("Recall", recall());
+        metrics.put("Fscore", fscore());
         return metrics;
     }
 }

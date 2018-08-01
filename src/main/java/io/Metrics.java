@@ -16,8 +16,14 @@ public class IterationMetrics{
         this.labeledPoints = labeledPoints;
     }
 
-    public void add(String name, Double value){
+    public void put(String name, Double value){
         metrics.put(name, value);
+    }
+
+    public void putAll(Map<String, Double> metrics){
+        for (Map.Entry<String, Double> entry : metrics.entrySet()){
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     @Override

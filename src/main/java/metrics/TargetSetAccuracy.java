@@ -1,7 +1,9 @@
 package metrics;
 
-import explore.Metrics;
 import utils.Validator;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This module stores the number of target elements retrieved so far, as well as the total number of targets in the dataset.
@@ -48,10 +50,10 @@ public class TargetSetAccuracy implements MetricStorage {
     }
 
     @Override
-    public Metrics getMetrics() {
-        Metrics metrics = new Metrics();
-        metrics.add("NumberOfTargetsRetrieved", (double) getNumberOfTargetsRetrieved());
-        metrics.add("TargetSetAccuracy", targetSetAccuracy());
+    public Map<String, Double> getMetrics() {
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("NumberOfTargetsRetrieved", (double) getNumberOfTargetsRetrieved());
+        metrics.put("TargetSetAccuracy", targetSetAccuracy());
         return metrics;
     }
 }
