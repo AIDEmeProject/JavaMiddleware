@@ -33,9 +33,9 @@ public class FolderManager {
      * @return a new file object
      * @throws RuntimeException if file already exists or an IO error occurs
      */
-    public File createNewFile() {
+    private File createNewFile(String filename) {
         String path = folder.getAbsolutePath();
-        File newFile = new File(path + File.separator + System.currentTimeMillis() + ".run");
+        File newFile = new File(path + File.separator + filename);
         try {
             if (!newFile.createNewFile()) {
                 throw new RuntimeException("File already exists!");
@@ -44,6 +44,14 @@ public class FolderManager {
             throw new RuntimeException("Failed to create file: " + newFile.getName(), ex);
         }
         return newFile;
+    }
+
+    public File createNewRunFile() {
+        return createNewFile(System.currentTimeMillis() + ".run");
+    }
+
+    public File createNewOutputFile(){
+        return createNewFile(System.currentTimeMillis() + ".average");
     }
 
     /**

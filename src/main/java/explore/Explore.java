@@ -120,7 +120,7 @@ public class Explore {
         activeLearner.initialize(data);
 
         for (int i = 0; i < runs; i++) {
-            runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i], folder.createNewFile());
+            runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i], folder.createNewRunFile());
         }
     }
 

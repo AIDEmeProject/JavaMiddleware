@@ -16,6 +16,7 @@ import preprocessing.StandardScaler;
 import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
+import utils.Averager;
 
 import java.io.File;
 import java.util.*;
@@ -114,8 +115,8 @@ public class RunExperiment {
             System.out.println(entry.getKey());
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
-                explore.run(points, user, entry.getValue(), 2, folder); //, new long[]{1, 2, 3, 4, 5,}
-                //TODO: average metrics
+                explore.run(points, user, entry.getValue(), 2, folder);
+                Averager.computeAverage(folder);
             } catch (Exception ex){
                 ex.printStackTrace();
             }

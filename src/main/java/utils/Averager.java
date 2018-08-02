@@ -11,7 +11,7 @@ import java.util.Collections;
  * This module is responsible for computing the average of all ".run" files in a folder.
  */
 public class Averager {
-    public static ArrayList<Metrics> computeAverage(FolderManager folder){
+    public static void computeAverage(FolderManager folder){
         File[] runFiles = folder.getRuns();
 
         ArrayList<Metrics> average = readMetrics(runFiles[0]);
@@ -24,7 +24,7 @@ public class Averager {
             metrics.setLabeledPoints(Collections.EMPTY_LIST);
         }
 
-        return average;
+        writeMetrics(folder.createNewOutputFile(), average);
     }
 
     private static ArrayList<Metrics> readMetrics(File file){
@@ -44,6 +44,18 @@ public class Averager {
         }
 
         return metrics;
+    }
+
+    private static void writeMetrics(File out, ArrayList<Metrics> metrics){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
+            for (Metrics metric : metrics){
+                writer.write(metric.toString());
+                writer.newLine();
+            }
+        }
+        catch (IOException ex){
+            throw new RuntimeException("Failed to write metrics to file: " + out, ex);
+        }
     }
 
     private static void mergeMetrics(ArrayList<Metrics> averages, ArrayList<Metrics> metrics, int size){
