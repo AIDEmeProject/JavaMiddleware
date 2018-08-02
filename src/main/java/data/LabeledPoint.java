@@ -57,8 +57,6 @@ public class LabeledPoint extends DataPoint {
     }
 
     public static LabeledPoint fromJson(JSONObject jsonObject){
-        //JSONObject jsonObject = new JSONObject(json);
-
         int row = jsonObject.getInt("row");
         int id = jsonObject.getInt("id");
         int label = jsonObject.getInt("label");

@@ -1,7 +1,6 @@
 import active.ActiveLearner;
 import active.activelearning.RandomSampler;
 import active.activelearning.UncertaintySampler;
-import active.activesearch.ActiveTreeSearch;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
@@ -16,7 +15,7 @@ import preprocessing.StandardScaler;
 import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
-import utils.Averager;
+import utils.statistics.StatisticsCalculator;
 
 import java.io.File;
 import java.util.*;
@@ -115,8 +114,8 @@ public class RunExperiment {
             System.out.println(entry.getKey());
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
-                explore.run(points, user, entry.getValue(), 2, folder);
-                Averager.computeAverage(folder);
+                //explore.run(points, user, entry.getValue(), 2, folder);
+                StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
             } catch (Exception ex){
                 ex.printStackTrace();
             }
