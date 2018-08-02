@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  * This module is responsible for parsing all ".run" files in a folder, aggregating all metrics into useful statistics
- * such as mean and variance. Statistics will be saved into a new file.
+ * such as mean and variance. Files are NOT required to have the same number of lines or the exactly same metrics.
  */
 public class StatisticsCalculator {
 

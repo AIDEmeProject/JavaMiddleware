@@ -48,6 +48,11 @@ public class LabeledPoint extends DataPoint {
         this(row, row, data, label);
     }
 
+    /**
+     * @param point: a data point
+     * @param label: label
+     * @throws IllegalArgumentException if label is different from 0 or 1
+     */
     public LabeledPoint(DataPoint point, int label) {
         this(point.row, point.id, point.data, label);
     }
@@ -56,7 +61,13 @@ public class LabeledPoint extends DataPoint {
         return label;
     }
 
-    public static LabeledPoint fromJson(JSONObject jsonObject){
+    /**
+     * @param json JSON string
+     * @return LabeledPoint object parsed from JSON string
+     */
+    public static LabeledPoint fromJson(String json){
+        JSONObject jsonObject = new JSONObject(json);
+
         int row = jsonObject.getInt("row");
         int id = jsonObject.getInt("id");
         int label = jsonObject.getInt("label");
@@ -70,6 +81,9 @@ public class LabeledPoint extends DataPoint {
         return new LabeledPoint(row, id, data, label);
     }
 
+    /**
+     * @return JSON encoding of this object
+     */
     @Override
     public String toString() {
         return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';

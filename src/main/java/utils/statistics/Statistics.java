@@ -1,7 +1,5 @@
 package utils.statistics;
 
-import utils.Validator;
-
 /**
  * This class holds statistical information from a particular metric, such as its mean, variance, and number of samples.
  * As new values for the same metric are observed, its internal statistics can be updated as well.
@@ -33,17 +31,10 @@ class Statistics {
      * @param value: metric's initial value
      */
     public Statistics(String name, double value) {
-        this(name, value, 0D, 1);
-    }
-
-    private Statistics(String name, double mean, double variance, int sampleSize) {
-        Validator.assertNonNegative(variance);
-        Validator.assertPositive(sampleSize);
-
         this.name = name;
-        this.mean = mean;
-        this.variance = variance;
-        this.sampleSize = sampleSize;
+        this.mean = value;
+        this.variance = 0D;
+        this.sampleSize = 1;
     }
 
     public String getName() {

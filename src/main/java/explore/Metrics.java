@@ -3,12 +3,13 @@ package explore;
 import data.LabeledPoint;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import sun.tools.jstat.Jstat;
 
 import java.util.*;
 
 /**
- * This class is a contains all metrics generated during an iteration of the exploration routine. In addition, it can parse
- * all metrics into a valid JSON string.
+ * This class is a contains all metrics generated during an iteration of the exploration routine. Metrics can also be
+ * encoded as JSON strings or decoded from them.
  */
 public class Metrics {
     /**
@@ -21,10 +22,17 @@ public class Metrics {
      */
     private Collection<LabeledPoint> labeledPoints = Collections.emptyList();
 
+    /**
+     * Create empty metrics
+     */
     public Metrics() {
         metrics = new HashMap<>();
     }
 
+    /**
+     * @param json JSON string encoding a Metrics's object
+     * @return new Metrics object
+     */
     public static Metrics fromJson(String json){
         Metrics metrics = new Metrics();
 
@@ -35,8 +43,8 @@ public class Metrics {
         JSONArray points = (JSONArray) jsonObject.remove("points"); // jsonObject.getJSONArray("points");
         Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.length());
 
-        for (int i = 0; i < points.length(); i++) {
-            labeledPoints.add(LabeledPoint.fromJson(points.getJSONObject(i)));
+        for (Object point : points) {
+            labeledPoints.add(LabeledPoint.fromJson(point.toString()));
         }
 
         metrics.setLabeledPoints(labeledPoints);
@@ -49,12 +57,26 @@ public class Metrics {
         return metrics;
     }
 
+    /**
+     * @return collection of metric names
+     */
     public Collection<String> names(){
         return metrics.keySet();
     }
 
+    /**
+     * @param name: metric's name
+     * @return value of the given metric
+     * @throws IllegalArgumentException if name is not found
+     */
     public Double get(String name){
-        return metrics.get(name);
+        Double value = metrics.get(name);
+
+        if (value == null){
+            throw new IllegalArgumentException("Metric " + name + " not found.");
+        }
+
+        return value;
     }
 
     /**
