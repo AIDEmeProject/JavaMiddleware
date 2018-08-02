@@ -29,57 +29,15 @@ public class Metrics {
     }
 
     /**
-     * @param json JSON string encoding a Metrics's object
-     * @return new Metrics object
+     * Set the collection of labeled points seen in this iteration
+     * @param labeledPoints: collection of labeled points
      */
-    public static Metrics fromJson(String json){
-        Metrics metrics = new Metrics();
-
-        // decode json object
-        JSONObject jsonObject = new JSONObject(json);
-
-        // parse labeled points
-        JSONArray points = (JSONArray) jsonObject.remove("points"); // jsonObject.getJSONArray("points");
-        Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.length());
-
-        for (Object point : points) {
-            labeledPoints.add(LabeledPoint.fromJson(point.toString()));
-        }
-
-        metrics.setLabeledPoints(labeledPoints);
-
-        // parse remaining metrics -> (String, Double) pairs
-        for (String key : jsonObject.keySet()){
-            metrics.put(key, jsonObject.getDouble(key));
-        }
-
-        return metrics;
+    public void setLabeledPoints(Collection<LabeledPoint> labeledPoints){
+        this.labeledPoints = labeledPoints;
     }
 
     /**
-     * @return collection of metric names
-     */
-    public Collection<String> names(){
-        return metrics.keySet();
-    }
-
-    /**
-     * @param name: metric's name
-     * @return value of the given metric
-     * @throws IllegalArgumentException if name is not found
-     */
-    public Double get(String name){
-        Double value = metrics.get(name);
-
-        if (value == null){
-            throw new IllegalArgumentException("Metric " + name + " not found.");
-        }
-
-        return value;
-    }
-
-    /**
-     * Put a new metric in the internal storage.
+     * Put a new metric in the internal storage. If there already is a metric with same name, its value will be overwritten.
      * @param name: metric's name
      * @param value: metric's value
      */
@@ -98,11 +56,53 @@ public class Metrics {
     }
 
     /**
-     * Set the collection of labeled points seen in this iteration
-     * @param labeledPoints: collection of labeled points
+     * @param name: metric's name
+     * @return value of the given metric
+     * @throws IllegalArgumentException if name is not in collection
      */
-    public void setLabeledPoints(Collection<LabeledPoint> labeledPoints){
-        this.labeledPoints = labeledPoints;
+    public Double get(String name){
+        Double value = metrics.get(name);
+
+        if (value == null){
+            throw new IllegalArgumentException("Metric " + name + " not in collection.");
+        }
+
+        return value;
+    }
+
+    /**
+     * @return collection of metric names
+     */
+    public Collection<String> names(){
+        return metrics.keySet();
+    }
+
+    /**
+     * @param json JSON string encoding a Metrics's object
+     * @return new Metrics object
+     */
+    public static Metrics fromJson(String json){
+        Metrics metrics = new Metrics();
+
+        // decode json object
+        JSONObject jsonObject = new JSONObject(json);
+
+        // parse labeled points
+        JSONArray points = (JSONArray) jsonObject.remove("points");
+        Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.length());
+
+        for (Object point : points) {
+            labeledPoints.add(LabeledPoint.fromJson(point.toString()));
+        }
+
+        metrics.setLabeledPoints(labeledPoints);
+
+        // parse remaining metrics -> (String, Double) pairs
+        for (String key : jsonObject.keySet()){
+            metrics.put(key, jsonObject.getDouble(key));
+        }
+
+        return metrics;
     }
 
     /**
