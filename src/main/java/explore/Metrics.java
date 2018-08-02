@@ -1,6 +1,8 @@
 package explore;
 
 import data.LabeledPoint;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -21,6 +23,38 @@ public class Metrics {
 
     public Metrics() {
         metrics = new HashMap<>();
+    }
+
+    public static Metrics fromJson(String json){
+        Metrics metrics = new Metrics();
+
+        // decode json object
+        JSONObject jsonObject = new JSONObject(json);
+
+        // parse labeled points
+        JSONArray points = (JSONArray) jsonObject.remove("points"); // jsonObject.getJSONArray("points");
+        Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.length());
+
+        for (int i = 0; i < points.length(); i++) {
+            labeledPoints.add(LabeledPoint.fromJson(points.getJSONObject(i)));
+        }
+
+        metrics.setLabeledPoints(labeledPoints);
+
+        // parse remaining metrics -> (String, Double) pairs
+        for (String key : jsonObject.keySet()){
+            metrics.put(key, jsonObject.getDouble(key));
+        }
+
+        return metrics;
+    }
+
+    public Collection<String> names(){
+        return metrics.keySet();
+    }
+
+    public Double get(String name){
+        return metrics.get(name);
     }
 
     /**

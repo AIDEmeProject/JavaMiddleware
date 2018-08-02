@@ -1,5 +1,8 @@
 package data;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 
 /**
@@ -51,6 +54,22 @@ public class LabeledPoint extends DataPoint {
 
     public int getLabel() {
         return label;
+    }
+
+    public static LabeledPoint fromJson(JSONObject jsonObject){
+        //JSONObject jsonObject = new JSONObject(json);
+
+        int row = jsonObject.getInt("row");
+        int id = jsonObject.getInt("id");
+        int label = jsonObject.getInt("label");
+
+        JSONArray dataArray = jsonObject.getJSONArray("data");
+        double[] data = new double[dataArray.length()];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = dataArray.getDouble(i);
+        }
+
+        return new LabeledPoint(row, id, data, label);
     }
 
     @Override
