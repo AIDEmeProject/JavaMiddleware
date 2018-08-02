@@ -23,11 +23,18 @@ class StatisticsCollection {
     }
 
     /**
-     * Adds a new statistic. If the collection already contains a statistic with the same name, it will be overwritten.
-     * @param statistics: new statistic to insert
+     * @param name: statistic's name
+     * @return requested statistic
+     * @throws IllegalArgumentException if name is not in collection
      */
-    public void add(Statistics statistics){
-        this.statistics.put(statistics.getName(), statistics);
+    public Statistics get(String name){
+        Statistics stat = statistics.get(name);
+
+        if (stat == null){
+            throw new IllegalArgumentException("Statistic " + name + " not in collection.");
+        }
+
+        return stat;
     }
 
     /**
@@ -45,6 +52,10 @@ class StatisticsCollection {
         }
     }
 
+    /**
+     * Update statistics from values in Metrics object. Metrics not in this collection will be simply appended.
+     * @param metrics: Metrics object
+     */
     public void update(Metrics metrics){
         for (String name : metrics.names()){
             update(name, metrics.get(name));

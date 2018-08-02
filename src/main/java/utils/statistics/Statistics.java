@@ -46,7 +46,7 @@ class Statistics {
     }
 
     public double getVariance() {
-        return sampleSize == 1 ? 1 : variance / (sampleSize - 1);
+        return sampleSize == 1 ? 0.0 : variance / (sampleSize - 1);
     }
 
     public int getSampleSize() {
