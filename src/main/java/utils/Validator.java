@@ -40,9 +40,9 @@ public class Validator {
     }
 
     /**
-     * Raises an exception if data vector is emtpy
+     * Raises an exception if data vector is null or emtpy
      * @param data: data vector
-     * @throws IllegalArgumentException if data vector is empty
+     * @throws IllegalArgumentException if data is null or empty
      */
     public static void assertNotEmpty(double[] data){
         if (data.length == 0){
@@ -136,6 +136,12 @@ public class Validator {
     public static void assertInRange(double value, double lower, double upper){
         if (value < lower || value > upper){
             throw new IllegalArgumentException("Value must be comprised between " + lower + " and " + upper);
+        }
+    }
+
+    public static void assertIsFinite(double value){
+        if (!Double.isFinite(value)){
+            throw new IllegalArgumentException("Value must be finite, obtained " + value);
         }
     }
 }

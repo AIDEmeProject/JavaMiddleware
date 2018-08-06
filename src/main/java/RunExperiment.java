@@ -1,4 +1,5 @@
 import active.ActiveLearner;
+import active.learning.GeneralizedBinarySearch;
 import active.learning.RandomSampler;
 import active.learning.UncertaintySampler;
 import classifier.SVM.Kernel;
@@ -12,10 +13,13 @@ import metrics.ConfusionMatrixCalculator;
 import metrics.MetricCalculator;
 import metrics.TargetSetAccuracyCalculator;
 import preprocessing.StandardScaler;
+import sampling.HitAndRunSampler;
 import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
 import utils.statistics.StatisticsCalculator;
+import utils.versionspace.LinearVersionSpace;
+import utils.versionspace.VersionSpace;
 
 import java.io.File;
 import java.util.*;
@@ -96,6 +100,10 @@ public class RunExperiment {
         activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
         //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
         //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(knn, 2));
+
+        HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
+        VersionSpace versionSpace = new LinearVersionSpace(sampler, points.iterator().next().getDim(), true);
+        activeLearners.put("Linear GBS warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(versionSpace, 8));
 
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 

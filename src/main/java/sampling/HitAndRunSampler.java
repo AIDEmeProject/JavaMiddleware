@@ -43,7 +43,7 @@ public class HitAndRunSampler {
     }
 
     private double[] advance(ConvexBody body, double[] point){
-        return body.computeLineIntersection(Line.getRandomLine(point)).sampleRandomPoint();
+        return body.computeLineIntersection(Line.sampleRandomLine(point)).sampleRandomPoint();
     }
 
 }

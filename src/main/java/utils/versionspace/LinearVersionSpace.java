@@ -38,7 +38,7 @@ public class LinearVersionSpace extends VersionSpace implements ConvexBody {
             labeledPoints.add(hasBias ? point.addBias() : point);
         }
 
-        Validator.assertEquals(super.getDim(), dim);
+        Validator.assertEquals(super.getDim(), getDim());
 
         sampleCache.removeIf(cachedSample -> !isInside(cachedSample));
     }
@@ -106,7 +106,7 @@ public class LinearVersionSpace extends VersionSpace implements ConvexBody {
             throw new RuntimeException("Line does not intercept convex body.");
         }
 
-        return new LineSegment(line, leftBound, rightBound);
+        return  line.getSegment(leftBound, rightBound);
     }
 
     @Override
