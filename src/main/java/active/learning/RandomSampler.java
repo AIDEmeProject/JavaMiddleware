@@ -1,15 +1,10 @@
-package active.activelearning;
+package active.learning;
 
 import active.ActiveLearner;
-import classifier.Classifier;
 import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
-import data.LabeledPoint;
 import sampling.ReservoirSampler;
-import utils.Validator;
-
-import java.util.Collection;
 
 /**
  * The RandomSampler is the most used baseline active. Basically, at every iteration it randomly samples one point from

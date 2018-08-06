@@ -1,4 +1,4 @@
-package active.activelearning;
+package active.learning;
 
 import active.ActiveLearner;
 import classifier.Classifier;

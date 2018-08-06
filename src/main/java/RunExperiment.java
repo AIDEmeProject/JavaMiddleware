@@ -1,6 +1,6 @@
 import active.ActiveLearner;
-import active.activelearning.RandomSampler;
-import active.activelearning.UncertaintySampler;
+import active.learning.RandomSampler;
+import active.learning.UncertaintySampler;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;

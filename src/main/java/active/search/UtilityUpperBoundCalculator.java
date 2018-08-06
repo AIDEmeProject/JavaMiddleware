@@ -1,4 +1,4 @@
-package active.activesearch;
+package active.search;
 
 import classifier.Classifier;
 import data.LabeledDataset;

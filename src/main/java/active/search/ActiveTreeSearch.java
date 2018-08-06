@@ -1,15 +1,12 @@
-package active.activesearch;
+package active.search;
 
 import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
-import data.LabeledPoint;
 import utils.OptimumFinder;
 import utils.Validator;
-
-import java.util.Collection;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:
