@@ -61,6 +61,13 @@ public class LabeledPoint extends DataPoint {
         return label;
     }
 
+    public LabeledPoint addBias(){
+        double[] dataWithBias = new double[getDim()+1];
+        dataWithBias[0] = 1;
+        System.arraycopy(data, 0, dataWithBias, 1, getDim());
+        return new LabeledPoint(row, id, dataWithBias, label);
+    }
+
     /**
      * @param json JSON string
      * @return LabeledPoint object parsed from JSON string
