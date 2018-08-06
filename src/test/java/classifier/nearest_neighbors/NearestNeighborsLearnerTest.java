@@ -83,6 +83,6 @@ class NearestNeighborsLearnerTest extends AbstractLearnerTest {
         }
 
         knn = new NearestNeighborsLearner(2, 0);
-        assertThrows(IllegalArgumentException.class, () -> knn.fit(labeledPoints));
+        assertThrows(NullPointerException.class, () -> knn.fit(labeledPoints));
     }
 }

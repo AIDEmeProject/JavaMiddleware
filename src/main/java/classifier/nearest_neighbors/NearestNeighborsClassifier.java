@@ -21,7 +21,6 @@ import utils.Validator;
  *     labeled set.
  *
  *  One limitation of this classifier is it cannot be reused with different datasets X.
- *  TODO: can we remove this limitation ?
  */
 public class NearestNeighborsClassifier implements Classifier {
 

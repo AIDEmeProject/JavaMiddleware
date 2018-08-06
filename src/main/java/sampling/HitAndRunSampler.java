@@ -54,6 +54,7 @@ public class HitAndRunSampler {
      * @param body: convex body to sample
      * @param numSamples: number of samples
      * @return matrix where each row is a hit-and-run sample from the convex body. Warm-up and thinning will be applied.
+     * @throws IllegalArgumentException if numSamples is not positive
      */
     public double[][] sample(ConvexBody body, int numSamples){
         Validator.assertPositive(numSamples);

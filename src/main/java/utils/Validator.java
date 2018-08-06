@@ -13,7 +13,7 @@ public class Validator {
      */
     public static <T> void assertNotNull(Object object){
         if (object == null){
-            throw new IllegalArgumentException("Object must not be null.");
+            throw new NullPointerException("Object must not be null.");
         }
     }
 
