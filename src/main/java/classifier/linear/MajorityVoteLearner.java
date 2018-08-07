@@ -24,9 +24,8 @@ public class VersionSpaceSamplingClassifier implements Learner {
 
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        versionSpace.setLabeledPoints(labeledPoints);
         MajorityVoteClassifier majorityVote = new MajorityVoteClassifier();
-        majorityVote.addAll(Arrays.asList(versionSpace.sample(sampleSize)));
+        majorityVote.addAll(Arrays.asList(versionSpace.sample(labeledPoints, sampleSize)));
         return majorityVote;
     }
 }
