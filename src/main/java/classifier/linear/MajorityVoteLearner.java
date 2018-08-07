@@ -10,11 +10,11 @@ import utils.versionspace.VersionSpace;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class VersionSpaceSamplingClassifier implements Learner {
-    private int sampleSize;
-    private VersionSpace versionSpace;
+public class MajorityVoteLearner implements Learner {
+    private final int sampleSize;
+    private final VersionSpace versionSpace;
 
-    public VersionSpaceSamplingClassifier(VersionSpace versionSpace, int sampleSize) {
+    public MajorityVoteLearner(VersionSpace versionSpace, int sampleSize) {
         Validator.assertNotNull(versionSpace);
         Validator.assertPositive(sampleSize);
 

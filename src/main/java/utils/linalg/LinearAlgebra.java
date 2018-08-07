@@ -16,4 +16,8 @@ public class LinearAlgebra {
     public static double sqNorm(double[] x){
         return dot(x,x);
     }
+
+    public static double sqDistance(double[] x, double[] y){
+        return dot(x, x) + dot(y, y) - 2 * dot(x, y);
+    }
 }

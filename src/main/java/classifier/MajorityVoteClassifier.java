@@ -17,7 +17,7 @@ public class MajorityVoteClassifier implements Classifier {
     /**
      * collection of classifiers to take the majority vote
      */
-    private Collection<Classifier> classifiers;
+    private final Collection<Classifier> classifiers;
 
     /**
      * Initialize classifier with an empty collection

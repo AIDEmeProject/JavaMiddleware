@@ -26,7 +26,7 @@ public class SecondDegreeEquationSolver {
         double delta = getDelta(a, b, c);
 
         if (delta <= 0){
-            throw new RuntimeException("Equation does not have two solutions.");
+            throw new RuntimeException("Equation does not have two solutions: [a=" + a + ", b=" +b + ", c=" + c + "], delta = " + delta);
         }
 
         double sqDelta = Math.sqrt(delta);

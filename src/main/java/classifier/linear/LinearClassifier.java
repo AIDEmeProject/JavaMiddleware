@@ -14,12 +14,12 @@ public class LinearClassifier implements Classifier {
     /**
      * Bias parameter
      */
-    private double bias;
+    private final double bias;
 
     /**
      * Weight vector
      */
-    private double[] weights;
+    private final double[] weights;
 
     /**
      * @param bias: bias parameters

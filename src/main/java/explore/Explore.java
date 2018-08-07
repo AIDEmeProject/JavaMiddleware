@@ -182,6 +182,7 @@ public class Explore {
         metrics.put("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
 
         metrics.put("IterTimeMillis",(System.nanoTime() - start) / 1e6);
+        //System.out.println(metrics);
         return metrics;
     }
 

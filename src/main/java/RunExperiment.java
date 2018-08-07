@@ -1,11 +1,11 @@
 import active.ActiveLearner;
 import active.learning.GeneralizedBinarySearch;
 import active.learning.RandomSampler;
-import active.learning.UncertaintySampler;
+import active.learning.SimpleMargin;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
-import classifier.nearest_neighbors.NearestNeighborsLearner;
+import classifier.linear.MajorityVoteLearner;
 import data.DataPoint;
 import explore.Explore;
 import io.FolderManager;
@@ -18,7 +18,7 @@ import sampling.StratifiedSampler;
 import user.DummyUser;
 import user.User;
 import utils.statistics.StatisticsCalculator;
-import utils.versionspace.LinearVersionSpace;
+import utils.versionspace.KernelVersionSpace;
 import utils.versionspace.VersionSpace;
 
 import java.io.File;
@@ -65,8 +65,8 @@ public class RunExperiment {
     public static void main(String[] args){
         // DATA and USER
         // simple example
-        String task = "simple";
-        Collection<DataPoint> points = generateX(250, 2, 1);
+        String task = "simple-10000";
+        Collection<DataPoint> points = generateX(10000, 2, 1);
         Set<Long> y = generateY(points);
         User user = new DummyUser(y);
 
@@ -91,19 +91,15 @@ public class RunExperiment {
                 .probability(false);
         SvmLearner svm = new SvmLearner(params);
 
-        // knn
-        NearestNeighborsLearner knn = new NearestNeighborsLearner(10, 0.1);
-
         // ACTIVE LEARNER
-        Map<String, ActiveLearner> activeLearners = new HashMap<>();
-        activeLearners.put("Random Learner kNN", new RandomSampler(knn));
-        activeLearners.put("Uncertainty Sampling kNN", new UncertaintySampler(knn));
-        //activeLearners.put("Active Tree Search l=1 kNN", new ActiveTreeSearch(knn, 1));
-        //activeLearners.put("Active Tree Search l=2 kNN", new ActiveTreeSearch(knn, 2));
+        Map<String, ActiveLearner> activeLearners = new LinkedHashMap<>();
+//        activeLearners.put("Random Learner svm", new RandomSampler(svm));
+//        activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
         HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
-        VersionSpace versionSpace = new LinearVersionSpace(sampler, points.iterator().next().getDim(), true);
-        activeLearners.put("Linear GBS warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(versionSpace, 8));
+        VersionSpace versionSpace = new KernelVersionSpace(sampler, true);
+        MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
+        activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
 
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
@@ -116,13 +112,13 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        Explore explore = new Explore(initialSampler, 200, metricCalculators);
+        Explore explore = new Explore(initialSampler, 50, metricCalculators);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
-                //explore.run(points, user, entry.getValue(), 2, folder);
+                explore.run(points, user, entry.getValue(), 1, folder);
                 StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
             } catch (Exception ex){
                 ex.printStackTrace();
