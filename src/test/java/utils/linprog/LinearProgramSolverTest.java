@@ -26,7 +26,7 @@ abstract class LinearProgramSolverTest {
 
     @Test
     void setUpper_ConstrainWithWrongDimension_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> solver.setLower(new double[dim+1]));
+        assertThrows(IllegalArgumentException.class, () -> solver.setUpper(new double[dim+1]));
     }
 
     @Test

@@ -128,8 +128,8 @@ public class PolyhedralCone implements ConvexBody {
         double b = LinearAlgebra.dot(line.getCenter(), line.getDirection());
         double c = LinearAlgebra.sqNorm(line.getCenter()) - line.getDim();
         SecondDegreeEquationSolver.SecondDegreeEquationSolution solution = SecondDegreeEquationSolver.solve(a, b, c);
-        leftBound = Math.max(leftBound, solution.getLeft());
-        rightBound = Math.min(rightBound, solution.getRight());
+        leftBound = Math.max(leftBound, solution.getFirst());
+        rightBound = Math.min(rightBound, solution.getSecond());
 
         if (leftBound >= rightBound){
             throw new RuntimeException("Line does not intercept convex body: " + leftBound + ", " + rightBound);

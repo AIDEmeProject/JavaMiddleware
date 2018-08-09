@@ -34,21 +34,21 @@ public interface LinearProgramSolver {
     /**
      * Sets the C vector in the objective function \(\langle C, X \rangle \)
      * @param vector: C vector
-     * @throws IllegalArgumentException if vectors's dimension is different from getDim().
+     * @throws IllegalArgumentException if input has incompatible dimension.
      */
     void setObjectiveFunction(double[] vector);
 
     /**
      * Sets the lower bound L for each variable.
      * @param vector: vector whose i-th component specify the constrain \( L_i \leq x_i \)
-     * @throws IllegalArgumentException if vector's dimension is different from getDim().
+     * @throws IllegalArgumentException  if input has incompatible dimension.
      */
     void setLower(double[] vector);
 
     /**
      * Sets the upper bound U for each variable.
      * @param vector: vector whose i-th component specify the constrain \( x_i \leq U_i \)
-     * @throws IllegalArgumentException if vector's dimension is different from getDim().
+     * @throws IllegalArgumentException  if input has incompatible dimension.
      */
     void setUpper(double[] vector);
 
@@ -64,7 +64,7 @@ public interface LinearProgramSolver {
      * @param vector: vector in LHS of inequality
      * @param inequalitySign: inequality sign
      * @param val: RHS of inequality
-     * @throws IllegalArgumentException if vector's dimension is different from getDim().
+     * @throws IllegalArgumentException  if input has incompatible dimension.
      */
     void addLinearConstrain(double[] vector, InequalitySign inequalitySign, double val);
 }
