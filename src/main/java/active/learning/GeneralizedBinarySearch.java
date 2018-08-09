@@ -3,27 +3,65 @@ package active.learning;
 import active.ActiveLearner;
 import classifier.Classifier;
 import classifier.Learner;
+import classifier.MajorityVoteClassifier;
 import classifier.linear.MajorityVoteLearner;
 import data.DataPoint;
 import data.LabeledDataset;
+import data.LabeledPoint;
 import utils.OptimumFinder;
 
+import java.util.Collection;
+
+/**
+ * This Active Learning class implements the {@link utils.versionspace.VersionSpace} bisection rule through sampling
+ * (similarly to Query by Committee).
+ *
+ * We also allow for using a different {@link Learner} instance for performing classification. If not provided, a majority vote
+ * over the Version Space will be used to make predictions.
+ */
 public class GeneralizedBinarySearch extends ActiveLearner {
 
     private final MajorityVoteLearner majorityVoteLearner;
+    private MajorityVoteClassifier majorityVoteClassifier;
+    private final boolean isSame;
 
-    public GeneralizedBinarySearch(Learner learner, MajorityVoteLearner majorityVoteLearner) {
+    private GeneralizedBinarySearch(Learner learner, MajorityVoteLearner majorityVoteLearner, boolean isSame){
         super(learner);
         this.majorityVoteLearner = majorityVoteLearner;
+        this.isSame = isSame;
     }
 
+    /**
+     * @param learner: {@link Learner} used for training a classifier over labeled data
+     * @param majorityVoteLearner: {@link MajorityVoteLearner} used for sampling the Version Space
+     */
+    public GeneralizedBinarySearch(Learner learner, MajorityVoteLearner majorityVoteLearner) {
+        this(learner, majorityVoteLearner, false);
+    }
+
+    /**
+     * @param majorityVoteLearner: {@link MajorityVoteLearner} instance, which will be used for both sampling the Version
+     * Space and making label predictions
+     */
     public GeneralizedBinarySearch(MajorityVoteLearner majorityVoteLearner) {
-        this(majorityVoteLearner, majorityVoteLearner);
+        this(majorityVoteLearner, majorityVoteLearner, true);
+    }
+
+    /**
+     * In this method, a {@link MajorityVoteClassifier} instance is built by sampling the version space. If other {@link Learner}
+     * instance was provided, it will be used for training over the labeled data, and its classifier will be returned.
+     * Otherwise, the MajorityVoteClassifier will be returned.
+     * @param labeledPoints: training data
+     * @return classifier trained over the training data
+     */
+    @Override
+    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
+        majorityVoteClassifier = majorityVoteLearner.fit(labeledPoints);
+        return isSame ? majorityVoteClassifier : super.fit(labeledPoints);
     }
 
     @Override
     public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        Classifier majorityVote = majorityVoteLearner.fit(data.getLabeledPoints());
-        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(majorityVote.probability(pt) - 0.5)).getOptimizer();
+        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(majorityVoteClassifier.probability(pt) - 0.5)).getOptimizer();
     }
 }

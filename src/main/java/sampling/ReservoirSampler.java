@@ -27,7 +27,7 @@ public class ReservoirSampler {
     }
 
     /**
-     * Extracts a random sample from a collection. We can also specify a filter function for
+     * Extracts a random sample from a collection. We can also specify a filter function for ignoring certain elements.
      * @param collection: collection of elements
      * @param sampleSize: sample size
      * @param filter: predicate which filters any element returning true

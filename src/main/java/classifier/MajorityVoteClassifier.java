@@ -3,48 +3,33 @@ package classifier;
 import data.DataPoint;
 import utils.Validator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
- * This class represents a Majority Vote classifier. Given a set of classifiers {H_i}, the majority vote outputs:
+ * This class represents a Majority Vote classifier. Given a set of classifiers {H_i}, the majority vote MV outputs:
  *
  *          P(MV(x) = 1) = (1 / N) * \sum_{i=1}^N I(H_i(x) = 1)
  *
- * In other words, the probability of each class is simply the proportion of classifiers predicting this class.
+ * In other words, the probability of each class is simply the proportion of classifiers agreeing on this class.
  */
 public class MajorityVoteClassifier implements Classifier {
     /**
      * collection of classifiers to take the majority vote
      */
-    private final Collection<Classifier> classifiers;
+    private final Classifier[] classifiers;
 
     /**
-     * Initialize classifier with an empty collection
+     * @param classifiers: array of classifiers used in Majority Vote computation
+     * @throws IllegalArgumentException if classifiers array is empty or contains null elements
      */
-    public MajorityVoteClassifier() {
-        classifiers = new ArrayList<>();
-    }
+    public MajorityVoteClassifier(Classifier[] classifiers) {
+        Validator.assertNotEmpty(classifiers);
 
-    /**
-     * Add a new classifier to the majority vote
-     * @param classifier: new classifier
-     * @throws NullPointerException if classifier is null
-     */
-    public void add(Classifier classifier){
-        Validator.assertNotNull(classifier);
-        classifiers.add(classifier);
-    }
-
-    /**
-     * Add all classifiers in collection
-     * @param classifiers: collection of classifiers to add
-     * @throws NullPointerException if any classifier in the collection is null
-     */
-    public void addAll(Collection<? extends Classifier> classifiers){
         for (Classifier classifier : classifiers){
-            add(classifier);
+            if (classifier == null){
+                throw new NullPointerException("Classifier cannot be null.");
+            }
         }
+
+        this.classifiers = classifiers;
     }
 
     /**
@@ -57,6 +42,6 @@ public class MajorityVoteClassifier implements Classifier {
         for (Classifier clf : classifiers) {
             proba += clf.predict(point);
         }
-        return proba / classifiers.size();
+        return proba / classifiers.length;
     }
 }

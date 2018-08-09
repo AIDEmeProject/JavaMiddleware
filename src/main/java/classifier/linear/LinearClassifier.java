@@ -5,6 +5,8 @@ import data.DataPoint;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 
+import java.util.Arrays;
+
 /**
  * A linear classifier. It is defined by two parameters: bias and weight. Predictions are made as in Logistic Regression:
  *
@@ -30,7 +32,7 @@ public class LinearClassifier implements Classifier {
         Validator.assertNotEmpty(weights);
 
         this.bias = bias;
-        this.weights = weights;
+        this.weights = weights;  //TODO: copy weights array to avoid unintended changes?
     }
 
     /**
@@ -38,8 +40,12 @@ public class LinearClassifier implements Classifier {
      * as determined by the hasBias parameter.
      * @param weights: collection of all weights, with the bias possibly being the first element
      * @param hasBias: whether treat weights[0] as the bias
+     * @throws IllegalArgumentException if weights is an empty array, or if it contains a single element while hasBias is true
      */
     public LinearClassifier(double[] weights, boolean hasBias) {
+        if (weights.length <= (hasBias ? 1 : 0)){
+            throw new IllegalArgumentException("Weights array too small: expected at least " + (hasBias ? 1 : 0) + ", but received " + Arrays.toString(weights));
+        }
         if (hasBias){
             this.bias = weights[0];
             this.weights = new double[weights.length-1];
@@ -61,7 +67,7 @@ public class LinearClassifier implements Classifier {
     }
 
     /**
-     * Computes bias + weight^T x
+     * Compute bias + weight^T x
      */
     private double margin(double[] x){
         return bias + LinearAlgebra.dot(x, weights);

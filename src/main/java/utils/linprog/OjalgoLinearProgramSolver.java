@@ -53,14 +53,14 @@ public class OjalgoLinearProgramSolver implements LinearProgramSolver {
     }
 
     @Override
-    public void addLinearConstrain(double[] vector, Relation relation, double val) {
+    public void addLinearConstrain(double[] vector, InequalitySign inequalitySign, double val) {
         Validator.assertEquals(vector.length, dim);
 
         numConstrains++;
 
         Expression exp = tmpModel.addExpression(String.format("constrain_%d", numConstrains));
 
-        if (relation == Relation.LEQ) {
+        if (inequalitySign == InequalitySign.LEQ) {
             exp.upper(val);
         }
         else {

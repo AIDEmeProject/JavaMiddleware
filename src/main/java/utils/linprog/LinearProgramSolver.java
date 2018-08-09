@@ -1,13 +1,9 @@
 package utils.linprog;
 
-import utils.Validator;
-
 /**
  * Wrapper of most common Linear Programming (LP) solvers available in java. A LP refers to the problem:
  *
- * \[
- * \min_{x \in \mathbb{R}^d} \langle C, x \rangle, \text{ s.t. } Ax \leq b \text{ and } L \leq x \leq U
- * \]
+ * \( \min_{x \in \mathbb{R}^d} \langle C, x \rangle, \text{ s.t. } Ax \leq b \text{ and } L \leq x \leq U \)
  *
  * The current interface does not support adding equality constrains. This can be added if needed in the future.
  *
@@ -31,7 +27,7 @@ public interface LinearProgramSolver {
             case OJALGO:
                 return new OjalgoLinearProgramSolver(dim);
             default:
-                throw new RuntimeException();
+                throw new RuntimeException("Unknown Linear Program library: " + library);
         }
     }
 
@@ -64,10 +60,11 @@ public interface LinearProgramSolver {
     double[] findMinimizer();
 
     /**
-     * Adds a new linear inequality constrain to the LP, given by \( \langle vector, x \rangle \leq val \)
+     * Adds a new linear inequality constrain to the LP, defined by a weight vector, a inequalitySign (inequality sign), and a free value
      * @param vector: vector in LHS of inequality
+     * @param inequalitySign: inequality sign
      * @param val: RHS of inequality
      * @throws IllegalArgumentException if vector's dimension is different from getDim().
      */
-    void addLinearConstrain(double[] vector, Relation relation, double val);
+    void addLinearConstrain(double[] vector, InequalitySign inequalitySign, double val);
 }

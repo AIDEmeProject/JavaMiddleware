@@ -27,6 +27,12 @@ public class DataPoint {
      */
     protected double[] data;
 
+    /**
+     * @param id: ID of this point
+     * @param row: row number
+     * @param data: the features array
+     * @throws IllegalArgumentException if data is emtpy
+     */
     public DataPoint(int row, long id, double[] data) {
         Validator.assertNotEmpty(data);
 
@@ -37,6 +43,9 @@ public class DataPoint {
 
     /**
      * Initializes data point with identical row and id values.
+     * @param row: value to be used as row number and ID
+     * @param data: the features array
+     * @throws IllegalArgumentException if data is emtpy
      */
     public DataPoint(int row, double[] data) {
         this(row, row, data);

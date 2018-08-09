@@ -1,5 +1,6 @@
-*.idea/
+.idea/
 target/
 out/
-/experiment/
+experiment/
+javadoc/
 *.ini

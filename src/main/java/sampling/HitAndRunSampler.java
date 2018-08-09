@@ -8,11 +8,11 @@ import utils.convexbody.Line;
  * The Hit-and-Run Sampler is an algorithm for sampling points uniformly at random from a bounded convex body K. This
  * algorithm computes a Markov Chain of points inside K, defined as:
  *
- *      1: X_0 = any point inside the convex body
- *      2: for t from 1 to T:
- *      3:    line = sample a random line going through X_t
+ *      1: \(X_0\) = any point inside the convex body
+ *      2: for \(t\) from \(1\) to \(T\):
+ *      3:    line = sample a random line going through \(X_t\)
  *      4:    segment = intersection between line and K
- *      5:    K_{t+1} = a random point in the segment
+ *      5:    \(K_{t+1}\) = a random point in the segment
  *
  * This Markov Chain converges to the uniform distribution over K.
  *

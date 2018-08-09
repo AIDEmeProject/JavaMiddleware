@@ -22,6 +22,11 @@ public class TargetSetAccuracy implements MetricStorage {
      */
     private final int totalNumberOfTargets;
 
+    /**
+     * @param numberOfTargetsRetrieved: Number of targets retrieved
+     * @param totalNumberOfTargets:
+     * @throws IllegalArgumentException if totalNumberOfTargets is not positive, or if numberOfTargetsRetrieved is negative or larger than totalNumberOfTargets
+     */
     public TargetSetAccuracy(int numberOfTargetsRetrieved, int totalNumberOfTargets) {
         Validator.assertNonNegative(numberOfTargetsRetrieved);
         Validator.assertPositive(totalNumberOfTargets);

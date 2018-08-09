@@ -8,9 +8,7 @@ import user.User;
 import java.util.Collection;
 
 /**
- * Factory method for TargetSetAccuracy class.
- *
- * @see TargetSetAccuracy
+ * Factory method for {@link TargetSetAccuracy} class.
  */
 public class TargetSetAccuracyCalculator implements MetricCalculator {
     /**

@@ -51,6 +51,17 @@ public class Validator {
     }
 
     /**
+     * Raises an exception if data vector is emtpy
+     * @param data: data vector
+     * @throws IllegalArgumentException if data vector is empty
+     */
+    public static <T> void assertNotEmpty(T[] data){
+        if (data.length == 0){
+            throw new IllegalArgumentException("Array must contain at least one element.");
+        }
+    }
+
+    /**
      * Throws exception is values are different.
      * @param val1: first value
      * @param val2: second value

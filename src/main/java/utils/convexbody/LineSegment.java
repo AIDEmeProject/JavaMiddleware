@@ -8,7 +8,7 @@ import java.util.Random;
  * A line segment is a compact, connected subset of a straight line. In mathematical terms, let a straight line be defined
  * by a point X0 and its direction V. A line segment is on the form:
  *
- *                  X(t) = X0 + t * V, for L <= t <= R
+ *                 \( X(t) = X0 + t * V, for L \leq t \leq R \)
  *
  * where L and R are the left and right bounds on the segment respectively.
  *

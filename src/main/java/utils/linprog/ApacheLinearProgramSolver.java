@@ -32,9 +32,9 @@ public class ApacheLinearProgramSolver implements LinearProgramSolver {
     }
 
     @Override
-    public void addLinearConstrain(double[] vector, Relation relation, double val) {
+    public void addLinearConstrain(double[] vector, InequalitySign inequalitySign, double val) {
         Validator.assertEquals(vector.length, dim);
-        constraints.add(new LinearConstraint(vector, relation == Relation.LEQ ? Relationship.LEQ : Relationship.GEQ, val));
+        constraints.add(new LinearConstraint(vector, inequalitySign == InequalitySign.LEQ ? Relationship.LEQ : Relationship.GEQ, val));
     }
 
     @Override

@@ -94,6 +94,7 @@ public class Explore {
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
+     * @param folder: folder which results are to be saved
      * @throws IllegalArgumentException if runs is not positive
      */
     public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, FolderManager folder){
@@ -106,6 +107,8 @@ public class Explore {
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
      * @param runs: number of runs to perform
+     * @param seeds: random seeds for each run
+     * @param folder: folder which results are to be saved
      * @throws IllegalArgumentException if runs is not positive and if seeds.length differs from runs
      */
     public void run(Collection<DataPoint> data, User user, ActiveLearner activeLearner, int runs, long[] seeds, FolderManager folder){

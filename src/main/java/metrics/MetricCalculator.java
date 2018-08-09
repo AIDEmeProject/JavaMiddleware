@@ -11,6 +11,7 @@ public interface MetricCalculator {
     /**
      * Computes a Metric from the labeled data and activeLearner objects.
      * @param data: labeled data
+     * @param user: user instance
      * @param classifier: classifier
      * @return computed metric
      */

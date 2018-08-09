@@ -16,7 +16,7 @@ abstract class LinearProgramSolverTest {
 
     @Test
     void addLinearConstrain_ConstrainWithWrongDimension_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> solver.addLinearConstrain(new double[dim+1], Relation.LEQ, 0));
+        assertThrows(IllegalArgumentException.class, () -> solver.addLinearConstrain(new double[dim+1], InequalitySign.LEQ, 0));
     }
 
     @Test
@@ -47,7 +47,7 @@ abstract class LinearProgramSolverTest {
     private void testSolver(double[] objective, double[][] constrainsMatrix, double[] constrainsVector, double[] answer){
         solver.setObjectiveFunction(objective);
         for(int i=0; i < constrainsMatrix.length; i++) {
-            solver.addLinearConstrain(constrainsMatrix[i], Relation.LEQ, constrainsVector[i]);
+            solver.addLinearConstrain(constrainsMatrix[i], InequalitySign.LEQ, constrainsVector[i]);
         }
         double[] solution = solver.findMinimizer();
         assertArrayEquals(answer, solution, 1e-10);

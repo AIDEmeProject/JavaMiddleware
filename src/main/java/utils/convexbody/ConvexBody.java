@@ -4,7 +4,7 @@ package utils.convexbody;
  * This interface represents an OPEN, BOUNDED, CONVEX subset in the euclidean space. More specifically, a subset K of
  * the euclidean space is called convex if:
  *
- *      for all x1, x2 in K, the point t * x1 + (1-t) * x2 is also in K, for 0 <= t <= 1
+ *      \(\forall x1, x2 \in K \text{ and }  0 \leq t \leq 1 \, t * x1 + (1-t) * x2 \in K \)
  *
  * However, since this condition cannot be algorithmically verified, it is up to each implementation to guarantee it
  * correctly defines such a mathematical object.

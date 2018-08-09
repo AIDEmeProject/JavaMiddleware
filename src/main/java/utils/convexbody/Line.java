@@ -70,7 +70,7 @@ public class Line {
     }
 
     /**
-     * Returns the segment: X(t) = center + t * direction, for leftBound <= t <= rightBound
+     * Returns the segment: X(t) = center + t * direction, for \(leftBound \leq t \leq rightBound\)
      * @param leftBound: left bound of line segment
      * @param rightBound: right bound of line segment
      * @return a line segment on this line

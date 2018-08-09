@@ -47,7 +47,7 @@ public class Metrics {
 
     /**
      * Put a collection of metrics in the internal storage
-     * @param metrics: map metric_name -> metric_value
+     * @param metrics: map metric_name to metric_value
      */
     public void putAll(Map<String, Double> metrics){
         for (Map.Entry<String, Double> entry : metrics.entrySet()){

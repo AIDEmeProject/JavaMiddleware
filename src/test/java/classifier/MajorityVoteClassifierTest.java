@@ -1,46 +1,51 @@
 package classifier;
 
 import data.DataPoint;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MajorityVoteClassifierTest {
-    private MajorityVoteClassifier majorityVote;
-
-    @BeforeEach
-    void setUp() {
-        majorityVote = new MajorityVoteClassifier();
+    @Test
+    void constructor_emptyClassifierArrayInput_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new MajorityVoteClassifier(new Classifier[0]));
     }
 
     @Test
-    void add_nullClassifier_throwsException() {
-        assertThrows(NullPointerException.class, () -> majorityVote.add(null));
+    void constructor_NullInClassifierInputArray_throwsException() {
+        assertThrows(NullPointerException.class, () -> new MajorityVoteClassifier(new Classifier[]{null}));
     }
 
     @Test
-    void addAll_CollectionHasANullClassifier_throwsException() {
-        Collection<Classifier> classifiers = new ArrayList<>();
-        classifiers.add(null);
-        assertThrows(NullPointerException.class, () -> majorityVote.addAll(classifiers));
+    void probability_OnePositiveClassifierAndOneNegativeClassifier_ProbabilityCorrectlyComputed() {
+        probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(1, 1);
     }
 
     @Test
-    void probability_positiveClassifierAndNegativeClassifier_returnsCorrectProbability() {
+    void probability_TwoPositiveClassifiersAndOneNegativeClassifier_ProbabilityCorrectlyComputed() {
+       probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(2, 1);
+    }
+
+    @Test
+    void probability_TwoNegativeClassifiersAndOnePositiveClassifier_ProbabilityCorrectlyComputed() {
+        probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(1, 2);
+    }
+
+    private void probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(int pos, int neg){
         Classifier positiveClassifier = Mockito.mock(Classifier.class);
         Mockito.when(positiveClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(1);
 
         Classifier negativeClassifier = Mockito.mock(Classifier.class);
         Mockito.when(negativeClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(0);
 
-        majorityVote.add(positiveClassifier);
-        majorityVote.add(negativeClassifier);
+        Classifier[] classifiers = new Classifier[pos+neg];
+        for (int i = 0; i < classifiers.length; i++) {
+            classifiers[i] = i < pos ? positiveClassifier : negativeClassifier;
+        }
 
-        assertEquals(0.5, majorityVote.probability(Mockito.mock(DataPoint.class)));
+        MajorityVoteClassifier majorityVote = new MajorityVoteClassifier(classifiers);
+        DataPoint point = Mockito.mock(DataPoint.class);
+        assertEquals((double) pos / classifiers.length, majorityVote.probability(point));
     }
 }
