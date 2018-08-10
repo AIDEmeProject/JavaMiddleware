@@ -5,7 +5,6 @@ import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 import utils.linprog.InequalitySign;
-import utils.linprog.LinearProgramLibrary;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class PolyhedralCone implements ConvexBody {
     @Override
     public double[] getInteriorPoint() {
         int dim = getDim();
-        LinearProgramSolver solver = LinearProgramSolver.getSolver(LinearProgramLibrary.OJALGO, dim+1);
+        LinearProgramSolver solver = LinearProgramSolver.getSolver(LinearProgramSolver.LIBRARY.OJALGO, dim+1);
 
         double[] constrain = new double[dim+1];
         constrain[0] = 1;
