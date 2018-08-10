@@ -1,5 +1,8 @@
 package utils.linprog;
 
+import exceptions.LinearProgramSolverFailed;
+import exceptions.NoFeasibleSolutionException;
+import exceptions.UnboundedSolutionException;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -75,6 +78,14 @@ public class OjalgoLinearProgramSolver implements LinearProgramSolver {
     @Override
     public double[] findMinimizer() {
         Optimisation.Result minimizer = tmpModel.minimise();
+
+        if (!minimizer.getState().isFeasible()){
+            throw new NoFeasibleSolutionException();
+        }
+        if (minimizer.getState().isFailure()){
+            throw new UnboundedSolutionException();
+        }
+
         double[] res = new double[dim];
         for(int i=0; i < dim; i++)
             res[i] = minimizer.get(i).doubleValue();

@@ -1,8 +1,6 @@
 package utils.linprog;
 
-import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import utils.Validator;
 
 import java.util.ArrayList;
@@ -59,11 +57,14 @@ public class ApacheLinearProgramSolver implements LinearProgramSolver {
 
     @Override
     public double[] findMinimizer() {
-        PointValuePair solution = new SimplexSolver().optimize(objective, new LinearConstraintSet(constraints), GoalType.MINIMIZE);
+        try {
+            return new SimplexSolver().optimize(objective, new LinearConstraintSet(constraints)).getPoint();
 
-        if(solution == null)
-            throw new RuntimeException("Linear Program failed.");
-
-        return solution.getPoint();
+        } catch (NoFeasibleSolutionException ex){
+            throw new exceptions.NoFeasibleSolutionException();
+        }
+        catch (UnboundedSolutionException ex){
+            throw new exceptions.UnboundedSolutionException();
+        }
     }
 }

@@ -1,5 +1,7 @@
 package utils.linprog;
 
+import exceptions.NoFeasibleSolutionException;
+import exceptions.UnboundedSolutionException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -7,7 +9,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 abstract class LinearProgramSolverTest {
     int dim = 2;
+    LinearProgramSolver.LIBRARY library;
     LinearProgramSolver solver;
+
+    @Test
+    void getSolver_NegativeDimension_ThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> LinearProgramSolver.getSolver(library, -1));
+    }
+
+    @Test
+    void getSolver_ZeroDimension_ThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> LinearProgramSolver.getSolver(library, 0));
+    }
 
     @Test
     void setObjectiveFunction_ConstrainWithWrongDimension_ThrowsException() {
@@ -30,28 +43,75 @@ abstract class LinearProgramSolverTest {
     }
 
     @Test
-    void testSolverOnProblem1() {
-        testSolver(new double[] {1,1}, new double[][] {{-1,0}, {0,-1}, {1,1}}, new double[] {0,0,1}, new double[] {0,0});
+    void solve_noConstrainsAddedToSolver_throwsUnboundedSolutionException() {
+        solver.setObjectiveFunction(new double[] {1,1});
+        assertThrows(UnboundedSolutionException.class, () -> solver.findMinimizer());
     }
 
+    /*
+     * minimize x + y, s.t. x >= 1 , y >= 1, x <= 0, y <= 0
+     * No solutions exist!
+     */
     @Test
-    void testSolverOnProblem2() {
-        testSolver(new double[] {-1,1}, new double[][] {{-1,0}, {0,-1}, {1,1}}, new double[] {0,0,1}, new double[] {1,0});
+    void solve_EmptyFeasibleRegion_ThrowsException() {
+        solver.setObjectiveFunction(new double[] {1,1});
+        solver.setLower(new double[] {1, 1});
+        solver.setUpper(new double[] {0, 0});
+        assertThrows(NoFeasibleSolutionException.class, () -> solver.findMinimizer());
     }
 
+    /*
+     * minimize x, x <= 0, y <= 0, x >= 0, y >= 0
+     * Only a single point is feasible: (0,0)
+     */
     @Test
-    void testSolverOnProblem3() {
-        testSolver(new double[] {0,-1}, new double[][] {{-1,0}, {0,-1}, {1,1}}, new double[] {0,0,1}, new double[] {0,1});
+    void solve_FeasibleRegionConsistsOfSinglePoint_ThrowsException() {
+        solver.setLower(new double[] {0, 0});
+        solver.setUpper(new double[] {0, 0});
+        assertSolverSolution(new double[] {0,0}, new double[] {1,1});
     }
 
-    private void testSolver(double[] objective, double[][] constrainsMatrix, double[] constrainsVector, double[] answer){
+    /*
+     * minimize x, x <= 0, y <= 0
+     * Unbounded solution (-infinity)
+     */
+    @Test
+    void solve_UnboundedFeasibleRegionAndSolution_ThrowsException() {
+        solver.setObjectiveFunction(new double[] {1,0});
+        solver.setUpper(new double[] {0, 0});
+        assertThrows(UnboundedSolutionException.class, () -> solver.findMinimizer());
+    }
+
+    /*
+     * minimize x + y, s.t. x >= 0 , y >= 0
+     * Feasible region is unbounded, but there is a solution at (0,0)
+     */
+    @Test
+    void solve_UnboundedFeasibleRegionButBoundedSolution_CorrectSolutionComputed() {
+        solver.setLower(new double[] {0, 0});
+        assertSolverSolution(new double[] {0, 0}, new double[] {1, 1});
+    }
+
+    /*
+     * minimize a*x + b*y, s.t. 0.2 <= x <= 0.6, 0.3 <= y <= 0.7, 0.6 <= x + y <= 1
+     * we choose (a,b) s.t. each time the solution falls in a different vertex of the feasible region polytope
+     */
+    @Test
+    void solver_NonEmptyAndBoundedFeasibleRegion_MinimizerCorrectlyComputed() {
+        solver.setLower(new double[] {0.2, 0.3});
+        solver.setUpper(new double[] {0.6, 0.7});
+        solver.addLinearConstrain(new double[] {1, 1}, InequalitySign.LEQ, 1);
+        solver.addLinearConstrain(new double[] {1, 1}, InequalitySign.GEQ, 0.6);
+        assertSolverSolution(new double[] {0.2, 0.4}, new double[] {1.1, 0.9});
+        assertSolverSolution(new double[] {0.3, 0.3}, new double[] {0.9, 1.1});
+        assertSolverSolution(new double[] {0.6, 0.3}, new double[] {-1, 1});
+        assertSolverSolution(new double[] {0.6, 0.4}, new double[] {-1.1, -0.9});
+        assertSolverSolution(new double[] {0.3, 0.7}, new double[] {-0.9, -1.1});
+        assertSolverSolution(new double[] {0.2, 0.7}, new double[] {1, -1});
+    }
+
+    private void assertSolverSolution(double[] answer, double[] objective){
         solver.setObjectiveFunction(objective);
-        for(int i=0; i < constrainsMatrix.length; i++) {
-            solver.addLinearConstrain(constrainsMatrix[i], InequalitySign.LEQ, constrainsVector[i]);
-        }
-        double[] solution = solver.findMinimizer();
-        assertArrayEquals(answer, solution, 1e-10);
+        assertArrayEquals(answer, solver.findMinimizer(), 1e-10);
     }
-
-    // TODO: check behavior on unfeasible problems
 }

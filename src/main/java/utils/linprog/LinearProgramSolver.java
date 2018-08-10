@@ -13,14 +13,22 @@ package utils.linprog;
  * @author lucianodp
  */
 public interface LinearProgramSolver {
+    /**
+     * Supported linear programming libraries.
+     *
+     * @see ApacheLinearProgramSolver
+     * @see OjalgoLinearProgramSolver
+     */
+    enum LIBRARY {
+        APACHE, OJALGO
+    }
 
     /**
-     * Factory method for retrieving a given LP solver through its library name.
      * @param library: LP solver library
-     * @param dim: expected dimension of each vector constrain
-     * @return LP solver instance
+     * @param dim: expected dimension of vector constraints
+     * @return a LP solver from a given library
      */
-    static LinearProgramSolver getSolver(LinearProgramLibrary library, int dim){
+    static LinearProgramSolver getSolver(LIBRARY library, int dim){
         switch(library) { 
             case APACHE:
                 return new ApacheLinearProgramSolver(dim);
@@ -40,7 +48,7 @@ public interface LinearProgramSolver {
 
     /**
      * Sets the lower bound L for each variable.
-     * @param vector: vector whose i-th component specify the constrain \( L_i \leq x_i \)
+     * @param vector: vector whose i-th component specify the constrain \( x_i \geq L_i \)
      * @throws IllegalArgumentException  if input has incompatible dimension.
      */
     void setLower(double[] vector);
