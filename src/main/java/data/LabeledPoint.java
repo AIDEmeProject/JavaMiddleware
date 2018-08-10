@@ -95,4 +95,8 @@ public class LabeledPoint extends DataPoint {
     public String toString() {
         return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';
     }
+
+    public LabeledPoint clone(double[] newData){
+        return new LabeledPoint(row, id, newData, label);
+    }
 }

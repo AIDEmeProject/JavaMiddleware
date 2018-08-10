@@ -1,11 +1,10 @@
 import active.ActiveLearner;
 import active.learning.GeneralizedBinarySearch;
-import active.learning.RandomSampler;
-import active.learning.SimpleMargin;
 import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
 import classifier.linear.MajorityVoteLearner;
+import classifier.kernel.GaussianKernel;
 import data.DataPoint;
 import explore.Explore;
 import io.FolderManager;
@@ -97,7 +96,7 @@ public class RunExperiment {
 //        activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
         HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
-        VersionSpace versionSpace = new KernelVersionSpace(sampler, true);
+        VersionSpace versionSpace = new KernelVersionSpace(sampler, true, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
         activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
 

@@ -92,4 +92,8 @@ public class DataPoint {
     public String toString() {
         return "{\"row\": " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
     }
+
+    public DataPoint clone(double[] newData){
+        return new DataPoint(row, id, newData);
+    }
 }

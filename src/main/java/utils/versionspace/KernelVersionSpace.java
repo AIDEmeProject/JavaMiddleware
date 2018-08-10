@@ -1,36 +1,28 @@
 package utils.versionspace;
 
-import classifier.linear.KernelLinearClassifier;
+import classifier.kernel.KernelLinearClassifier;
 import classifier.linear.LinearClassifier;
-import data.DataPoint;
+import classifier.kernel.Kernel;
 import data.LabeledPoint;
 import sampling.HitAndRunSampler;
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A Kernel classifier is defined as:
+ * This class defines the Version Space for the {@link KernelLinearClassifier} classifier. It is defined by the set of
+ * equations:
  *
- *  \( h(x) = sign \left(b + \sum_i \alpha_i k(x_i, x) \right) \)
+ *  \( y_i  \left(b + \sum_i \alpha_i^t k(x_i, x_j) \right) &gt; 0 \)
  *
- * As we can see, it is a generalization of a Linear Classifier, but each data points is substituted by it Kernel application:
+ * Note that its dimension equals the number of support vectors (which increases as an Active Learning algorighm runs).
+ * Sampling from this version space can be done in the same way as for the {@link LinearVersionSpace}, the only difference
+ * is we need to construct the Kernel Matrix of the labeled data beforehand.
  *
- *      \( K = [k(x_i, x)] \)
- *
- * For this set of classifiers, we can define the Version Space at iteration \( t \) by the set of equations:
- *
- *  \( y_i  \left(b + \sum_i \alpha_i^t k(x_i, x_j) \right) &gt; 0
- *
- * Note that its dimension increases with each iteration. Sampling from this version space can be done in the same way
- * as in the {@link LinearVersionSpace} case, we only need to construct the Kernel Matrix of the labeled data beforehand.
- *
- * @see LinearClassifier
+ * @see KernelLinearClassifier
  * @see LinearVersionSpace
  * @see HitAndRunSampler
- * @see utils.convexbody.PolyhedralCone
  */
 public class KernelVersionSpace implements VersionSpace {
     /**
@@ -38,54 +30,35 @@ public class KernelVersionSpace implements VersionSpace {
      */
     private final LinearVersionSpace linearVersionSpace;
 
-    public KernelVersionSpace(HitAndRunSampler sampler, boolean addIntercept) {
+    private final Kernel kernel;
+
+    public KernelVersionSpace(HitAndRunSampler sampler, boolean addIntercept, Kernel kernel) {
         Validator.assertNotNull(sampler);
+        Validator.assertNotNull(kernel);
         this.linearVersionSpace = new LinearVersionSpace(sampler, addIntercept);
+        this.kernel = kernel;
     }
 
-    /**
-     * Computes the RBF kernel function k(x,y)
-     */
-    private double kernel(double[] x, double[] y){
-        return Math.exp(-LinearAlgebra.sqDistance(x, y) / x.length);
-    }
-
-    /**
-     * Given X and a collection {x_1, ..., x_n}, computes {k(x_1, X), ..., k(x_n, X)}
-     */
-    private LabeledPoint applyKernel(LabeledPoint point, Collection<? extends DataPoint> pointCollection){
-        double[] kernalizedPoint = new double[pointCollection.size()];
+    private Collection<LabeledPoint> computeKernelMatrix(Collection<LabeledPoint> labeledPoints){
+        // apply kernel function
+        double[][] kernelMatrix = kernel.compute(labeledPoints);
 
         int i = 0;
-        for (DataPoint pt : pointCollection) {
-            kernalizedPoint[i++] = kernel(pt.getData(), point.getData());
+        Collection<LabeledPoint> kernelLabeledPoints = new ArrayList<>(labeledPoints.size());
+        for (LabeledPoint point : labeledPoints) {
+            kernelLabeledPoints.add(point.clone(kernelMatrix[i++]));
         }
 
-        return new LabeledPoint(point.getRow(), point.getId(), kernalizedPoint, point.getLabel());
-    }
-
-    /**
-     * Given {x_1, ..., x_n}, computes the kernel matrix K = [k(x_i, x_j)]
-     */
-    private Collection<LabeledPoint> applyKernel(Collection<LabeledPoint> pointCollection){
-        Collection<LabeledPoint> kernalizedPoints = new ArrayList<>(pointCollection.size());
-
-        for (LabeledPoint pt : pointCollection) {
-           kernalizedPoints.add(applyKernel(pt, pointCollection));
-        }
-
-        return kernalizedPoints;
+        return kernelLabeledPoints;
     }
 
     @Override
     public KernelLinearClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
-        // apply kernel function
-        Collection<LabeledPoint> kernalizedPoints = applyKernel(labeledPoints);
-        LinearClassifier[] linearClassifiers = linearVersionSpace.sample(kernalizedPoints, numSamples);
+        LinearClassifier[] linearClassifiers = linearVersionSpace.sample(computeKernelMatrix(labeledPoints), numSamples);
 
         KernelLinearClassifier[] kernelLinearClassifiers = new KernelLinearClassifier[numSamples];
         for (int i = 0; i < numSamples; i++) {
-            kernelLinearClassifiers[i] = new KernelLinearClassifier(linearClassifiers[i], labeledPoints);
+            kernelLinearClassifiers[i] = new KernelLinearClassifier(linearClassifiers[i], labeledPoints, kernel);
         }
 
         return kernelLinearClassifiers;
