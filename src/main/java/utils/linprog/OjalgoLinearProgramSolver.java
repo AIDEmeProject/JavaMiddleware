@@ -1,6 +1,5 @@
 package utils.linprog;
 
-import exceptions.LinearProgramSolverFailed;
 import exceptions.NoFeasibleSolutionException;
 import exceptions.UnboundedSolutionException;
 import org.ojalgo.optimisation.Expression;
