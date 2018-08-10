@@ -59,26 +59,27 @@ public class HitAndRunSampler {
     public double[][] sample(ConvexBody body, int numSamples){
         Validator.assertPositive(numSamples);
 
-        double[] point = body.getInteriorPoint();
-        double[][] samples = new double[numSamples][point.length];
+        double[][] samples = new double[numSamples][];
 
         // warm-up phase
-        for (int i = 0; i < warmup; i++) {
-            point = advance(body, point);
-        }
-
-        samples[0] = point;
+        samples[0] = advance(body, body.getInteriorPoint(), warmup);
 
         for (int i = 1; i < numSamples; i++) {
             // only keep every "thin" samples
-            for (int j = 0; j < thin; j++) {
-                point = advance(body, point);
-            }
-
-            samples[i] = point;
+            samples[i] = advance(body, samples[i-1], thin);
         }
 
         return samples;
+    }
+
+    /**
+     * Advance "n" steps in the Markov Chain
+     */
+    private double[] advance(ConvexBody body, double[] point, int n){
+        for (int i = 0; i < n; i++) {
+            point = advance(body, point);
+        }
+        return point;
     }
 
     /**
