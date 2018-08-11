@@ -1,15 +1,15 @@
 package explore;
 
-import active.ActiveLearner;
-import classifier.Classifier;
+import machinelearning.active.ActiveLearner;
+import machinelearning.classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import io.FolderManager;
-import metrics.MetricCalculator;
-import sampling.ReservoirSampler;
-import sampling.StratifiedSampler;
-import user.User;
+import explore.metrics.MetricCalculator;
+import explore.sampling.ReservoirSampler;
+import explore.sampling.StratifiedSampler;
+import explore.user.User;
 import utils.Validator;
 
 import java.io.BufferedWriter;
@@ -55,7 +55,7 @@ public class Explore {
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
      * @param subsampleSize: size of sample to restrict unlabeled set at every iteration (speeds up computation)
-     * @param metricCalculators: collection of metrics to be calculated
+     * @param metricCalculators: collection of metrics  to be calculated
      * @throws IllegalArgumentException if budget is not positive
      */
     public Explore(StratifiedSampler initialSampler, int budget, int subsampleSize, Collection<MetricCalculator> metricCalculators) {
@@ -71,7 +71,7 @@ public class Explore {
      * Through this constructor, no subsampling is performed.
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
-     * @param metricCalculators: collection of metrics to be calculated
+     * @param metricCalculators: collection of metrics  to be calculated
      * @throws IllegalArgumentException if budget is not positive
      */
     public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
@@ -79,7 +79,7 @@ public class Explore {
     }
 
     /**
-     * Through this constructor, no subsampling is performed and no additional metrics will be computed.
+     * Through this constructor, no subsampling is performed and no additional metrics  will be computed.
      * Only time measurements and the set of labeled rows will be provided in result.
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
@@ -89,7 +89,7 @@ public class Explore {
     }
 
     /**
-     * Run the exploration process several times (with random seeds), saving all exploration metrics to disk.
+     * Run the exploration process several times (with random seeds), saving all exploration metrics  to disk.
      * @param data: data points
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
@@ -102,7 +102,7 @@ public class Explore {
     }
 
     /**
-     * Run the exploration process several times (with specified seeds) and average resulting metrics.
+     * Run the exploration process several times (with specified seeds) and average resulting metrics .
      * @param data: data points
      * @param user: user or oracle
      * @param activeLearner: active activeLearner object
@@ -152,11 +152,11 @@ public class Explore {
     }
 
     /**
-     * Run a single iteration of the exploration process, computing the necessary metrics.
+     * Run a single iteration of the exploration process, computing the necessary metrics .
      */
-    private Metrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
+    private IterationMetrics runSingleIteration(LabeledDataset data, User user, ActiveLearner activeLearner){
         long initialTime, start;
-        Metrics metrics = new Metrics();
+        IterationMetrics metrics = new IterationMetrics();
 
         // find next points to label
         initialTime = System.nanoTime();
@@ -185,7 +185,7 @@ public class Explore {
         metrics.put("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
 
         metrics.put("IterTimeMillis",(System.nanoTime() - start) / 1e6);
-        //System.out.println(metrics);
+        //System.out.println(metrics );
         return metrics;
     }
 

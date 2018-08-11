@@ -1,6 +1,6 @@
 package data;
 
-import sampling.ReservoirSampler;
+import explore.sampling.ReservoirSampler;
 import utils.Validator;
 
 import java.util.*;
