@@ -7,8 +7,7 @@ import org.mockito.stubbing.Answer;
 import utils.convexbody.ConvexBody;
 import utils.convexbody.Line;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class HitAndRunSamplerTest {

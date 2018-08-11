@@ -4,7 +4,7 @@ import classifier.SVM.Kernel;
 import classifier.SVM.SvmLearner;
 import classifier.SVM.SvmParameterAdapter;
 import classifier.linear.MajorityVoteLearner;
-import classifier.kernel.GaussianKernel;
+import classifier.linear.GaussianKernel;
 import data.DataPoint;
 import explore.Explore;
 import io.FolderManager;

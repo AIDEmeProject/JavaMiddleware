@@ -1,7 +1,5 @@
-package classifier.kernel;
+package classifier.linear;
 
-import classifier.Classifier;
-import classifier.linear.LinearClassifier;
 import data.DataPoint;
 import utils.Validator;
 
@@ -24,7 +22,7 @@ import java.util.Collection;
  * For the time being, we only support the RBF kernel.
  */
 
-public class KernelLinearClassifier implements Classifier {
+public class KernelClassifier extends MarginClassifier {
     /**
      * linear classifier used for computing probabilities and making predictions
      */
@@ -38,32 +36,35 @@ public class KernelLinearClassifier implements Classifier {
     private final Kernel kernel;
 
     /**
-     *
+     * @param bias: the bias \(b\)
+     * @param weights: the weights \(\alpha_i\)
+     * @param supportVectors: collection of support vectors
+     * @throws NullPointerException if kernel is null
+     * @throws IllegalArgumentException if the number of weights and support vectors are different
+     */
+    public KernelClassifier(double bias, double[] weights, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
+        this(new LinearClassifier(bias, weights), supportVectors, kernel);
+    }
+
+    /**
      * @param linearClassifier: a {@link LinearClassifier} instance containing the bias the weight parameters
      * @param supportVectors: collection of support vectors
-     * @throws NullPointerException if linearClassifier is null
-     * @throws IllegalArgumentException if supportVectors are empty
+     * @throws NullPointerException if linearClassifier or kernel is null
+     * @throws IllegalArgumentException if linearClassifier dimension is different from the number of support vectors
      */
-    public KernelLinearClassifier(LinearClassifier linearClassifier, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
+    public KernelClassifier(LinearClassifier linearClassifier, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
         Validator.assertNotNull(linearClassifier);
-        Validator.assertNotEmpty(supportVectors);
         Validator.assertNotNull(kernel);
+        Validator.assertEquals(linearClassifier.getDim(), supportVectors.size());
 
         this.linearClassifier = linearClassifier;
         this.supportVectors = supportVectors;
         this.kernel = kernel;
-
     }
 
     @Override
-    public double probability(DataPoint point) {
-        double[] kernelVector = kernel.compute(supportVectors, point);
-        return linearClassifier.probability(point.clone(kernelVector));
-    }
-
-    @Override
-    public int predict(DataPoint point) {
-        double[] kernelVector = kernel.compute(supportVectors, point);
-        return linearClassifier.predict(point.clone(kernelVector));
+    public double margin(double[] x) {
+        double[] kernelVector = kernel.compute(supportVectors, x);
+        return linearClassifier.margin(kernelVector);
     }
 }

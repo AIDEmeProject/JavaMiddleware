@@ -1,8 +1,8 @@
 package utils.versionspace;
 
-import classifier.kernel.KernelLinearClassifier;
+import classifier.linear.KernelClassifier;
 import classifier.linear.LinearClassifier;
-import classifier.kernel.Kernel;
+import classifier.linear.Kernel;
 import data.LabeledPoint;
 import sampling.HitAndRunSampler;
 import utils.Validator;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * This class defines the Version Space for the {@link KernelLinearClassifier} classifier. It is defined by the set of
+ * This class defines the Version Space for the {@link KernelClassifier} classifier. It is defined by the set of
  * equations:
  *
  *  \( y_i  \left(b + \sum_i \alpha_i^t k(x_i, x_j) \right) &gt; 0 \)
@@ -20,7 +20,7 @@ import java.util.Collection;
  * Sampling from this version space can be done in the same way as for the {@link LinearVersionSpace}, the only difference
  * is we need to construct the Kernel Matrix of the labeled data beforehand.
  *
- * @see KernelLinearClassifier
+ * @see KernelClassifier
  * @see LinearVersionSpace
  * @see HitAndRunSampler
  */
@@ -30,8 +30,17 @@ public class KernelVersionSpace implements VersionSpace {
      */
     private final LinearVersionSpace linearVersionSpace;
 
+    /**
+     * {@link Kernel} function
+     */
     private final Kernel kernel;
 
+    /**
+     * @param sampler: Hit-and-Run sampler used for sampling the Version Space
+     * @param addIntercept: whether to sample the bias parameter
+     * @param kernel: the kernel function
+     * @throws NullPointerException if sampler or kernel is null
+     */
     public KernelVersionSpace(HitAndRunSampler sampler, boolean addIntercept, Kernel kernel) {
         Validator.assertNotNull(sampler);
         Validator.assertNotNull(kernel);
@@ -53,14 +62,14 @@ public class KernelVersionSpace implements VersionSpace {
     }
 
     @Override
-    public KernelLinearClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
+    public KernelClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
         LinearClassifier[] linearClassifiers = linearVersionSpace.sample(computeKernelMatrix(labeledPoints), numSamples);
 
-        KernelLinearClassifier[] kernelLinearClassifiers = new KernelLinearClassifier[numSamples];
+        KernelClassifier[] kernelClassifiers = new KernelClassifier[numSamples];
         for (int i = 0; i < numSamples; i++) {
-            kernelLinearClassifiers[i] = new KernelLinearClassifier(linearClassifiers[i], labeledPoints, kernel);
+            kernelClassifiers[i] = new KernelClassifier(linearClassifiers[i], labeledPoints, kernel);
         }
 
-        return kernelLinearClassifiers;
+        return kernelClassifiers;
     }
 }

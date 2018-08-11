@@ -1,7 +1,5 @@
 package classifier.linear;
 
-import classifier.Classifier;
-import data.DataPoint;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 
@@ -12,7 +10,7 @@ import java.util.Arrays;
  *
  *      P(y = 1 | x) = sigmoid(bias + weight^T x)
  */
-public class LinearClassifier implements Classifier {
+public class LinearClassifier extends MarginClassifier {
     /**
      * Bias parameter
      */
@@ -57,9 +55,12 @@ public class LinearClassifier implements Classifier {
         }
     }
 
-    public double getBias() {
-        return bias;
-    }
+    /**
+     * @return dimension of hyperplane
+     */
+    public int getDim() { return weights.length; }
+
+    public double getBias() { return bias; }
 
     public double[] getWeights() {
         //TODO: return copy so to avoid unintended changes?
@@ -69,17 +70,7 @@ public class LinearClassifier implements Classifier {
     /**
      * Compute bias + weight^T x
      */
-    private double margin(double[] x){
+    public double margin(double[] x){
         return bias + LinearAlgebra.dot(x, weights);
-    }
-
-    @Override
-    public double probability(DataPoint point) {
-        return 1. / (1. + Math.exp(-margin(point.getData())));
-    }
-
-    @Override
-    public int predict(DataPoint point) {
-        return margin(point.getData()) > 0 ? 1 : 0;
     }
 }

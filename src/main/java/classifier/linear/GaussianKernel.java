@@ -1,4 +1,4 @@
-package classifier.kernel;
+package classifier.linear;
 
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
@@ -10,7 +10,7 @@ import utils.linalg.LinearAlgebra;
  *
  * where gamma is a positive number. In practice, one usually chooses gamma = 1.0 / num_features.
  */
-public class GaussianKernel implements Kernel {
+public class GaussianKernel extends Kernel {
     /**
      * gamma parameter
      */

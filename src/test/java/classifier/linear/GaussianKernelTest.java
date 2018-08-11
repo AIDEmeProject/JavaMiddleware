@@ -1,4 +1,4 @@
-package classifier.kernel;
+package classifier.linear;
 
 import data.DataPoint;
 import org.junit.jupiter.api.BeforeEach;
