@@ -1,6 +1,7 @@
 package data;
 
 import explore.sampling.ReservoirSampler;
+import machinelearning.classifier.Label;
 import utils.Validator;
 
 import java.util.*;
@@ -113,7 +114,7 @@ public class LabeledDataset {
         labeled.add(point);
     }
 
-    public void putOnLabeledSet(DataPoint point, int label) {
+    public void putOnLabeledSet(DataPoint point, Label label) {
         putOnLabeledSet(new LabeledPoint(point, label));
     }
 
@@ -131,7 +132,7 @@ public class LabeledDataset {
         }
     }
 
-    public void putOnLabeledSet(Collection<DataPoint> points, int[] label) {
+    public void putOnLabeledSet(Collection<DataPoint> points, Label[] label) {
         Validator.assertEquals(points.size(), label.length);
 
         int i = 0;

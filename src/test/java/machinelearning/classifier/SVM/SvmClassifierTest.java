@@ -1,6 +1,7 @@
 package machinelearning.classifier.SVM;
 
 import data.DataPoint;
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,6 @@ class SvmClassifierTest {
     @Test
     void margin_PredictLabelOfAttributeValueArray_ExpectedLabelPredicted() {
         DataPoint point = new DataPoint(0, new double[] {0,1});
-        assertEquals(0, classifier.predict(point));
+        assertEquals(Label.NEGATIVE, classifier.predict(point));
     }
 }

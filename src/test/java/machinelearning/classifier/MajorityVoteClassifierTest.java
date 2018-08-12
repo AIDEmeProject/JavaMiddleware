@@ -34,10 +34,10 @@ class MajorityVoteClassifierTest {
 
     private void probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(int pos, int neg){
         Classifier positiveClassifier = Mockito.mock(Classifier.class);
-        Mockito.when(positiveClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(1);
+        Mockito.when(positiveClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(Label.POSITIVE);
 
         Classifier negativeClassifier = Mockito.mock(Classifier.class);
-        Mockito.when(negativeClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(0);
+        Mockito.when(negativeClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(Label.NEGATIVE);
 
         Classifier[] classifiers = new Classifier[pos+neg];
         for (int i = 0; i < classifiers.length; i++) {

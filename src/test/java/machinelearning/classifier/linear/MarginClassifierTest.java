@@ -1,6 +1,7 @@
 package machinelearning.classifier.linear;
 
 import data.DataPoint;
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,21 +14,21 @@ class MarginClassifierTest {
     void predict_positiveMargin_returnPositiveLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
         when(classifier.margin((double[]) any())).thenReturn(1.);
-        assertEquals(1, classifier.predict(mock(DataPoint.class)));
+        assertEquals(Label.POSITIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test
     void predict_negativeMargin_returnNegativeLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
         when(classifier.margin((double[]) any())).thenReturn(-1.);
-        assertEquals(0, classifier.predict(mock(DataPoint.class)));
+        assertEquals(Label.NEGATIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test
     void predict_zeroMargin_returnNegativeLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
         when(classifier.margin((double[]) any())).thenReturn(0.);
-        assertEquals(0, classifier.predict(mock(DataPoint.class)));
+        assertEquals(Label.NEGATIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test

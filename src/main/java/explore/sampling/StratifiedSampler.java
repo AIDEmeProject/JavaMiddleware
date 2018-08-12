@@ -2,6 +2,7 @@ package explore.sampling;
 
 import data.DataPoint;
 import explore.user.User;
+import machinelearning.classifier.Label;
 import utils.Validator;
 
 import java.util.ArrayList;
@@ -30,12 +31,12 @@ public class StratifiedSampler {
         Collection<DataPoint> samples = new ArrayList<>(positiveSamples + negativeSamples);
 
         if (positiveSamples > 0){
-            Collection<DataPoint> positive = ReservoirSampler.sample(points, positiveSamples, pt -> user.getLabel(pt) != 1);
+            Collection<DataPoint> positive = ReservoirSampler.sample(points, positiveSamples, pt -> user.getLabel(pt).isNegative());
             samples.addAll(positive);
         }
 
         if (negativeSamples > 0){
-            Collection<DataPoint> negative = ReservoirSampler.sample(points, positiveSamples, pt -> user.getLabel(pt) == 1);
+            Collection<DataPoint> negative = ReservoirSampler.sample(points, positiveSamples, pt -> user.getLabel(pt).isPositive());
             samples.addAll(negative);
         }
 

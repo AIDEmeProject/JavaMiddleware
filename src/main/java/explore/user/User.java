@@ -2,6 +2,7 @@ package explore.user;
 
 import data.DataPoint;
 import data.LabeledPoint;
+import machinelearning.classifier.Label;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,15 +17,15 @@ public interface User {
      * @param point: point to label
      * @return label of data[row]
      */
-    int getLabel(DataPoint point);
+    Label getLabel(DataPoint point);
 
     /**
      * Return the labels of a batch of rows
      * @param points: collection of data points
      * @return an array containing the labels of each requested row
      */
-    default int[] getLabel(Collection<DataPoint> points){
-        int[] labels = new int[points.size()];
+    default Label[] getLabel(Collection<DataPoint> points){
+        Label[] labels = new Label[points.size()];
 
         int i = 0;
         for (DataPoint point : points){

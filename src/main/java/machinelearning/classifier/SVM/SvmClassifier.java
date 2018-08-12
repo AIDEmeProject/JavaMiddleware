@@ -4,6 +4,7 @@ import machinelearning.classifier.Classifier;
 import data.DataPoint;
 import libsvm.svm;
 import libsvm.svm_model;
+import machinelearning.classifier.Label;
 
 /**
  *  This module represents a trained SVM classifier. It's an immutable object used for predicting labels over new data instances.
@@ -57,8 +58,8 @@ public class SvmClassifier implements Classifier {
     }
 
     @Override
-    public int predict(DataPoint point) {
-        return margin(point) > 0 ? 1 : 0;
+    public Label predict(DataPoint point) {
+        return margin(point) > 0 ? Label.POSITIVE : Label.NEGATIVE;
     }
 
     /**

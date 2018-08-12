@@ -3,6 +3,7 @@ package machinelearning.classifier.neighbors;
 import machinelearning.classifier.AbstractLearnerTest;
 import data.DataPoint;
 import data.LabeledPoint;
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,7 +80,7 @@ class NearestNeighborsLearnerTest extends AbstractLearnerTest {
     void fit_initializeNeverCalled_throwsException() {
         Collection<LabeledPoint> labeledPoints = new ArrayList<>();
         for (DataPoint point : points){
-            labeledPoints.add(new LabeledPoint(point, 1));
+            labeledPoints.add(new LabeledPoint(point, Label.POSITIVE));
         }
 
         knn = new NearestNeighborsLearner(2, 0);

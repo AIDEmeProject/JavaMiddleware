@@ -4,6 +4,7 @@ import machinelearning.classifier.Classifier;
 import data.LabeledDataset;
 import data.LabeledPoint;
 import explore.user.User;
+import machinelearning.classifier.Label;
 
 import java.util.Collection;
 
@@ -17,15 +18,15 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
      * @param y: true labels array
      * @return TargetSetAccuracy object
      */
-    public TargetSetAccuracy compute(Collection<LabeledPoint> labeledPoints, int[] y){
+    public TargetSetAccuracy compute(Collection<LabeledPoint> labeledPoints, Label[] y){
         int numberOfTargetsRetrieved = 0;
         for (LabeledPoint point : labeledPoints){
-            numberOfTargetsRetrieved += point.getLabel();
+            numberOfTargetsRetrieved += point.getLabel().asBinary();
         }
 
         int totalNumberOfTargets = 0;
-        for (int label : y){
-            totalNumberOfTargets += label;
+        for (Label label : y){
+            totalNumberOfTargets += label.asBinary();
         }
 
         return new TargetSetAccuracy(numberOfTargetsRetrieved, totalNumberOfTargets);

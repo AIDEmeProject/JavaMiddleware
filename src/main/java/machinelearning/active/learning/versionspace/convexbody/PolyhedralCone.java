@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
+import machinelearning.classifier.Label;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
@@ -37,8 +38,7 @@ public class PolyhedralCone implements ConvexBody {
         Validator.assertEquals(x.length, getDim());
 
         for (LabeledPoint point : labeledPoints){
-            int signedLabel = point.getLabel() == 1 ? 1 : -1;
-            if (signedLabel * LinearAlgebra.dot(x, point.getData()) <= 0){
+            if (point.getLabel().asSign() * LinearAlgebra.dot(x, point.getData()) <= 0){
                 return false;
             }
         }
@@ -67,8 +67,8 @@ public class PolyhedralCone implements ConvexBody {
 
         for (LabeledPoint labeledPoint : labeledPoints) {
             constrain = labeledPoint.addBias().getData();
-            constrain[0] = labeledPoint.getLabel() == 1 ? 1 : -1;
-            solver.addLinearConstrain(constrain, labeledPoint.getLabel() == 1 ? InequalitySign.GEQ : InequalitySign.LEQ, 0);
+            constrain[0] = labeledPoint.getLabel().asSign();
+            solver.addLinearConstrain(constrain, labeledPoint.getLabel().isPositive() ? InequalitySign.GEQ : InequalitySign.LEQ, 0);
         }
 
         for (int i = 0; i < dim+1; i++) {
@@ -108,7 +108,7 @@ public class PolyhedralCone implements ConvexBody {
 
         // polytope intersection
         for (LabeledPoint point : labeledPoints){
-            int signedLabel = point.getLabel() == 1 ? 1 : -1;
+            int signedLabel = point.getLabel().asSign();
             double numerator = signedLabel * LinearAlgebra.dot(point.getData(), line.getCenter());
             double denominator = signedLabel * LinearAlgebra.dot(point.getData(), line.getDirection());
             double value = - numerator / denominator;

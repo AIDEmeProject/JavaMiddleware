@@ -2,6 +2,7 @@ package machinelearning.active.search;
 
 import machinelearning.active.ActiveLearner;
 import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
@@ -111,12 +112,12 @@ public class ActiveTreeSearch extends ActiveLearner {
      */
     private double optimalUtilityGivenPoint(LabeledDataset data, int steps, DataPoint point, double proba){
         // positive label branch
-        data.putOnLabeledSet(point, 1);
+        data.putOnLabeledSet(point, Label.POSITIVE);
         double positiveUtility = utility(data, steps-1).getScore();
         data.removeFromLabeledSet(point);
 
         // negative label branch
-        data.putOnLabeledSet(point, 0);
+        data.putOnLabeledSet(point, Label.NEGATIVE);
         double negativeUtility = utility(data, steps-1).getScore();
         data.removeFromLabeledSet(point);
 

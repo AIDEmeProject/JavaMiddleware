@@ -65,7 +65,7 @@ public class SvmLearner implements Learner {
         int i = 0;
         for (LabeledPoint point : labeledPoints) {
             prob.x[i] = SvmNodeConverter.toSvmNodeArray(point.getData());
-            prob.y[i] = point.getLabel();
+            prob.y[i] = point.getLabel().asBinary();
             i++;
         }
 

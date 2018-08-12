@@ -89,6 +89,16 @@ public class Validator {
      * @param vector2: one of input arrays
      * @throws IllegalArgumentException arrays have different sizes.
      */
+    public static <T> void assertEqualLengths(T[] vector1, T[] vector2){
+        assertEquals(vector1.length, vector2.length);
+    }
+
+    /**
+     * Raises an exception if input vectors have different sizes.
+     * @param vector1: one of input arrays
+     * @param vector2: one of input arrays
+     * @throws IllegalArgumentException arrays have different sizes.
+     */
     public static void assertEqualLengths(double[] vector1, double[] vector2){
         assertEquals(vector1.length, vector2.length);
     }

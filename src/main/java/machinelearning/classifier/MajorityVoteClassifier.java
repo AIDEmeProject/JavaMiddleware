@@ -40,7 +40,7 @@ public class MajorityVoteClassifier implements Classifier {
     public double probability(DataPoint point) {
         double proba = 0;
         for (Classifier clf : classifiers) {
-            proba += clf.predict(point);
+            proba += clf.predict(point).asBinary();
         }
         return proba / classifiers.length;
     }

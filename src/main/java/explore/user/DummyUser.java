@@ -1,6 +1,7 @@
 package explore.user;
 
 import data.DataPoint;
+import machinelearning.classifier.Label;
 
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class DummyUser implements User {
      * @return 1 if positiveKeys contains data point's id; else 0
      */
     @Override
-    public int getLabel(DataPoint point) {
-        return positiveKeys.contains(point.getId()) ? 1 : 0;
+    public Label getLabel(DataPoint point) {
+        return positiveKeys.contains(point.getId()) ? Label.POSITIVE : Label.NEGATIVE;
     }
 }

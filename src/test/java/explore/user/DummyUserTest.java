@@ -1,8 +1,10 @@
 package explore.user;
 
 import data.DataPoint;
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.omg.PortableServer.POA;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,17 +39,16 @@ class DummyUserTest {
 
     @Test
     void getLabel_testAllIndexes_returnsCorrectLabels() {
+        Label[] labels = new Label[] {Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.NEGATIVE};
         int i = 0;
         for (DataPoint point : points) {
-            int label = (i == 1 || i == 2) ? 1 : 0;
-            assertEquals(label, user.getLabel(point));
-            i++;
+            assertEquals(labels[i++], user.getLabel(point));
         }
     }
 
     @Test
     void getAllLabels_callGetAllLabels_returnsLabelsArray() {
-        assertArrayEquals(new int[] {0,1,1,0}, user.getLabel(points));
+        assertArrayEquals(new Label[] {Label.NEGATIVE,Label.POSITIVE,Label.POSITIVE,Label.NEGATIVE}, user.getLabel(points));
     }
 
 }

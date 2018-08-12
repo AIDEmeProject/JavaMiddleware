@@ -1,5 +1,6 @@
 package data;
 
+import machinelearning.classifier.Label;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,7 +18,7 @@ public class LabeledPoint extends DataPoint {
     /**
      * data point's label
      */
-    private int label;
+    private Label label;
 
     /**
      * @param row: row number of data point
@@ -27,13 +28,8 @@ public class LabeledPoint extends DataPoint {
      * @throws IllegalArgumentException if data is empty
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
-    public LabeledPoint(int row, long id, double[] data, int label) {
+    public LabeledPoint(int row, long id, double[] data, Label label) {
         super(row, id, data);
-
-        if (label < 0 || label > 1) {
-            throw new IllegalArgumentException("Only 1 and 0 labels are supported, received " + label);
-        }
-
         this.label = label;
     }
 
@@ -44,7 +40,7 @@ public class LabeledPoint extends DataPoint {
      * @throws IllegalArgumentException if data is empty
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
-    public LabeledPoint(int row, double[] data, int label) {
+    public LabeledPoint(int row, double[] data, Label label) {
         this(row, row, data, label);
     }
 
@@ -53,11 +49,11 @@ public class LabeledPoint extends DataPoint {
      * @param label: label
      * @throws IllegalArgumentException if label is different from 0 or 1
      */
-    public LabeledPoint(DataPoint point, int label) {
+    public LabeledPoint(DataPoint point, Label label) {
         this(point.row, point.id, point.data, label);
     }
 
-    public int getLabel() {
+    public Label getLabel() {
         return label;
     }
 
@@ -85,7 +81,7 @@ public class LabeledPoint extends DataPoint {
             data[i] = dataArray.getDouble(i);
         }
 
-        return new LabeledPoint(row, id, data, label);
+        return new LabeledPoint(row, id, data, label == 1 ? Label.POSITIVE : Label.NEGATIVE);
     }
 
     /**
@@ -93,7 +89,7 @@ public class LabeledPoint extends DataPoint {
      */
     @Override
     public String toString() {
-        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label + '}';
+        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label.asBinary() + '}';
     }
 
     public LabeledPoint clone(double[] newData){

@@ -110,7 +110,7 @@ public class NearestNeighborsLearner implements Learner {
             for(LabeledPoint point : labeledPoints){
                 // if labeledIndex is one of the k-closest neighbors, increment counters
                 if(Arrays.binarySearch(indexes[i], point.getRow()) >= 0){
-                    sumOfLabelsInLabeledNeighborhood[i] += point.getLabel();
+                    sumOfLabelsInLabeledNeighborhood[i] += point.getLabel().asBinary();
                     labeledNeighborhoodSize[i]++;
                 }
             }

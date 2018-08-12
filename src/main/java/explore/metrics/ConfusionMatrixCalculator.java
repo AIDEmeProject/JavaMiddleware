@@ -3,6 +3,7 @@ package explore.metrics;
 import machinelearning.classifier.Classifier;
 import data.LabeledDataset;
 import explore.user.User;
+import machinelearning.classifier.Label;
 import utils.Validator;
 
 /**
@@ -31,7 +32,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * @throws IllegalArgumentException if inputs have incompatible dimensions, are 0-length arrays, or contain any value
      * different from 1 or 0.
      */
-    public ConfusionMatrix compute(int[] trueLabels, int[] predictedLabels){
+    public ConfusionMatrix compute(Label[] trueLabels, Label[] predictedLabels){
         // validate input
         Validator.assertEqualLengths(trueLabels, predictedLabels);
         Validator.assertNotEmpty(trueLabels);
@@ -40,21 +41,17 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
         int truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
 
         for(int i=0; i < trueLabels.length; i++){
-            if(trueLabels[i] == 1 && predictedLabels[i] == 1){
-                truePositives++;
+            if(predictedLabels[i].isPositive()){
+                if(trueLabels[i].isPositive())
+                    truePositives++;
+                else
+                    falsePositives++;
             }
-            else if(trueLabels[i] == 1 && predictedLabels[i] == 0){
-                falseNegatives++;
-            }
-            else if(trueLabels[i] == 0 && predictedLabels[i] == 1){
-                falsePositives++;
-            }
-            else if(trueLabels[i] == 0 && predictedLabels[i] == 0){
-                trueNegatives++;
-            }
-            else{
-                throw new IllegalArgumentException(
-                        "Only 1 and 0 labels are supported, received " + trueLabels[i] + " and " + predictedLabels[i]);
+            else {
+                if(trueLabels[i].isPositive())
+                    falseNegatives++;
+                else
+                    trueNegatives++;
             }
         }
 

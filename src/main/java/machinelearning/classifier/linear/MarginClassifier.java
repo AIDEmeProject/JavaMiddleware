@@ -2,6 +2,7 @@ package machinelearning.classifier.linear;
 
 import machinelearning.classifier.Classifier;
 import data.DataPoint;
+import machinelearning.classifier.Label;
 
 /**
  * A margin machinelearning.classifier is defined by:
@@ -42,7 +43,7 @@ public abstract class MarginClassifier implements Classifier {
      * @return sign( margin(x) )
      */
     @Override
-    public final int predict(DataPoint point) {
-        return margin(point) > 0 ? 1 : 0;
+    public final Label predict(DataPoint point) {
+        return margin(point) > 0 ? Label.POSITIVE : Label.NEGATIVE;
     }
 }

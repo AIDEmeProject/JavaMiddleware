@@ -41,8 +41,8 @@ public interface Classifier {
      * @param point: data point
      * @return class label of given point
      */
-    default int predict(DataPoint point){
-        return probability(point) > 0.5 ? 1 : 0;
+    default Label predict(DataPoint point){
+        return probability(point) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
     }
 
     /**
@@ -50,8 +50,8 @@ public interface Classifier {
      * @param points: collection of data points
      * @return predicted class labels
      */
-    default int[] predict(Collection<DataPoint> points){
-        int[] labels = new int[points.size()];
+    default Label[] predict(Collection<DataPoint> points){
+        Label[] labels = new Label[points.size()];
 
         int i = 0;
         for (DataPoint point : points) {

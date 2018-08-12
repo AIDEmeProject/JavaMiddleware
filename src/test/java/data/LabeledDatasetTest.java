@@ -1,5 +1,6 @@
 package data;
 
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import java.util.Iterator;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LabeledDatasetTest {
-    private int[] y;
+    private Label[] y;
     private ArrayList<DataPoint> points;
     private LabeledDataset data;
 
@@ -19,7 +20,7 @@ class LabeledDatasetTest {
         double[][] X = new double[][] {{1}, {2}, {3}, {4}};
         computePointsFromMatrix(X);
 
-        y = new int[] {0,0,1,1};
+        y = new Label[] {Label.NEGATIVE, Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE};
         data = new LabeledDataset(points);
     }
 
@@ -125,14 +126,8 @@ class LabeledDatasetTest {
     }
 
     @Test
-    void putOnLabeledSet_invalidLabel_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(points.get(0), -1));
-        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(points.get(0), 2));
-    }
-
-    @Test
     void putOnLabeledSet_incompatibleSizes_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(new ArrayList<>(), new int[]{0, 1}));
+        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(new ArrayList<>(), new Label[]{Label.NEGATIVE, Label.POSITIVE}));
     }
 
     @Test

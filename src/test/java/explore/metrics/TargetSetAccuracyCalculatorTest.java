@@ -1,6 +1,7 @@
 package explore.metrics;
 
 import data.LabeledPoint;
+import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,13 +14,13 @@ class TargetSetAccuracyCalculatorTest {
     private TargetSetAccuracyCalculator calculator;
     private TargetSetAccuracy metric;
     private Collection<LabeledPoint> points;
-    private int[] labels;
+    private Label[] labels;
 
     @BeforeEach
     void setUp() {
         calculator = new TargetSetAccuracyCalculator();
         points = new ArrayList<>();
-        labels = new int[] {0,0,1,0,1};
+        labels = new Label[] {Label.NEGATIVE, Label.NEGATIVE, Label.POSITIVE, Label.NEGATIVE, Label.POSITIVE};
     }
 
     @Test
