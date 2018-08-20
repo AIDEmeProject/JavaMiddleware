@@ -63,6 +63,10 @@ public class DataPoint {
         return data;
     }
 
+    public double get(int i){
+        return data[i];
+    }
+
     /**
      * @return data point's dimension (i.e. number of features)
      */

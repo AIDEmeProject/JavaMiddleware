@@ -77,9 +77,7 @@ public class RunExperiment {
 //        User user = new DummyUser(positiveKeys);
 
         // SCALING
-        StandardScaler scaler = new StandardScaler();
-        scaler.fit(points);
-        points = scaler.transform(points);
+        points = StandardScaler.fit(points).transform(points);
 
         // CLASSIFIER
         // svm

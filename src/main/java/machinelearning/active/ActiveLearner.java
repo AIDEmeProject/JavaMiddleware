@@ -18,7 +18,7 @@ import java.util.Collection;
 public abstract class ActiveLearner implements Learner{
     protected final Learner learner;
 
-    public ActiveLearner(Learner learner) {
+    protected ActiveLearner(Learner learner) {
         this.learner = learner;
     }
 

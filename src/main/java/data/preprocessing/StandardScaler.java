@@ -1,12 +1,12 @@
 package data.preprocessing;
 
 import data.DataPoint;
+import explore.statistics.Statistics;
 import utils.Validator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 /**
  * This class is responsible for standardizing each column of a double matrix; in other words, after processing, each
@@ -26,90 +26,99 @@ public class StandardScaler {
      */
     private double[] std;
 
-    /**
-     * number of points being fit
-     */
-    private int counter;
-
-    /**
-     * @return whether the fit() method was already called
-     */
-    public boolean isFit(){
-        return mean != null && std != null;
+    private StandardScaler(double[] mean, double[] std) {
+        this.mean = mean;
+        this.std = std;
     }
 
     /**
-     * Fit the object to a particular data matrix. Basically, we compute and store the mean and standard deviation of
-     * each column of the input matrix.
-     * @param points: data matrix to fit
+     * Compute the mean and standard deviation of each column in the input collection
+     * @param points: collection of points to fit
+     * @return a Standard Scaler object fitted on the input data
+     * @throws IllegalArgumentException if points is empty, or if any two points have different dimensions, or if
+     * standard deviation of any column is zero
      */
-    public void fit(Collection<DataPoint> points){
+    public static StandardScaler fit(Collection<DataPoint> points){
         Validator.assertNotEmpty(points);
 
+        Statistics[] statistics = computeStatisticsOfEachFeature(points);
+
+        double[] mean = getMeanArrayFromStatistics(statistics);
+        double[] std = getStandardDeviationArrayFromStatistics(statistics);
+
+        return new StandardScaler(mean, std);
+    }
+
+    private static Statistics[] computeStatisticsOfEachFeature(Collection<DataPoint> points) {
         Iterator<DataPoint> pointIterator = points.iterator();
 
-        // initialize mean and std
         DataPoint point = pointIterator.next();
-        mean = Arrays.copyOf(point.getData(), point.getDim());
-        std = new double[point.getDim()];
+        int dim = point.getDim();
 
-        // update mean and variance
-        counter = 1;
-        pointIterator.forEachRemaining(pt -> updateMeanAndStd(pt.getData()));
+        Statistics[] statistics = new Statistics[dim];
+        for (int i = 0; i < dim; i++) {
+            statistics[i] = new Statistics("column", point.get(i));
+        }
 
-        // compute std from variance
-        for (int j = 0; j < std.length; j++) {
-            if (std[j] == 0){
-                throw new IllegalArgumentException("Column number " + j + "has zero standard deviation.");
-            }
+        pointIterator.forEachRemaining(pt -> updateStatisticsGivenNewDataPoint(pt, statistics));
 
-            std[j] = Math.sqrt(std[j] / counter);
+        return statistics;
+    }
+
+    private static void updateStatisticsGivenNewDataPoint(DataPoint point, Statistics[] statistics) {
+        Validator.assertEquals(point.getDim(), statistics.length);
+
+        for (int i = 0; i < statistics.length; i++) {
+            statistics[i].update(point.get(i));
         }
     }
 
-    private void updateMeanAndStd(double[] values){
-        Validator.assertEqualLengths(mean, values);
+    private static double[] getMeanArrayFromStatistics(Statistics[] statistics) {
+        double[] mean = new double[statistics.length];
 
-        counter++;
+        for (int i = 0; i < statistics.length; i++) {
+            mean[i] = statistics[i].getMean();
+        }
 
-        for (int j = 0; j < values.length; j++) {
-            double diff = values[j] - mean[j];
-            mean[j] += diff / counter;
-            std[j] += diff * (values[j] - mean[j]);
+        return mean;
+    }
+
+    private static double[] getStandardDeviationArrayFromStatistics(Statistics[] statistics) {
+        double[] std = new double[statistics.length];
+
+        for (int i = 0; i < statistics.length; i++) {
+            std[i] = statistics[i].getStandardDeviation();
+            validateStandardDeviation(std[i], i);
+        }
+
+        return std;
+    }
+
+    private static void validateStandardDeviation(double standardDeviation, int column) {
+        if (standardDeviation == 0){
+            throw new IllegalArgumentException("Column number " + column + " has zero standard deviation.");
         }
     }
 
     /**
-     * Standardize a given collection of data points. The fit() method must have been called beforehand.
-     * @param X: data to standardize
+     * Standardize a given collection of data points.
+     * @param dataPoints: data to standardize
      * @return a new standardized collection of points
-     * @throws RuntimeException if object was not fit beforehand
-     * @throws IllegalArgumentException if data points have different dimension from expected
+     * @throws IllegalArgumentException if data points have different dimension from fitted data
      */
-    public Collection<DataPoint> transform(Collection<DataPoint> X){
-        if (!isFit()){
-            throw new RuntimeException("Object was not fit; remember to call fit() before calling transform().");
-        }
-
-        Collection<DataPoint> scaled = new ArrayList<>(X.size());
-
-        for (DataPoint point : X){
-            scaled.add(transform(point));
-        }
-
-        return scaled;
+    public Collection<DataPoint> transform(Collection<DataPoint> dataPoints){
+        return dataPoints.stream().map(this::transform).collect(Collectors.toList());
     }
 
-    DataPoint transform(DataPoint point){
+    private DataPoint transform(DataPoint point){
         Validator.assertEquals(point.getDim(), mean.length);
 
-        double[] data = point.getData();
-        double[] scaledData = new double[data.length];
+        double[] scaledData = new double[point.getDim()];
 
-        for (int j = 0; j < data.length; j++) {
-            scaledData[j] = (data[j] - mean[j]) / std[j];
+        for (int j = 0; j < point.getDim(); j++) {
+            scaledData[j] = (point.get(j) - mean[j]) / std[j];
         }
 
-        return new DataPoint(point.getRow(), point.getId(), scaledData);
+        return point.clone(scaledData);
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,8 +20,7 @@ class StandardScalerTest {
 
         computePointsFromMatrix(X);
 
-        scaler = new StandardScaler();
-        scaler.fit(points);
+        scaler = StandardScaler.fit(points);
     }
 
     private void computePointsFromMatrix(double[][] X){
@@ -32,55 +32,47 @@ class StandardScalerTest {
 
     @Test
     void fit_emptyInputCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> scaler.fit(new ArrayList<>()));
+        assertThrows(IllegalArgumentException.class, () -> StandardScaler.fit(new ArrayList<>()));
     }
 
     @Test
-    void fit_constantColumn_throwsException() {
+    void fit_columnOfZeroStandardDeviation_throwsException() {
         computePointsFromMatrix(new double[][] {{1}, {1}, {1}});
-        assertThrows(IllegalArgumentException.class, () -> scaler.fit(points));
+        assertThrows(IllegalArgumentException.class, () -> StandardScaler.fit(points));
+    }
+
+    @Test
+    void fit_inputContainRowsOfDifferentDimensions_throwsException() {
+        computePointsFromMatrix(new double[][] {{1, 2}, {3}});
+        assertThrows(IllegalArgumentException.class, () -> StandardScaler.fit(points));
     }
 
     @Test
     void transform_emptyInputCollection_returnsEmptyCollection() {
-        assertTrue(scaler.transform(new ArrayList<>()).isEmpty());
-    }
-
-    @Test
-    void transform_notFit_throwsException() {
-        scaler = new StandardScaler();
-        assertThrows(RuntimeException.class, () -> scaler.transform(points.get(0)));
+        assertTrue(scaler.transform(Collections.EMPTY_LIST).isEmpty());
     }
 
     @Test
     void transform_inputHasIncompatibleDimension_throwsException() {
         DataPoint point = new DataPoint(0, new double[] {1});
-        assertThrows(RuntimeException.class, () -> scaler.transform(point));
+        Collection<DataPoint> toTransform = new ArrayList<>();
+        toTransform.add(point);
+        assertThrows(RuntimeException.class, () -> scaler.transform(toTransform));
     }
 
     @Test
-    void transform_validInput_correctValueReturned() {
+    void transform_validInput_inputCorrectlyNormalized() {
         double[][] expected = new double[][] {
-                {-1.22474487 , -1.37281294},
-                { 0.         , 0.392232270},
-                { 1.22474487 , 0.980580675}
+                {-1. , -1.120897076},
+                { 0. ,  0.320256307},
+                { 1. ,  0.800640769}
         };
+
         Collection<DataPoint> scaled = scaler.transform(points);
 
         int i = 0;
         for (DataPoint point : scaled) {
             assertArrayEquals(expected[i++], point.getData(), 1e-8);
         }
-    }
-
-    @Test
-    void isFit_objectNotFitted_returnsFalse() {
-        scaler = new StandardScaler();
-        assertFalse(scaler.isFit());
-    }
-
-    @Test
-    void isFit_objectFitted_returnsTrue() {
-        assertTrue(scaler.isFit());
     }
 }

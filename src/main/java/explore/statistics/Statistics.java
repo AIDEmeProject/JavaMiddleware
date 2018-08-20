@@ -4,7 +4,7 @@ package explore.statistics;
  * This class holds statistical information from a particular metric, such as its mean, variance, and number of samples.
  * As new values for the same metric are observed, its internal statistics can be updated as well.
  */
-class Statistics {
+public class Statistics {
     /**
      * Metric's name
      */
@@ -47,6 +47,10 @@ class Statistics {
 
     public double getVariance() {
         return sampleSize == 1 ? 0.0 : variance / (sampleSize - 1);
+    }
+
+    public double getStandardDeviation() {
+        return Math.sqrt(getVariance());
     }
 
     public int getSampleSize() {
