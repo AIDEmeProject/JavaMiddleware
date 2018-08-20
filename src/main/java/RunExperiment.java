@@ -1,8 +1,8 @@
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.GeneralizedBinarySearch;
-import machinelearning.classifier.SVM.Kernel;
-import machinelearning.classifier.SVM.SvmLearner;
-import machinelearning.classifier.SVM.SvmParameterAdapter;
+import machinelearning.classifier.svm.Kernel;
+import machinelearning.classifier.svm.SvmLearner;
+import machinelearning.classifier.svm.SvmParameterAdapter;
 import machinelearning.classifier.linear.MajorityVoteLearner;
 import machinelearning.classifier.linear.GaussianKernel;
 import data.DataPoint;
@@ -111,13 +111,15 @@ public class RunExperiment {
         StratifiedSampler initialSampler = new StratifiedSampler(1, 1);
 
         // EXPLORE
-        Explore explore = new Explore(initialSampler, 50, metricCalculators);
+        int budget = 50;
+        int runs = 1;
+        Explore explore = new Explore(initialSampler, budget, metricCalculators);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
-                explore.run(points, user, entry.getValue(), 1, folder);
+                explore.run(points, user, entry.getValue(), runs, folder);
                 StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
             } catch (Exception ex){
                 ex.printStackTrace();

@@ -2,8 +2,8 @@ package machinelearning.active.learning;
 
 import machinelearning.active.ActiveLearner;
 import machinelearning.classifier.Classifier;
-import machinelearning.classifier.SVM.SvmClassifier;
-import machinelearning.classifier.SVM.SvmLearner;
+import machinelearning.classifier.svm.SvmClassifier;
+import machinelearning.classifier.svm.SvmLearner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;

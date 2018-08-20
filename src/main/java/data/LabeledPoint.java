@@ -57,6 +57,9 @@ public class LabeledPoint extends DataPoint {
         return label;
     }
 
+    /**
+     * @return a new Labeled Point with the value 1 appended to its left
+     */
     public LabeledPoint addBias(){
         double[] dataWithBias = new double[getDim()+1];
         dataWithBias[0] = 1;
@@ -92,6 +95,10 @@ public class LabeledPoint extends DataPoint {
         return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label.asBinary() + '}';
     }
 
+    /**
+     * @param newData: new data array
+     * @return a new LabeledPoint with new data, but the same metadata
+     */
     public LabeledPoint clone(double[] newData){
         return new LabeledPoint(row, id, newData, label);
     }

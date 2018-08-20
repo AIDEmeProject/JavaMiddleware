@@ -30,9 +30,21 @@ public class FolderManager {
     }
 
     /**
-     * @return a new file object
+     * @return a new .run file
      * @throws RuntimeException if file already exists or an IO error occurs
      */
+    public File createNewRunFile() {
+        return createNewFile(System.currentTimeMillis() + ".run");
+    }
+
+    /**
+     * @return a new .average file
+     * @throws RuntimeException if file already exists or an IO error occurs
+     */
+    public File createNewOutputFile() {
+        return createNewFile(System.currentTimeMillis() + ".average");
+    }
+
     private File createNewFile(String filename) {
         String path = folder.getAbsolutePath();
         File newFile = new File(path + File.separator + filename);
@@ -46,18 +58,10 @@ public class FolderManager {
         return newFile;
     }
 
-    public File createNewRunFile() {
-        return createNewFile(System.currentTimeMillis() + ".run");
-    }
-
-    public File createNewOutputFile(){
-        return createNewFile(System.currentTimeMillis() + ".average");
-    }
-
     /**
      * @return list of run files in folder
      */
-    public File[] getRuns(){
+    public File[] getRuns() {
         return folder.listFiles(file -> file.getName().endsWith(".run"));
     }
 }

@@ -1,4 +1,4 @@
-package machinelearning.classifier.SVM;
+package machinelearning.classifier.svm;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

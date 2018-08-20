@@ -1,4 +1,4 @@
-package machinelearning.classifier.SVM;
+package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
 

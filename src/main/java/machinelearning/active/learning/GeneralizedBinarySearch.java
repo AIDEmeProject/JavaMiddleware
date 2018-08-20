@@ -13,8 +13,8 @@ import utils.OptimumFinder;
 import java.util.Collection;
 
 /**
- * This Active Learning class implements the {@link machinelearning.active.learning.versionspace.VersionSpace} bisection rule through sampling
- * (similarly to Query by Committee).
+ * This Active Learning class implements the {@link machinelearning.active.learning.versionspace.VersionSpace} bisection
+ * rule through sampling (similarly to Query by Committee).
  *
  * We also allow for using a different {@link Learner} instance for performing classification. If not provided, a majority vote
  * over the Version Space will be used to make predictions.
