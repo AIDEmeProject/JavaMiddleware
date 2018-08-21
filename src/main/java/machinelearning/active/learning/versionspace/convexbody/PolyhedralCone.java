@@ -18,14 +18,24 @@ import java.util.Collection;
  * @see <a href="https://en.wikipedia.org/wiki/Convex_cone">Convex Cone wiki</a>
  */
 public class PolyhedralCone implements ConvexBody {
+    /**
+     * Collection of labeled points defining this polyhedral cone
+     */
     private final Collection<LabeledPoint> labeledPoints;
 
     /**
-     * @param labeledPoints: set of labeled points to built polytope. \(w_i = y_i x_i\)
+     * Factory instance of LP solvers, used for finding an interior point
      */
-    public PolyhedralCone(Collection<LabeledPoint> labeledPoints) {
+    private final LinearProgramSolver.FACTORY solverFactory;
+
+    /**
+     * @param labeledPoints: set of labeled points to built polytope. \(w_i = y_i x_i\)
+     * @param solverFactory: factory instance for LP solvers
+     */
+    public PolyhedralCone(Collection<LabeledPoint> labeledPoints, LinearProgramSolver.FACTORY solverFactory) {
         Validator.assertNotEmpty(labeledPoints);
         this.labeledPoints = labeledPoints;
+        this.solverFactory = solverFactory;
     }
 
     public int getDim() {
@@ -47,9 +57,9 @@ public class PolyhedralCone implements ConvexBody {
     /**
      * Finding an interior point to the convex cone is done by solving a linear program problem:
      *
-     *  \(maximize_{x, s} s\), subject to \(\langle x, w_i \rangle &gq; s, -1 \leq s, x_i \leq 1\)
+     *  \(maximize_{x, s} s\), subject to \(\langle x, w_i \rangle \leq s, -1 \leq s, x_i \leq 1\)
      *
-     * If optimal solution \(s^*, x^*\) satisfies \(s^* &gt; 0\), then \(x^*\) is an interior point to the polytope.
+     * If the optimal solution \(s^*, x^*\) satisfies \(s^* &gt; 0\), then \(x^*\) is an interior point to the polytope.
      * The \(-1, 1\) constrains are just to bound the problem's solution.
      *
      * @return point interior to this polyhedral cone
@@ -58,7 +68,15 @@ public class PolyhedralCone implements ConvexBody {
     @Override
     public double[] getInteriorPoint() {
         int dim = getDim();
-        LinearProgramSolver solver = LinearProgramSolver.getSolver(LinearProgramSolver.LIBRARY.OJALGO, dim+1);
+
+        LinearProgramSolver solver = solverFactory.getSolver(dim+1);
+        configureLinearProgrammingProblem(solver);
+
+        return parseLinearProgramSolution(solver.findMinimizer());
+    }
+
+    private void configureLinearProgrammingProblem(LinearProgramSolver solver) {
+        int dim = getDim();
 
         double[] constrain = new double[dim+1];
         constrain[0] = 1;
@@ -70,19 +88,18 @@ public class PolyhedralCone implements ConvexBody {
             solver.addLinearConstrain(constrain, labeledPoint.getLabel().isPositive() ? InequalitySign.GEQ : InequalitySign.LEQ, 0);
         }
 
-        for (int i = 0; i < dim+1; i++) {
-            constrain = new double[dim+1];
-            Arrays.fill(constrain, -1);
-            solver.setLower(constrain);
+        constrain = new double[dim+1];
+        Arrays.fill(constrain, -1);
+        solver.setLower(constrain);
 
-            constrain = new double[dim+1];
-            Arrays.fill(constrain, 1);
-            solver.setUpper(constrain);
-        }
+        constrain = new double[dim+1];
+        Arrays.fill(constrain, 1);
+        solver.setUpper(constrain);
+    }
 
-
-        double[] optimalX = new double[dim];
-        System.arraycopy(solver.findMinimizer(), 1, optimalX, 0, dim);
+    private double[] parseLinearProgramSolution(double[] solution) {
+        double[] optimalX = new double[solution.length-1];
+        System.arraycopy(solution, 1, optimalX, 0, optimalX.length);
         return optimalX;
     }
 
@@ -102,6 +119,8 @@ public class PolyhedralCone implements ConvexBody {
      */
     @Override
     public LineSegment computeLineIntersection(Line line) {
+        Validator.assertEquals(getDim(), line.getDim());
+
         double leftBound = Double.NEGATIVE_INFINITY;
         double rightBound = Double.POSITIVE_INFINITY;
 

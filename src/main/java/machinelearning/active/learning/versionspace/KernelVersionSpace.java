@@ -6,6 +6,7 @@ import machinelearning.classifier.margin.KernelClassifier;
 import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
+import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,15 +37,14 @@ public class KernelVersionSpace implements VersionSpace {
     private final Kernel kernel;
 
     /**
-     * @param sampler: Hit-and-Run sampler used for sampling the Version Space
-     * @param addIntercept: whether to sample the bias parameter
+     * @param linearVersionSpace: linear version space instance
      * @param kernel: the kernel function
      * @throws NullPointerException if sampler or kernel is null
      */
-    public KernelVersionSpace(HitAndRunSampler sampler, boolean addIntercept, Kernel kernel) {
-        Validator.assertNotNull(sampler);
+    public KernelVersionSpace(LinearVersionSpace linearVersionSpace, Kernel kernel) {
+        Validator.assertNotNull(linearVersionSpace);
         Validator.assertNotNull(kernel);
-        this.linearVersionSpace = new LinearVersionSpace(sampler, addIntercept);
+        this.linearVersionSpace = linearVersionSpace;
         this.kernel = kernel;
     }
 

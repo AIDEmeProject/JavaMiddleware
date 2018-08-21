@@ -5,6 +5,7 @@ import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
+import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,15 +32,18 @@ public class LinearVersionSpace implements VersionSpace {
      */
     private final HitAndRunSampler sampler;
 
+    private final LinearProgramSolver.FACTORY solverFactory;
+
     /**
      * @param sampler: Hit-and-Run sampler instance
      * @param addIntercept: whether to include the bias \(b\) when sampling
      * @throws NullPointerException if sampler is null
      */
-    public LinearVersionSpace(HitAndRunSampler sampler, boolean addIntercept) {
+    public LinearVersionSpace(HitAndRunSampler sampler, boolean addIntercept, LinearProgramSolver.FACTORY solverFactory) {
         Validator.assertNotNull(sampler);
         this.sampler = sampler;
         this.addIntercept = addIntercept;
+        this.solverFactory = solverFactory;
     }
 
     /**
@@ -62,7 +66,7 @@ public class LinearVersionSpace implements VersionSpace {
         LinearClassifier[] classifiers = new LinearClassifier[numSamples];
 
         int i = 0;
-        for (double[] sampledWeight : sampler.sample(new PolyhedralCone(labeledPoints), numSamples)) {
+        for (double[] sampledWeight : sampler.sample(new PolyhedralCone(labeledPoints, solverFactory), numSamples)) {
             classifiers[i++] = new LinearClassifier(sampledWeight, addIntercept);
         }
 

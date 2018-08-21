@@ -9,14 +9,17 @@ import explore.user.DummyUser;
 import explore.user.User;
 import io.FolderManager;
 import machinelearning.active.ActiveLearner;
+import machinelearning.active.learning.GeneralizedBinarySearch;
 import machinelearning.active.learning.RandomSampler;
 import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
+import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
 import machinelearning.classifier.MajorityVoteLearner;
 import machinelearning.classifier.svm.GaussianKernel;
 import machinelearning.classifier.svm.SvmLearner;
+import utils.linprog.LinearProgramSolver;
 
 import java.io.File;
 import java.util.*;
@@ -83,13 +86,14 @@ public class RunExperiment {
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new LinkedHashMap<>();
-        activeLearners.put("Random Learner svm", new RandomSampler(svm));
-        activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
+        //activeLearners.put("Random Learner svm", new RandomSampler(svm));
+        //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
         HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
-        VersionSpace versionSpace = new KernelVersionSpace(sampler, true, new GaussianKernel());
+        LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, true, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
+        VersionSpace versionSpace = new KernelVersionSpace(linearVersionSpace, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
-        //activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
+        activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
