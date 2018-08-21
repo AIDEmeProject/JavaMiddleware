@@ -1,56 +1,87 @@
 package machinelearning.classifier.svm;
 
-import machinelearning.classifier.Learner;
+import data.DataPoint;
 import data.LabeledPoint;
-import libsvm.svm;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_problem;
+import libsvm.*;
+import machinelearning.classifier.Learner;
+import machinelearning.classifier.margin.KernelClassifier;
 import utils.Validator;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
- * This module is responsible for training an SVM classifier over labeled data.
+ * This module is responsible for training an SVM classifier over labeled data. Basically, it is a wrapper over the
+ * well known libsvm library.
  *
- * @author luciano
+ * <a href="https://www.csie.ntu.edu.tw/">libsvm homepage</a>
+ * <a href="https://www.csie.ntu.edu.tw/~r94100/libsvm-2.8/README">svm training README</a>
  */
 public class SvmLearner implements Learner {
 
     /**
      * SVM training parameters
      */
-    private final SvmParameterAdapter parameter;
+    private final svm_parameter param;
 
-    // Disables libsvm's training output
+    /**
+     * SVM kernel function
+     */
+    private final Kernel kernel;
+
+    // Disable libsvm training output
     static {
         svm.svm_set_print_string_function(s -> {});
     }
 
     /**
-     * Builds SvmLearner from SvmParameterAdapter instance.
-     * @param param: svm parameter instance
+     * @param C: penalty parameter
+     * @param kernel: kernel function
      */
-    public SvmLearner(SvmParameterAdapter param) {
-        this.parameter = param;
+    public SvmLearner(double C, Kernel kernel) {
+        Validator.assertPositive(C);
+
+        param = buildSvmParameterWithDefaultValues();
+        param.C = C;
+        kernel.setSvmParameters(param);
+
+        this.kernel = kernel;
+    }
+
+    private svm_parameter buildSvmParameterWithDefaultValues() {
+        svm_parameter parameter = new svm_parameter();
+
+        // probability estimates (no estimation by default)
+        parameter.probability = 0;
+
+        // DO NOT CHANGE THESE PARAMETERS
+        parameter.svm_type = svm_parameter.C_SVC;
+        parameter.cache_size = 40;  // cache size in MB
+        parameter.eps = 1e-3; // optimization tolerance
+        parameter.shrinking = 1;  // use shrinking optimization
+        parameter.nr_weight = 0;  // no class weights
+        parameter.weight = new double[0];
+
+        return parameter;
     }
 
     /**
      * Trains a SVM classifier over the labeled data.
      * @param labeledPoints: labeled data
-     * @return SVM classifier instance
+     * @return fitted SVM model as a KernelClassifier instance
      */
     @Override
-    public SvmClassifier fit(Collection<LabeledPoint> labeledPoints) {
+    public KernelClassifier fit(Collection<LabeledPoint> labeledPoints) {
         svm_problem prob = buildSvmProblem(labeledPoints);
-        svm_parameter param = parameter.build();
+        svm_parameter parameter = (svm_parameter) param.clone();
 
         // use default gamma if needed
-        if(param.gamma <= 0){
-            param.gamma = 1.0 / prob.x[0].length;
+        if(parameter.gamma <= 0){
+            parameter.gamma = 1.0 / prob.x[0].length;
         }
 
-        return new SvmClassifier(svm.svm_train(prob, param));
+        return parseKernelClassifierFromSvmModel(svm.svm_train(prob, parameter));
+
     }
 
     private svm_problem buildSvmProblem(Collection<LabeledPoint> labeledPoints){
@@ -64,11 +95,24 @@ public class SvmLearner implements Learner {
 
         int i = 0;
         for (LabeledPoint point : labeledPoints) {
-            prob.x[i] = SvmNodeConverter.toSvmNodeArray(point.getData());
-            prob.y[i] = point.getLabel().asBinary();
+            prob.x[i] = SvmNodeConverter.toSvmNode(point.getData());
+            prob.y[i] = point.getLabel().asSign();
             i++;
         }
 
         return prob;
+    }
+
+    private KernelClassifier parseKernelClassifierFromSvmModel(svm_model model) {
+        assert model.rho.length == 1;
+        double bias = -model.rho[0];
+
+        assert model.sv_coef.length == 1;
+        double[] alpha = model.sv_coef[0];
+
+        assert model.sv_coef[0].length == model.SV.length;
+        List<DataPoint> sv = SvmNodeConverter.toDataPoint(model.SV);
+
+        return new KernelClassifier(bias, alpha, sv, kernel);
     }
 }

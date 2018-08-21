@@ -1,127 +1,76 @@
 package machinelearning.classifier.svm;
 
+import data.DataPoint;
+import libsvm.svm_parameter;
 
-import utils.Validator;
+import java.util.Collection;
 
 /**
- * This class encapsulates the choice of kernel for SVM classifier. Four choices are available: linear, polynomial, gaussian
- * (RBF), and sigmoid. In most applications, linear or gaussian kernels are enough.
+ * A kernel is any function k(x,y) satisfying the Mercer conditions:
  *
- * Currently we do not support precomputed or user-defined kernels.
- *
- * If gamma is not set, we use 1.0 / num_features in all computations.
- *
- * @author luciano
+ *      - Symmetry: k(x,y) = k(y,x)
+ *      - Positivity: for all \( \{x_1, \ldots, x_n\}, \) the matrix \(K_{ij} = k(x_i, x_j\) is positive definite
  */
-public class Kernel {
-    private KernelType kernelType = KernelType.RBF;
-    private double gamma = 0;
-    private double coef0 = 0;
-    private int degree = 3;
+public abstract class Kernel {
+    /**
+     * @param x: a vector
+     * @param y: a vector
+     * @return the kernel function applied on the input vectors: k(x,y)
+     */
+    public abstract double compute(double[] x, double[] y);
 
-    public Kernel() {
-    }
-
-    public KernelType getKernelType() {
-        return kernelType;
-    }
-
-    public double getGamma() {
-        return gamma;
-    }
-
-    public double getCoef0() {
-        return coef0;
-    }
-
-    public int getDegree() {
-        return degree;
+    /**
+     * @param x: a data point
+     * @param y: a data point
+     * @return the kernel function applied on the input data points: k(x,y)
+     */
+    public final double compute(DataPoint x, DataPoint y){
+        return compute(x.getData(), y.getData());
     }
 
     /**
-     * Sets a new kernel. Default one is RBF.
-     * @param kernelType: KernelType instance representing the choice of kernel
-     * @return this
-     * @throws NullPointerException is kernelType is null
+     * @param xs a collection of data points
+     * @param y a data point
+     * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
      */
-    public Kernel kernelType(KernelType kernelType){
-        this.kernelType = kernelType;
-        return this;
-    }
+    public final double[] compute(Collection<? extends DataPoint> xs, double[] y){
+        double[] kernelVector = new double[xs.size()];
 
-    /**
-     * Sets a new gamma value. Default one is 1 / num_features.
-     * @param gamma: gamma parameter in RBF and SIGMOID kernels
-     * @return this
-     * @throws IllegalArgumentException is gamma is negative
-     */
-    public Kernel gamma(double gamma){
-        Validator.assertPositive(gamma);
-        this.gamma = gamma;
-        return this;
-    }
-
-    /**
-     * Sets a new coef0 value. Default one 0.
-     * @param coef0: coef0 parameter in RBF, POLY and SIGMOID kernels
-     * @return this
-     * @throws IllegalArgumentException is coef0 is non-positive
-     */
-    public Kernel coef0(double coef0){
-        Validator.assertNonNegative(coef0);
-        this.coef0 = coef0;
-        return this;
-    }
-
-    /**
-     * Sets a new degree value. Default one 3.
-     * @param degree: polynome degree in POLY kernel
-     * @return this
-     * @throws IllegalArgumentException is degree is negative
-     */
-    public Kernel degree(int degree){
-        Validator.assertPositive(degree);
-        this.degree = degree;
-        return this;
-    }
-
-    /**
-     * Computes the kernel function over x and y
-     * @param x: first parameter
-     * @param y: second parameter
-     * @return k(x,y)
-     * @throws IllegalArgumentException if x and y have different sizes
-     */
-    public double compute(double[] x, double[] y){
-        Validator.assertEqualLengths(x, y);
-
-        // use default gamma if needed
-        double gamma = (this.gamma > 0) ? this.gamma : 1.0 / x.length;
-
-        switch (this.kernelType){
-            case LINEAR:
-                return dot(x,y);
-            case POLY:
-                return Math.pow(gamma * dot(x,y) + coef0, degree);
-            case RBF:
-                return Math.exp(-gamma * squaredDifference(x,y));
-            case SIGMOID:
-                return Math.tanh(gamma * dot(x, y) + coef0);
-            default:
-                throw new RuntimeException("Invalid kernel type found.");
+        int i = 0;
+        for (DataPoint x : xs) {
+            kernelVector[i++] = compute(x.getData(), y);
         }
 
+        return kernelVector;
     }
 
-    private static double squaredDifference(double[] x, double[] y){
-        return dot(x,x) + dot(y,y) - 2*dot(x,y);
+    /**
+     * @param xs a collection of data points
+     * @param y a data point
+     * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
+     */
+    public final double[] compute(Collection<? extends DataPoint> xs, DataPoint y){
+        return compute(xs, y.getData());
     }
 
-    private static double dot(double[] x, double[] y) {
-        double sum = 0.0D;
-        for(int i=0; i < x.length; i++) {
-            sum += x[i] * y[i];
+    /**
+     * @param xs a collection of data points
+     * @return the kernel matrix \(K_{ij} = k(x_i, x_j)\)
+     */
+    public final double[][] compute(Collection<? extends DataPoint> xs){
+        double[][] kernelMatrix = new double[xs.size()][xs.size()];
+
+        int i = 0;
+        for (DataPoint x : xs) {
+            kernelMatrix[i++] = compute(xs, x);
         }
-        return sum;
+
+        return kernelMatrix;
     }
+
+    /**
+     * Utility method for setting the libsvm's training parameters
+     * @see SvmLearner
+     */
+     abstract void setSvmParameters(svm_parameter parameters);
 }

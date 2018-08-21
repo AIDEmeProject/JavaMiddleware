@@ -1,12 +1,12 @@
 package machinelearning.active.learning;
 
-import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.svm.SvmClassifier;
-import machinelearning.classifier.svm.SvmLearner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import machinelearning.active.ActiveLearner;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.margin.MarginClassifier;
+import machinelearning.classifier.svm.SvmLearner;
 import utils.OptimumFinder;
 import utils.Validator;
 
@@ -28,7 +28,7 @@ public class SimpleMargin extends ActiveLearner {
     /**
      * SVM classifier
      */
-    private SvmClassifier classifier;
+    private MarginClassifier classifier;
 
     public SimpleMargin(SvmLearner learner) {
         super(learner);
@@ -36,7 +36,7 @@ public class SimpleMargin extends ActiveLearner {
 
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        classifier = (SvmClassifier) super.fit(labeledPoints);
+        classifier = (MarginClassifier) super.fit(labeledPoints);
         return classifier;
     }
 

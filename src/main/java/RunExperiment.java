@@ -1,24 +1,22 @@
-import machinelearning.active.ActiveLearner;
-import machinelearning.active.learning.GeneralizedBinarySearch;
-import machinelearning.classifier.svm.Kernel;
-import machinelearning.classifier.svm.SvmLearner;
-import machinelearning.classifier.svm.SvmParameterAdapter;
-import machinelearning.classifier.linear.MajorityVoteLearner;
-import machinelearning.classifier.linear.GaussianKernel;
 import data.DataPoint;
+import data.preprocessing.StandardScaler;
 import explore.Explore;
-import io.FolderManager;
 import explore.metrics.ConfusionMatrixCalculator;
 import explore.metrics.MetricCalculator;
 import explore.metrics.TargetSetAccuracyCalculator;
-import data.preprocessing.StandardScaler;
-import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
 import explore.sampling.StratifiedSampler;
 import explore.user.DummyUser;
 import explore.user.User;
-import explore.statistics.StatisticsCalculator;
+import io.FolderManager;
+import machinelearning.active.ActiveLearner;
+import machinelearning.active.learning.RandomSampler;
+import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
+import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
+import machinelearning.classifier.MajorityVoteLearner;
+import machinelearning.classifier.svm.GaussianKernel;
+import machinelearning.classifier.svm.SvmLearner;
 
 import java.io.File;
 import java.util.*;
@@ -81,24 +79,17 @@ public class RunExperiment {
 
         // CLASSIFIER
         // svm
-        SvmParameterAdapter params = new SvmParameterAdapter();
-        params = params
-                .C(1000)
-                .kernel(new Kernel())
-                .probability(false);
-        SvmLearner svm = new SvmLearner(params);
+        SvmLearner svm = new SvmLearner(1000, new GaussianKernel());
 
         // ACTIVE LEARNER
         Map<String, ActiveLearner> activeLearners = new LinkedHashMap<>();
-//        activeLearners.put("Random Learner svm", new RandomSampler(svm));
-//        activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
+        activeLearners.put("Random Learner svm", new RandomSampler(svm));
+        activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
         HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
         VersionSpace versionSpace = new KernelVersionSpace(sampler, true, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
-        activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
-
-        //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
+        //activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -118,7 +109,7 @@ public class RunExperiment {
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
                 explore.run(points, user, entry.getValue(), runs, folder);
-                StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
+                //StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
             } catch (Exception ex){
                 ex.printStackTrace();
             }

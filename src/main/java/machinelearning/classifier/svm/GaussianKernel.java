@@ -1,7 +1,9 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.svm;
 
+import libsvm.svm_parameter;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
+
 
 /**
  * The gaussian kernel is defined as:
@@ -36,5 +38,16 @@ public class GaussianKernel extends Kernel {
     public double compute(double[] x, double[] y) {
         double gamma = this.gamma > 0 ? this.gamma : 1.0 / x.length;
         return Math.exp(-gamma * LinearAlgebra.sqDistance(x, y));
+    }
+
+    @Override
+    void setSvmParameters(svm_parameter parameters) {
+        parameters.kernel_type = svm_parameter.RBF;
+        parameters.gamma = gamma;
+    }
+
+    @Override
+    public String toString() {
+        return "Gaussian Kernel gamma=" + gamma;
     }
 }
