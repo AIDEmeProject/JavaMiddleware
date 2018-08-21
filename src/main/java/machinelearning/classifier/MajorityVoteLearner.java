@@ -1,10 +1,8 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier;
 
-import machinelearning.classifier.Learner;
-import machinelearning.classifier.MajorityVoteClassifier;
 import data.LabeledPoint;
-import utils.Validator;
 import machinelearning.active.learning.versionspace.VersionSpace;
+import utils.Validator;
 
 import java.util.Collection;
 
@@ -41,6 +39,7 @@ public class MajorityVoteLearner implements Learner {
      */
     @Override
     public MajorityVoteClassifier fit(Collection<LabeledPoint> labeledPoints) {
+        Validator.assertNotEmpty(labeledPoints);
         return new MajorityVoteClassifier(versionSpace.sample(labeledPoints, sampleSize));
     }
 }
