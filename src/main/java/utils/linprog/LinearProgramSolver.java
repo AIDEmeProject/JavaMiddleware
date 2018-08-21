@@ -26,6 +26,30 @@ public interface LinearProgramSolver {
     }
 
     /**
+     * Factory class for instantiating LP solvers from a particular library. This is used in order to decouple our code
+     * from the chosen LP library.
+     */
+    class FACTORY {
+        private LIBRARY library;
+
+        private FACTORY(LIBRARY library) {
+            this.library = library;
+        }
+
+        public LinearProgramSolver getSolver(int dim) {
+            return LinearProgramSolver.getSolver(library, dim);
+        }
+    }
+
+    /**
+     * @param library LP library to use
+     * @return a LinearProgrammingSolver factory which consistently returns solvers from the input library
+     */
+    static FACTORY getFactory(LIBRARY library) {
+        return new FACTORY(library);
+    }
+
+    /**
      * @param library: LP solver library
      * @param dim: expected dimension of vector constraints
      * @return a LP solver from a given library
