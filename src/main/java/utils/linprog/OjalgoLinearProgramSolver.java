@@ -20,7 +20,6 @@ public class OjalgoLinearProgramSolver implements LinearProgramSolver {
     private final ExpressionsBasedModel tmpModel;
 
     public OjalgoLinearProgramSolver(int dim){
-        Validator.assertPositive(dim);
         this.dim = dim;
         this.numConstrains = 0;
         this.tmpModel = new ExpressionsBasedModel();

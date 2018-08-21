@@ -18,7 +18,6 @@ public class ApacheLinearProgramSolver implements LinearProgramSolver {
     private final Collection<LinearConstraint> constraints;
 
     ApacheLinearProgramSolver(int dim) {
-        Validator.assertPositive(dim);
         this.dim = dim;
         this.constraints = new ArrayList<>();
     }

@@ -1,5 +1,7 @@
 package utils.linprog;
 
+import utils.Validator;
+
 /**
  * Wrapper of most common Linear Programming (LP) solvers available in java. A LP refers to the problem:
  *
@@ -29,6 +31,7 @@ public interface LinearProgramSolver {
      * @return a LP solver from a given library
      */
     static LinearProgramSolver getSolver(LIBRARY library, int dim){
+        Validator.assertPositive(dim);
         switch(library) { 
             case APACHE:
                 return new ApacheLinearProgramSolver(dim);
