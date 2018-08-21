@@ -1,4 +1,4 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.margin;
 
 import utils.Validator;
 import utils.linalg.LinearAlgebra;

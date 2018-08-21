@@ -1,6 +1,7 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.margin;
 
 import data.DataPoint;
+import machinelearning.classifier.svm.Kernel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

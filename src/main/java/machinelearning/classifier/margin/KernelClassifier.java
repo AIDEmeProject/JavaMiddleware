@@ -1,6 +1,7 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.margin;
 
 import data.DataPoint;
+import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.margin;
 
 import data.DataPoint;
 import org.junit.jupiter.api.BeforeEach;

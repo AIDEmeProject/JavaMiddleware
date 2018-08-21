@@ -1,11 +1,11 @@
-package machinelearning.classifier.linear;
+package machinelearning.classifier.margin;
 
-import machinelearning.classifier.Classifier;
 import data.DataPoint;
+import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 
 /**
- * A margin machinelearning.classifier is defined by:
+ * A margin classifier is defined by:
  *
  *      \( h(x) = sign( T(x) ) \)
  *
