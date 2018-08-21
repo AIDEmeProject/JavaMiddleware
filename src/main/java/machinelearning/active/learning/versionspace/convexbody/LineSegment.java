@@ -49,6 +49,14 @@ public class LineSegment {
         this.rightBound = rightBound;
     }
 
+    public double getLeftBound() {
+        return leftBound;
+    }
+
+    public double getRightBound() {
+        return rightBound;
+    }
+
     /**
      * @return a random point in the line segment.
      */
