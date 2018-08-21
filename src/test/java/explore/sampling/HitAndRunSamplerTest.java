@@ -1,12 +1,12 @@
 package explore.sampling;
 
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.Line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
-import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.Line;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;

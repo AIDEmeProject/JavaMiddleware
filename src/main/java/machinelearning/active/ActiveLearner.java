@@ -1,10 +1,10 @@
 package machinelearning.active;
 
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Learner;
 import utils.Validator;
 
 import java.util.Collection;

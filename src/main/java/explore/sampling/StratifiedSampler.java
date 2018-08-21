@@ -2,7 +2,6 @@ package explore.sampling;
 
 import data.DataPoint;
 import explore.user.User;
-import machinelearning.classifier.Label;
 import utils.Validator;
 
 import java.util.ArrayList;

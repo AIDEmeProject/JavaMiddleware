@@ -1,10 +1,10 @@
 package machinelearning.active.learning;
 
-import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
 import explore.sampling.ReservoirSampler;
+import machinelearning.active.ActiveLearner;
+import machinelearning.classifier.Learner;
 
 /**
  * The RandomSampler is the most used baseline active. Basically, at every iteration it randomly samples one point from

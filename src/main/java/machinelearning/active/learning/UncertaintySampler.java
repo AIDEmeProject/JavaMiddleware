@@ -1,11 +1,11 @@
 package machinelearning.active.learning;
 
-import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Learner;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import machinelearning.active.ActiveLearner;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Learner;
 import utils.OptimumFinder;
 import utils.Validator;
 

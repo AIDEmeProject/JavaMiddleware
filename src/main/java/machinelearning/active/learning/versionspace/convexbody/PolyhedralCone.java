@@ -1,7 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
-import machinelearning.classifier.Label;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;

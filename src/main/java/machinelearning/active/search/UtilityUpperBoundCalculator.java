@@ -1,7 +1,7 @@
 package machinelearning.active.search;
 
-import machinelearning.classifier.Classifier;
 import data.LabeledDataset;
+import machinelearning.classifier.Classifier;
 
 /**
  * Tree Search optimization method described in [1]. The optimization consists of pruning the tree search by

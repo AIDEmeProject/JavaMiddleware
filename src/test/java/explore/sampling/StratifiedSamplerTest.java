@@ -1,10 +1,10 @@
 package explore.sampling;
 
 import data.DataPoint;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import explore.user.DummyUser;
 import explore.user.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;

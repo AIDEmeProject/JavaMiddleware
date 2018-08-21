@@ -1,15 +1,15 @@
 package explore;
 
-import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import io.FolderManager;
 import explore.metrics.MetricCalculator;
 import explore.sampling.ReservoirSampler;
 import explore.sampling.StratifiedSampler;
 import explore.user.User;
+import io.FolderManager;
+import machinelearning.active.ActiveLearner;
+import machinelearning.classifier.Classifier;
 import utils.Validator;
 
 import java.io.BufferedWriter;

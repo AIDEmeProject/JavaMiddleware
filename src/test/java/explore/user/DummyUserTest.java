@@ -4,7 +4,6 @@ import data.DataPoint;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.omg.PortableServer.POA;
 
 import java.util.ArrayList;
 import java.util.Collection;

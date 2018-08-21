@@ -1,9 +1,9 @@
 package machinelearning.classifier.neighbors;
 
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Learner;
 import data.DataPoint;
 import data.LabeledPoint;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Learner;
 import smile.neighbor.KDTree;
 import smile.neighbor.Neighbor;
 import utils.Validator;

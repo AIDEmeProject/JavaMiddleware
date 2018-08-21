@@ -1,8 +1,8 @@
 package explore.metrics;
 
-import machinelearning.classifier.Classifier;
 import data.LabeledDataset;
 import explore.user.User;
+import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import utils.Validator;
 

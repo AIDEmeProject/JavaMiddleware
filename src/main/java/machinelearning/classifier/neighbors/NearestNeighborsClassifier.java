@@ -1,8 +1,8 @@
 package machinelearning.classifier.neighbors;
 
-import machinelearning.classifier.Classifier;
 import data.DataPoint;
 import data.LabeledDataset;
+import machinelearning.classifier.Classifier;
 import utils.OptimumFinder;
 import utils.Validator;
 

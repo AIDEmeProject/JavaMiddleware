@@ -1,7 +1,7 @@
 package machinelearning.active.learning.versionspace;
 
-import machinelearning.classifier.Classifier;
 import data.LabeledPoint;
+import machinelearning.classifier.Classifier;
 
 import java.util.Collection;
 

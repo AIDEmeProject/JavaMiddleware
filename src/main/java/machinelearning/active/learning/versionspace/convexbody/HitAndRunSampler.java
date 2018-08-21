@@ -1,8 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
-import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.Line;
 
 /**
  * The Hit-and-Run Sampler is an algorithm for sampling points uniformly at random from a bounded convex body K. This

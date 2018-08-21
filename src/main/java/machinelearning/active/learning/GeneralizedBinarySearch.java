@@ -1,13 +1,13 @@
 package machinelearning.active.learning;
 
+import data.DataPoint;
+import data.LabeledDataset;
+import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.MajorityVoteClassifier;
-import machinelearning.classifier.linear.MajorityVoteLearner;
-import data.DataPoint;
-import data.LabeledDataset;
-import data.LabeledPoint;
+import machinelearning.classifier.MajorityVoteLearner;
 import utils.OptimumFinder;
 
 import java.util.Collection;

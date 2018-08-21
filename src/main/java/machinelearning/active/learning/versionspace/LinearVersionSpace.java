@@ -1,10 +1,10 @@
 package machinelearning.active.learning.versionspace;
 
-import machinelearning.classifier.linear.LinearClassifier;
 import data.LabeledPoint;
 import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
-import utils.Validator;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
+import machinelearning.classifier.margin.LinearClassifier;
+import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
