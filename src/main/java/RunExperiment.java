@@ -10,10 +10,10 @@ import explore.user.User;
 import io.FolderManager;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.GeneralizedBinarySearch;
-import machinelearning.active.learning.RandomSampler;
-import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
+import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
+import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
 import machinelearning.classifier.MajorityVoteLearner;
@@ -89,8 +89,10 @@ public class RunExperiment {
         //activeLearners.put("Random Learner svm", new RandomSampler(svm));
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
-        HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
-        LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, true, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
+        HitAndRunSampler sampler = new HitAndRunSampler(100, 100);
+        LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
+        linearVersionSpace.addIntercept();
+        //linearVersionSpace.setSampleCachingStrategy(new SampleCache());
         VersionSpace versionSpace = new KernelVersionSpace(linearVersionSpace, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
         activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));

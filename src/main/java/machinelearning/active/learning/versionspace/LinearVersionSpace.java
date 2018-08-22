@@ -1,14 +1,13 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledPoint;
-import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
-import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
+import machinelearning.active.learning.versionspace.convexbody.*;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
 import utils.linprog.LinearProgramSolver;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * The Version Space for the {@link LinearClassifier}. Mathematically, it can be defined by a set of linear inequalities:
@@ -25,25 +24,56 @@ public class LinearVersionSpace implements VersionSpace {
     /**
      * Whether to add intercept to data points
      */
-    private final boolean addIntercept;
+    private boolean addIntercept;
 
     /**
-     * Hit-and-Run sampler
+     * {@link HitAndRunSampler} instance for sampling from this version space
      */
     private final HitAndRunSampler sampler;
 
+    /**
+     * {@link LinearProgramSolver} factory
+     */
     private final LinearProgramSolver.FACTORY solverFactory;
 
     /**
+     * {@link SampleCache} sample caching procedure
+     */
+    private SampleCache sampleCache;
+
+    /**
+     * By default, no intercept and no sample caching is performed.
+     *
      * @param sampler: Hit-and-Run sampler instance
-     * @param addIntercept: whether to include the bias \(b\) when sampling
+     * @param solverFactory: {@link LinearProgramSolver} factory object
      * @throws NullPointerException if sampler is null
      */
-    public LinearVersionSpace(HitAndRunSampler sampler, boolean addIntercept, LinearProgramSolver.FACTORY solverFactory) {
-        Validator.assertNotNull(sampler);
+    public LinearVersionSpace(HitAndRunSampler sampler, LinearProgramSolver.FACTORY solverFactory) {
         this.sampler = sampler;
-        this.addIntercept = addIntercept;
+        this.addIntercept = false;
         this.solverFactory = solverFactory;
+        this.sampleCache = new DummySampleCache();
+    }
+
+    /**
+     * Also sample intercept of Linear Classifiers
+     */
+    public void addIntercept() {
+        this.addIntercept = true;
+    }
+
+    /**
+     * Do not sample the intercept of Linear Classifiers (default)
+     */
+    public void dropIntercept() {
+        this.addIntercept = false;
+    }
+
+    /**
+     * @param sampleCache: new sample caching strategy to use
+     */
+    public void setSampleCachingStrategy(SampleCache sampleCache) {
+        this.sampleCache = sampleCache;
     }
 
     /**
@@ -55,19 +85,31 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
-        if(addIntercept){
-            Collection<LabeledPoint> labeledPointsWithBias = new ArrayList<>(labeledPoints.size());
-            for (LabeledPoint point : labeledPoints){
-                labeledPointsWithBias.add(point.addBias());
-            }
-            labeledPoints = labeledPointsWithBias;
+        ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
+        cone = sampleCache.attemptToSetDefaultInteriorPoint(cone);
+
+        double[][] samples = sampler.sample(cone, numSamples);
+
+        sampleCache.updateCache(samples);
+
+        return getLinearClassifiers(samples);
+    }
+
+    private Collection<LabeledPoint> addIntercept(Collection<LabeledPoint> labeledPoints) {
+        if (!addIntercept){
+            return labeledPoints;
         }
 
-        LinearClassifier[] classifiers = new LinearClassifier[numSamples];
+        return labeledPoints.stream()
+                .map(LabeledPoint::addBias)
+                .collect(Collectors.toList());
+    }
 
-        int i = 0;
-        for (double[] sampledWeight : sampler.sample(new PolyhedralCone(labeledPoints, solverFactory), numSamples)) {
-            classifiers[i++] = new LinearClassifier(sampledWeight, addIntercept);
+    private LinearClassifier[] getLinearClassifiers(double[][] samples) {
+        LinearClassifier[] classifiers = new LinearClassifier[samples.length];
+
+        for (int i = 0; i < samples.length; i++) {
+            classifiers[i] = new LinearClassifier(samples[i], addIntercept);
         }
 
         return classifiers;
