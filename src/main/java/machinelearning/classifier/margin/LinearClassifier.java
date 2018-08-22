@@ -60,17 +60,18 @@ public class LinearClassifier extends MarginClassifier {
      */
     public int getDim() { return weights.length; }
 
-    public double getBias() { return bias; }
-
-    public double[] getWeights() {
-        //TODO: return copy so to avoid unintended changes?
-        return weights;
-    }
-
     /**
      * Compute bias + weight^T x
      */
     public double margin(double[] x){
         return bias + LinearAlgebra.dot(x, weights);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LinearClassifier that = (LinearClassifier) o;
+        return Double.compare(that.bias, bias) == 0 && Arrays.equals(weights, that.weights);
     }
 }
