@@ -20,4 +20,15 @@ public class LinearAlgebra {
     public static double sqDistance(double[] x, double[] y){
         return dot(x, x) + dot(y, y) - 2 * dot(x, y);
     }
+
+    public static double[] truncateOrPaddleWithZeros(double[] values, int size) {
+        if (values.length == size){
+            return values;
+        }
+
+        double[] result = new double[size];
+        System.arraycopy(values, 0, result, 0, Math.min(values.length, size));
+
+        return result;
+    }
 }
