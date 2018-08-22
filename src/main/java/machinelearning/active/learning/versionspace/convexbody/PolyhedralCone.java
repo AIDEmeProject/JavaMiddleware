@@ -9,6 +9,7 @@ import utils.linprog.LinearProgramSolver;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A polyhedral cone is a convex body defined by a set of homogeneous linear equations:
@@ -67,9 +68,7 @@ public class PolyhedralCone implements ConvexBody {
     // TODO: is there a mechanism to stop the LP solver once a s > 0 point has been found?
     @Override
     public double[] getInteriorPoint() {
-        int dim = getDim();
-
-        LinearProgramSolver solver = solverFactory.getSolver(dim+1);
+        LinearProgramSolver solver = solverFactory.getSolver(getDim()+1);
         configureLinearProgrammingProblem(solver);
 
         return parseLinearProgramSolution(solver.findMinimizer());
@@ -153,5 +152,16 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         return  line.getSegment(leftBound, rightBound);
+    }
+
+    /**
+     * @return true if both objects are PolyhedralCone instances containing the same labeled data.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PolyhedralCone that = (PolyhedralCone) o;
+        return Objects.equals(labeledPoints, that.labeledPoints);
     }
 }

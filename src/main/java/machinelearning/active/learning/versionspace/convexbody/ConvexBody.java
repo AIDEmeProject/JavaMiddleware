@@ -13,6 +13,11 @@ package machinelearning.active.learning.versionspace.convexbody;
  */
 public interface ConvexBody {
     /**
+     * @return dimension of the enclosing euclidean space
+     */
+    int getDim();
+
+    /**
      * @param x: a point in the euclidean space
      * @return whether the point x is inside or outside the convex body
      */
