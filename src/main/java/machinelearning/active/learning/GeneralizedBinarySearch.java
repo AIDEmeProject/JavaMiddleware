@@ -23,20 +23,14 @@ public class GeneralizedBinarySearch extends ActiveLearner {
 
     private final MajorityVoteLearner majorityVoteLearner;
     private MajorityVoteClassifier majorityVoteClassifier;
-    private final boolean isSame;
-
-    private GeneralizedBinarySearch(Learner learner, MajorityVoteLearner majorityVoteLearner, boolean isSame){
-        super(learner);
-        this.majorityVoteLearner = majorityVoteLearner;
-        this.isSame = isSame;
-    }
 
     /**
      * @param learner: {@link Learner} used for training a classifier over labeled data
      * @param majorityVoteLearner: {@link MajorityVoteLearner} used for sampling the Version Space
      */
     public GeneralizedBinarySearch(Learner learner, MajorityVoteLearner majorityVoteLearner) {
-        this(learner, majorityVoteLearner, false);
+       super(learner);
+       this.majorityVoteLearner = majorityVoteLearner;
     }
 
     /**
@@ -44,7 +38,7 @@ public class GeneralizedBinarySearch extends ActiveLearner {
      * Space and making label predictions
      */
     public GeneralizedBinarySearch(MajorityVoteLearner majorityVoteLearner) {
-        this(majorityVoteLearner, majorityVoteLearner, true);
+        this(majorityVoteLearner, majorityVoteLearner);
     }
 
     /**
@@ -57,7 +51,7 @@ public class GeneralizedBinarySearch extends ActiveLearner {
     @Override
     public Classifier fit(Collection<LabeledPoint> labeledPoints) {
         majorityVoteClassifier = majorityVoteLearner.fit(labeledPoints);
-        return isSame ? majorityVoteClassifier : super.fit(labeledPoints);
+        return learner == majorityVoteLearner ? majorityVoteClassifier : super.fit(labeledPoints);
     }
 
     @Override
