@@ -89,10 +89,10 @@ public class RunExperiment {
         //activeLearners.put("Random Learner svm", new RandomSampler(svm));
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
-        HitAndRunSampler sampler = new HitAndRunSampler(100, 100);
+        HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
         LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
         linearVersionSpace.addIntercept();
-        //linearVersionSpace.setSampleCachingStrategy(new SampleCache());
+        linearVersionSpace.setSampleCachingStrategy(new SampleCache());
         VersionSpace versionSpace = new KernelVersionSpace(linearVersionSpace, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
         activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));

@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
+import machinelearning.classifier.margin.LinearClassifier;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
@@ -10,11 +11,12 @@ import utils.linprog.LinearProgramSolver;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A polyhedral cone is a convex body defined by a set of homogeneous linear equations:
  *
- *      \( {x : \langle x, w_i \rangle &gq; 0} \)
+ *      \( {x : \langle x, w_i \rangle /geq 0} \)
  *
  * @see <a href="https://en.wikipedia.org/wiki/Convex_cone">Convex Cone wiki</a>
  */
@@ -45,14 +47,7 @@ public class PolyhedralCone implements ConvexBody {
 
     @Override
     public boolean isInside(double[] x) {
-        Validator.assertEquals(x.length, getDim());
-
-        for (LabeledPoint point : labeledPoints){
-            if (point.getLabel().asSign() * LinearAlgebra.dot(x, point.getData()) <= 0){
-                return false;
-            }
-        }
-        return true;
+        return !getSeparatingHyperplane(x).isPresent();
     }
 
     /**
@@ -71,7 +66,9 @@ public class PolyhedralCone implements ConvexBody {
         LinearProgramSolver solver = solverFactory.getSolver(getDim()+1);
         configureLinearProgrammingProblem(solver);
 
-        return parseLinearProgramSolution(solver.findMinimizer());
+        double[] interiorPoint = parseLinearProgramSolution(solver.findMinimizer());
+
+        return LinearAlgebra.normalize(interiorPoint, 0.9);  // normalize point so it is contained on the unit ball
     }
 
     private void configureLinearProgrammingProblem(LinearProgramSolver solver) {
@@ -142,7 +139,7 @@ public class PolyhedralCone implements ConvexBody {
         // ball intersection
         double a = LinearAlgebra.sqNorm(line.getDirection());
         double b = LinearAlgebra.dot(line.getCenter(), line.getDirection());
-        double c = LinearAlgebra.sqNorm(line.getCenter()) - line.getDim();
+        double c = LinearAlgebra.sqNorm(line.getCenter()) - 1;  //line.getDim();
         SecondDegreeEquationSolver.SecondDegreeEquationSolution solution = SecondDegreeEquationSolver.solve(a, b, c);
         leftBound = Math.max(leftBound, solution.getFirst());
         rightBound = Math.min(rightBound, solution.getSecond());
@@ -152,6 +149,23 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         return  line.getSegment(leftBound, rightBound);
+    }
+
+    @Override
+    public Optional<LinearClassifier> getSeparatingHyperplane(double[] x) {
+        Validator.assertEquals(x.length, getDim());
+
+        if (LinearAlgebra.sqNorm(x) > 1) {
+            return Optional.of(new LinearClassifier(0, x));
+        }
+
+        for (LabeledPoint point : labeledPoints) {
+            if (point.getLabel().asSign() * LinearAlgebra.dot(x, point.getData()) < 0){
+                return Optional.of(new LinearClassifier(0, point.getData()));
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**

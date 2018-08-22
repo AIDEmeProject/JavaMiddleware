@@ -1,6 +1,9 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
+import machinelearning.classifier.margin.LinearClassifier;
 import utils.linalg.LinearAlgebra;
+
+import java.util.Optional;
 
 /**
  * The SampleCache is a module for caching samples from the {@link machinelearning.active.learning.versionspace.LinearVersionSpace}
@@ -81,6 +84,11 @@ public class SampleCache {
         @Override
         public LineSegment computeLineIntersection(Line line) {
             return convexBody.computeLineIntersection(line);
+        }
+
+        @Override
+        public Optional<LinearClassifier> getSeparatingHyperplane(double[] x) {
+            return convexBody.getSeparatingHyperplane(x);
         }
     }
 }

@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class SampleCacheTest {
     private ConvexBody body;
@@ -53,5 +52,27 @@ class SampleCacheTest {
         ConvexBody result = cache.attemptToSetDefaultInteriorPoint(body);
 
         assertArrayEquals(toCache[1], result.getInteriorPoint());
+    }
+
+    @Test
+    void attemptToSetDefaultInteriorPoint_cachedSamplesIsInsideConvexBody_callingAnyMethodDifferentFromGetInteriorPointDefaultsToInputBody() {
+        cache.updateCache(new double[][] {{1}, {2}});
+        when(body.getDim()).thenReturn(1);
+        when(body.isInside(any())).thenReturn(true);
+
+        ConvexBody result = cache.attemptToSetDefaultInteriorPoint(body);
+        reset(body);
+
+        result.getSeparatingHyperplane(any());
+        verify(body).getSeparatingHyperplane(any());
+
+        result.getDim();
+        verify(body).getDim();
+
+        result.computeLineIntersection(any());
+        verify(body).computeLineIntersection(any());
+
+        result.isInside(any());
+        verify(body).isInside(any());
     }
 }

@@ -2,17 +2,19 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
 import machinelearning.classifier.Label;
+import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.LinearAlgebra;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +32,7 @@ class PolyhedralConeTest {
 
     @Test
     void constructor_emptyLabeledPoints_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new PolyhedralCone(Collections.EMPTY_LIST, any()));
+        assertThrows(IllegalArgumentException.class, () -> new PolyhedralCone(Collections.EMPTY_LIST, mock(LinearProgramSolver.FACTORY.class)));
     }
 
     @Test
@@ -45,7 +47,7 @@ class PolyhedralConeTest {
 
     @Test
     void isInside_pointOnInteriorOfCone_returnsTrue() {
-        assertTrue(cone.isInside(new double[] {1, -1}));
+        assertTrue(cone.isInside(new double[] {0.5, -0.5}));
     }
 
     @Test
@@ -56,9 +58,9 @@ class PolyhedralConeTest {
     }
 
     @Test
-    void isInside_pointOnBoundaryOfCone_returnsFalse() {
-        assertFalse(cone.isInside(new double[] {1, 0}));
-        assertFalse(cone.isInside(new double[] {0, -1}));
+    void isInside_pointOnBoundaryOfCone_returnsTrue() {
+        assertTrue(cone.isInside(new double[] {1, 0}));
+        assertTrue(cone.isInside(new double[] {0, -1}));
     }
 
     @Test
@@ -105,7 +107,7 @@ class PolyhedralConeTest {
         cone = new PolyhedralCone(points, solverFactory);
         double[] result = cone.getInteriorPoint();
 
-        assertArrayEquals(new double[] {1, -1}, result);
+        assertArrayEquals(LinearAlgebra.normalize(new double[] {1, -1}, 0.9), result);
     }
 
     @Test
@@ -131,6 +133,44 @@ class PolyhedralConeTest {
         Line line = new Line(new double[]{0.5, -0.5}, new double[]{1, 0});
         LineSegment segment = cone.computeLineIntersection(line);
         assertEquals(-0.5, segment.getLeftBound());
-        assertEquals(Math.sqrt(1.75) - 0.5, segment.getRightBound());
+        assertEquals(Math.sqrt(0.75) - 0.5, segment.getRightBound());
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputNormLargerThanOne_returnsHyperplanePerpendicularToInput() {
+        double[] x = new double[]{1, 1};
+        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        assertTrue(hyperplane.isPresent());
+        assertEquals(new LinearClassifier(0, x), hyperplane.get());
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputOnInteriorOfCone_returnsEmptyOption() {
+        double[] x = new double[]{0.5, -0.5};
+        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        assertFalse(hyperplane.isPresent());
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputOnBoundaryOfCone_returnsEmptyOption() {
+        double[] x = new double[]{0.5, 0};
+        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        assertFalse(hyperplane.isPresent());
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputWithNegativeFirstCoordinateButInsideUnitBall_returnsConesXAxisConstraint() {
+        double[] x = new double[]{-0.5, -0.5};
+        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        assertTrue(hyperplane.isPresent());
+        assertEquals(new LinearClassifier(0, new double[] {1, 0}), hyperplane.get());
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputWithPositiveFirstAndSecondCoordinatesButInsideUnitBall_returnsConesYAxisConstraint() {
+        double[] x = new double[]{0.5, 0.5};
+        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        assertTrue(hyperplane.isPresent());
+        assertEquals(new LinearClassifier(0, new double[] {0, 1}), hyperplane.get());
     }
 }
