@@ -1,6 +1,11 @@
-package machinelearning.active.learning.versionspace.convexbody;
+package machinelearning.active.learning.versionspace.convexbody.sampling;
 
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.active.learning.versionspace.convexbody.Line;
+import machinelearning.active.learning.versionspace.convexbody.LineSegment;
 import utils.Validator;
+
+import java.util.Random;
 
 /**
  * The Hit-and-Run Sampler is an algorithm for sampling points uniformly at random from a bounded convex body K. This
@@ -35,11 +40,12 @@ public class HitAndRunSampler {
      */
     private int thin;
 
-    private final boolean rounding;
-    private RoundingEllipsoid ellipsoid;
+    private final DirectionSamplingStrategy directionSamplingStrategy;
+
+    private final Random rand = new Random();  // TODO: set this seed from exterior
 
     public HitAndRunSampler(int warmup, int thin) {
-        this(warmup, thin, false);
+        this(warmup, thin, new UnitSphereSampler());
     }
 
     /**
@@ -47,14 +53,13 @@ public class HitAndRunSampler {
      * @param thin: after the warmup phase, only retain every "thin" samples. The higher this value, the more independent to each other samples will be.
      * @throws IllegalArgumentException if "warmup" is negative or "thin" is not positive
      */
-    public HitAndRunSampler(int warmup, int thin, boolean rounding) {
+    public HitAndRunSampler(int warmup, int thin, DirectionSamplingStrategy directionSamplingStrategy) {
         Validator.assertNonNegative(warmup);
         Validator.assertPositive(thin);
 
         this.warmup = warmup;
         this.thin = thin;
-        this.rounding = rounding;
-        this.ellipsoid = null;
+        this.directionSamplingStrategy = directionSamplingStrategy;
     }
 
     /**
@@ -66,13 +71,10 @@ public class HitAndRunSampler {
     public double[][] sample(ConvexBody body, int numSamples){
         Validator.assertPositive(numSamples);
 
-        double[][] samples = new double[numSamples][];
-
-        if (rounding) {
-            ellipsoid = new RoundingEllipsoid(body);
-        }
+        directionSamplingStrategy.fit(body);
 
         // warm-up phase
+        double[][] samples = new double[numSamples][];
         samples[0] = advance(body, body.getInteriorPoint(), warmup);
 
         for (int i = 1; i < numSamples; i++) {
@@ -97,10 +99,8 @@ public class HitAndRunSampler {
      * Compute the next element of the Markov Chain (steps 3 to 5 in the pseudo-code)
      */
     private double[] advance(ConvexBody body, double[] currentPoint){
-        Line line = Line.sampleRandomLine(currentPoint);
-        if (rounding) {
-            line.roundDirection(ellipsoid);
-        }
-        return body.computeLineIntersection(line).sampleRandomPoint();
+        Line line = new Line(currentPoint, directionSamplingStrategy.sampleDirection(rand));
+        LineSegment segment = body.computeLineIntersection(line);
+        return segment.getPoint(rand.nextDouble());
     }
 }

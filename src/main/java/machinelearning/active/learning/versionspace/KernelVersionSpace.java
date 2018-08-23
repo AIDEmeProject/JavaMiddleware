@@ -1,7 +1,7 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledPoint;
-import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.classifier.margin.KernelClassifier;
 import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;

@@ -3,8 +3,6 @@ package machinelearning.active.learning.versionspace.convexbody;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 
-import java.util.Random;
-
 /**
  * This class represents a Line Segment in euclidean space. A line is defined by two elements:
  *
@@ -78,27 +76,5 @@ public class Line {
      */
     public LineSegment getSegment(double leftBound, double rightBound){
         return new LineSegment(this, leftBound, rightBound);
-    }
-
-    /**
-     * @param center: any point the line must go through
-     * @return a random line going through the specified center point
-     * @throws IllegalArgumentException if center is an empty array
-     */
-    public static Line sampleRandomLine(double[] center) {
-        // TODO: how to set this seed
-        Random rand = new Random();
-
-        double[] direction = new double[center.length];
-
-        for (int i = 0; i < center.length; i++) {
-            direction[i] = rand.nextGaussian();
-        }
-
-        return new Line(center, direction);
-    }
-
-    public void roundDirection(RoundingEllipsoid ellipsoid) {
-        direction = ellipsoid.scaleVector(direction);
     }
 }

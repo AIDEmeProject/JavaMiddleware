@@ -61,9 +61,4 @@ class LineTest {
     void getSegment_leftBoundLargerThanRightBound_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> line.getSegment(2, 1));
     }
-
-    @Test
-    void sampleRandomLine_EmptyInputArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Line.sampleRandomLine(new double[0]));
-    }
 }

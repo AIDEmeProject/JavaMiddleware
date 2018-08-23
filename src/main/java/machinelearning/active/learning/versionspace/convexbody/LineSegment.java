@@ -2,8 +2,6 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
 
-import java.util.Random;
-
 /**
  * A line segment is a compact, connected subset of a straight line. In mathematical terms, let a straight line be defined
  * by a point X0 and its direction V. A line segment is on the form:
@@ -36,7 +34,7 @@ public class LineSegment {
      * @param rightBound: right bound R in the line segment definition
      * @throws IllegalArgumentException if leftBound is not smaller than rightBound
      */
-     LineSegment(Line line, double leftBound, double rightBound) {
+     public LineSegment(Line line, double leftBound, double rightBound) {
         Validator.assertIsFinite(leftBound);
         Validator.assertIsFinite(rightBound);
 
@@ -58,11 +56,19 @@ public class LineSegment {
     }
 
     /**
-     * @return a random point in the line segment.
+     * @return the length of the segment
      */
-    public double[] sampleRandomPoint(){
-        // TODO: how to set this seed
-        Random rand = new Random();
-        return line.getPoint(leftBound + rand.nextDouble() * (rightBound - leftBound));
+    public double length() {
+         return rightBound - leftBound;
+    }
+
+    /**
+     * @param proportion: proportion from the left bound bound of segment
+     * @return the point at leftBound + proportion * length
+     * @throws IllegalArgumentException if proportion is negative or larger than 1
+     */
+    public double[] getPoint(double proportion) {
+         Validator.assertInRange(proportion, 0, 1);
+        return line.getPoint(leftBound + proportion * length());
     }
 }

@@ -1,9 +1,11 @@
-package machinelearning.active.learning.versionspace.convexbody;
+package machinelearning.active.learning.versionspace.convexbody.sampling;
 
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import org.apache.commons.math3.linear.*;
 
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Random;
 
 
 /**
@@ -11,10 +13,10 @@ import java.util.Optional;
  * is very "elongated" or "thin" into some directions, the Hit-and-Run samples tend to concentrate over the edges, no exploring
  * sufficiently the center regions. In order to compensate for these cases, the rounding procedure was introduced.
  *
- * Basically, the algorithm attempts to find a "weak ellipsoid pair" enclosing the convex body. This pair consists of
+ * Basically, the algorithm attempts to find a weak Lowner-John ellipsoid pair enclosing the convex body. This pair consists of
  * two ellipsoids satisfying:
  *
- *          \( E \subset K \subset n E \)
+ *          \( E \subset K \subset (n+1)\sqrt{n} E \)
  *
  * Given such a pair, we can choose a linear transformation taking E into the unit ball in to be our rounding transformation.
  *
@@ -31,7 +33,7 @@ import java.util.Optional;
  *          Bioinformatics, Volume 33, Issue 11, 1 June 2017, Pages 1741–1743
  *          See supplementary material
  */
-public class RoundingEllipsoid {
+public class EllipsoidRoundingSampler implements DirectionSamplingStrategy {
     /**
      * Ellipsoid's center
      */
@@ -42,15 +44,26 @@ public class RoundingEllipsoid {
      */
     private RealMatrix matrix;
 
+    /**
+     * Unit Ball sampler
+     */
+    private UnitSphereSampler sampler = new UnitSphereSampler();
 
-    public RoundingEllipsoid(ConvexBody body) {
-        center = new ArrayRealVector(body.getDim());
-        matrix = MatrixUtils.createRealIdentityMatrix(body.getDim());
-        fitWeakEllipsoid(body);
+    /**
+     * @param rand: random number generator
+     * @return the fitted matrix multiplied by
+     */
+    @Override
+    public double[] sampleDirection(Random rand) {
+        return matrix.operate(sampler.sampleDirection(rand));
     }
 
-    public double[] scaleVector(double[] vector) {
-        return matrix.operate(vector);
+    @Override
+    public void fit(ConvexBody body) {
+        sampler.fit(body);
+
+        fitWeakLownerJohnEllipsoid(body);
+        matrix = new CholeskyDecomposition(matrix).getL();
     }
 
     /**
@@ -61,11 +74,13 @@ public class RoundingEllipsoid {
      *      - E_{k+1} is contained in E_k
      *
      * At every iteration, we check whether  E_k / (n + 1) is contained in K: if true, we have found a weak Lowner-John pair;
-     * otherwise, we further restrict the current ellipsoid through the Ellipsoid Method {@link #ellipsoidMethodUpdate(double[])}.
+     * otherwise, we further restrict the current ellipsoid through the Ellipsoid Method {@link #ellipsoidMethodUpdate}.
      *
      * In particular, we start the algorithm with a large enough ball E_0 = B(0, R) containing K. TODO: add getRadius() to ConvexBody?
      */
-    private void fitWeakEllipsoid(ConvexBody body) {
+    private void fitWeakLownerJohnEllipsoid(ConvexBody body) {
+        initialize(body);
+
         boolean converged = false;
 
         while (!converged) {
@@ -82,8 +97,14 @@ public class RoundingEllipsoid {
                 }
             }
         }
+    }
 
-        matrix = new CholeskyDecomposition(matrix).getL();
+    /**
+     * Initialize center to the zero vector and matrix to the identity matrix
+     */
+    private void initialize(ConvexBody body) {
+        center = new ArrayRealVector(body.getDim());
+        matrix = MatrixUtils.createRealIdentityMatrix(body.getDim());
     }
 
     /**
