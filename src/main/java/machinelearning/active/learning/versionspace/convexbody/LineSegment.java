@@ -34,7 +34,7 @@ public class LineSegment {
      * @param rightBound: right bound R in the line segment definition
      * @throws IllegalArgumentException if leftBound is not smaller than rightBound
      */
-     public LineSegment(Line line, double leftBound, double rightBound) {
+     LineSegment(Line line, double leftBound, double rightBound) {
         Validator.assertIsFinite(leftBound);
         Validator.assertIsFinite(rightBound);
 

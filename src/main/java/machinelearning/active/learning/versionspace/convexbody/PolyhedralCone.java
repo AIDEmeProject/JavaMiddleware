@@ -147,7 +147,7 @@ public class PolyhedralCone implements ConvexBody {
             throw new RuntimeException("Line does not intercept convex body: " + leftBound + ", " + rightBound);
         }
 
-        return  line.getSegment(leftBound, rightBound);
+        return line.getSegment(leftBound, rightBound);
     }
 
     /**

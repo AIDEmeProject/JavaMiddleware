@@ -3,6 +3,8 @@ package machinelearning.active.learning.versionspace.convexbody;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 
+import java.util.Arrays;
+
 /**
  * This class represents a Line Segment in euclidean space. A line is defined by two elements:
  *
@@ -30,7 +32,6 @@ public class Line {
      * @throws IllegalArgumentException if center and direction have different lengths, if they are empty arrays, or direction is the zero vector
      */
     public Line(double[] center, double[] direction) {
-        Validator.assertNotEmpty(center);
         Validator.assertEqualLengths(center, direction);
         Validator.assertPositive(LinearAlgebra.sqNorm(direction));
 
@@ -72,6 +73,7 @@ public class Line {
      * @param leftBound: left bound of line segment
      * @param rightBound: right bound of line segment
      * @return a line segment on this line
+     * @throws IllegalArgumentException if rightBound is smaller than leftBound, or any of the bounds are not finite
      * @see LineSegment
      */
     public LineSegment getSegment(double leftBound, double rightBound){

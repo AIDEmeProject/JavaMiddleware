@@ -53,6 +53,16 @@ class LineTest {
     }
 
     @Test
+    void getSegment_infiniteLeftBound_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> line.getSegment(Double.NEGATIVE_INFINITY, 1));
+    }
+
+    @Test
+    void getSegment_infiniteRightBound_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> line.getSegment(Double.POSITIVE_INFINITY, 1));
+    }
+
+    @Test
     void getSegment_leftBoundEqualsRightBound_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> line.getSegment(1, 1));
     }
@@ -60,5 +70,12 @@ class LineTest {
     @Test
     void getSegment_leftBoundLargerThanRightBound_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> line.getSegment(2, 1));
+    }
+
+    @Test
+    void getSegment_validInput_returnsExpectedLineSegment() {
+        LineSegment segment = line.getSegment(-2, 3);
+        assertEquals(-2, segment.getLeftBound());
+        assertEquals(3, segment.getRightBound());
     }
 }
