@@ -5,7 +5,6 @@ import org.apache.commons.math3.linear.*;
 
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.Random;
 
 
 /**
@@ -33,7 +32,7 @@ import java.util.Random;
  *          Bioinformatics, Volume 33, Issue 11, 1 June 2017, Pages 1741–1743
  *          See supplementary material
  */
-public class EllipsoidRoundingSampler implements DirectionSamplingStrategy {
+public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
     /**
      * Ellipsoid's center
      */
@@ -44,26 +43,10 @@ public class EllipsoidRoundingSampler implements DirectionSamplingStrategy {
      */
     private RealMatrix matrix;
 
-    /**
-     * Unit Ball sampler
-     */
-    private UnitSphereSampler sampler = new UnitSphereSampler();
-
-    /**
-     * @param rand: random number generator
-     * @return the fitted matrix multiplied by
-     */
     @Override
-    public double[] sampleDirection(Random rand) {
-        return matrix.operate(sampler.sampleDirection(rand));
-    }
-
-    @Override
-    public void fit(ConvexBody body) {
-        sampler.fit(body);
-
+    public DirectionSampler fit(ConvexBody body) {
         fitWeakLownerJohnEllipsoid(body);
-        matrix = new CholeskyDecomposition(matrix).getL();
+        return new EllipsoidSampler(matrix);
     }
 
     /**

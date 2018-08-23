@@ -14,7 +14,7 @@ import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.SampleCache;
-import machinelearning.active.learning.versionspace.convexbody.sampling.EllipsoidRoundingSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.RoundingAlgorithm;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.classifier.MajorityVoteLearner;
 import machinelearning.classifier.svm.GaussianKernel;
@@ -89,7 +89,7 @@ public class RunExperiment {
         //activeLearners.put("Random Learner svm", new RandomSampler(svm));
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
-        HitAndRunSampler sampler = new HitAndRunSampler(100, 10, new EllipsoidRoundingSampler());
+        HitAndRunSampler sampler = new HitAndRunSampler(100, 10, new RoundingAlgorithm());
         LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
         linearVersionSpace.addIntercept();
         linearVersionSpace.setSampleCachingStrategy(new SampleCache());

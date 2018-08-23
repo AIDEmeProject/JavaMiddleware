@@ -40,12 +40,12 @@ public class HitAndRunSampler {
      */
     private int thin;
 
-    private final DirectionSamplingStrategy directionSamplingStrategy;
+    private final DirectionSamplingAlgorithm directionSamplingAlgorithm;
 
     private final Random rand = new Random();  // TODO: set this seed from exterior
 
     public HitAndRunSampler(int warmup, int thin) {
-        this(warmup, thin, new UnitSphereSampler());
+        this(warmup, thin, new RandomSamplingAlgorithm());
     }
 
     /**
@@ -53,13 +53,13 @@ public class HitAndRunSampler {
      * @param thin: after the warmup phase, only retain every "thin" samples. The higher this value, the more independent to each other samples will be.
      * @throws IllegalArgumentException if "warmup" is negative or "thin" is not positive
      */
-    public HitAndRunSampler(int warmup, int thin, DirectionSamplingStrategy directionSamplingStrategy) {
+    public HitAndRunSampler(int warmup, int thin, DirectionSamplingAlgorithm directionSamplingAlgorithm) {
         Validator.assertNonNegative(warmup);
         Validator.assertPositive(thin);
 
         this.warmup = warmup;
         this.thin = thin;
-        this.directionSamplingStrategy = directionSamplingStrategy;
+        this.directionSamplingAlgorithm = directionSamplingAlgorithm;
     }
 
     /**
@@ -71,15 +71,15 @@ public class HitAndRunSampler {
     public double[][] sample(ConvexBody body, int numSamples){
         Validator.assertPositive(numSamples);
 
-        directionSamplingStrategy.fit(body);
+        DirectionSampler directionSampler = directionSamplingAlgorithm.fit(body);
 
         // warm-up phase
         double[][] samples = new double[numSamples][];
-        samples[0] = advance(body, body.getInteriorPoint(), warmup);
+        samples[0] = advance(body, body.getInteriorPoint(), directionSampler, warmup);
 
         for (int i = 1; i < numSamples; i++) {
             // only keep every "thin" samples
-            samples[i] = advance(body, samples[i-1], thin);
+            samples[i] = advance(body, samples[i-1], directionSampler, thin);
         }
 
         return samples;
@@ -88,9 +88,9 @@ public class HitAndRunSampler {
     /**
      * Advance "n" steps in the Markov Chain
      */
-    private double[] advance(ConvexBody body, double[] point, int n){
+    private double[] advance(ConvexBody body, double[] point, DirectionSampler directionSampler, int n){
         for (int i = 0; i < n; i++) {
-            point = advance(body, point);
+            point = advance(body, point, directionSampler);
         }
         return point;
     }
@@ -98,8 +98,8 @@ public class HitAndRunSampler {
     /**
      * Compute the next element of the Markov Chain (steps 3 to 5 in the pseudo-code)
      */
-    private double[] advance(ConvexBody body, double[] currentPoint){
-        Line line = new Line(currentPoint, directionSamplingStrategy.sampleDirection(rand));
+    private double[] advance(ConvexBody body, double[] currentPoint, DirectionSampler directionSampler){
+        Line line = new Line(currentPoint, directionSampler.sampleDirection(rand));
         LineSegment segment = body.computeLineIntersection(line);
         return segment.getPoint(rand.nextDouble());
     }
