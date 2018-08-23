@@ -62,6 +62,7 @@ class HitAndRunSamplerTest {
     private void verifyNumberOfCalls(int warmup, int thin, int numSamples){
         sampler = new HitAndRunSampler(warmup, thin);
         ConvexBody mockConvexBody = mock(ConvexBody.class);
+        when(mockConvexBody.getDim()).thenReturn(1);
 
         // return [0] for interiorPoint
         when(mockConvexBody.getInteriorPoint()).thenReturn(new double[1]);
