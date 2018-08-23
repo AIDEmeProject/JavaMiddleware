@@ -8,7 +8,7 @@ import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
  * @see HitAndRunSampler
  * @see RandomDirectionSampler
  */
-public class RandomSamplingAlgorithm implements DirectionSamplingAlgorithm {
+public class RandomDirectionAlgorithm implements DirectionSamplingAlgorithm {
 
     /**
      * @param body: convex body used for fitting out {@link DirectionSampler} technique

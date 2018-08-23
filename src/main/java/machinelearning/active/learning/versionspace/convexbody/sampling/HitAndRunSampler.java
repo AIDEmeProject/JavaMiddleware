@@ -45,7 +45,7 @@ public class HitAndRunSampler {
     private final Random rand = new Random();  // TODO: set this seed from exterior
 
     public HitAndRunSampler(int warmup, int thin) {
-        this(warmup, thin, new RandomSamplingAlgorithm());
+        this(warmup, thin, new RandomDirectionAlgorithm());
     }
 
     /**
