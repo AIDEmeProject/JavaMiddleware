@@ -56,19 +56,12 @@ public class LineSegment {
     }
 
     /**
-     * @return the length of the segment
-     */
-    public double length() {
-         return rightBound - leftBound;
-    }
-
-    /**
      * @param proportion: proportion from the left bound bound of segment
      * @return the point at leftBound + proportion * length
      * @throws IllegalArgumentException if proportion is negative or larger than 1
      */
     public double[] getPoint(double proportion) {
          Validator.assertInRange(proportion, 0, 1);
-        return line.getPoint(leftBound + proportion * length());
+        return line.getPoint(leftBound + proportion * (rightBound - leftBound));
     }
 }
