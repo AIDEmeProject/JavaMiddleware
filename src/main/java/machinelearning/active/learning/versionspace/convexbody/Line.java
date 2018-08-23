@@ -80,7 +80,6 @@ public class Line {
         return new LineSegment(this, leftBound, rightBound);
     }
 
-
     /**
      * @param center: any point the line must go through
      * @return a random line going through the specified center point
@@ -97,5 +96,9 @@ public class Line {
         }
 
         return new Line(center, direction);
+    }
+
+    public void roundDirection(RoundingEllipsoid ellipsoid) {
+        direction = ellipsoid.scaleVector(direction);
     }
 }

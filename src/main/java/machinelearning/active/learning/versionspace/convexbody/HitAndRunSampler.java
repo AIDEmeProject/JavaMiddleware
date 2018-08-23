@@ -35,17 +35,26 @@ public class HitAndRunSampler {
      */
     private int thin;
 
+    private final boolean rounding;
+    private RoundingEllipsoid ellipsoid;
+
+    public HitAndRunSampler(int warmup, int thin) {
+        this(warmup, thin, false);
+    }
+
     /**
      * @param warmup: the first "warmup" samples will be ignored. The higher this value, the closest to uniform samples will be.
      * @param thin: after the warmup phase, only retain every "thin" samples. The higher this value, the more independent to each other samples will be.
      * @throws IllegalArgumentException if "warmup" is negative or "thin" is not positive
      */
-    public HitAndRunSampler(int warmup, int thin) {
+    public HitAndRunSampler(int warmup, int thin, boolean rounding) {
         Validator.assertNonNegative(warmup);
         Validator.assertPositive(thin);
 
         this.warmup = warmup;
         this.thin = thin;
+        this.rounding = rounding;
+        this.ellipsoid = null;
     }
 
     /**
@@ -58,6 +67,10 @@ public class HitAndRunSampler {
         Validator.assertPositive(numSamples);
 
         double[][] samples = new double[numSamples][];
+
+        if (rounding) {
+            ellipsoid = new RoundingEllipsoid(body);
+        }
 
         // warm-up phase
         samples[0] = advance(body, body.getInteriorPoint(), warmup);
@@ -84,6 +97,10 @@ public class HitAndRunSampler {
      * Compute the next element of the Markov Chain (steps 3 to 5 in the pseudo-code)
      */
     private double[] advance(ConvexBody body, double[] currentPoint){
-        return body.computeLineIntersection(Line.sampleRandomLine(currentPoint)).sampleRandomPoint();
+        Line line = Line.sampleRandomLine(currentPoint);
+        if (rounding) {
+            line.roundDirection(ellipsoid);
+        }
+        return body.computeLineIntersection(line).sampleRandomPoint();
     }
 }

@@ -12,10 +12,9 @@ import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.GeneralizedBinarySearch;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
-import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
-import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import machinelearning.classifier.MajorityVoteLearner;
 import machinelearning.classifier.svm.GaussianKernel;
 import machinelearning.classifier.svm.SvmLearner;
@@ -89,13 +88,13 @@ public class RunExperiment {
         //activeLearners.put("Random Learner svm", new RandomSampler(svm));
         //activeLearners.put("Simple Margin C=1000", new SimpleMargin(svm));
 
-        HitAndRunSampler sampler = new HitAndRunSampler(100, 10);
+        HitAndRunSampler sampler = new HitAndRunSampler(100, 10, true);
         LinearVersionSpace linearVersionSpace = new LinearVersionSpace(sampler, LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO));
         linearVersionSpace.addIntercept();
         linearVersionSpace.setSampleCachingStrategy(new SampleCache());
         VersionSpace versionSpace = new KernelVersionSpace(linearVersionSpace, new GaussianKernel());
         MajorityVoteLearner majorityVoteLearner = new MajorityVoteLearner(versionSpace, 8);
-        activeLearners.put("Linear GBS learner=SVM warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(svm, majorityVoteLearner));
+        activeLearners.put("Linear GBS learner=MV warmup=100 thin=10 numSamples=8", new GeneralizedBinarySearch(majorityVoteLearner));
 
         // METRICS
         Collection<MetricCalculator> metricCalculators = new ArrayList<>();
@@ -114,7 +113,7 @@ public class RunExperiment {
             System.out.println(entry.getKey());
             try {
                 FolderManager folder = new FolderManager("experiment" + File.separator + task + File.separator + entry.getKey());
-                explore.run(points, user, entry.getValue(), runs, folder);
+                explore.run(points, user, entry.getValue(), runs, new long[] {10}, folder);
                 //StatisticsCalculator.averageRunFiles(folder.getRuns(), folder.createNewOutputFile());
             } catch (Exception ex){
                 ex.printStackTrace();
