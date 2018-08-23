@@ -6,7 +6,6 @@ import machinelearning.classifier.margin.KernelClassifier;
 import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
-import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;

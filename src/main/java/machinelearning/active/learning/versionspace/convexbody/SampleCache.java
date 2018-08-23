@@ -1,6 +1,5 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
-import machinelearning.classifier.margin.LinearClassifier;
 import utils.linalg.LinearAlgebra;
 
 import java.util.Optional;
@@ -87,7 +86,7 @@ public class SampleCache {
         }
 
         @Override
-        public Optional<LinearClassifier> getSeparatingHyperplane(double[] x) {
+        public Optional<double[]> getSeparatingHyperplane(double[] x) {
             return convexBody.getSeparatingHyperplane(x);
         }
     }

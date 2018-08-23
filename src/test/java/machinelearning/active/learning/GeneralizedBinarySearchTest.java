@@ -3,7 +3,10 @@ package machinelearning.active.learning;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import machinelearning.classifier.*;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Learner;
+import machinelearning.classifier.MajorityVoteClassifier;
+import machinelearning.classifier.MajorityVoteLearner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

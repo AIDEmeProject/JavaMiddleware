@@ -1,7 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
-import machinelearning.classifier.margin.LinearClassifier;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
@@ -16,7 +15,7 @@ import java.util.Optional;
 /**
  * A polyhedral cone is a convex body defined by a set of homogeneous linear equations:
  *
- *      \( {x : \langle x, w_i \rangle /geq 0} \)
+ *      \( {x : \langle x, w_i \rangle \geq 0} \)
  *
  * @see <a href="https://en.wikipedia.org/wiki/Convex_cone">Convex Cone wiki</a>
  */
@@ -151,17 +150,26 @@ public class PolyhedralCone implements ConvexBody {
         return  line.getSegment(leftBound, rightBound);
     }
 
+    /**
+     * For a point x outside the polyhedral cone, we compute an separating hyperplane by using the following rule:
+     *
+     *      - if point is outside the unit ball, just return x itself
+     *      - else, we look for a unsatisfying constraint \( y_i \langle x_i, x \rangle < 0 \), where we return \( -y_i x_i \)
+     *
+     * @param x: a data point
+     * @return the separating hyperplane vector (if it exists)
+     */
     @Override
-    public Optional<LinearClassifier> getSeparatingHyperplane(double[] x) {
+    public Optional<double[]> getSeparatingHyperplane(double[] x) {
         Validator.assertEquals(x.length, getDim());
 
         if (LinearAlgebra.sqNorm(x) > 1) {
-            return Optional.of(new LinearClassifier(0, x));
+            return Optional.of(x);
         }
 
         for (LabeledPoint point : labeledPoints) {
             if (point.getLabel().asSign() * LinearAlgebra.dot(x, point.getData()) < 0){
-                return Optional.of(new LinearClassifier(0, point.getData()));
+                return Optional.of(LinearAlgebra.multiply(point.getData(), -point.getLabel().asSign()));
             }
         }
 

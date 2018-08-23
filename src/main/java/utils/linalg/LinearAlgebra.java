@@ -3,6 +3,14 @@ package utils.linalg;
 import utils.Validator;
 
 public class LinearAlgebra {
+    public static double[] multiply(double[] x, double value) {
+        double[] result = new double[x.length];
+        for (int i = 0; i < x.length; i++) {
+            result[i] = value * x[i];
+        }
+        return result;
+    }
+
     public static double[] normalize(double[] x, double newNorm) {
         Validator.assertPositive(newNorm);
 

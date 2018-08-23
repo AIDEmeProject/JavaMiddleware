@@ -2,7 +2,6 @@ package machinelearning.classifier.neighbors;
 
 import data.DataPoint;
 import data.LabeledPoint;
-
 import machinelearning.classifier.AbstractLearnerTest;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;

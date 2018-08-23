@@ -2,7 +2,6 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledPoint;
 import machinelearning.classifier.Label;
-import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.linalg.LinearAlgebra;
@@ -139,38 +138,38 @@ class PolyhedralConeTest {
     @Test
     void getSeparatingHyperplane_InputNormLargerThanOne_returnsHyperplanePerpendicularToInput() {
         double[] x = new double[]{1, 1};
-        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertEquals(new LinearClassifier(0, x), hyperplane.get());
+        assertArrayEquals(x, hyperplane.get(), 1e-10);
     }
 
     @Test
     void getSeparatingHyperplane_InputOnInteriorOfCone_returnsEmptyOption() {
         double[] x = new double[]{0.5, -0.5};
-        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
         assertFalse(hyperplane.isPresent());
     }
 
     @Test
     void getSeparatingHyperplane_InputOnBoundaryOfCone_returnsEmptyOption() {
         double[] x = new double[]{0.5, 0};
-        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
         assertFalse(hyperplane.isPresent());
     }
 
     @Test
     void getSeparatingHyperplane_InputWithNegativeFirstCoordinateButInsideUnitBall_returnsConesXAxisConstraint() {
         double[] x = new double[]{-0.5, -0.5};
-        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertEquals(new LinearClassifier(0, new double[] {1, 0}), hyperplane.get());
+        assertArrayEquals(new double[] {-1, 0}, hyperplane.get(), 1e-10);
     }
 
     @Test
     void getSeparatingHyperplane_InputWithPositiveFirstAndSecondCoordinatesButInsideUnitBall_returnsConesYAxisConstraint() {
         double[] x = new double[]{0.5, 0.5};
-        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
+        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertEquals(new LinearClassifier(0, new double[] {0, 1}), hyperplane.get());
+        assertArrayEquals(new double[] {0, 1}, hyperplane.get(), 1e-10);
     }
 }

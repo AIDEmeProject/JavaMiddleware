@@ -1,7 +1,5 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
-import machinelearning.classifier.margin.LinearClassifier;
-
 import java.util.Optional;
 
 /**
@@ -42,9 +40,14 @@ public interface ConvexBody {
     LineSegment computeLineIntersection(Line line);
 
     /**
-     * Given a closed convex body K and a point x not in K, there is at least one hyperplane separating the point x from K
-     * (i.e. the hyperplane is such that K is contained on one side of the hyperplane and x is on the other side). Computing
-     * this hyperplane is used for the "rounding" optimization of the Hit-and-Run Sampler.
+     * Given a closed convex body K and a point x not in K, we define its "separating hyperplane" by a vector C satisfying:
+     *
+     *                  \( \forall w \in K, c^T w \leq c^T x  \)
+     *
+     * In other words, if H is the hyperplane passing through x and orthogonal to c, then K is contained in its negative
+     * half-space.
+     *
+     * Computing this hyperplane is necessary for using "rounding" optimization of the Hit-and-Run Sampler.
      *
      * In addition, note that there is a contract between this method and the isInside() function. We must have that x is inside K
      * if, and only if, there ISN'T a separating hyperplane (i.e. this method returns Optional.empty()).
@@ -54,5 +57,5 @@ public interface ConvexBody {
      * the convex body, Optional.empty() is returned instead.
      * @throws IllegalArgumentException if x.length and getDim() are different
      */
-    Optional<LinearClassifier> getSeparatingHyperplane(double[] x);
+    Optional<double[]> getSeparatingHyperplane(double[] x);
 }
