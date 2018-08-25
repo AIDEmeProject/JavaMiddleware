@@ -67,13 +67,6 @@ public class LinearVersionSpace implements VersionSpace {
     }
 
     /**
-     * Do not sample the intercept of Linear Classifiers (default)
-     */
-    public void dropIntercept() {
-        this.addIntercept = false;
-    }
-
-    /**
      * @param sampleCache: new sample caching strategy to use
      */
     public void setSampleCachingStrategy(SampleCache sampleCache) {

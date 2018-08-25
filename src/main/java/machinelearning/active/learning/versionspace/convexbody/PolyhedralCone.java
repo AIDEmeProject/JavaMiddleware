@@ -9,7 +9,6 @@ import utils.linprog.LinearProgramSolver;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -174,16 +173,5 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         return Optional.empty();
-    }
-
-    /**
-     * @return true if both objects are PolyhedralCone instances containing the same labeled data.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PolyhedralCone that = (PolyhedralCone) o;
-        return Objects.equals(labeledPoints, that.labeledPoints);
     }
 }
