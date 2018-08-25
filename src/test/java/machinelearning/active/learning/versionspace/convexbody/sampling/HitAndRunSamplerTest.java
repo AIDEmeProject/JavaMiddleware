@@ -58,17 +58,6 @@ class HitAndRunSamplerTest {
         verifyCallsToConvexBodyMock(5, 7, 12);
     }
 
-    private void verifyCallsToConvexBodyMock(int warmup, int thin, int numSamples){
-        sampler = new HitAndRunSampler(warmup, thin);
-        ConvexBody mockConvexBody = getConvexBodyMock();
-
-        // verify number of calls
-        sampler.sample(mockConvexBody, numSamples);
-        verify(mockConvexBody, never()).isInside(any());
-        verify(mockConvexBody, times(1)).getInteriorPoint();
-        verify(mockConvexBody, times(warmup + thin * (numSamples - 1))).computeLineIntersection(any());
-    }
-
     @Test
     void sample_mockDirectionSamplingAlgorithm_fitCalledOnce() {
         ConvexBody convexBodyStub = getConvexBodyMock();
@@ -87,18 +76,30 @@ class HitAndRunSamplerTest {
 
     @Test
     void sample_warmupAndThinApplied_sampleDirectionCalledOncePerIteration() {
-        verifyCallsToDirectionSampler(5, 3, 5 + 3*9);
+        verifyCallsToDirectionSampler(5, 3, 12);
+    }
+
+    private void verifyCallsToConvexBodyMock(int warmup, int thin, int numSamples){
+        sampler = new HitAndRunSampler(warmup, thin);
+        ConvexBody mockConvexBody = getConvexBodyMock();
+
+        // verify number of calls
+        sampler.sample(mockConvexBody, numSamples);
+        verify(mockConvexBody, never()).isInside(any());
+        verify(mockConvexBody, times(1)).getInteriorPoint();
+        verify(mockConvexBody, times(warmup + thin * (numSamples - 1))).computeLineIntersection(any());
     }
 
     private void verifyCallsToDirectionSampler(int warmup, int thin, int numSamples) {
+        sampler = new HitAndRunSampler(warmup, thin);
         ConvexBody convexBodyStub = getConvexBodyMock();
 
         DirectionSampler directionSamplerMock = getDirectionSamplerMock();
         DirectionSamplingAlgorithm algorithmStub = getDirectionSamplingAlgorithmMock(directionSamplerMock);
 
         sampler = new HitAndRunSampler(warmup, thin, algorithmStub);
-        sampler.sample(convexBodyStub, 10);
-        verify(directionSamplerMock, times(numSamples)).sampleDirection(any());
+        sampler.sample(convexBodyStub, numSamples);
+        verify(directionSamplerMock, times(warmup + thin*(numSamples-1))).sampleDirection(any());
     }
 
     private ConvexBody getConvexBodyMock() {
