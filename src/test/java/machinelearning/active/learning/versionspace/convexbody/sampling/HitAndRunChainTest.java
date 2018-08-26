@@ -2,6 +2,8 @@ package machinelearning.active.learning.versionspace.convexbody.sampling;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

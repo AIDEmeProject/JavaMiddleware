@@ -1,4 +1,4 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import utils.Validator;
 
@@ -23,7 +23,7 @@ public class RandomDirectionSampler implements DirectionSampler {
      * @param dim: dimension of the output samples
      * @throws IllegalArgumentException if dim is not positive
      */
-    public RandomDirectionSampler(int dim) {
+    RandomDirectionSampler(int dim) {
         Validator.assertPositive(dim);
         this.dim = dim;
     }

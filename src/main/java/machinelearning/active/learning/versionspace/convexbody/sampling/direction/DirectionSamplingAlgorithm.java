@@ -1,6 +1,7 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 
 /**
  * This interface is a Factory for creating the appropriate {@link DirectionSampler} used by the {@link HitAndRunSampler}.

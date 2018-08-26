@@ -1,8 +1,15 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.active.learning.versionspace.convexbody.sampling.cache.DummySampleCache;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCache;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSamplingAlgorithm;
+import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +30,7 @@ class HitAndRunSamplerTest {
         selector = mock(SampleSelector.class);
         when(selector.select(any(), anyInt())).thenReturn(new double[][]{{0}, {1}, {2}});
 
-        cache = spy(DummySampleCache.class);
+        cache = Mockito.spy(DummySampleCache.class);
         sampler = new HitAndRunSampler
                 .Builder(directionSamplingAlgorithm, selector)
                 .cache(cache)

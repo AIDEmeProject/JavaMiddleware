@@ -1,4 +1,6 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
+
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
 
 /**
  * Interface for all sample selecting algorithms. They are used for extracting a target selection of samples from a Markov Chain.

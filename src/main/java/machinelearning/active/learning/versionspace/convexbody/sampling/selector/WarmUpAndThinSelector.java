@@ -1,5 +1,6 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
 import utils.Validator;
 
 

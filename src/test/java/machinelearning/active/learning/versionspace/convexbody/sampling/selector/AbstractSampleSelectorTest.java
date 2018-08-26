@@ -1,5 +1,7 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

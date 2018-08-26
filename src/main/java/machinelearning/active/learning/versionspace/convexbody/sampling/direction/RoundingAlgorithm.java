@@ -1,4 +1,4 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import org.apache.commons.math3.linear.*;

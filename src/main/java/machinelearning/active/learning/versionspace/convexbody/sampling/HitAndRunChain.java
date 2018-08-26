@@ -3,6 +3,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
 import machinelearning.active.learning.versionspace.convexbody.LineSegment;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
 import utils.Validator;
 
 import java.util.Objects;
@@ -22,7 +23,7 @@ import java.util.Random;
  * REFERENCES:
  *      Hit-and-run mixes fast, Laszlo Lovasz
  */
-class HitAndRunChain {
+public class HitAndRunChain {
     /**
      * {@link ConvexBody} to sample from
      */
@@ -60,7 +61,7 @@ class HitAndRunChain {
     /**
      * @return the next sample of this Markov Chain. It corresponds to the lines 3 to 5 in the pseudo-code above.
      */
-    double[] advance() {
+    public double[] advance() {
         Line line = new Line(currentSample, directionSampler.sampleDirection(rand));
         LineSegment segment = body.computeLineIntersection(line);
         currentSample = segment.getPoint(rand.nextDouble());
@@ -71,7 +72,7 @@ class HitAndRunChain {
      * @param n: number of iterations to advance in the chain
      * @return the last sample
      */
-     double[] advance(int n) {
+     public double[] advance(int n) {
         Validator.assertPositive(n);
 
         for (int i = 0; i < n; i++) {
@@ -84,7 +85,7 @@ class HitAndRunChain {
      * @return an independent copy of this Markov Chain, at the same current point. Both objects will share the same
      * random state though TODO: can we avoid this?
      */
-     HitAndRunChain copy() {
+     public HitAndRunChain copy() {
         return new HitAndRunChain(body, directionSampler, rand, currentSample.clone());
     }
 }

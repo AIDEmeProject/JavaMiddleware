@@ -1,6 +1,7 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 
 /**
  * Factory method for RandomDirectionSampler algorithm.

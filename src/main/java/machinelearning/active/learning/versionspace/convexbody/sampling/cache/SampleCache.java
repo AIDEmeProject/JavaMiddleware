@@ -1,4 +1,4 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.cache;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;

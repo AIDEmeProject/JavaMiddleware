@@ -1,4 +1,6 @@
-package machinelearning.active.learning.versionspace.convexbody.sampling;
+package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
+
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 
 import java.util.Random;
 
