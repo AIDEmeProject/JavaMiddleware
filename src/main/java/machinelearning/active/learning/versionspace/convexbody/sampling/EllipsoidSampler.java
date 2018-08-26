@@ -17,7 +17,7 @@ import java.util.Random;
  *      2) Compute the Cholesky decomposition of A: \( A = L L^T \)  TODO: couldn't we use PD^{1/2} instead, where A = PDP^T
  *      3) Output the vector \( LX \) as the sample
  */
-public class EllipsoidSampler implements DirectionSampler {
+class EllipsoidSampler implements DirectionSampler {
     private RealMatrix matrix;
     private RandomDirectionSampler randomDirectionSampler;
 
@@ -25,7 +25,7 @@ public class EllipsoidSampler implements DirectionSampler {
      * @param matrix the matrix A in the description.
      * @throws RuntimeException if computing its Cholesky decomposition failed.
      */
-    public EllipsoidSampler(RealMatrix matrix) {
+    EllipsoidSampler(RealMatrix matrix) {
         this.matrix = new CholeskyDecomposition(matrix).getL();
         this.randomDirectionSampler = new RandomDirectionSampler(matrix.getColumnDimension());
     }

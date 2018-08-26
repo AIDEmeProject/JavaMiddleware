@@ -22,7 +22,7 @@ import java.util.Random;
  * REFERENCES:
  *      Hit-and-run mixes fast, Laszlo Lovasz
  */
-public class HitAndRunChain {
+class HitAndRunChain {
     /**
      * {@link ConvexBody} to sample from
      */
@@ -46,7 +46,7 @@ public class HitAndRunChain {
     /**
      * Initialize the MarkovChain with the body.getInteriorPoint() method.
      */
-    public HitAndRunChain(ConvexBody body, DirectionSampler directionSampler, Random rand) {
+    HitAndRunChain(ConvexBody body, DirectionSampler directionSampler, Random rand) {
         this(body, directionSampler, rand, body.getInteriorPoint());
     }
 
@@ -60,7 +60,7 @@ public class HitAndRunChain {
     /**
      * @return the next sample of this Markov Chain. It corresponds to the lines 3 to 5 in the pseudo-code above.
      */
-    public double[] advance() {
+    double[] advance() {
         Line line = new Line(currentSample, directionSampler.sampleDirection(rand));
         LineSegment segment = body.computeLineIntersection(line);
         currentSample = segment.getPoint(rand.nextDouble());
@@ -71,7 +71,7 @@ public class HitAndRunChain {
      * @param n: number of iterations to advance in the chain
      * @return the last sample
      */
-    public double[] advance(int n) {
+     double[] advance(int n) {
         Validator.assertPositive(n);
 
         for (int i = 0; i < n; i++) {
@@ -84,7 +84,7 @@ public class HitAndRunChain {
      * @return an independent copy of this Markov Chain, at the same current point. Both objects will share the same
      * random state though TODO: can we avoid this?
      */
-    public HitAndRunChain copy() {
+     HitAndRunChain copy() {
         return new HitAndRunChain(body, directionSampler, rand, currentSample.clone());
     }
 }
