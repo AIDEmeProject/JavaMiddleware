@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import utils.Validator;
 
 
@@ -42,8 +42,10 @@ public class WarmUpAndThinSelector implements SampleSelector {
     }
 
     @Override
-    public double[][] select(HitAndRunChain chain, int numSamples) {
+    public double[][] select(HitAndRun hitAndRun, int numSamples) {
         Validator.assertPositive(numSamples);
+
+        HitAndRun.Chain chain = hitAndRun.newChain();
 
         double[][] samples = new double[numSamples][];
         samples[0] = chain.advance(warmUp);

@@ -89,7 +89,7 @@ public class HitAndRunSampler {
 
         body = sampleCache.attemptToSetDefaultInteriorPoint(body);
 
-        HitAndRunChain chain = new HitAndRunChain(body, directionSamplingAlgorithm.fit(body), random);
+        HitAndRun chain = new HitAndRun(body, directionSamplingAlgorithm.fit(body), random);
         double[][] samples = sampleSelector.select(chain, numSamples);
 
         sampleCache.updateCache(samples);

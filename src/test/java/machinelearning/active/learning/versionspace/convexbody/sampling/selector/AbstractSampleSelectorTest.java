@@ -1,7 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
-import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,11 +11,11 @@ abstract class AbstractSampleSelectorTest {
 
     @Test
     void select_negativeNumSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> sampleSelector.select(mock(HitAndRunChain.class), -1));
+        assertThrows(IllegalArgumentException.class, () -> sampleSelector.select(mock(HitAndRun.class), -1));
     }
 
     @Test
     void select_zeroNumSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> sampleSelector.select(mock(HitAndRunChain.class), 0));
+        assertThrows(IllegalArgumentException.class, () -> sampleSelector.select(mock(HitAndRun.class), 0));
     }
 }

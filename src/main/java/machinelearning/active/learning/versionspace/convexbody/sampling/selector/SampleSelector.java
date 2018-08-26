@@ -1,16 +1,16 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 
 /**
  * Interface for all sample selecting algorithms. They are used for extracting a target selection of samples from a Markov Chain.
  */
 public interface SampleSelector {
     /**
-     * @param hitAndRunChain: markov chain to select samples from
+     * @param hitAndRun: {@link HitAndRun} chain generator
      * @param numSamples: number os samples to select
-     * @return a selection of "numSamples" samples from the hitAndRunChain
+     * @return a selection of "numSamples" samples obtained through Hit-and-Run
      * @throws IllegalArgumentException if numSamples is not positive
      */
-    double[][] select(HitAndRunChain hitAndRunChain, int numSamples);
+    double[][] select(HitAndRun hitAndRun, int numSamples);
 }

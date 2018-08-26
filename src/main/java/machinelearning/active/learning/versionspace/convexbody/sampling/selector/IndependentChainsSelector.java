@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import utils.Validator;
 
 /**
@@ -9,12 +9,13 @@ import utils.Validator;
  */
 public class IndependentChainsSelector implements SampleSelector {
     /**
-     * Chain length for each independent run
+     * Chain length of each independent run
      */
     private int chainLength;
 
     /**
-     * @param chainLength: number of iterations of each independent run. The larger this value, the close to the limiting distribution the samples will be.
+     * @param chainLength: number of iterations of each independent run. The larger this value, the close to the limiting
+     *                   distribution the samples will be.
      * @throws IllegalArgumentException if chainLength is not positive
      */
     public IndependentChainsSelector(int chainLength) {
@@ -23,14 +24,13 @@ public class IndependentChainsSelector implements SampleSelector {
     }
 
     @Override
-    public double[][] select(HitAndRunChain hitAndRunChain, int numSamples) {
+    public double[][] select(HitAndRun hitAndRun, int numSamples) {
         Validator.assertPositive(numSamples);
 
         double[][] samples = new double[numSamples][];
 
         for (int i = 0; i < numSamples; i++) {
-            // copy sample before advancing so each run is independent
-            samples[i] = hitAndRunChain.copy().advance(chainLength);
+            samples[i] = hitAndRun.newChain().advance(chainLength);
         }
 
         return samples;

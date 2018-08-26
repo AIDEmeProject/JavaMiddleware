@@ -2,7 +2,6 @@ package machinelearning.active.learning.versionspace.convexbody.sampling;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,64 +14,64 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class HitAndRunChainTest {
+class HitAndRunTest {
     private ConvexBody convexBody;
     private DirectionSampler directionSampler;
-    private HitAndRunChain hitAndRunChain;
+    private HitAndRun.Chain chain;
 
     @BeforeEach
     void setUp() {
         convexBody = getConvexBodyMock();
         directionSampler = getDirectionSamplerMock();
-        hitAndRunChain = new HitAndRunChain(convexBody, directionSampler, new Random());
+        chain = new HitAndRun(convexBody, directionSampler).newChain();
     }
 
     @Test
     void constructor_nullConvexBody_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunChain(null, directionSampler, new Random()));
+        assertThrows(NullPointerException.class, () -> new HitAndRun(null, directionSampler, new Random()));
     }
 
     @Test
     void constructor_nullDirectionSampler_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunChain(convexBody, null, new Random()));
+        assertThrows(NullPointerException.class, () -> new HitAndRun(convexBody, null, new Random()));
     }
 
     @Test
     void constructor_nullRandomNumberGenerator_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunChain(convexBody, directionSampler, null));
+        assertThrows(NullPointerException.class, () -> new HitAndRun(convexBody, directionSampler, null));
     }
 
     @Test
     void advance_singleIteration_convexBodyMethodsCalledOnlyOnce() {
-        hitAndRunChain.advance();
+        chain.advance();
         verifyCallsToConvexBodyMock(1);
     }
 
     @Test
     void advance_singleIteration_directionSamplerCalledOnce() {
-        hitAndRunChain.advance();
+        chain.advance();
         verify(directionSampler).sampleDirection(any());
     }
 
     @Test
     void advance_negativeNumSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> hitAndRunChain.advance(-1));
+        assertThrows(IllegalArgumentException.class, () -> chain.advance(-1));
     }
 
     @Test
     void advance_zeroNumSamples_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> hitAndRunChain.advance(0));
+        assertThrows(IllegalArgumentException.class, () -> chain.advance(0));
     }
 
     @Test
     void advance_fiveIteration_convexBodyMethodsCalledOnlyFiveTimes() {
-        hitAndRunChain.advance(5);
+        chain.advance(5);
         verifyCallsToConvexBodyMock(5);
     }
 
     @Test
     void advance_fiveIteration_directionSamplerCalledFiveTimes() {
-        hitAndRunChain.advance(5);
+        chain.advance(5);
         verify(directionSampler, times(5)).sampleDirection(any());
     }
 

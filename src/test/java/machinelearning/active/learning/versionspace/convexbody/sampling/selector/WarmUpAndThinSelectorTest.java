@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,15 +12,18 @@ class WarmUpAndThinSelectorTest extends AbstractSampleSelectorTest {
     private final int warmUp = 10;
     private final int thin = 6;
     private final int numSamples = 3;
-    private HitAndRunChain chain;
+    private HitAndRun hitAndRun;
+    private HitAndRun.Chain chain;
 
     @BeforeEach
     void setUp() {
         sampleSelector = new WarmUpAndThinSelector(warmUp, thin);
 
-        chain = mock(HitAndRunChain.class);
+        chain = mock(HitAndRun.Chain.class);
         when(chain.advance(anyInt())).thenReturn(new double[]{0}, new double[]{1}, new double[]{2});
-        when(chain.copy()).thenReturn(chain);
+
+        hitAndRun = mock(HitAndRun.class);
+        when(hitAndRun.newChain()).thenReturn(chain);
     }
 
     @Test
@@ -39,21 +42,21 @@ class WarmUpAndThinSelectorTest extends AbstractSampleSelectorTest {
     }
 
     @Test
-    void select_mockedHitAndRunChain_copyNeverCalled() {
-        sampleSelector.select(chain, numSamples);
-        verify(chain, never()).copy();
+    void select_mockedHitAndRunChain_newChainCalledOnce() {
+        sampleSelector.select(hitAndRun, numSamples);
+        verify(hitAndRun).newChain();
     }
 
     @Test
     void select_mockedHitAndRunChain_advanceCalledOnceForWarmUpAndRemainingTimesForThinning() {
-        sampleSelector.select(chain, numSamples);
+        sampleSelector.select(hitAndRun, numSamples);
         verify(chain).advance(warmUp);
         verify(chain, times(numSamples-1)).advance(thin);
     }
 
     @Test
     void select_stubbedHitAndRunChainResults_selectReturnsStubbedSamples() {
-        double[][] result = sampleSelector.select(chain, numSamples);
+        double[][] result = sampleSelector.select(hitAndRun, numSamples);
         assertArrayEquals(new double[][] {{0}, {1}, {2}}, result);
     }
 }

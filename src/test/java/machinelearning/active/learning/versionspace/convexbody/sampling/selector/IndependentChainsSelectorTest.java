@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.selector;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,15 +11,18 @@ import static org.mockito.Mockito.*;
 class IndependentChainsSelectorTest extends AbstractSampleSelectorTest {
     private final int numSamples = 3;
     private final int chainLength = 10;
-    private HitAndRunChain chain;
+    private HitAndRun hitAndRun;
+    private HitAndRun.Chain chain;
 
     @BeforeEach
     void setUp() {
         sampleSelector = new IndependentChainsSelector(chainLength);
 
-        chain = mock(HitAndRunChain.class);
+        chain = mock(HitAndRun.Chain.class);
         when(chain.advance(chainLength)).thenReturn(new double[]{0}, new double[]{1}, new double[]{2});
-        when(chain.copy()).thenReturn(chain);
+
+        hitAndRun = mock(HitAndRun.class);
+        when(hitAndRun.newChain()).thenReturn(chain);
     }
 
     @Test
@@ -33,20 +36,20 @@ class IndependentChainsSelectorTest extends AbstractSampleSelectorTest {
     }
 
     @Test
-    void select_sampleThreePoints_copyCalledOncePerSample() {
-        sampleSelector.select(chain, numSamples);
-        verify(chain, times(numSamples)).copy();
+    void select_sampleThreePoints_newChainCalledOncePerSample() {
+        sampleSelector.select(hitAndRun, numSamples);
+        verify(hitAndRun, times(numSamples)).newChain();
     }
 
     @Test
-    void select_sampleThreePoints_generateThreeChainsOfSizeGivenByChainLengthParameter() {
-        sampleSelector.select(chain, numSamples);
+    void select_sampleThreePoints_generateThreeChainsOfSizeEqualToChainLength() {
+        sampleSelector.select(hitAndRun, numSamples);
         verify(chain, times(numSamples)).advance(chainLength);
     }
 
     @Test
     void select_stubbedHitAndRunChainResults_selectReturnsStubbedSamples() {
-        double[][] result = sampleSelector.select(chain, numSamples);
+        double[][] result = sampleSelector.select(hitAndRun, numSamples);
         assertArrayEquals(new double[][] {{0}, {1}, {2}}, result);
     }
 }
