@@ -38,20 +38,9 @@ public class LinearVersionSpace implements VersionSpace {
     private final HitAndRunSampler hitAndRunSampler;
 
     /**
-     * {@link SampleSelector} strategy for selecting samples from the Hit-and-Run chain
-     */
-    private SampleSelector sampleSelector;
-
-    /**
      * {@link LinearProgramSolver} factory
      */
     private final LinearProgramSolver.FACTORY solverFactory;
-
-    /**
-     * {@link SampleCache} sample caching procedure
-     */
-    private SampleCache sampleCache;
-
 
     /**
      * By default, no intercept and no sample caching is performed.
@@ -60,13 +49,10 @@ public class LinearVersionSpace implements VersionSpace {
      * @param solverFactory: {@link LinearProgramSolver} factory object
      * @throws NullPointerException if sampler is null
      */
-    //TODO: use Builder pattern (or similar) to simplify this object's construction
-    public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, SampleSelector sampleSelector, LinearProgramSolver.FACTORY solverFactory) {
+    public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, LinearProgramSolver.FACTORY solverFactory) {
         this.hitAndRunSampler = Objects.requireNonNull(hitAndRunSampler);
-        this.sampleSelector = Objects.requireNonNull(sampleSelector);
         this.solverFactory = Objects.requireNonNull(solverFactory);
         this.addIntercept = false;
-        this.sampleCache = new DummySampleCache();
     }
 
     /**
@@ -74,13 +60,6 @@ public class LinearVersionSpace implements VersionSpace {
      */
     public void addIntercept() {
         this.addIntercept = true;
-    }
-
-    /**
-     * @param sampleCache: new sample caching strategy to use
-     */
-    public void setSampleCachingStrategy(SampleCache sampleCache) {
-        this.sampleCache = sampleCache;
     }
 
     /**
@@ -93,11 +72,8 @@ public class LinearVersionSpace implements VersionSpace {
         Validator.assertPositive(numSamples);
 
         ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
-        cone = sampleCache.attemptToSetDefaultInteriorPoint(cone);
 
-        double[][] samples = sampleSelector.select(hitAndRunSampler.newChain(cone), numSamples);
-
-        sampleCache.updateCache(samples);
+        double[][] samples = hitAndRunSampler.sample(cone, numSamples);
 
         return getLinearClassifiers(samples);
     }

@@ -24,7 +24,6 @@ import static org.mockito.Mockito.*;
 class LinearVersionSpaceTest {
     private List<LabeledPoint> trainingData;
     private HitAndRunSampler sampler;
-    private SampleSelector sampleSelector;
     private LinearVersionSpace versionSpace;
     private double[][] hitAndRunSamples;
 
@@ -35,11 +34,9 @@ class LinearVersionSpaceTest {
         hitAndRunSamples = new double[][] {{1,2}, {3,4}, {5,6}};
 
         sampler = mock(HitAndRunSampler.class);
+        when(sampler.sample(any(), anyInt())).thenReturn(hitAndRunSamples);
 
-        sampleSelector = mock(SampleSelector.class);
-        when(sampleSelector.select(any(), anyInt())).thenReturn(hitAndRunSamples);
-
-        versionSpace = new LinearVersionSpace(sampler, sampleSelector, mock(LinearProgramSolver.FACTORY.class));
+        versionSpace = new LinearVersionSpace(sampler, mock(LinearProgramSolver.FACTORY.class));
     }
 
     @Test
@@ -59,8 +56,8 @@ class LinearVersionSpaceTest {
 
     @Test
     void sample_validInput_HitAndRunSamplerCalledOnce() {
-        versionSpace.sample(trainingData, 10);
-        verify(sampler).newChain(any());
+        versionSpace.sample(trainingData, hitAndRunSamples.length);
+        verify(sampler).sample(any(), eq(hitAndRunSamples.length));
     }
 
     @Test
@@ -83,23 +80,5 @@ class LinearVersionSpaceTest {
         }
 
         assertArrayEquals(expected, versionSpace.sample(trainingData, hitAndRunSamples.length));
-    }
-
-    @Test
-    void sample_mockSampleCache_cacheMethodsAreCalledOnlyOnce() {
-        SampleCache cache = spy(DummySampleCache.class);
-
-        versionSpace.setSampleCachingStrategy(cache);
-        versionSpace.sample(trainingData, hitAndRunSamples.length);
-
-        verify(cache).attemptToSetDefaultInteriorPoint(any());
-        verify(cache).updateCache(hitAndRunSamples);
-    }
-
-    @Test
-    void sample_mockSampleSelector_selectCalledOnceWithExpectedNumberOfSamples() {
-        int numSamples = 10;
-        versionSpace.sample(trainingData, numSamples);
-        verify(sampleSelector).select(any(), eq(numSamples));
     }
 }
