@@ -3,7 +3,9 @@ package machinelearning.active.learning.versionspace;
 import data.LabeledPoint;
 import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
 import machinelearning.active.learning.versionspace.convexbody.SampleCache;
+import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunChain;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.SampleSelector;
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.*;
 class LinearVersionSpaceTest {
     private List<LabeledPoint> trainingData;
     private HitAndRunSampler sampler;
+    private SampleSelector sampleSelector;
     private LinearVersionSpace versionSpace;
     private double[][] hitAndRunSamples;
 
@@ -30,10 +33,13 @@ class LinearVersionSpaceTest {
         trainingData = Arrays.asList(mock(LabeledPoint.class));
 
         hitAndRunSamples = new double[][] {{1,2}, {3,4}, {5,6}};
-        sampler = mock(HitAndRunSampler.class);
-        when(sampler.sample(any(), anyInt())).thenReturn(hitAndRunSamples);
 
-        versionSpace = new LinearVersionSpace(sampler, mock(LinearProgramSolver.FACTORY.class));
+        sampler = mock(HitAndRunSampler.class);
+
+        sampleSelector = mock(SampleSelector.class);
+        when(sampleSelector.select(any(), anyInt())).thenReturn(hitAndRunSamples);
+
+        versionSpace = new LinearVersionSpace(sampler, sampleSelector, mock(LinearProgramSolver.FACTORY.class));
     }
 
     @Test
@@ -53,9 +59,8 @@ class LinearVersionSpaceTest {
 
     @Test
     void sample_validInput_HitAndRunSamplerCalledOnce() {
-        when(sampler.sample(any(), anyInt())).thenReturn(new double[][] {{1,2}});
-        versionSpace.sample(trainingData, 1);
-        verify(sampler).sample(any(), eq(1));
+        versionSpace.sample(trainingData, 10);
+        verify(sampler).newChain(any());
     }
 
     @Test
@@ -81,15 +86,20 @@ class LinearVersionSpaceTest {
     }
 
     @Test
-    void sample_addSamplerCache_cacheMethodsAreCalledOnlyOnce() {
+    void sample_mockSampleCache_cacheMethodsAreCalledOnlyOnce() {
         SampleCache cache = spy(DummySampleCache.class);
 
         versionSpace.setSampleCachingStrategy(cache);
         versionSpace.sample(trainingData, hitAndRunSamples.length);
 
-        ArgumentCaptor<double[][]> captor = ArgumentCaptor.forClass(double[][].class);
         verify(cache).attemptToSetDefaultInteriorPoint(any());
-        verify(cache).updateCache(captor.capture());
-        assertSame(hitAndRunSamples, captor.getValue());
+        verify(cache).updateCache(hitAndRunSamples);
+    }
+
+    @Test
+    void sample_mockSampleSelector_selectCalledOnceWithExpectedNumberOfSamples() {
+        int numSamples = 10;
+        versionSpace.sample(trainingData, numSamples);
+        verify(sampleSelector).select(any(), eq(numSamples));
     }
 }

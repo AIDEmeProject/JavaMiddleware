@@ -6,11 +6,13 @@ import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
 import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.SampleSelector;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +35,12 @@ public class LinearVersionSpace implements VersionSpace {
     /**
      * {@link HitAndRunSampler} instance for sampling from this version space
      */
-    private final HitAndRunSampler sampler;
+    private final HitAndRunSampler hitAndRunSampler;
+
+    /**
+     * {@link SampleSelector} strategy for selecting samples from the Hit-and-Run chain
+     */
+    private SampleSelector sampleSelector;
 
     /**
      * {@link LinearProgramSolver} factory
@@ -45,17 +52,20 @@ public class LinearVersionSpace implements VersionSpace {
      */
     private SampleCache sampleCache;
 
+
     /**
      * By default, no intercept and no sample caching is performed.
      *
-     * @param sampler: Hit-and-Run sampler instance
+     * @param hitAndRunSampler: Hit-and-Run sampler instance
      * @param solverFactory: {@link LinearProgramSolver} factory object
      * @throws NullPointerException if sampler is null
      */
-    public LinearVersionSpace(HitAndRunSampler sampler, LinearProgramSolver.FACTORY solverFactory) {
-        this.sampler = sampler;
+    //TODO: use Builder pattern (or similar) to simplify this object's construction
+    public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, SampleSelector sampleSelector, LinearProgramSolver.FACTORY solverFactory) {
+        this.hitAndRunSampler = Objects.requireNonNull(hitAndRunSampler);
+        this.sampleSelector = Objects.requireNonNull(sampleSelector);
+        this.solverFactory = Objects.requireNonNull(solverFactory);
         this.addIntercept = false;
-        this.solverFactory = solverFactory;
         this.sampleCache = new DummySampleCache();
     }
 
@@ -85,7 +95,7 @@ public class LinearVersionSpace implements VersionSpace {
         ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
         cone = sampleCache.attemptToSetDefaultInteriorPoint(cone);
 
-        double[][] samples = sampler.sample(cone, numSamples);
+        double[][] samples = sampleSelector.select(hitAndRunSampler.newChain(cone), numSamples);
 
         sampleCache.updateCache(samples);
 
