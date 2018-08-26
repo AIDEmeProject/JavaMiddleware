@@ -3,8 +3,6 @@ package machinelearning.active.learning.versionspace.convexbody;
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
 
-import java.util.Arrays;
-
 /**
  * This class represents a Line Segment in euclidean space. A line is defined by two elements:
  *

@@ -1,5 +1,8 @@
-package machinelearning.active.learning.versionspace.convexbody;
+package machinelearning.active.learning.versionspace.convexbody.sampling;
 
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.active.learning.versionspace.convexbody.Line;
+import machinelearning.active.learning.versionspace.convexbody.LineSegment;
 import utils.linalg.LinearAlgebra;
 
 import java.util.Optional;

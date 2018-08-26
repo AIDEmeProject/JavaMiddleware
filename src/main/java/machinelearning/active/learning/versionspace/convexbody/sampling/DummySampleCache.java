@@ -1,4 +1,6 @@
-package machinelearning.active.learning.versionspace.convexbody;
+package machinelearning.active.learning.versionspace.convexbody.sampling;
+
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 
 /**
  * This is a dummy {@link SampleCache} object, which performs no caching operation. This is used when caching behavior

@@ -2,11 +2,8 @@ package machinelearning.active.learning.versionspace;
 
 import data.LabeledPoint;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
-import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
-import machinelearning.active.learning.versionspace.convexbody.sampling.SampleSelector;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
 import utils.linprog.LinearProgramSolver;

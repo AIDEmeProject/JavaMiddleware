@@ -1,5 +1,6 @@
-package machinelearning.active.learning.versionspace.convexbody;
+package machinelearning.active.learning.versionspace.convexbody.sampling;
 
+import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;

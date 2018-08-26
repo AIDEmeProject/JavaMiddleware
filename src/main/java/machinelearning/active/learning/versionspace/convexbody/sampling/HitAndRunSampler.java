@@ -1,8 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.DummySampleCache;
-import machinelearning.active.learning.versionspace.convexbody.SampleCache;
 import utils.Validator;
 
 import java.util.Objects;

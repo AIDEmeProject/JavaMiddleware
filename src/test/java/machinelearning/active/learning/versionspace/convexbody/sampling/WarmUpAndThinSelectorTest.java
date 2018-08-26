@@ -3,9 +3,9 @@ package machinelearning.active.learning.versionspace.convexbody.sampling;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 class WarmUpAndThinSelectorTest extends AbstractSampleSelectorTest {
     private final int warmUp = 10;
