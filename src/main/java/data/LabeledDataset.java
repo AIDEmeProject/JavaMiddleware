@@ -183,4 +183,21 @@ public class LabeledDataset {
 
         return new LabeledDataset(labeled, sample, allPoints);
     }
+
+
+    public static HashSet<Integer> getRowSet(Collection<DataPoint> allPoints){
+        HashSet<Integer> rowSet = new HashSet<>();
+        for(DataPoint dp : allPoints){
+            rowSet.add(dp.getRow());
+        }
+        return rowSet;
+    }
+
+    public static HashSet<Long> getIdSet(Collection<DataPoint> allPoints){
+        HashSet<Long> idSet = new HashSet<>();
+        for(DataPoint dp : allPoints){
+            idSet.add(dp.getId());
+        }
+        return idSet;
+    }
 }

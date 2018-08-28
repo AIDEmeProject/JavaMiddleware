@@ -66,6 +66,7 @@ public class DataPoint {
     public double get(int i){
         return data[i];
     }
+    //Todo: retrieve data by id? In addition, this class lacks of feature selection
 
     /**
      * @return data point's dimension (i.e. number of features)
