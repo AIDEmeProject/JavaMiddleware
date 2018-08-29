@@ -1,7 +1,6 @@
 package machinelearning.classifier.TSM;
 
 import utils.ObjectWithDistance;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -49,20 +48,6 @@ public class OneDimTSM {
 
         concavePoints = new HashSet<>();
     }
-
-//    /**
-//     * Update three-set partition on 1-dim space
-//     * @param point 1-dim point
-//     * @param label
-//     * @throws IOException
-//     */
-//    public void update(double point, double label) {
-//        if(flag){
-//            updatePos(point, label);
-//        }else {
-//            updateNeg(point, label );
-//        }
-//    }
 
     /**
      * Update three-set partition on 1-dim space when the pos region is convex

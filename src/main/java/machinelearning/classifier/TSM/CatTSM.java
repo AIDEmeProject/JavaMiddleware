@@ -1,6 +1,7 @@
 //package machinelearning.classifier.TSM;
 //
 //import data.LabeledPoint;
+//import utils.AttributeValue;
 //
 //import java.io.IOException;
 //import java.util.Collection;
@@ -8,7 +9,7 @@
 //
 //
 ///**
-// * This class deals with Three-set partition of space spanned by one-hot encoding features that converted from categorical attributes
+// * This class deals with Three-Set partition of space spanned by one-hot encoding features that converted from categorical attributes
 // *
 // * @author enhui
 // */
@@ -30,7 +31,7 @@
 //        falseLines = new HashSet<>();
 //    }
 //
-//    public void updateCatRatio(Collection<LabeledPoint> labeledSamples) throws IOException {
+//    public void updateCat(Collection<LabeledPoint> labeledSamples) throws IOException {
 //        for(LabeledPoint t: labeledSamples) {
 //            Collection <AttributeValue> rawValues = t.getSelectedUnscaledAV();
 //            for(AttributeValue attributeValue: rawValues){
