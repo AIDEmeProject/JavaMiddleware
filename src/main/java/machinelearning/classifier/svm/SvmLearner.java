@@ -20,9 +20,9 @@ import java.util.List;
 public class SvmLearner implements Learner {
 
     /**
-     * SVM training parameters
+     * SVM's penalty value
      */
-    private final svm_parameter param;
+    private final double C;
 
     /**
      * SVM kernel function
@@ -40,16 +40,17 @@ public class SvmLearner implements Learner {
      */
     public SvmLearner(double C, Kernel kernel) {
         Validator.assertPositive(C);
+        Validator.assertNotNull(kernel);
 
-        param = buildSvmParameterWithDefaultValues();
-        param.C = C;
-        kernel.setSvmParameters(param);
-
+        this.C = C;
         this.kernel = kernel;
     }
 
-    private svm_parameter buildSvmParameterWithDefaultValues() {
+    private svm_parameter buildSvmParameter() {
         svm_parameter parameter = new svm_parameter();
+
+        parameter.C = C;
+        kernel.setSvmParameters(parameter);
 
         // probability estimates (no estimation by default)
         parameter.probability = 0;
@@ -72,6 +73,7 @@ public class SvmLearner implements Learner {
      */
     @Override
     public KernelClassifier fit(Collection<LabeledPoint> labeledPoints) {
+        svm_parameter param = buildSvmParameter();
         svm_problem prob = buildSvmProblem(labeledPoints);
         svm_parameter parameter = (svm_parameter) param.clone();
 
@@ -114,5 +116,10 @@ public class SvmLearner implements Learner {
         List<DataPoint> sv = SvmNodeConverter.toDataPoint(model.SV);
 
         return new KernelClassifier(bias, alpha, sv, kernel);
+    }
+
+    @Override
+    public String toString() {
+        return "SVM C = " + C + ", kernel = " + kernel;
     }
 }
