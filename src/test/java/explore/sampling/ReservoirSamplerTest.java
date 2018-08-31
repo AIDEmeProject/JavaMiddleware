@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ReservoirSamplerTest {
@@ -34,8 +35,8 @@ class ReservoirSamplerTest {
     }
 
     @Test
-    void sample_collectionSmallerThanSampleSize_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> ReservoirSampler.sample(values, values.size()+1));
+    void sample_collectionSmallerThanSampleSize_theOwnCollectionIsReturned() {
+        assertSame(values, ReservoirSampler.sample(values, values.size()+1));
     }
 
     @Test

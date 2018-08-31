@@ -40,6 +40,10 @@ public class ReservoirSampler {
         Validator.assertNotEmpty(collection);
         Validator.assertPositive(sampleSize);
 
+        if (sampleSize >= collection.size()) {
+            return collection;
+        }
+
         int index = 0;
         ArrayList<T> result = new ArrayList<>(sampleSize);
 

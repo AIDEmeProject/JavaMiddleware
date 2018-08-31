@@ -45,7 +45,7 @@ class StratifiedSamplerTest {
         keys.add(3L);
         user = new DummyUser(keys);
 
-        assertThrows(RuntimeException.class, () -> sampler.sample(points, user));
+        assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }
 
     @Test
@@ -56,6 +56,6 @@ class StratifiedSamplerTest {
         keys.add(2L);
         user = new DummyUser(keys);
 
-        assertThrows(RuntimeException.class, () -> sampler.sample(points, user));
+        assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }
 }
