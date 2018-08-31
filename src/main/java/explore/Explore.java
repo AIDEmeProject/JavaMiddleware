@@ -3,13 +3,11 @@ package explore;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
-import explore.metrics.MetricCalculator;
+import explore.sampling.InitialSampler;
 import explore.sampling.ReservoirSampler;
-import explore.sampling.StratifiedSampler;
 import explore.user.User;
 import io.FolderManager;
 import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
 import utils.Validator;
 
 import java.io.BufferedWriter;
@@ -18,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -39,12 +38,7 @@ public class Explore {
     /**
      * Initial sampler. It randomly chooses an initial batch of positive and negative points to be labeled.
      */
-    private final StratifiedSampler initialSampler;
-
-    /**
-     * metric calculators
-     */
-    private final Collection<MetricCalculator> metricCalculators;
+    private final InitialSampler initialSampler;
 
     /**
      * Size of unlabeled set sample taken at every iteration
@@ -55,15 +49,12 @@ public class Explore {
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
      * @param subsampleSize: size of sample to restrict unlabeled set at every iteration (speeds up computation)
-     * @param metricCalculators: collection of metrics  to be calculated
      * @throws IllegalArgumentException if budget is not positive
      */
-    public Explore(StratifiedSampler initialSampler, int budget, int subsampleSize, Collection<MetricCalculator> metricCalculators) {
+    public Explore(InitialSampler initialSampler, int budget, int subsampleSize) {
         Validator.assertPositive(budget);
-
         this.initialSampler = initialSampler;
         this.budget = budget;
-        this.metricCalculators = metricCalculators;
         this.subsampleSize = subsampleSize;
     }
 
@@ -71,23 +62,11 @@ public class Explore {
      * Through this constructor, no subsampling is performed.
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
      * @param budget: number of iterations in the active learning exploration process
-     * @param metricCalculators: collection of metrics  to be calculated
      * @throws IllegalArgumentException if budget is not positive
      */
-    public Explore(StratifiedSampler initialSampler, int budget, Collection<MetricCalculator> metricCalculators) {
-        this(initialSampler, budget, Integer.MAX_VALUE, metricCalculators);
+    public Explore(InitialSampler initialSampler, int budget) {
+        this(initialSampler, budget, Integer.MAX_VALUE);
     }
-
-    /**
-     * Through this constructor, no subsampling is performed and no additional metrics  will be computed.
-     * Only time measurements and the set of labeled rows will be provided in result.
-     * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
-     * @param budget: number of iterations in the active learning exploration process
-     */
-    public Explore(StratifiedSampler initialSampler, int budget) {
-        this(initialSampler, budget, Integer.MAX_VALUE, new ArrayList<>());
-    }
-
     /**
      * Run the exploration process several times (with random seeds), saving all exploration metrics  to disk.
      * @param data: data points
@@ -118,9 +97,6 @@ public class Explore {
         if (seeds != null){
             Validator.assertEquals(runs, seeds.length);
         }
-
-        // initializes active learner internal data structures
-        activeLearner.initialize(data);
 
         for (int i = 0; i < runs; i++) {
             runSingleExploration(data, user, activeLearner, seeds == null ? System.nanoTime() : seeds[i], folder.createNewRunFile());
@@ -174,35 +150,35 @@ public class Explore {
 
         // retrain model
         initialTime = System.nanoTime();
-        Classifier classifier = activeLearner.fit(data.getLabeledPoints());
+        activeLearner.update(labeledPoints);
         metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // compute accuracy metrics
-        initialTime = System.nanoTime();
-        for (MetricCalculator metricCalculator : metricCalculators){
-            metrics.putAll(metricCalculator.compute(data, user, classifier).getMetrics());
-        }
-        metrics.put("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
+//        initialTime = System.nanoTime();
+//        for (MetricCalculator metricCalculator : metricCalculators){
+//            metrics.putAll(metricCalculator.compute(data, user, classifier).getMetrics());
+//        }
+//        metrics.put("AccuracyComputationTimeMillis",(System.nanoTime() - initialTime) / 1e6);
 
         metrics.put("IterTimeMillis",(System.nanoTime() - start) / 1e6);
-        //System.out.println(metrics );
+
         return metrics;
     }
 
     /**
      * Retrieves the next points to labeled, either through the initial sampling or using the active learning model.
      */
-    private Collection<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
+    private List<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
         ArrayList<DataPoint> result = new ArrayList<>();
 
         // initial sampling
         if (data.getNumLabeledPoints() == 0){
-            result.addAll(initialSampler.sample(data.getUnlabeledPoints(), user));
+            result.addAll(initialSampler.runInitialSample(data.getUnlabeledPoints(), user));
         }
         // retrieve most informative point according to model
         else{
-            LabeledDataset sample = data.subsampleUnlabeledSet(subsampleSize);
-            result.add(activeLearner.retrieveMostInformativeUnlabeledPoint(sample));
+            Collection<DataPoint> sample = ReservoirSampler.sample(data.getUnlabeledPoints(), subsampleSize);
+            result.add(activeLearner.getRanker().top(sample));
         }
 
         return result;

@@ -1,4 +1,4 @@
-package machinelearning.active.search;
+package machinelearning.active.ranker;
 
 import data.LabeledDataset;
 import machinelearning.classifier.Classifier;

@@ -1,16 +1,9 @@
 package machinelearning.active.learning;
 
-import data.DataPoint;
-import data.LabeledDataset;
-import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.margin.MarginClassifier;
+import machinelearning.active.Ranker;
+import machinelearning.active.ranker.MarginRanker;
 import machinelearning.classifier.svm.SvmLearner;
-import utils.OptimumFinder;
-import utils.Validator;
-
-import java.util.Collection;
 
 /**
  * Simple Margin is a Active Learning technique introduced in [1]. It approximates a version space cutting technique
@@ -28,27 +21,14 @@ public class SimpleMargin extends ActiveLearner {
     /**
      * SVM classifier
      */
-    private MarginClassifier classifier;
+    private SvmLearner svmLearner;
 
-    public SimpleMargin(SvmLearner learner) {
-        super(learner);
+    public SimpleMargin(SvmLearner svmLearner) {
+        this.svmLearner = svmLearner;
     }
 
     @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        classifier = (MarginClassifier) super.fit(labeledPoints);
-        return classifier;
-    }
-
-    /**
-     * Retrieve point closest to the decision boundary
-     * @param data: labeled data object
-     * @return row index of unlabeled point closest to decision boundary
-     * @throws IllegalArgumentException if unlabeled set is empty
-     */
-    @Override
-    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        Validator.assertNotEmpty(data.getUnlabeledPoints());
-        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.margin(pt))).getOptimizer();
+    protected Ranker computeRanker() {
+        return new MarginRanker(svmLearner.fit(labeledSet));
     }
 }

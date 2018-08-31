@@ -1,13 +1,10 @@
 package machinelearning.active;
 
-import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Learner;
-import utils.Validator;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * ActiveLearner represents a classifier adapted to the Active Learning scenario. It is augmented with the capacity of
@@ -15,29 +12,25 @@ import java.util.Collection;
  *
  * @author luciano
  */
-public abstract class ActiveLearner implements Learner{
-    protected final Learner learner;
+public abstract class ActiveLearner {
+    protected List<LabeledPoint> labeledSet = new ArrayList<>();
+    private Ranker ranker;
 
-    protected ActiveLearner(Learner learner) {
-        this.learner = learner;
+    protected abstract Ranker computeRanker();
+
+    public Ranker getRanker() {
+        return ranker;
     }
 
-    @Override
-    public void initialize(Collection<DataPoint> points) {
-        learner.initialize(points);
+    public Ranker update(LabeledPoint labeledPoint){
+        labeledSet.add(labeledPoint);
+        ranker = computeRanker();
+        return ranker;
     }
 
-    @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        Validator.assertNotEmpty(labeledPoints);
-        return learner.fit(labeledPoints);
+    public Ranker update(Collection<LabeledPoint> labeledPoints){
+        labeledSet.addAll(labeledPoints);
+        ranker = computeRanker();
+        return ranker;
     }
-
-    /**
-     * Retrieve the most informative point for labeling from the unlabeled set.
-     * @param data: labeled data object
-     * @return index of the next unlabeled point to label
-     * @throws IllegalArgumentException if unlabeled set is empty
-     */
-    public abstract DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
 }

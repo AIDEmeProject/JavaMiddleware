@@ -1,13 +1,12 @@
 package machinelearning.active.search;
 
-import data.DataPoint;
-import data.LabeledDataset;
 import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Label;
+import machinelearning.active.Ranker;
+import machinelearning.active.ranker.MaximumUtilityRanker;
 import machinelearning.classifier.Learner;
-import utils.OptimumFinder;
 import utils.Validator;
+
+import java.util.Objects;
 
 /**
  * Active Search is a domain of research very close to Active Learning. They differ by the quantity they try to optimize:
@@ -20,7 +19,7 @@ import utils.Validator;
  * point, thus impractical in any reasonable scenario.
  *
  * Thus, se also implement an optimization described in [2]. The optimization consists of pruning the tree search by
- * computing relatively inexpensive bound on the expected number of positive points to be retrieved; allowing for skipping
+ * computing relatively inexpensive bound on the expected number of positive points to be retrieved; this allows for skipping
  * points which do not meet the necessary thresholds.
  *
  * References:
@@ -38,90 +37,21 @@ public class ActiveTreeSearch extends ActiveLearner {
      */
     private final int lookahead;
 
-    /**
-     * maximum utility upper bound calculator
-     */
-    private UtilityUpperBoundCalculator calculator;
+    private final Learner learner;
 
     /**
      * @param learner k-Nearest-Neighbors classifier
      * @param lookahead: number of steps to look ahead at every iteration. Usually 1 and 2 work fine.
      */
     public ActiveTreeSearch(Learner learner, int lookahead) {
-        super(learner);
-
         Validator.assertPositive(lookahead);
+
+        this.learner = Objects.requireNonNull(learner);
         this.lookahead = lookahead;
-        this.calculator = new UtilityUpperBoundCalculator();
     }
 
-    /**
-     * Retrieves the unlabeled point which is expected to return the largest number of positive points in average, in
-     * the l-next future steps. If there are less than l unlabeled points remaining, we restrict l = # unlabeled points.
-     *
-     * @param data: labeled data object
-     * @return row index of most informative unlabeled point
-     */
     @Override
-    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        Validator.assertNotEmpty(data.getUnlabeledPoints());
-
-        int steps = Math.min(data.getNumUnlabeledPoints(), this.lookahead);
-
-        return utility(data, steps).getOptimizer();
-    }
-
-    /**
-     * Core function computing the maximum l-steps utility. Refer to [1] and [2] for details.
-     * @param data: labeled data
-     * @param steps: number of steps to look into the future
-     * @return optimal utility index and value
-     */
-    private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
-        Classifier classifier = learner.fit(data.getLabeledPoints());
-        double[] probas = classifier.probability(data.getAllPoints());
-
-        // find the unlabeled point maximizing the probability of being a target
-        OptimumFinder.OptimumResult<DataPoint> optimum = OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> probas[pt.getRow()]);
-
-        // if only one step remain, return previous optimum (i.e. greedy selection)
-        if (steps <= 1){
-            return optimum;
-        }
-
-        calculator.fit(data, classifier, steps);
-
-        // return the unlabeled point maximizing the optimalUtilityGivenPoint.
-        // the calculator variable can be used for pruning the tree search provided our classifier implements the computeProbabilityUpperBound method
-        // use the previous optimizer point as a "warm-starting" for the tree search
-        return OptimumFinder.maximizer(
-                data.getUnlabeledPoints(),
-                pt -> optimalUtilityGivenPoint(data, steps, pt, probas[pt.getRow()]),
-                pt -> calculator.upperBound(probas[pt.getRow()]),
-                optimum.getOptimizer());
-    }
-
-    /**
-     * Helper function for computing the expected number of labeled points to be retrieved if we start at a particular point.
-     * This function if computed recursively, calling the utility() method twice. Refer to [2] for details.
-     * @param data: labeled data so far
-     * @param steps: number to future steps remaining
-     * @param point: row number of starting point
-     * @param proba: probability of X[i] being 1
-     * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
-     */
-    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, DataPoint point, double proba){
-        // positive label branch
-        data.putOnLabeledSet(point, Label.POSITIVE);
-        double positiveUtility = utility(data, steps-1).getScore();
-        data.removeFromLabeledSet(point);
-
-        // negative label branch
-        data.putOnLabeledSet(point, Label.NEGATIVE);
-        double negativeUtility = utility(data, steps-1).getScore();
-        data.removeFromLabeledSet(point);
-
-        // return utility
-        return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
+    protected Ranker computeRanker() {
+        return new MaximumUtilityRanker(learner, labeledSet, lookahead);
     }
 }
