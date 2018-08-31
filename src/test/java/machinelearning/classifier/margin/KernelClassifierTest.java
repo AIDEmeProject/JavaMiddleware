@@ -64,7 +64,7 @@ class KernelClassifierTest {
 
     @Test
     void margin_alwaysOneKernel_returnsCorrectMargin() {
-        when(kernel.compute((double[]) any(), any())).thenReturn(1.);
+        when(kernel.compute((Collection<? extends DataPoint>) any(), (double[]) any())).thenReturn(new double[] {1, 1});
         assertEquals(2, classifier.margin(new double[] {1,2}));
     }
 }

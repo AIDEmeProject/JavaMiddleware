@@ -36,11 +36,11 @@ public class LabeledDataset {
         allPoints = points;
     }
 
-    public LabeledDataset(Collection<LabeledPoint> labeledPoints, Collection<DataPoint> unlabeledPoints) {
-        unlabeled = new LinkedHashSet<>(unlabeledPoints);
-        labeled = new LinkedHashSet<>(labeledPoints);
-        allPoints = new LinkedHashSet<>(unlabeled);
-        allPoints.addAll(labeled);
+    public LabeledDataset(List<LabeledPoint> labeled, Collection<DataPoint> unlabeled){
+        this.labeled = new HashSet<>(labeled);
+        this.unlabeled = new HashSet<>(unlabeled);
+        this.allPoints = new HashSet<>(unlabeled);
+        this.allPoints.addAll(labeled);
     }
 
     private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled, Collection<DataPoint> allPoints) {
@@ -162,32 +162,5 @@ public class LabeledDataset {
         }
 
         unlabeled.add(point);
-    }
-
-    /**
-     * Create a new LabeledDataset instance by subsampling the unlabeled set. If sample size is larger than number of unlabeled
-     * points remaining, this own object is returned.
-     *
-     * @param sampleSize: sample size
-     * @return new LabeledDataset object whose unlabeled set is restricted to a sample.
-     * @throws IllegalArgumentException is size not positive
-     * @throws IllegalArgumentException if unlabeled set is empty
-     */
-    public LabeledDataset subsampleUnlabeledSet(int sampleSize) {
-        Validator.assertPositive(sampleSize);
-        Validator.assertNotEmpty(unlabeled);
-
-        if (sampleSize >= getNumUnlabeledPoints()) {
-            return this;
-        }
-
-        // sample keys
-        Collection<DataPoint> points = ReservoirSampler.sample(unlabeled, sampleSize);
-
-        // copy sample to set
-        Set<DataPoint> sample = new HashSet<>(sampleSize);
-        sample.addAll(points);
-
-        return new LabeledDataset(labeled, sample, allPoints);
     }
 }

@@ -150,35 +150,4 @@ class LabeledDatasetTest {
         assertFalse(data.getLabeledPoints().contains(point));
         assertTrue(data.getUnlabeledPoints().contains(point));
     }
-
-    @Test
-    void subsampleUnlabeledSet_zeroSampleSize_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(0));
-    }
-
-    @Test
-    void subsampleUnlabeledSet_negativeSampleSize_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(-1));
-    }
-
-    @Test
-    void subsampleUnlabeledSet_sampleSizeEqualsToNumUnlabeledPoints_theOwnObjectIsReturned() {
-        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledPoints()));
-    }
-
-    @Test
-    void subsampleUnlabeledSet_sampleSizeLargerThanNumUnlabeledPoints_theOwnObjectIsReturned() {
-        assertTrue(data == data.subsampleUnlabeledSet(data.getNumUnlabeledPoints() + 1));
-    }
-
-    @Test
-    void subsampleUnlabeledSet_sampleSizeEqualsInfinity_theOwnObjectIsReturned() {
-        assertTrue(data == data.subsampleUnlabeledSet(Integer.MAX_VALUE));
-    }
-
-    @Test
-    void subsampleUnlabeledSet_emptyUnlabeledSet_throwsException() {
-        labelAll();
-        assertThrows(IllegalArgumentException.class, () -> data.subsampleUnlabeledSet(1));
-    }
 }
