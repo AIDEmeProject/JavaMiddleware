@@ -11,7 +11,7 @@ import machinelearning.active.learning.versionspace.convexbody.sampling.selector
 
 import java.lang.reflect.Type;
 
-public class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAndRunSampler> {
+class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAndRunSampler> {
     @Override
     public HitAndRunSampler deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();

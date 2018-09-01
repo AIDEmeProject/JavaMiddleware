@@ -1,7 +1,5 @@
 package explore.statistics;
 
-import explore.IterationMetrics;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -56,9 +54,9 @@ class StatisticsCollection {
      * Update statistics from values in Metrics object. Metrics not in this collection will be simply appended.
      * @param metrics: Metrics object
      */
-    public void update(IterationMetrics metrics){
-        for (String name : metrics.names()){
-            update(name, metrics.get(name));
+    public void update(Map<String, Double> metrics){
+        for (Map.Entry<String, Double> entry : metrics.entrySet()){
+            update(entry.getKey(), entry.getValue());
         }
     }
 

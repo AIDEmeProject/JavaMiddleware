@@ -4,7 +4,7 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
-public abstract class JsonDeserializedAdapter<T> implements com.google.gson.JsonDeserializer<T> {
+abstract class JsonDeserializedAdapter<T> implements com.google.gson.JsonDeserializer<T> {
     private static String PROP_NAME ="name";
 
     @Override

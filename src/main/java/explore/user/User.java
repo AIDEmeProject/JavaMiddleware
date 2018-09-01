@@ -6,6 +6,7 @@ import machinelearning.classifier.Label;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * An User represents the "oracle" of Active Learning scenario: an expert or human annotator capable of, given a data point,
@@ -39,8 +40,8 @@ public interface User {
         return new LabeledPoint(point, getLabel(point));
     }
 
-    default Collection<LabeledPoint> getLabeledPoint(Collection<DataPoint> points){
-        Collection<LabeledPoint> labeledPoints = new ArrayList<>(points.size());
+    default List<LabeledPoint> getLabeledPoint(List<DataPoint> points){
+        List<LabeledPoint> labeledPoints = new ArrayList<>(points.size());
 
         for (DataPoint point : points){
             labeledPoints.add(getLabeledPoint(point));

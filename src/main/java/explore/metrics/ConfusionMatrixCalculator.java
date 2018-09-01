@@ -11,7 +11,7 @@ import utils.Validator;
  *
  * @see ConfusionMatrix
  */
-public class ConfusionMatrixCalculator implements MetricCalculator{
+public class ConfusionMatrixCalculator implements MetricCalculator {
     /**
      * Compute a ConfusionMatrix from the labeled dataset and activeLearner objects.
      * @param data: dataset containing both features X and true labels y

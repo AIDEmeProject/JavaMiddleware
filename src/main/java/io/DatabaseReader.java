@@ -3,10 +3,7 @@ package io;
 import data.DataPoint;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This module is responsible for reading data from a database using JDBC. We make the following assumptions about the
@@ -50,8 +47,8 @@ public class DatabaseReader {
      * @param columns: list of data columns to read. Must be of numeric type.
      * @return Indexes dataset instance containing both the keys and the data read from the database
      */
-    public Collection<DataPoint> readTable(String table, String key, String[] columns){
-        Collection<DataPoint> points = new ArrayList<>();
+    public List<DataPoint> readTable(String table, String key, String[] columns){
+        List<DataPoint> points = new ArrayList<>();
 
         // build SQL query
         String SQL = buildSQLString(table, key, columns, "");

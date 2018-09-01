@@ -3,7 +3,7 @@ package json;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.ActiveLearner;
 
-public class ActiveLearnerAdapter extends JsonDeserializedAdapter<ActiveLearner> {
+class ActiveLearnerAdapter extends JsonDeserializedAdapter<ActiveLearner> {
     @Override
     public String getPackagePrefix() {
         return "machinelearning.active.learning";

@@ -3,7 +3,7 @@ package json;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.classifier.svm.Kernel;
 
-public class KernelAdapter extends JsonDeserializedAdapter<Kernel> {
+class KernelAdapter extends JsonDeserializedAdapter<Kernel> {
     @Override
     public String getPackagePrefix() {
         return "machinelearning.classifier.svm";

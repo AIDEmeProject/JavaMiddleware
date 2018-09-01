@@ -3,10 +3,10 @@ package json;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.classifier.Learner;
 
-public class LearnerAdapter extends JsonDeserializedAdapter<Learner> {
+class LearnerAdapter extends JsonDeserializedAdapter<Learner> {
     @Override
     public String getPackagePrefix() {
-        return "machinelearner.classifier" ;
+        return "machinelearning.classifier" ;
     }
 
     public String getCanonicalName(String identifier){

@@ -11,7 +11,7 @@ import utils.linprog.LinearProgramSolver;
 
 import java.lang.reflect.Type;
 
-public class LinearVersionSpaceAdapter implements com.google.gson.JsonDeserializer<LinearVersionSpace> {
+class LinearVersionSpaceAdapter implements com.google.gson.JsonDeserializer<LinearVersionSpace> {
     @Override
     public LinearVersionSpace deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
