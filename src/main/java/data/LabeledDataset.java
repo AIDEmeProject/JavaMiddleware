@@ -1,10 +1,12 @@
 package data;
 
-import explore.sampling.ReservoirSampler;
 import machinelearning.classifier.Label;
 import utils.Validator;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class LabeledDataset {
     /**
@@ -36,17 +38,15 @@ public class LabeledDataset {
         allPoints = points;
     }
 
-    public LabeledDataset(List<LabeledPoint> labeled, Collection<DataPoint> unlabeled){
-        this.labeled = new HashSet<>(labeled);
-        this.unlabeled = new HashSet<>(unlabeled);
-        this.allPoints = new HashSet<>(unlabeled);
-        this.allPoints.addAll(labeled);
+    public LabeledDataset(LabeledDataset labeledDataset){
+        this(labeledDataset.labeled, labeledDataset.unlabeled);
     }
 
-    private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled, Collection<DataPoint> allPoints) {
-        this.labeled = labeled;
-        this.unlabeled = unlabeled;
-        this.allPoints = allPoints;
+    public LabeledDataset(Collection<LabeledPoint> labeled, Collection<DataPoint> unlabeled){
+        this.labeled = new LinkedHashSet<>(labeled);
+        this.unlabeled = new LinkedHashSet<>(unlabeled);
+        this.allPoints = new LinkedHashSet<>(unlabeled);
+        this.allPoints.addAll(labeled);
     }
 
     /**
@@ -84,13 +84,6 @@ public class LabeledDataset {
     }
 
     /**
-     * @return total number of points
-     */
-    public int getNumPoints() {
-        return allPoints.size();
-    }
-
-    /**
      * @return number of labeled points
      */
     public int getNumLabeledPoints() {
@@ -102,6 +95,14 @@ public class LabeledDataset {
      */
     public int getNumUnlabeledPoints() {
         return unlabeled.size();
+    }
+
+    public boolean hasLabeledPoints() {
+        return !labeled.isEmpty();
+    }
+
+    public boolean hasUnlabeledPoints() {
+        return !unlabeled.isEmpty();
     }
 
     /**

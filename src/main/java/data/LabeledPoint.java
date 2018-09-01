@@ -1,8 +1,6 @@
 package data;
 
 import machinelearning.classifier.Label;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -68,31 +66,11 @@ public class LabeledPoint extends DataPoint {
     }
 
     /**
-     * @param json JSON string
-     * @return LabeledPoint object parsed from JSON string
-     */
-    public static LabeledPoint fromJson(String json){
-        JSONObject jsonObject = new JSONObject(json);
-
-        int row = jsonObject.getInt("row");
-        int id = jsonObject.getInt("id");
-        int label = jsonObject.getInt("label");
-
-        JSONArray dataArray = jsonObject.getJSONArray("data");
-        double[] data = new double[dataArray.length()];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = dataArray.getDouble(i);
-        }
-
-        return new LabeledPoint(row, id, data, label == 1 ? Label.POSITIVE : Label.NEGATIVE);
-    }
-
-    /**
      * @return JSON encoding of this object
      */
     @Override
     public String toString() {
-        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": " + label.asBinary() + '}';
+        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": \"" + label + "\"}";
     }
 
     /**
