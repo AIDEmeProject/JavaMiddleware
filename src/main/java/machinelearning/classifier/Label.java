@@ -39,4 +39,9 @@ public enum Label {
     public int asSign(){
         return isPositive ? 1 : -1;
     }
+
+    @Override
+    public String toString() {
+        return isPositive() ? "POSITIVE" : "NEGATIVE";
+    }
 }
