@@ -145,6 +145,10 @@ public class DatabaseReader {
             sqlBuilder.append(predicate);
         }
 
+        // This is necessary because the row order of a query is NOT guaranteed otherwise.
+        sqlBuilder.append(" ORDER BY ");
+        sqlBuilder.append(key);
+
         sqlBuilder.append(';');
 
         return sqlBuilder.toString();

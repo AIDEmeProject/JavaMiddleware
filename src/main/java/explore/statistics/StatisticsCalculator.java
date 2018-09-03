@@ -40,7 +40,7 @@ public class StatisticsCalculator {
         StatisticsCollection collection = new StatisticsCollection();
 
         for (String line : lines) {
-            collection.update(JsonConverter.deserializeMap(line));
+            collection.update(JsonConverter.deserializeMetricsMap(line));
         }
 
         return collection;

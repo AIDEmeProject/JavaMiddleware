@@ -6,6 +6,7 @@ import utils.Validator;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ public class StandardScaler {
      * @throws IllegalArgumentException if points is empty, or if any two points have different dimensions, or if
      * standard deviation of any column is zero
      */
-    public static StandardScaler fit(Collection<DataPoint> points){
+    public static StandardScaler fit(List<DataPoint> points){
         Validator.assertNotEmpty(points);
 
         Statistics[] statistics = computeStatisticsOfEachFeature(points);
@@ -47,6 +48,10 @@ public class StandardScaler {
         double[] std = getStandardDeviationArrayFromStatistics(statistics);
 
         return new StandardScaler(mean, std);
+    }
+
+    public static List<DataPoint> fitAndTransform(List<DataPoint> points) {
+        return fit(points).transform(points);
     }
 
     private static Statistics[] computeStatisticsOfEachFeature(Collection<DataPoint> points) {
@@ -106,7 +111,7 @@ public class StandardScaler {
      * @return a new standardized collection of points
      * @throws IllegalArgumentException if data points have different dimension from fitted data
      */
-    public Collection<DataPoint> transform(Collection<DataPoint> dataPoints){
+    public List<DataPoint> transform(List<DataPoint> dataPoints){
         return dataPoints.stream().map(this::transform).collect(Collectors.toList());
     }
 

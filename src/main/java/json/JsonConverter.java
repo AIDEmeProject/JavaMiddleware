@@ -3,6 +3,7 @@ package json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
@@ -41,13 +42,13 @@ public class JsonConverter {
         return gson.fromJson(json, type);
     }
 
-    public static <T> List<T> deserializeList(String json) {
-        Type listType = new TypeToken<ArrayList<T>>(){}.getType();
+    public static List<LabeledPoint> deserializeLabeledPoints(String json) {
+        Type listType = new TypeToken<ArrayList<LabeledPoint>>(){}.getType();
         return gson.fromJson(json, listType);
     }
 
-    public static <K, V> Map<K, V> deserializeMap(String json) {
-        Type mapType = new TypeToken<HashMap<K,V>>(){}.getType();
+    public static Map<String, Double> deserializeMetricsMap(String json) {
+        Type mapType = new TypeToken<HashMap<String,Double>>(){}.getType();
         return gson.fromJson(json, mapType);
     }
 

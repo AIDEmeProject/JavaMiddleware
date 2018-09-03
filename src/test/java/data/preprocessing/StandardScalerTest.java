@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,7 +56,7 @@ class StandardScalerTest {
     @Test
     void transform_inputHasIncompatibleDimension_throwsException() {
         DataPoint point = new DataPoint(0, new double[] {1});
-        Collection<DataPoint> toTransform = new ArrayList<>();
+        List<DataPoint> toTransform = new ArrayList<>();
         toTransform.add(point);
         assertThrows(RuntimeException.class, () -> scaler.transform(toTransform));
     }
