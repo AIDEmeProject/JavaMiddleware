@@ -8,6 +8,7 @@ import explore.sampling.ReservoirSampler;
 import explore.user.User;
 import io.FolderManager;
 import machinelearning.active.ActiveLearner;
+import machinelearning.active.Ranker;
 import utils.Validator;
 
 import java.io.BufferedWriter;
@@ -44,6 +45,8 @@ public class Explore {
      * Size of unlabeled set sample taken at every iteration
      */
     private final int subsampleSize;
+
+    private Ranker ranker;
 
     /**
      * @param initialSampler: initial sampling method. It randomly picks a given number of positive and negative points
@@ -137,7 +140,7 @@ public class Explore {
         // find next points to label
         initialTime = System.nanoTime();
         start = initialTime;
-        Collection<DataPoint> points = getNextPointToLabel(data, user, activeLearner);
+        Collection<DataPoint> points = getNextPointToLabel(data, user);
         metrics.put("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled set
@@ -150,7 +153,7 @@ public class Explore {
 
         // retrain model
         initialTime = System.nanoTime();
-        activeLearner.update(labeledPoints);
+        ranker = activeLearner.fit(data.getLabeledPoints());
         metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // compute accuracy metrics
@@ -168,7 +171,7 @@ public class Explore {
     /**
      * Retrieves the next points to labeled, either through the initial sampling or using the active learning model.
      */
-    private List<DataPoint> getNextPointToLabel(LabeledDataset data, User user, ActiveLearner activeLearner){
+    private List<DataPoint> getNextPointToLabel(LabeledDataset data, User user){
         ArrayList<DataPoint> result = new ArrayList<>();
 
         // initial sampling
@@ -178,7 +181,7 @@ public class Explore {
         // retrieve most informative point according to model
         else{
             Collection<DataPoint> sample = ReservoirSampler.sample(data.getUnlabeledPoints(), subsampleSize);
-            result.add(activeLearner.getRanker().top(sample));
+            result.add(ranker.top(sample));
         }
 
         return result;

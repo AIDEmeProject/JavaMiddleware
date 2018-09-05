@@ -1,9 +1,12 @@
 package machinelearning.active.learning;
 
+import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.active.ranker.ProbabilityRanker;
 import machinelearning.classifier.Learner;
+
+import java.util.Collection;
 
 /**
  * Uncertainty Sampling is the most common Active Learning technique. Basically, it ranks points through the predicted class
@@ -12,7 +15,7 @@ import machinelearning.classifier.Learner;
  *
  * @author luciano
  */
-public class UncertaintySampler extends ActiveLearner {
+public class UncertaintySampler implements ActiveLearner {
     /**
      * internal classifier used for predicting probabilities
      */
@@ -23,7 +26,7 @@ public class UncertaintySampler extends ActiveLearner {
     }
 
     @Override
-    protected Ranker computeRanker() {
-        return new ProbabilityRanker(learner.fit(labeledSet));
+    public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+        return new ProbabilityRanker(learner.fit(labeledPoints));
     }
 }

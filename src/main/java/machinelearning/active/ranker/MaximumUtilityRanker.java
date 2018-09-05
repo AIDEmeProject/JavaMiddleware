@@ -24,7 +24,7 @@ public class MaximumUtilityRanker implements Ranker {
     /**
      * Collection of labeled points
      */
-    private final List<LabeledPoint> labeledPoints;
+    private final Collection<LabeledPoint> labeledPoints;
 
     /**
      * maximum utility upper bound calculator
@@ -32,7 +32,7 @@ public class MaximumUtilityRanker implements Ranker {
     private final UtilityUpperBoundCalculator calculator;
 
 
-    public MaximumUtilityRanker(Learner learner, List<LabeledPoint> labeledPoints, int lookahead) {
+    public MaximumUtilityRanker(Learner learner, Collection<LabeledPoint> labeledPoints, int lookahead) {
         this.learner = learner;
         this.labeledPoints = labeledPoints;
         this.lookahead = lookahead;

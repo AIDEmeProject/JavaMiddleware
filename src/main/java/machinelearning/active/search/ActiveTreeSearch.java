@@ -1,11 +1,13 @@
 package machinelearning.active.search;
 
+import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.active.ranker.MaximumUtilityRanker;
 import machinelearning.classifier.Learner;
 import utils.Validator;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -31,7 +33,7 @@ import java.util.Objects;
  *        Bayesian Optimal Active Search and Surveying
  *        ICML, 2012
  */
-public class ActiveTreeSearch extends ActiveLearner {
+public class ActiveTreeSearch implements ActiveLearner {
     /**
      * number of steps to look into the future
      */
@@ -51,7 +53,7 @@ public class ActiveTreeSearch extends ActiveLearner {
     }
 
     @Override
-    protected Ranker computeRanker() {
-        return new MaximumUtilityRanker(learner, labeledSet, lookahead);
+    public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+        return new MaximumUtilityRanker(learner, labeledPoints, lookahead);
     }
 }

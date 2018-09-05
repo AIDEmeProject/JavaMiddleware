@@ -36,6 +36,13 @@ public class LabeledDataset {
         allPoints = points;
     }
 
+    public LabeledDataset(Collection<LabeledPoint> labeledPoints, Collection<DataPoint> unlabeledPoints) {
+        unlabeled = new LinkedHashSet<>(unlabeledPoints);
+        labeled = new LinkedHashSet<>(labeledPoints);
+        allPoints = new LinkedHashSet<>(unlabeled);
+        allPoints.addAll(labeled);
+    }
+
     private LabeledDataset(Set<LabeledPoint> labeled, Set<DataPoint> unlabeled, Collection<DataPoint> allPoints) {
         this.labeled = labeled;
         this.unlabeled = unlabeled;

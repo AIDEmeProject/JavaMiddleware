@@ -117,7 +117,7 @@ public class RunExperiment {
         // EXPLORE
         int budget = 50;
         int runs = 1;
-        Explore explore = new Explore(initialSampler, budget, metricCalculators);
+        Explore explore = new Explore(initialSampler, budget);
 
         for (Map.Entry<String, ActiveLearner> entry : activeLearners.entrySet()) {
             System.out.println(entry.getKey());
