@@ -1,4 +1,4 @@
-package json;
+package io.json;
 
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.learning.versionspace.VersionSpace;

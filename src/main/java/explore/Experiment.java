@@ -11,7 +11,7 @@ import explore.user.DummyUser;
 import explore.user.User;
 import io.FolderManager;
 import io.TaskReader;
-import json.JsonConverter;
+import io.json.JsonConverter;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Label;

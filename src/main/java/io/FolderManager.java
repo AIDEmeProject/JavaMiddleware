@@ -2,7 +2,7 @@ package io;
 
 import data.LabeledPoint;
 import explore.ExperimentConfiguration;
-import json.JsonConverter;
+import io.json.JsonConverter;
 
 import java.io.*;
 import java.nio.file.Files;

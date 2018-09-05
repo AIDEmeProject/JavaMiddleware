@@ -1,4 +1,4 @@
-package json;
+package io.json;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
