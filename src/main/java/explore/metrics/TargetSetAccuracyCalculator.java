@@ -2,8 +2,6 @@ package explore.metrics;
 
 import data.LabeledDataset;
 import data.LabeledPoint;
-import explore.user.User;
-import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 
 import java.util.Collection;
@@ -33,7 +31,7 @@ public class TargetSetAccuracyCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledDataset data, User user, Classifier classifier) {
-        return compute(data.getLabeledPoints(), user.getLabel(data.getAllPoints()));
+    public MetricStorage compute(LabeledDataset data, Label[] trueLabels) {
+        return compute(data.getLabeledPoints(), trueLabels);
     }
 }
