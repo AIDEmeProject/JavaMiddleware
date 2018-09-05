@@ -34,6 +34,10 @@ public abstract class ActiveLearner {
     }
 
     public final Ranker update(Collection<LabeledPoint> labeledPoints){
+        if (labeledPoints.isEmpty()) {
+            return ranker;
+        }
+
         labeledSet.addAll(labeledPoints);
         ranker = computeRanker();
         return ranker;

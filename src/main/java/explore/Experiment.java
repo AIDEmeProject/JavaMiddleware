@@ -3,94 +3,94 @@ package explore;
 import data.DataPoint;
 import data.LabeledDataset;
 import data.LabeledPoint;
+import data.preprocessing.StandardScaler;
+import explore.metrics.MetricCalculator;
 import explore.sampling.InitialSampler;
 import explore.sampling.ReservoirSampler;
-import explore.sampling.StratifiedSampler;
+import explore.user.DummyUser;
 import explore.user.User;
+import io.FolderManager;
+import io.TaskReader;
 import json.JsonConverter;
 import machinelearning.active.ActiveLearner;
-import utils.Validator;
+import machinelearning.classifier.Label;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Experiment {
-    private LabeledDataset labeledDataset;
+    private FolderManager folder;
+    private List<DataPoint> dataPoints;
     private User user;
     private ActiveLearner activeLearner;
-
     private InitialSampler initialSampler;
     private int subsampleSize;
-    private int budget;
 
-    public static class Builder {
-        private LabeledDataset labeledDataset;
-        private User user;
-        private ActiveLearner activeLearner;
+    public Experiment(FolderManager folder) {
+        this.folder = folder;
 
-        private int subsampleSize = Integer.MAX_VALUE;
-        private int budget = 100;
-        private InitialSampler initialSampler = new StratifiedSampler(1, 1);
+        ExperimentConfiguration configuration = folder.parseConfigurationFile();
 
-        public Builder(LabeledDataset labeledDataset, User user, ActiveLearner activeLearner) {
-            this.labeledDataset = Objects.requireNonNull(labeledDataset);
-            this.user = Objects.requireNonNull(user);
-            this.activeLearner = Objects.requireNonNull(activeLearner);
+        String task = configuration.getTask();
+        TaskReader reader = new TaskReader(task);
+
+        this.dataPoints = StandardScaler.fitAndTransform(reader.readData());
+
+        Set<Long> positiveKeys = reader.readTargetSetKeys();
+        this.user = new DummyUser(positiveKeys);
+
+        this.activeLearner = configuration.getActiveLearner();
+        this.initialSampler = configuration.getInitialSampler();
+        this.subsampleSize = configuration.getSubsampleSize();
+    }
+
+    public int run(int budget) {
+        int id = folder.getNewRunFileIndex();
+        resume(id, budget, StandardOpenOption.CREATE_NEW);
+        return id;
+    }
+
+    public void resume(int id, int budget) {
+        resume(id, budget, StandardOpenOption.APPEND);
+    }
+
+    private void resume(int id, int budget, StandardOpenOption openOption) {
+        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
+
+        for (List<LabeledPoint> labeledPoints : folder.parseRunFile(id)) {
+            labeledDataset.putOnLabeledSet(labeledPoints);
         }
 
-        public Builder subsample(int subsampleSize) {
-            Validator.assertPositive(subsampleSize);
-            this.subsampleSize = subsampleSize;
-            return this;
-        }
+        activeLearner.clear();
+        activeLearner.update(labeledDataset.getLabeledPoints());
 
-        public Builder budget(int budget) {
-            Validator.assertPositive(budget);
-            this.budget = budget;
-            return this;
-        }
+        // run exploration
+        try (BufferedWriter labeledPointsWriter = Files.newBufferedWriter(folder.getRunFile(id), openOption);
+             BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile(id), openOption)) {
 
-        public Builder initialSampler(InitialSampler initialSampler) {
-            this.initialSampler = Objects.requireNonNull(initialSampler);
-            return this;
-        }
-
-        public Experiment build() {
-            resetAndUpdateActiveLearner();
-            return new Experiment(this);
-        }
-
-        private void resetAndUpdateActiveLearner() {
-            this.activeLearner.clear();
-            if (labeledDataset.hasLabeledPoints()) {
-                this.activeLearner.update(labeledDataset.getLabeledPoints());
+            while(labeledDataset.getNumLabeledPoints() <= budget && labeledDataset.hasUnlabeledPoints()) {
+                runSingleIteration(labeledDataset, labeledPointsWriter, metricsWriter);
             }
+
+        } catch (Exception ex) {
+            //TODO: log error
+            throw new RuntimeException("Exploration failed.", ex);
         }
     }
 
-    private Experiment(Builder builder) {
-        this.labeledDataset = new LabeledDataset(builder.labeledDataset);
-        this.user = builder.user;
-        this.activeLearner = builder.activeLearner;
-        this.subsampleSize = builder.subsampleSize;
-        this.budget = builder.budget;
-        this.initialSampler = builder.initialSampler;
-    }
-
-    public void run(BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
-        for (int iter = 0; iter < budget && labeledDataset.hasUnlabeledPoints(); iter++) {
-            runSingleIteration(labeledPointsWriter, metricsWriter);
-        }
-    }
-
-    private void runSingleIteration(BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
+    private void runSingleIteration(LabeledDataset labeledDataset, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
         Map<String, Double> metrics = new HashMap<>();
         long initialTime, start = System.nanoTime();
 
         // find next points to label
         initialTime = System.nanoTime();
-        List<DataPoint> mostInformativePoint = getNextPointsToLabel();
+        List<DataPoint> mostInformativePoint = getNextPointsToLabel(labeledDataset);
         metrics.put("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // ask user for labels
@@ -107,16 +107,14 @@ public class Experiment {
         metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // iter time
-        metrics.put("IterTimeMillis",(System.nanoTime() - start) / 1e6);
-
-        System.out.println(metrics);
+        metrics.put("IterTimeMillis", (System.nanoTime() - start) / 1e6);
 
         // save metrics to file
         writeLineToFile(labeledPointsWriter,  JsonConverter.serialize(labeledPoints));
         writeLineToFile(metricsWriter, JsonConverter.serialize(metrics));
     }
 
-    private List<DataPoint> getNextPointsToLabel() {
+    private List<DataPoint> getNextPointsToLabel(LabeledDataset labeledDataset) {
         if (!labeledDataset.hasLabeledPoints()) {
             return initialSampler.runInitialSample(labeledDataset.getUnlabeledPoints(), user);
         }
@@ -125,10 +123,38 @@ public class Experiment {
         return Collections.singletonList(activeLearner.getRanker().top(sample));
     }
 
+    public void evaluate(int id, MetricCalculator[] calculators) {
+        Label[] trueLabels = user.getLabel(dataPoints);
+        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
+
+        Path tempFile = folder.getTempFile(id);
+        Path evalFile = folder.getEvalFile(id);
+
+        try (BufferedWriter tempFileWriter = Files.newBufferedWriter(tempFile, StandardOpenOption.CREATE_NEW);
+             BufferedReader evalFileReader = Files.newBufferedReader(evalFile)) {
+
+            for (List<LabeledPoint> labeledPoints : folder.parseRunFile(id)) {
+                Map<String, Double> metrics = JsonConverter.deserializeMetricsMap(evalFileReader.readLine());
+
+                labeledDataset.putOnLabeledSet(labeledPoints);
+
+                for (MetricCalculator metricCalculator : calculators) {
+                    metrics.putAll(metricCalculator.compute(labeledDataset, trueLabels).getMetrics());
+                }
+
+                writeLineToFile(tempFileWriter, JsonConverter.serialize(metrics));
+            }
+
+            Files.move(tempFile, evalFile, StandardCopyOption.REPLACE_EXISTING);
+
+        } catch (IOException ex) {
+            throw new RuntimeException("evaluation failed.", ex);
+        }
+    }
+
     private static void writeLineToFile(BufferedWriter writer, String line) throws IOException {
         writer.write(line);
         writer.newLine();
         writer.flush();
     }
-
 }

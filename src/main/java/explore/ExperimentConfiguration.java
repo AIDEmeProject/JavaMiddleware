@@ -6,7 +6,6 @@ import machinelearning.active.ActiveLearner;
 
 public final class ExperimentConfiguration {
     private String task;
-    private int budget;
     private ActiveLearner activeLearner;
 
     private InitialSampler initialSampler = new StratifiedSampler(1, 1);
@@ -14,10 +13,6 @@ public final class ExperimentConfiguration {
 
     public String getTask() {
         return task;
-    }
-
-    public int getBudget() {
-        return budget;
     }
 
     public InitialSampler getInitialSampler() {

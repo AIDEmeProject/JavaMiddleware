@@ -3,7 +3,10 @@ package io;
 import data.DataPoint;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This module is responsible for reading data from a database using JDBC. We make the following assumptions about the

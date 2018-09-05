@@ -1,6 +1,5 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
-import machinelearning.active.learning.versionspace.convexbody.sampling.direction.EllipsoidSampler;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

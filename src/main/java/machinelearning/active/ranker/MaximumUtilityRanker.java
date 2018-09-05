@@ -51,10 +51,7 @@ public class MaximumUtilityRanker implements Ranker {
 
         int steps = Math.min(unlabeledSet.size(), this.lookahead);
 
-        LabeledDataset labeledDataset = new LabeledDataset(labeledPoints, unlabeledSet);
-        labeledDataset.putOnLabeledSet(labeledPoints);
-
-        return utility(labeledDataset, steps).getOptimizer();
+        return utility(new LabeledDataset(labeledPoints, unlabeledSet), steps).getOptimizer();
     }
 
     /**
