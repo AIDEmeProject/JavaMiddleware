@@ -13,6 +13,7 @@ import io.FolderManager;
 import io.TaskReader;
 import json.JsonConverter;
 import machinelearning.active.ActiveLearner;
+import machinelearning.active.Ranker;
 import machinelearning.classifier.Label;
 
 import java.io.BufferedReader;
@@ -31,6 +32,8 @@ public class Experiment {
     private ActiveLearner activeLearner;
     private InitialSampler initialSampler;
     private int subsampleSize;
+
+    private Ranker ranker;
 
     public Experiment(FolderManager folder) {
         this.folder = folder;
@@ -67,10 +70,10 @@ public class Experiment {
             labeledDataset.putOnLabeledSet(labeledPoints);
         }
 
-        activeLearner.clear();
-        activeLearner.update(labeledDataset.getLabeledPoints());
+        if (labeledDataset.hasLabeledPoints()) {
+            ranker = activeLearner.fit(labeledDataset.getLabeledPoints());
+        }
 
-        // run exploration
         try (BufferedWriter labeledPointsWriter = Files.newBufferedWriter(folder.getRunFile(id), openOption);
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile(id), openOption)) {
 
@@ -103,7 +106,7 @@ public class Experiment {
 
         // update model
         initialTime = System.nanoTime();
-        activeLearner.update(labeledPoints);
+        ranker = activeLearner.fit(labeledDataset.getLabeledPoints());
         metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // iter time
@@ -120,7 +123,7 @@ public class Experiment {
         }
 
         Collection<DataPoint> sample = ReservoirSampler.sample(labeledDataset.getUnlabeledPoints(), subsampleSize);
-        return Collections.singletonList(activeLearner.getRanker().top(sample));
+        return Collections.singletonList(ranker.top(sample));
     }
 
     public void evaluate(int id, MetricCalculator[] calculators) {

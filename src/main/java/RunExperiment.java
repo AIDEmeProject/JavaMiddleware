@@ -16,8 +16,8 @@ public class RunExperiment {
 
         Experiment experiment = new Experiment(new FolderManager("experiment/sdss_Q1_0.1%/Simple Margin C=1000/"));
 
-        //int fileId = experiment.run(10);
-        experiment.resume(2, 20);
-        experiment.evaluate(2, calculators);
+        int fileId = experiment.run(10);
+        experiment.resume(fileId, 20);
+        experiment.evaluate(fileId, calculators);
     }
 }

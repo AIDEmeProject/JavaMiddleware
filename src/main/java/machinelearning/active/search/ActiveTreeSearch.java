@@ -54,6 +54,7 @@ public class ActiveTreeSearch implements ActiveLearner {
 
     @Override
     public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+        Validator.assertNotEmpty(labeledPoints);
         return new MaximumUtilityRanker(learner, labeledPoints, lookahead);
     }
 }
