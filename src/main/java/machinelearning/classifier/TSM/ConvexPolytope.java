@@ -142,7 +142,7 @@ public class ConvexPolytope {
     /**
      * Check whether a point is contained in the convex polytope
      * @param point
-     * @return true if it is a internal point, otherwise false
+     * @return true if it is a internal point, false otherwise
      */
     public boolean containsPoint(double[] point) {
         if (point.length != dim) {

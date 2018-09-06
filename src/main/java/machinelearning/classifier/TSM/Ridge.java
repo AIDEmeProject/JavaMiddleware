@@ -39,7 +39,7 @@ public class Ridge {
      * Specify the equal relationship for ridge
      *
      * @param a a ridge
-     * @return true if two ridges are equal, otherwise false
+     * @return true if two ridges are equal, false otherwise
      */
     public boolean equals(Object a) {
         if (this == a) {

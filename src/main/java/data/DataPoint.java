@@ -2,7 +2,9 @@ package data;
 
 import utils.Validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * This class stores a data point. It contains:
@@ -26,6 +28,10 @@ public class DataPoint {
      * data point's values
      */
     protected double[] data;
+
+    /**
+     *
+     */
 
     /**
      * @param id: ID of this point
@@ -67,6 +73,34 @@ public class DataPoint {
         return data[i];
     }
     //Todo: retrieve data by id? In addition, this class lacks of feature selection
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public HashMap<Integer, Double> getSelectedAttributesMap(int[] indices) {
+        Arrays.sort(indices);
+
+        HashMap<Integer, Double> selectedAttributes = new HashMap<>();
+        for(int index: indices){
+            selectedAttributes.put(index, data[index]);
+        }
+        return selectedAttributes;
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public double[] getSelectedAttributes(int[] indices) {
+        Arrays.sort(indices);
+
+        double[] selected = new double[indices.length];
+        for(int index: indices){
+            selected[index] = data[index];
+        }
+        return selected;
+    }
 
     /**
      * @return data point's dimension (i.e. number of features)

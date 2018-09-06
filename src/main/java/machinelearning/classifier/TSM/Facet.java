@@ -259,7 +259,7 @@ public class Facet {
 
     /**
      * @param a a facet
-     * @return true for the facets filled with the same vertices, otherwise false
+     * @return true for the facets filled with the same vertices, false otherwise
      */
     public boolean equals(Object a) {
         if (this == a) {

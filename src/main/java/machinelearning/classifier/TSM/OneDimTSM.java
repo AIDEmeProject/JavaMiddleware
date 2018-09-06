@@ -22,12 +22,12 @@ public class OneDimTSM {
     private ArrayList<Double> concaveRay;
 
     /**
-     * True if the interval(the single point)  has existed, otherwise false
+     * True if the interval(the single point)  has existed, false otherwise
      */
     private boolean convexInitialized = false;
 
     /**
-     * True if a ray has existed, otherwise false
+     * True if a ray has existed, false otherwise
      */
     private boolean concaveInitialized = false;
 
@@ -37,7 +37,7 @@ public class OneDimTSM {
     private HashSet<Double> concavePoints;
 
     /**
-     * True if the pos region is convex, otherwise false
+     * True if the pos region is convex, false otherwise
      */
     private boolean flag;
 
@@ -57,9 +57,9 @@ public class OneDimTSM {
      */
     public void updatePos(double point, double label) {
         if (label > 0) {
-            updateConvexLineSeg(point, label);
+            updateConvexLineSeg(point);
         } else {
-            updateConcaveRay(point, label);
+            updateConcaveRay(point);
         }
     }
 
@@ -71,9 +71,9 @@ public class OneDimTSM {
      */
     public void updateNeg(double point, double label) {
         if (label < 0) {
-            updateConvexLineSeg(point, label);
+            updateConvexLineSeg(point);
         } else {
-            updateConcaveRay(point, label);
+            updateConcaveRay(point);
         }
     }
 
@@ -81,10 +81,9 @@ public class OneDimTSM {
     /**
      * Update the convex region(interval or single point) on 1-dim space
      * @param point value of selected feature
-     * @param label label of the point on 1-dim space
      * @throws IllegalArgumentException if a positive point is in negative rays or a negative point is in positive interval
      */
-    public void updateConvexLineSeg(double point, double label){
+    public void updateConvexLineSeg(double point){
         // check whether the sample is in concave regions
         if (concaveRay.size() == 2 && isInConcaveRay(point)) {
             throw new IllegalArgumentException("A positive point is in negative rays");
@@ -113,10 +112,9 @@ public class OneDimTSM {
     /**
      * Update the concave rays on 1-dim space
      * @param point value of selected feature
-     * @param label label of the point on 1-dim space
      * @throws IllegalArgumentException if a positive point is in negative rays or a negative point is in positive interval
      */
-    public void updateConcaveRay(double point, double label){
+    public void updateConcaveRay(double point){
         if ((convexLineSeg.size() == 2 && isInConvexSeg(point)) || (convexLineSeg.size() == 1 && point == convexLineSeg.get(0))) {
             throw new IllegalArgumentException("A negative point is in positive convex interval");
             //if the interval has not been defined, instead of defining the rays, only negative points will be recorded
@@ -173,27 +171,19 @@ public class OneDimTSM {
     /**
      * Check whether a point is in the interval
      * @param sample point to be checked
-     * @return true if the point is in the interval, otherwise false
+     * @return true if the point is in the interval, false otherwise
      */
     public boolean isInConvexSeg(double sample){
-        if(sample >= convexLineSeg.get(0) && sample <= convexLineSeg.get(1)){
-            return true;
-        }else {
-            return false;
-        }
+        return sample >= convexLineSeg.get(0) && sample <= convexLineSeg.get(1);
     }
 
     /**
      * Check whether a point is in any of the rays
      * @param sample point to be checked
-     * @return true if the point is in the rays, otherwise false
+     * @return true if the point is in the rays, false otherwise
      */
     public boolean isInConcaveRay(double sample){
-        if(concaveRay.size()==2 && (sample <= concaveRay.get(0) || sample >= concaveRay.get(1))){
-            return true;
-        }else {
-            return false;
-        }
+        return concaveRay.size() == 2 && (sample <= concaveRay.get(0) || sample >= concaveRay.get(1));
     }
 
     /**
@@ -221,20 +211,8 @@ public class OneDimTSM {
     public static double[] findTopK(HashSet<Double> points, int k, double convexPoint){
         Double[] pointsArray = points.toArray(new Double[points.size()]);
         //System.out.println("transformed Array is: " + Arrays.toString(pointsArray));
-        Comparator<ObjectWithDistance<Double>> comparator = new Comparator<ObjectWithDistance<Double>>() {
-            @Override
-            public int compare(ObjectWithDistance<Double> o1, ObjectWithDistance<Double> o2) {
-                double d1 = o1.getDistance();
-                double d2 = o2.getDistance();
-                if(d1 < d2) {
-                    return 1;
-                } else if(d1 > d2) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
-        };
+        Comparator<ObjectWithDistance<Double>> comparator = (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance());
+
         PriorityQueue<ObjectWithDistance<Double>> topK = new PriorityQueue<>(1, comparator);
         for(int i=0;i<points.size();i++){
             topK.add( new ObjectWithDistance<Double>(Math.abs(pointsArray[i]-convexPoint), pointsArray[i]));

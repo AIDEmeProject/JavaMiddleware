@@ -2,7 +2,6 @@ package machinelearning.classifier.TSM;
 
 import org.apache.commons.math3.util.Pair;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +12,7 @@ import java.util.Iterator;
  *
  * @author lppeng, enhui
  */
+
 public class PointWiseComplementConvexHull {
     /**
      * Dimension of the vertices

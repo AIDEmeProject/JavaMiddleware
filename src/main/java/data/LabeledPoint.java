@@ -53,6 +53,18 @@ public class LabeledPoint extends DataPoint {
         this(point.row, point.id, point.data, label);
     }
 
+    /**
+     * Set label by values
+     * @param value
+     */
+    public void setLabel(int value){
+        if(value > 0){
+            label = Label.POSITIVE;
+        }else {
+            label = Label.NEGATIVE;
+        }
+    }
+
     public Label getLabel() {
         return label;
     }
