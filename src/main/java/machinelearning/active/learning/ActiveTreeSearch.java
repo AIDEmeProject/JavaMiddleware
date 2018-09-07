@@ -1,4 +1,4 @@
-package machinelearning.active.search;
+package machinelearning.active.learning;
 
 import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
