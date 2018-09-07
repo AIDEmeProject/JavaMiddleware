@@ -34,7 +34,6 @@ public class JsonConverter {
         builder.registerTypeAdapter(SampleSelector.class, new SampleSelectorAdapter());
         builder.registerTypeAdapter(HitAndRunSampler.class, new HitAndRunSamplerAdapter());
 
-        builder.registerTypeAdapter(LinearVersionSpace.class, new LinearVersionSpaceAdapter());
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
 
         return builder.create();

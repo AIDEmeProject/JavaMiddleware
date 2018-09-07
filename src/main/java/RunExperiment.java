@@ -14,7 +14,7 @@ public class RunExperiment {
                 new TargetSetAccuracyCalculator()
         };
 
-        Experiment experiment = new Experiment(new FolderManager("experiment/sdss_Q1_0.1%/Simple Margin C=1000/"));
+        Experiment experiment = new Experiment(new FolderManager("experiment/sdss_Q1_0.1%/UncertaintySampler/learner=MajorityVote sampleSize=8 addIntercept=True solver=ojalgo kernel=gaussian gamma=0 cache=True rounding=True selector=WarmUpAndThin warmUp=100 thin=10"));
 
         int fileId = experiment.run(10);
         experiment.resume(fileId, 20);
