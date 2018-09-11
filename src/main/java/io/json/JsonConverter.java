@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import data.LabeledPoint;
+import explore.metrics.MetricCalculator;
 import machinelearning.active.ActiveLearner;
-import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
@@ -35,6 +35,8 @@ public class JsonConverter {
         builder.registerTypeAdapter(HitAndRunSampler.class, new HitAndRunSamplerAdapter());
 
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
+
+        builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
 
         return builder.create();
     }
