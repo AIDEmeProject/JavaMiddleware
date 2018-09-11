@@ -1,3 +1,4 @@
+import os
 import json
 
 
@@ -11,7 +12,7 @@ class Printable:
         return self.__name
 
     def __repr__(self):
-        return ' '.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict()).items()])
+        return '_'.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict()).items()])
 
     def as_dict(self):
         result = {}
@@ -24,6 +25,19 @@ class Printable:
 
     def to_json(self):
         return json.dumps(self.as_dict(), sort_keys=True, indent=4, separators=(',', ': '), allow_nan=False)
+
+    def dump_to_config_file(self, folder, add_name=False):
+        if add_name:
+            folder = os.path.join(folder, self.__repr__())
+
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        config_file = os.path.join(folder, 'config.json')
+
+        if not os.path.exists(config_file):
+            with open(config_file, 'w+') as f:
+                f.write(self.to_json())
 
     @staticmethod
     def __flatten_dict(d):

@@ -1,9 +1,6 @@
 import subprocess
 
-from experiment import *
-from active_learners import *
-from metrics import *
-
+from scripts import *
 
 # TASK
 MODE = 'NEW'  # NEW, RESUME, EVAL
@@ -28,16 +25,16 @@ ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
     add_intercept=True, solver="ojalgo")  # extra
 )
 
-base_dir = os.path.join('../experiment', TASK, ACTIVE_LEARNER.name)
-experiment_dir = create_config_file(base_dir, ACTIVE_LEARNER)
-
+experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
 
 experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER)
+experiment.dump_to_config_file(experiment_dir)
+
 command_line = [
-    "java RunExperiment ../META-INF/MANIFEST.MF ../out/artifacts/data_exploration_jar/data_exploration.jar",
-    "--experiment_dir", str(experiment),
+    "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
+    "--experiment_dir", experiment_dir,
     "--mode", MODE,
-    "--numRuns", str(NUM_RUNS),
+    "--num_runs", str(NUM_RUNS),
     "--budget", str(BUDGET),
 ]
 
@@ -47,6 +44,10 @@ if RUNS:
 
 if METRICS:
     command_line.append("--metrics")
-    command_line.append(' '.join(map(str, METRICS)))
+    for m in METRICS:
+        command_line.append(str(m))
+        m.dump_to_config_file(experiment_dir, add_name=True)
 
-subprocess.run(command_line, shell=True)
+print(command_line)
+
+subprocess.run(' '.join(command_line), shell=True)

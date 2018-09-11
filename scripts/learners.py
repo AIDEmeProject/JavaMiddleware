@@ -1,5 +1,5 @@
-from printable import *
-from validation import *
+from .printable import *
+from .validation import *
 
 
 LINPROG_SOLVERS = ['apache', 'ojalgo']

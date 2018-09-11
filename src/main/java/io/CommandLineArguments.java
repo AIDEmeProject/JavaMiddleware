@@ -1,12 +1,11 @@
 package io;
 
-import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.validators.PositiveInteger;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandLineArguments {
     @Parameter(names = "--experiment_dir", required = true)
@@ -21,11 +20,11 @@ public class CommandLineArguments {
     @Parameter(names = "--num_runs", validateWith = PositiveInteger.class)
     private int numRuns = 0;
 
-    @Parameter(names = "--runs", validateValueWith = PositiveArray.class)
-    private int[] runs = new int[0];
+    @Parameter(names = "--runs", variableArity = true)
+    private List<Integer> runs = new ArrayList<>();
 
-    @Parameter(names = "--metrics")
-    private String[] metrics = new String[0];
+    @Parameter(names = "--metrics", variableArity = true)
+    private List<String> metrics = new ArrayList<>();
 
     private CommandLineArguments() {
 
@@ -47,11 +46,11 @@ public class CommandLineArguments {
         return numRuns;
     }
 
-    public int[] getRuns() {
+    public List<Integer> getRuns() {
         return runs;
     }
 
-    public String[] getMetrics() {
+    public List<String> getMetrics() {
         return metrics;
     }
 
@@ -71,19 +70,9 @@ public class CommandLineArguments {
                 ", mode='" + mode + '\'' +
                 ", budget=" + budget +
                 ", numRuns=" + numRuns +
-                ", runs=" + Arrays.toString(runs) +
-                ", metrics=" + Arrays.toString(metrics) +
+                ", runs=" + runs +
+                ", metrics=" + metrics +
                 '}';
     }
 }
 
-
-class PositiveArray implements IValueValidator<int[]> {
-    public void validate(String name, int[] values) throws ParameterException {
-        for(int value : values) {
-            if (value <= 0) {
-                throw new ParameterException("Parameter " + name + " must only contain positive values.");
-            }
-        }
-    }
-}

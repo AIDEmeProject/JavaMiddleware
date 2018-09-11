@@ -1,4 +1,4 @@
-from learners import *
+from .learners import *
 
 
 class ActiveLearner(Printable):

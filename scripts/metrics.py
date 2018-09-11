@@ -1,4 +1,4 @@
-from learners import *
+from .learners import *
 
 
 class Metric(Printable):
@@ -6,7 +6,8 @@ class Metric(Printable):
         super().__init__(add_name=True)
 
     def __repr__(self):
-        return "{0} {1}".format(self.name, super().__repr__()).strip()
+
+        return "{0}_{1}".format(self.name, super().__repr__()).strip('_')
 
 
 class ConfusionMatrix(Metric):
