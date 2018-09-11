@@ -1,5 +1,4 @@
 import explore.Experiment;
-import explore.metrics.MetricCalculator;
 import io.CommandLineArguments;
 import io.FolderManager;
 
@@ -24,15 +23,10 @@ public class RunExperiment {
                 }
                 break;
             case "EVAL":
-                MetricCalculator[] metricCalculators = new MetricCalculator[arguments.getMetrics().size()];
-
-                int i = 0;
-                for (String metric : arguments.getMetrics()) {
-                    metricCalculators[i++] = experimentFolder.getMetricCalculator(metric);
-                }
-
                 for (int id : arguments.getRuns()) {
-                    experiment.evaluate(id, metricCalculators);
+                    for (String calculatorId : arguments.getMetrics()) {
+                        experiment.evaluate(id, calculatorId);
+                    }
                 }
                 break;
             default:

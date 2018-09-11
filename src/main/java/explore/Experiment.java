@@ -16,12 +16,10 @@ import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Label;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
@@ -38,7 +36,7 @@ public class Experiment {
     public Experiment(FolderManager folder) {
         this.folder = folder;
 
-        ExperimentConfiguration configuration = folder.parseConfigurationFile();
+        ExperimentConfiguration configuration = folder.getExperimentConfig();
 
         String task = configuration.getTask();
         TaskReader reader = new TaskReader(task);
@@ -75,7 +73,7 @@ public class Experiment {
         }
 
         try (BufferedWriter labeledPointsWriter = Files.newBufferedWriter(folder.getRunFile(id), openOption);
-             BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile(id), openOption)) {
+             BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
             while(labeledDataset.getNumLabeledPoints() <= budget && labeledDataset.hasUnlabeledPoints()) {
                 runSingleIteration(labeledDataset, labeledPointsWriter, metricsWriter);
@@ -126,30 +124,23 @@ public class Experiment {
         return Collections.singletonList(ranker.top(sample));
     }
 
-    public void evaluate(int id, MetricCalculator[] calculators) {
+    public void evaluate(int id, String calculatorIdentifier) {
+        MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
+
         Label[] trueLabels = user.getLabel(dataPoints);
         LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
 
-        Path tempFile = folder.getTempFile(id);
-        Path evalFile = folder.getEvalFile(id);
+        Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
-        try (BufferedWriter tempFileWriter = Files.newBufferedWriter(tempFile, StandardOpenOption.CREATE_NEW);
-             BufferedReader evalFileReader = Files.newBufferedReader(evalFile)) {
+        try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile)) {
 
             for (List<LabeledPoint> labeledPoints : folder.parseRunFile(id)) {
-                Map<String, Double> metrics = JsonConverter.deserializeMetricsMap(evalFileReader.readLine());
-
                 labeledDataset.putOnLabeledSet(labeledPoints);
 
-                for (MetricCalculator metricCalculator : calculators) {
-                    metrics.putAll(metricCalculator.compute(labeledDataset, trueLabels).getMetrics());
-                }
+                Map<String, Double> metrics = metricCalculator.compute(labeledDataset, trueLabels).getMetrics();
 
-                writeLineToFile(tempFileWriter, JsonConverter.serialize(metrics));
+                writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
             }
-
-            Files.move(tempFile, evalFile, StandardCopyOption.REPLACE_EXISTING);
-
         } catch (IOException ex) {
             throw new RuntimeException("evaluation failed.", ex);
         }

@@ -3,12 +3,12 @@ import subprocess
 from scripts import *
 
 # TASK
-MODE = 'NEW'  # NEW, RESUME, EVAL
-NUM_RUNS = 1
-RUNS = range(10)
-BUDGET = 20
-METRICS = [
-    ConfusionMatrix(SVM(C=1e4, kernel='gaussian')),
+MODE = 'EVAL'  # NEW, RESUME, EVAL
+NUM_RUNS = 1  # NEW mode only
+BUDGET = 20  # NEW and RESUME modes
+RUNS = [1]  # RESUME and EVAL modes
+METRICS = [  # EVAL mode only
+    ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     TargetSetAccuracy()
 ]
 
@@ -38,16 +38,20 @@ command_line = [
     "--budget", str(BUDGET),
 ]
 
+assert_in_list(MODE, ['NEW', 'RESUME', 'EVAL'])
+assert_positive("NUM_RUNS", NUM_RUNS)
+assert_positive("BUDGET", BUDGET)
+assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
+
 if RUNS:
     command_line.append("--runs")
     command_line.append(' '.join(map(str, RUNS)))
 
-if METRICS:
+if METRICS and MODE == 'EVAL':
     command_line.append("--metrics")
     for m in METRICS:
+        assert_is_instance(m, Metric)
         command_line.append(str(m))
         m.dump_to_config_file(experiment_dir, add_name=True)
-
-print(command_line)
 
 subprocess.run(' '.join(command_line), shell=True)

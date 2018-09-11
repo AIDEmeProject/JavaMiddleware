@@ -21,7 +21,6 @@ public class FolderManager {
     private static String CONFIG_FILE = "config.json";
     private static String RUN_EXT = ".run";
     private static String EVAL_EXT = ".eval";
-    private static String TEMP_EXT = ".tmp";
 
     /**
      * File object pointing to folder
@@ -54,19 +53,15 @@ public class FolderManager {
     }
 
     public Path getRunFile(int index) {
-        return getPathToFile(index + RUN_EXT);
+        return getPathToFile("Runs", index + RUN_EXT);
     }
 
-    public Path getEvalFile(int index) {
-        return getPathToFile(index + EVAL_EXT);
+    public Path getEvalFile(String metric, int index) {
+        return getPathToFile(metric, index + EVAL_EXT);
     }
 
-    public Path getTempFile(int index) {
-        return getPathToFile(index + TEMP_EXT);
-    }
-
-    private Path getPathToFile(String filename) {
-        return folder.resolve(filename);
+    private Path getPathToFile(String metric, String filename) {
+        return folder.resolve(metric).resolve(filename);
     }
 
     public List<List<LabeledPoint>> parseRunFile(int index) {
@@ -84,7 +79,7 @@ public class FolderManager {
         }
     }
 
-    public ExperimentConfiguration parseConfigurationFile() {
+    public ExperimentConfiguration getExperimentConfig() {
         return parseConfigFile(folder.resolve(CONFIG_FILE), ExperimentConfiguration.class);
     }
 
