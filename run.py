@@ -2,18 +2,26 @@ import subprocess
 
 from scripts import *
 
-# TASK
-MODE = 'EVAL'  # NEW, RESUME, EVAL
-NUM_RUNS = 1  # NEW mode only
-BUDGET = 20  # NEW and RESUME modes
-RUNS = [1]  # RESUME and EVAL modes
-METRICS = [  # EVAL mode only
+######################################
+# CONFIGURATIONS
+######################################
+
+TASK = "sdss_Q1_0.1%"  # task id, as defined in the tasks.ini file
+SUBSAMPLE_SIZE = 50000  # size of random, unlabeled sample . Use float('inf') if no sub-sampling is to be performed
+
+MODE = [  #
+    'NEW',  # run new exploration
+    # 'RESUME',  # resume a previous exploration
+    'EVAL',   # run evaluation procedure over finished runs
+    'AVERAGE'  # average all evaluation file for a given metric
+]
+NUM_RUNS = 1  # Number of new explorations to run. Necessary for the NEW mode only
+BUDGET = 20   # Maximum number of labeled points to be labeled by the user. Necessary for NEW and RESUME modes
+RUNS = [2]    # Runs to perform evaluation. Necessary for RESUME and EVAL modes
+METRICS = [   # Evaluation metrics. Necessary for EVAL and AVERAGE modes
     ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     TargetSetAccuracy()
 ]
-
-TASK = "sdss_Q1_0.1%"
-SUBSAMPLE_SIZE = 50000
 
 ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 ACTIVE_LEARNER = RandomSampler()
@@ -25,29 +33,37 @@ ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
     add_intercept=True, solver="ojalgo")  # extra
 )
 
+#############################
+# DO NOT CHANGE
+#############################
+
+# PARAMETER VALIDATION
+for mode in MODE:
+    assert_in_list(mode, ['NEW', 'RESUME', 'EVAL', 'AVERAGE'])
+assert_positive("NUM_RUNS", NUM_RUNS)
+assert_positive("BUDGET", BUDGET)
+assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
+
+# BUILD EXPERIMENT
 experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
 
 experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER)
 experiment.dump_to_config_file(experiment_dir)
 
+# BUILD COMMAND LINE ARGUMENTS
 command_line = [
     "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
     "--experiment_dir", experiment_dir,
-    "--mode", MODE,
+    "--mode", ' '.join(MODE),
     "--num_runs", str(NUM_RUNS),
     "--budget", str(BUDGET),
 ]
-
-assert_in_list(MODE, ['NEW', 'RESUME', 'EVAL'])
-assert_positive("NUM_RUNS", NUM_RUNS)
-assert_positive("BUDGET", BUDGET)
-assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
 if RUNS:
     command_line.append("--runs")
     command_line.append(' '.join(map(str, RUNS)))
 
-if METRICS and MODE == 'EVAL':
+if METRICS and ('EVAL' in MODE or 'AVERAGE' in MODE):
     command_line.append("--metrics")
     for m in METRICS:
         assert_is_instance(m, Metric)

@@ -11,8 +11,8 @@ public class CommandLineArguments {
     @Parameter(names = "--experiment_dir", required = true)
     private String experimentDirectory;
 
-    @Parameter(names = "--mode", required = true)
-    private String mode;
+    @Parameter(names = "--mode", required = true, variableArity = true)
+    private List<String> modes;
 
     @Parameter(names = "--budget", validateWith = PositiveInteger.class)
     private int budget = 0;
@@ -34,8 +34,8 @@ public class CommandLineArguments {
         return experimentDirectory;
     }
 
-    public String getMode() {
-        return mode;
+    public List<String> getModes() {
+        return modes;
     }
 
     public int getBudget() {
@@ -67,7 +67,7 @@ public class CommandLineArguments {
     public String toString() {
         return "CommandLineArguments{" +
                 "experimentDirectory='" + experimentDirectory + '\'' +
-                ", mode='" + mode + '\'' +
+                ", mode='" + modes + '\'' +
                 ", budget=" + budget +
                 ", numRuns=" + numRuns +
                 ", runs=" + runs +

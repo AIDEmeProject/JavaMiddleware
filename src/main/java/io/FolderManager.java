@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
  */
 public class FolderManager {
     private static String CONFIG_FILE = "config.json";
-    private static String RUN_EXT = ".run";
-    private static String EVAL_EXT = ".eval";
+    private static String RUN_FILE = "Runs/%d.run";
+    private static String EVAL_FILE = "%s/%d.eval";
 
     /**
      * File object pointing to folder
@@ -39,8 +39,11 @@ public class FolderManager {
         }
     }
 
+    /**
+     * @return the index of a new run file
+     */
     public int getNewRunFileIndex() {
-        File[] files = folder.toFile().listFiles(x -> x.getName().endsWith(".run"));
+        File[] files = folder.resolve("Runs").toFile().listFiles(x -> x.getName().endsWith(".run"));
 
         if (files == null || files.length == 0) {
             return 1;
@@ -53,18 +56,26 @@ public class FolderManager {
     }
 
     public Path getRunFile(int index) {
-        return getPathToFile("Runs", index + RUN_EXT);
+        return getFullPath(String.format(RUN_FILE, index));
     }
 
     public Path getEvalFile(String metric, int index) {
-        return getPathToFile(metric, index + EVAL_EXT);
+        return getFullPath(String.format(EVAL_FILE, metric, index));
     }
 
-    private Path getPathToFile(String metric, String filename) {
-        return folder.resolve(metric).resolve(filename);
+    public File[] getAllEvalFiles(String metric) {
+        return folder.resolve(metric).toFile().listFiles(x -> x.getName().endsWith(".eval"));
     }
 
-    public List<List<LabeledPoint>> parseRunFile(int index) {
+    public File getAverageFile(String metric) {
+        return folder.resolve(metric).resolve("average.eval").toFile();
+    }
+
+    private Path getFullPath(String filename) {
+        return folder.resolve(filename);
+    }
+
+    public List<List<LabeledPoint>> getLabeledPoints(int index) {
         if (Files.notExists(getRunFile(index))) {
             return Collections.emptyList();
         }

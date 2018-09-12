@@ -62,7 +62,7 @@ public class Experiment {
     private void resume(int id, int budget, StandardOpenOption openOption) {
         LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
 
-        for (List<LabeledPoint> labeledPoints : folder.parseRunFile(id)) {
+        for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
             labeledDataset.putOnLabeledSet(labeledPoints);
         }
 
@@ -135,7 +135,7 @@ public class Experiment {
 
         try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile)) {
 
-            for (List<LabeledPoint> labeledPoints : folder.parseRunFile(id)) {
+            for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
                 labeledDataset.putOnLabeledSet(labeledPoints);
 
                 Map<String, Double> metrics = metricCalculator.compute(labeledDataset, trueLabels).getMetrics();
