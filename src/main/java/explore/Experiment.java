@@ -31,8 +31,6 @@ public class Experiment {
     private InitialSampler initialSampler;
     private int subsampleSize;
 
-    private Ranker ranker;
-
     public Experiment(FolderManager folder) {
         this.folder = folder;
 
@@ -68,6 +66,7 @@ public class Experiment {
             labeledDataset.putOnLabeledSet(labeledPoints);
         }
 
+        Ranker ranker = null;
         if (labeledDataset.hasLabeledPoints()) {
             ranker = activeLearner.fit(labeledDataset.getLabeledPoints());
         }
@@ -76,7 +75,7 @@ public class Experiment {
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
             while(labeledDataset.getNumLabeledPoints() <= budget && labeledDataset.hasUnlabeledPoints()) {
-                runSingleIteration(labeledDataset, labeledPointsWriter, metricsWriter);
+                ranker = runSingleIteration(labeledDataset, ranker, labeledPointsWriter, metricsWriter);
             }
 
         } catch (Exception ex) {
@@ -85,13 +84,13 @@ public class Experiment {
         }
     }
 
-    private void runSingleIteration(LabeledDataset labeledDataset, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
+    private Ranker runSingleIteration(LabeledDataset labeledDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
         Map<String, Double> metrics = new HashMap<>();
         long initialTime, start = System.nanoTime();
 
         // find next points to label
         initialTime = System.nanoTime();
-        List<DataPoint> mostInformativePoint = getNextPointsToLabel(labeledDataset);
+        List<DataPoint> mostInformativePoint = getNextPointsToLabel(labeledDataset, ranker);
         metrics.put("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // ask user for labels
@@ -113,9 +112,11 @@ public class Experiment {
         // save metrics to file
         writeLineToFile(labeledPointsWriter,  JsonConverter.serialize(labeledPoints));
         writeLineToFile(metricsWriter, JsonConverter.serialize(metrics));
+
+        return ranker;
     }
 
-    private List<DataPoint> getNextPointsToLabel(LabeledDataset labeledDataset) {
+    private List<DataPoint> getNextPointsToLabel(LabeledDataset labeledDataset, Ranker ranker) {
         if (!labeledDataset.hasLabeledPoints()) {
             return initialSampler.runInitialSample(labeledDataset.getUnlabeledPoints(), user);
         }
