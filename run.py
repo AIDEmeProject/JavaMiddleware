@@ -14,8 +14,8 @@ SUBSAMPLE_SIZE = 50000
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    'NEW',       # run new exploration
-    # 'RESUME',    # resume a previous exploration
+    #'NEW',       # run new exploration
+    #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -24,7 +24,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of labeled points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 20
+BUDGET = 25
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [2]
@@ -63,7 +63,7 @@ assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 # BUILD EXPERIMENT
 experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
 experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER)
-experiment.dump_to_config_file(experiment_dir)
+experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
 # BUILD COMMAND LINE ARGUMENTS
 command_line = [

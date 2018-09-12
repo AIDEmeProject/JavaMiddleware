@@ -133,10 +133,17 @@ public class Experiment {
 
         Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
-        try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile)) {
+        try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+
+            long iter = 0;
+            long numberOfPreviousIters = countLinesOfFile(evalFile);
 
             for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
                 labeledDataset.putOnLabeledSet(labeledPoints);
+
+                if (iter++ < numberOfPreviousIters) {
+                    continue;
+                }
 
                 Map<String, Double> metrics = metricCalculator.compute(labeledDataset, trueLabels).getMetrics();
 
@@ -144,6 +151,14 @@ public class Experiment {
             }
         } catch (IOException ex) {
             throw new RuntimeException("evaluation failed.", ex);
+        }
+    }
+
+    private static long countLinesOfFile(Path file) {
+        try {
+            return Files.lines(file).filter(x -> !x.trim().isEmpty()).count();
+        } catch (IOException ex) {
+            throw new RuntimeException("IO error while counting lines of file " + file);
         }
     }
 

@@ -60,6 +60,14 @@ public class FolderManager {
     }
 
     public Path getEvalFile(String metric, int index) {
+        try {
+            if (Files.notExists(folder.resolve(metric))) {
+                Files.createDirectories(folder.resolve(metric));
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("IO error while creating directory.", ex);
+        }
+
         return getFullPath(String.format(EVAL_FILE, metric, index));
     }
 
@@ -91,7 +99,7 @@ public class FolderManager {
     }
 
     public ExperimentConfiguration getExperimentConfig() {
-        return parseConfigFile(folder.resolve(CONFIG_FILE), ExperimentConfiguration.class);
+        return parseConfigFile(folder.resolve("Runs/" + CONFIG_FILE), ExperimentConfiguration.class);
     }
 
     public MetricCalculator getMetricCalculator(String name) {
@@ -111,7 +119,7 @@ public class FolderManager {
             parsedObject = JsonConverter.deserialize(reader, type);
         }
         catch (FileNotFoundException ex) {
-            throw new RuntimeException(CONFIG_FILE + " file not found on " + folder);
+            throw new RuntimeException(CONFIG_FILE + " file not found on " + folder, ex);
         }
 
         if (parsedObject == null) {
