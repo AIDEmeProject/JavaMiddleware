@@ -3,10 +3,7 @@ package data;
 import machinelearning.classifier.Label;
 import utils.Validator;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class LabeledDataset {
     /**
@@ -27,26 +24,15 @@ public class LabeledDataset {
     /**
      * @param points collection of data points to be used as initial unlabeled data pool
      */
-    public LabeledDataset(Collection<DataPoint> points){
+    public LabeledDataset(List<DataPoint> points){
         validateDataPointCollection(points);
 
-        labeled = new LinkedHashSet<>();  // preserve insertion order
+        labeled = new LinkedHashSet<>();
 
-        unlabeled = new LinkedHashSet<>();  // insertion order is not important
+        unlabeled = new LinkedHashSet<>();
         unlabeled.addAll(points);
 
         allPoints = points;
-    }
-
-    public LabeledDataset(LabeledDataset labeledDataset){
-        this(labeledDataset.labeled, labeledDataset.unlabeled);
-    }
-
-    public LabeledDataset(Collection<LabeledPoint> labeled, Collection<DataPoint> unlabeled){
-        this.labeled = new LinkedHashSet<>(labeled);
-        this.unlabeled = new LinkedHashSet<>(unlabeled);
-        this.allPoints = new LinkedHashSet<>(unlabeled);
-        this.allPoints.addAll(labeled);
     }
 
     /**

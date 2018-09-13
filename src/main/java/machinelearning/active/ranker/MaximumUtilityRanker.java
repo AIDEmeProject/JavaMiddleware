@@ -51,34 +51,34 @@ public class MaximumUtilityRanker implements Ranker {
 
         int steps = Math.min(unlabeledSet.size(), this.lookahead);
 
-        return utility(new LabeledDataset(labeledPoints, unlabeledSet), steps).getOptimizer();
+        return utility(unlabeledSet, steps).getOptimizer();
     }
 
     /**
      * Core function computing the maximum l-steps utility. Refer to [1] and [2] for details.
-     * @param data: labeled data
+     * @param unlabeledSet: unlabeled data
      * @param steps: number of steps to look into the future
      * @return optimal utility index and value
      */
-    private OptimumFinder.OptimumResult<DataPoint> utility(LabeledDataset data, int steps){
-        Classifier classifier = learner.fit(data.getLabeledPoints());
+    private OptimumFinder.OptimumResult<DataPoint> utility(Collection<DataPoint> unlabeledSet, int steps){
+        Classifier classifier = learner.fit(labeledPoints);
 
         // find the unlabeled point maximizing the probability of being a target
-        OptimumFinder.OptimumResult<DataPoint> optimum = OptimumFinder.maximizer(data.getUnlabeledPoints(), classifier::probability);
+        OptimumFinder.OptimumResult<DataPoint> optimum = OptimumFinder.maximizer(unlabeledSet, classifier::probability);
 
         // if only one step remain, return previous optimum (i.e. greedy selection)
         if (steps <= 1){
             return optimum;
         }
 
-        calculator.fit(data, classifier, steps);
+        calculator.fit(unlabeledSet, classifier, steps);
 
         // return the unlabeled point maximizing the optimalUtilityGivenPoint.
         // the calculator variable can be used for pruning the tree search provided our classifier implements the computeProbabilityUpperBound method
         // use the previous optimizer point as a "warm-starting" for the tree search
         return OptimumFinder.maximizer(
-                data.getUnlabeledPoints(),
-                pt -> optimalUtilityGivenPoint(data, steps, pt, classifier.probability(pt)),
+                unlabeledSet,
+                pt -> optimalUtilityGivenPoint(unlabeledSet, steps, pt, classifier.probability(pt)),
                 pt -> calculator.upperBound(classifier.probability(pt)),
                 optimum.getOptimizer());
     }
@@ -86,22 +86,24 @@ public class MaximumUtilityRanker implements Ranker {
     /**
      * Helper function for computing the expected number of labeled points to be retrieved if we start at a particular point.
      * This function if computed recursively, calling the utility() method twice. Refer to [2] for details.
-     * @param data: labeled data so far
+     * @param unlabeledSet: unlabeled data
      * @param steps: number to future steps remaining
      * @param point: row number of starting point
      * @param proba: probability of X[i] being 1
      * @return Expected number of positive points to be retrieved if we start at X[rowNumber]
      */
-    private double optimalUtilityGivenPoint(LabeledDataset data, int steps, DataPoint point, double proba){
+    private double optimalUtilityGivenPoint(Collection<DataPoint> unlabeledSet, int steps, DataPoint point, double proba){
         // positive label branch
-        data.putOnLabeledSet(point, Label.POSITIVE);
-        double positiveUtility = utility(data, steps-1).getScore();
-        data.removeFromLabeledSet(point);
+        LabeledPoint newLabeledPoint = new LabeledPoint(point, Label.POSITIVE);
+        labeledPoints.add(newLabeledPoint);
+        double positiveUtility = utility(unlabeledSet, steps-1).getScore();
+        labeledPoints.remove(newLabeledPoint);
 
         // negative label branch
-        data.putOnLabeledSet(point, Label.NEGATIVE);
-        double negativeUtility = utility(data, steps-1).getScore();
-        data.removeFromLabeledSet(point);
+        newLabeledPoint = new LabeledPoint(point, Label.NEGATIVE);
+        labeledPoints.add(newLabeledPoint);
+        double negativeUtility = utility(unlabeledSet, steps-1).getScore();
+        labeledPoints.remove(newLabeledPoint);
 
         // return utility
         return (positiveUtility + 1) * proba + negativeUtility * (1 - proba);
