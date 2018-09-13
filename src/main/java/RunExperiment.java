@@ -4,38 +4,27 @@ import io.CommandLineArguments;
 import io.FolderManager;
 
 public class RunExperiment {
-    private static FolderManager experimentFolder;
-    private static Experiment experiment;
-
-    private static Experiment getExperiment() {
-        if (experiment == null) {
-            experiment = new Experiment(experimentFolder);
-        }
-        return experiment;
-    }
-
     public static void main(String[] args) {
         CommandLineArguments arguments = CommandLineArguments.parseCommandLineArgs(args);
-        System.out.println(arguments);
-
-        experimentFolder = new FolderManager(arguments.getExperimentDirectory());
+        FolderManager experimentFolder = new FolderManager(arguments.getExperimentDirectory());
+        Experiment experiment = new Experiment(experimentFolder);
 
         if (arguments.getModes().contains("NEW")) {
             for (int i = 0; i < arguments.getNumRuns(); i++) {
-                getExperiment().run(arguments.getBudget());
+                experiment.getExplore().run(experimentFolder.getNewRunFileIndex(), arguments.getBudget());
             }
         }
 
         if (arguments.getModes().contains("RESUME")) {
             for (int id : arguments.getRuns()) {
-                getExperiment().resume(id, arguments.getBudget());
+                experiment.getExplore().resume(id, arguments.getBudget());
             }
         }
 
         if (arguments.getModes().contains("EVAL")) {
             for (int id : arguments.getRuns()) {
                 for (String calculatorId : arguments.getMetrics()) {
-                    getExperiment().evaluate(id, calculatorId);
+                    experiment.getEvaluate().evaluate(id, calculatorId);
                 }
             }
         }

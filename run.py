@@ -9,13 +9,13 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASK = "sdss_Q1_0.1%"
 
-# size of random, unlabeled sample . Use float('inf') if no sub-sampling is to be performed
+# size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
     #'NEW',       # run new exploration
-    #'RESUME',    # resume a previous exploration
+    'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -24,10 +24,10 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of labeled points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 25
+BUDGET = 20
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [2]
+RUNS = [1, 2]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
@@ -52,7 +52,6 @@ ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
 #############################
 # DO NOT CHANGE
 #############################
-
 # PARAMETER VALIDATION
 for mode in MODES:
     assert_in_list(mode, ['NEW', 'RESUME', 'EVAL', 'AVERAGE'])
