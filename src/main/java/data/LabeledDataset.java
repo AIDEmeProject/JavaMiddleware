@@ -19,7 +19,7 @@ public class LabeledDataset {
     /**
      * Reference to the initial collection of points
      */
-    private final Collection<DataPoint> allPoints;
+    private final List<DataPoint> allPoints;
 
     /**
      * @param points collection of data points to be used as initial unlabeled data pool
@@ -28,10 +28,7 @@ public class LabeledDataset {
         validateDataPointCollection(points);
 
         labeled = new LinkedHashSet<>();
-
-        unlabeled = new LinkedHashSet<>();
-        unlabeled.addAll(points);
-
+        unlabeled = new LinkedHashSet<>(points);
         allPoints = points;
     }
 
@@ -51,7 +48,7 @@ public class LabeledDataset {
     /**
      * @return collection containing all points
      */
-    public Collection<DataPoint> getAllPoints() {
+    public List<DataPoint> getAllPoints() {
         return allPoints;
     }
 
@@ -108,10 +105,6 @@ public class LabeledDataset {
         labeled.add(point);
     }
 
-    public void putOnLabeledSet(DataPoint point, Label label) {
-        putOnLabeledSet(new LabeledPoint(point, label));
-    }
-
     /**
      * Add all points in collection to labeled points set, removing then from the unlabeled set.
      *
@@ -124,30 +117,5 @@ public class LabeledDataset {
         for (LabeledPoint point : points) {
             putOnLabeledSet(point);
         }
-    }
-
-    public void putOnLabeledSet(Collection<DataPoint> points, Label[] label) {
-        Validator.assertEquals(points.size(), label.length);
-
-        int i = 0;
-        for (DataPoint point : points){
-            putOnLabeledSet(point, label[i++]);
-        }
-    }
-
-    /**
-     * Removes a data point labeled points collection, putting it back on the unlabeled points set.
-     *
-     * @param point: index of labeled point to remove.
-     * @throws IllegalArgumentException if point is not in labeled set
-     */
-    public void removeFromLabeledSet(DataPoint point) {
-        boolean removed = labeled.remove(point);
-
-        if (!removed) {
-            throw new IllegalArgumentException("Point " + point + " is not in labeled set.");
-        }
-
-        unlabeled.add(point);
     }
 }

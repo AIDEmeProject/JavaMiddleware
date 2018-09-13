@@ -7,6 +7,7 @@ import explore.user.User;
 import io.FolderManager;
 import io.TaskReader;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public final class Experiment {
 
         TaskReader reader = new TaskReader(configuration.getTask());
 
-        List<DataPoint> dataPoints = StandardScaler.fitAndTransform(reader.readData());
+        List<DataPoint> dataPoints = Collections.unmodifiableList(StandardScaler.fitAndTransform(reader.readData()));
 
         Set<Long> positiveKeys = reader.readTargetSetKeys();
         User user = new DummyUser(positiveKeys);
