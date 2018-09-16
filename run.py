@@ -32,15 +32,13 @@ RUNS = [1, 2]
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    TargetSetAccuracy()
+    ConfusionMatrix(SVM(C=1e7, kernel='gaussian'))
 ]
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
-# ACTIVE_LEARNER = ActiveTreeSearch(KNN(k=100, gamma=0.1), lookahead=1)
 ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run

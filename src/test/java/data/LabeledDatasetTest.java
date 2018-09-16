@@ -31,8 +31,6 @@ class LabeledDatasetTest {
     }
 
     private void assertUnlabeledCollectionsAreEqual(Collection<DataPoint> collection1, Collection<DataPoint> collection2){
-        System.out.println(collection1);
-        System.out.println(collection2);
         assertTrue(collection1.containsAll(collection2) && collection2.containsAll(collection1));
     }
 
