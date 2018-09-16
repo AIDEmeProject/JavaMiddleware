@@ -61,7 +61,6 @@ public class NearestNeighborsLearner implements Learner {
      * Computes a KD-tree over a collection of data points (for easily finding the k-nearest neighbors)
      * @param points: data points
      */
-    @Override
     public void initialize(Collection<DataPoint> points) {
         // convert do double[][] matrix
         double[][] X = new double[points.size()][];
