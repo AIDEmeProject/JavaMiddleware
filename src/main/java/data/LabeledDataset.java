@@ -1,6 +1,5 @@
 package data;
 
-import machinelearning.classifier.Label;
 import utils.Validator;
 
 import java.util.*;

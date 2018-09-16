@@ -16,7 +16,6 @@ class LinearSearchTest {
     private List<Double> elems;
     private FakeFunction score;
 
-
     private class FakeFunction implements Function<Double, Double>{
         private Function<Double, Double> function;
         private int counter;
@@ -30,10 +29,6 @@ class LinearSearchTest {
         public Double apply(Double aDouble) {
             counter++;
             return function.apply(aDouble);
-        }
-
-        public int getCounter() {
-            return counter;
         }
     }
 
@@ -61,5 +56,19 @@ class LinearSearchTest {
     @Test
     void maximizer_quadraticScoreFunction_returnsCorrectMaximum() {
         assertEquals(new Double(-3),  LinearSearch.findMaximizer(elems, score));
+    }
+
+    @Test
+    void minimizer_anyFunction_applyCalledOncePerElementInCollection() {
+        Function<Double, Double> mockFunction = score;
+        LinearSearch.findMinimizer(elems, score);
+        assertEquals(elems.size(), score.counter);
+    }
+
+    @Test
+    void maximizer_anyFunction_applyCalledOncePerElementInCollection() {
+        Function<Double, Double> mockFunction = score;
+        LinearSearch.findMaximizer(elems, score);
+        assertEquals(elems.size(), score.counter);
     }
 }
