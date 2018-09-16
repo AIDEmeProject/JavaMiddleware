@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LinearSearchTest {
     private List<Double> elems;
-    private FakeFunction score;
+    private MockFunction score;
 
-    private class FakeFunction implements Function<Double, Double>{
+    private class MockFunction implements Function<Double, Double>{
         private Function<Double, Double> function;
         private int counter;
 
-        public FakeFunction(Function<Double, Double> function) {
+        public MockFunction(Function<Double, Double> function) {
             this.counter = 0;
             this.function = function;
         }
@@ -35,7 +35,7 @@ class LinearSearchTest {
     @BeforeEach
     void setUp() {
         elems = Arrays.asList(-3.,-1., 2., 1.5, -2.5);
-        score = new FakeFunction(x -> x*x);
+        score = new MockFunction(x -> x*x);
     }
 
     @Test
@@ -60,14 +60,12 @@ class LinearSearchTest {
 
     @Test
     void minimizer_anyFunction_applyCalledOncePerElementInCollection() {
-        Function<Double, Double> mockFunction = score;
         LinearSearch.findMinimizer(elems, score);
         assertEquals(elems.size(), score.counter);
     }
 
     @Test
     void maximizer_anyFunction_applyCalledOncePerElementInCollection() {
-        Function<Double, Double> mockFunction = score;
         LinearSearch.findMaximizer(elems, score);
         assertEquals(elems.size(), score.counter);
     }
