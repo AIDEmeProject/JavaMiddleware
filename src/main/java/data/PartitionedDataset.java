@@ -1,24 +1,34 @@
 package data;
 
 import machinelearning.classifier.Label;
+import machinelearning.threesetmetric.ExtendedClassifier;
+import machinelearning.threesetmetric.ExtendedClassifierStub;
 
 import java.util.*;
 
 public class PartitionedDataset {
     private List<DataPoint> points;
+    private ExtendedClassifier classifier;
+
     private Map<Long, Integer> indexToPosition;
     private ExtendedLabel[] labels;
     private int modelStart;
     private int unknownStart;
 
-    public PartitionedDataset(List<DataPoint> points) {
+    public PartitionedDataset(List<DataPoint> points, ExtendedClassifier classifier) {
         this.points = new ArrayList<>(points);
+        this.classifier = Objects.requireNonNull(classifier);
+
         this.indexToPosition = new HashMap<>(points.size());
         this.labels = new ExtendedLabel[points.size()];
         this.modelStart = 0;
         this.unknownStart = 0;
 
         initializeDataStructures(points);
+    }
+
+    public PartitionedDataset(List<DataPoint> points) {
+        this(points, new ExtendedClassifierStub());
     }
 
     private void initializeDataStructures(List<DataPoint> points) {
@@ -54,6 +64,12 @@ public class PartitionedDataset {
     }
 
     public void update(DataPoint point, Label label) {
+        updateLabeledPointsPartition(point, label);
+        classifier.update(point.getData(), label);
+        updateModelPartition();
+    }
+
+    private void updateLabeledPointsPartition(DataPoint point, Label label) {
         int pos = findPosition(point);
         labels[pos] = ExtendedLabel.fromLabel(label);
 
@@ -64,8 +80,16 @@ public class PartitionedDataset {
         else if (pos >= modelStart) {
             swap(pos, modelStart++);
         }
+    }
 
-        // TODO: update model
+    private void updateModelPartition() {
+        int position = unknownStart;
+        for (ExtendedLabel prediction : classifier.predict(getUncertainPoints())) {
+            if (prediction != ExtendedLabel.UNKNOWN) {
+                swap(position, unknownStart++);
+            }
+            position++;
+        }
     }
 
     private void swap(int i, int j) {
