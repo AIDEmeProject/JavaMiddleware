@@ -1,13 +1,12 @@
 package explore;
 
 import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
+import data.PartitionedDataset;
 import explore.metrics.MetricCalculator;
 import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
-import machinelearning.classifier.Label;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -31,8 +30,7 @@ public final class Evaluate {
     public void evaluate(int id, String calculatorIdentifier) {
         MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
 
-        Label[] trueLabels = user.getLabel(dataPoints);
-        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
+        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
 
         Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
@@ -42,13 +40,13 @@ public final class Evaluate {
             long numberOfPreviousIters = countLinesOfFile(evalFile);
 
             for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
-                labeledDataset.putOnLabeledSet(labeledPoints);
+                partitionedDataset.update(labeledPoints);
 
                 if (iter++ < numberOfPreviousIters) {
                     continue;
                 }
 
-                Map<String, Double> metrics = metricCalculator.compute(labeledDataset, trueLabels).getMetrics();
+                Map<String, Double> metrics = metricCalculator.compute(partitionedDataset, user).getMetrics();
 
                 writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
             }
