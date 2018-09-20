@@ -6,7 +6,7 @@ import machinelearning.classifier.Label;
 
 import java.util.Collection;
 
-public class ExtendedClassifierStub implements ExtendedClassifier {
+public final class ExtendedClassifierStub implements ExtendedClassifier {
     @Override
     public void update(double[] point, Label label) {
         // do nothing
