@@ -1,8 +1,9 @@
 package explore;
 
 import data.DataPoint;
-import data.LabeledDataset;
+import data.ExtendedLabel;
 import data.LabeledPoint;
+import data.PartitionedDataset;
 import explore.sampling.InitialSampler;
 import explore.sampling.ReservoirSampler;
 import explore.user.User;
@@ -10,6 +11,7 @@ import io.FolderManager;
 import io.json.JsonConverter;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
+import machinelearning.classifier.Label;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -24,6 +26,7 @@ public final class Explore {
     private ActiveLearner activeLearner;
     private InitialSampler initialSampler;
     private int subsampleSize;
+    private double searchUncertainRegionProbability;
 
     public Explore(FolderManager folder, List<DataPoint> dataPoints, User user) {
         this.folder = folder;
@@ -34,6 +37,7 @@ public final class Explore {
         this.activeLearner = configuration.getActiveLearner();
         this.initialSampler = configuration.getInitialSampler();
         this.subsampleSize = configuration.getSubsampleSize();
+        this.searchUncertainRegionProbability = configuration.getSearchUncertainRegionProbability();
     }
 
     public void run(int id, int budget) {
@@ -45,22 +49,23 @@ public final class Explore {
     }
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
-        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
+        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
 
         for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
-            labeledDataset.putOnLabeledSet(labeledPoints);
+            partitionedDataset.update(labeledPoints);
         }
 
-        Ranker ranker = null;
-        if (labeledDataset.hasLabeledPoints()) {
-            ranker = activeLearner.fit(labeledDataset.getLabeledPoints());
+        Ranker ranker = null;  // TODO: avoid setting ranker to null (move initial sampling here?)
+        if (partitionedDataset.hasLabeledPoints()) {
+            ranker = activeLearner.fit(partitionedDataset.getLabeledPoints());
         }
 
         try (BufferedWriter labeledPointsWriter = Files.newBufferedWriter(folder.getRunFile(id), openOption);
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
-            while (labeledDataset.getNumLabeledPoints() <= budget && labeledDataset.hasUnlabeledPoints()) {
-                ranker = runSingleIteration(labeledDataset, ranker, labeledPointsWriter, metricsWriter);
+            // TODO: change budget stop criteria to "while user has not labeled 'budget' points"
+            while (partitionedDataset.getNumLabeledPoints() <= budget && partitionedDataset.hasUnknownPoints()) {
+                ranker = runSingleIteration(partitionedDataset, ranker, labeledPointsWriter, metricsWriter);
             }
 
         } catch (Exception ex) {
@@ -69,44 +74,58 @@ public final class Explore {
         }
     }
 
-    private Ranker runSingleIteration(LabeledDataset labeledDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
+    private Ranker runSingleIteration(PartitionedDataset partitionedDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
         Map<String, Double> metrics = new HashMap<>();
         long initialTime, start = System.nanoTime();
 
         // find next points to label
         initialTime = System.nanoTime();
-        List<DataPoint> mostInformativePoint = getNextPointsToLabel(labeledDataset, ranker);
+        List<DataPoint> mostInformativePoints = getNextPointsToLabel(partitionedDataset, ranker);
         metrics.put("GetNextTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // ask user for labels
         initialTime = System.nanoTime();
-        List<LabeledPoint> labeledPoints = user.getLabeledPoint(mostInformativePoint);
+        List<LabeledPoint> labeledPoints = getDataPointsLabels(partitionedDataset, mostInformativePoints);
         metrics.put("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
-        // update labeled / unlabeled sets
-        labeledDataset.putOnLabeledSet(labeledPoints);
+        // update labeled / unlabeled partitions
+        initialTime = System.nanoTime();
+        partitionedDataset.update(labeledPoints);
+        metrics.put("UpdatePartitionsTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update model
         initialTime = System.nanoTime();
-        ranker = activeLearner.fit(labeledDataset.getLabeledPoints());
+        ranker = activeLearner.fit(partitionedDataset.getLabeledPoints());
         metrics.put("FitTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // iter time
         metrics.put("IterTimeMillis", (System.nanoTime() - start) / 1e6);
 
         // save metrics to file
+        // TODO: we should accumulate labeled points until the user labels at least one point
         writeLineToFile(labeledPointsWriter, JsonConverter.serialize(labeledPoints));
         writeLineToFile(metricsWriter, JsonConverter.serialize(metrics));
 
         return ranker;
     }
 
-    private List<DataPoint> getNextPointsToLabel(LabeledDataset labeledDataset, Ranker ranker) {
-        if (!labeledDataset.hasLabeledPoints()) {
-            return initialSampler.runInitialSample(labeledDataset.getUnlabeledPoints(), user);
+    private List<LabeledPoint> getDataPointsLabels(PartitionedDataset partitionedDataset, List<DataPoint> mostInformativePoints) {
+        List<LabeledPoint> labeledPoints = new ArrayList<>();
+        for (DataPoint dataPoint : mostInformativePoints) {
+            ExtendedLabel extendedLabel = partitionedDataset.getLabel(dataPoint);
+            Label label = extendedLabel == ExtendedLabel.UNKNOWN ? user.getLabel(dataPoint) : extendedLabel.toLabel();
+            labeledPoints.add(new LabeledPoint(dataPoint, label));
+        }
+        return labeledPoints;
+    }
+
+    private List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, Ranker ranker) {
+        if (!partitionedDataset.hasLabeledPoints()) {
+            return initialSampler.runInitialSample(partitionedDataset.getUnlabeledPoints(), user);
         }
 
-        Collection<DataPoint> sample = ReservoirSampler.sample(labeledDataset.getUnlabeledPoints(), subsampleSize);
+        List<DataPoint> unlabeledData = new Random().nextDouble() <= searchUncertainRegionProbability ? partitionedDataset.getUncertainPoints() : partitionedDataset.getUnlabeledPoints();
+        Collection<DataPoint> sample = ReservoirSampler.sample(unlabeledData, subsampleSize);
         return Collections.singletonList(ranker.top(sample));
     }
 
