@@ -63,6 +63,28 @@ public class PartitionedDataset {
         return labels[findPosition(point)];
     }
 
+    public ExtendedLabel[] getLabel(Collection<DataPoint> points) {
+        return points.stream().map(this::getLabel).toArray(ExtendedLabel[]::new);
+    }
+
+    public int getNumLabeledPoints() {
+        return modelStart;
+    }
+
+    public boolean hasLabeledPoints() {
+        return modelStart > 0;
+    }
+
+    public boolean hasUnknownPoints() {
+        return unknownStart < points.size();
+    }
+
+    public void update(List<LabeledPoint> labeledPoints) {
+        for (LabeledPoint labeledPoint : labeledPoints) {
+            update(labeledPoint, labeledPoint.getLabel());
+        }
+    }
+
     public void update(DataPoint point, Label label) {
         updateLabeledPointsPartition(point, label);
         classifier.update(point.getData(), label);
