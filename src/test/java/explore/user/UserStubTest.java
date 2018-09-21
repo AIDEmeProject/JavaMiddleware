@@ -12,9 +12,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DummyUserTest {
+class UserStubTest {
     private Collection<DataPoint> points;
-    private DummyUser user;
+    private UserStub user;
 
     @BeforeEach
     void setUp() {
@@ -28,12 +28,12 @@ class DummyUserTest {
         positiveKeys.add(1L);
         positiveKeys.add(2L);
 
-        user = new DummyUser(positiveKeys);
+        user = new UserStub(positiveKeys);
     }
 
     @Test
     void constructor_emptyKeySet_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new DummyUser(new HashSet<>()));
+        assertThrows(IllegalArgumentException.class, () -> new UserStub(new HashSet<>()));
     }
 
     @Test

@@ -6,10 +6,10 @@ import machinelearning.classifier.Label;
 import java.util.Set;
 
 /**
- * The DummyUser is a special kind of annotator. It knows the which data points are positive in advance.
+ * The UserStub is a special kind of annotator. It knows the which data points are positive in advance.
  * It is useful when developing new algorithms and making benchmarks over known datasets.
  */
-public class DummyUser implements User {
+public class UserStub implements User {
     /**
      * true labels
      */
@@ -19,7 +19,7 @@ public class DummyUser implements User {
      * @param positiveKeys: set of data point's indexes in the target set
      * @throws IllegalArgumentException if array is empty, contains any number different from 0 or 1, or all labels are identical
      */
-    public DummyUser(Set<Long> positiveKeys) {
+    public UserStub(Set<Long> positiveKeys) {
         if (positiveKeys.isEmpty()){
             throw new IllegalArgumentException("Positive key set cannot be empty.");
         }
