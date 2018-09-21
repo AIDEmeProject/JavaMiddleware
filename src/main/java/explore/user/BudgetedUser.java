@@ -6,9 +6,9 @@ import utils.Validator;
 
 import java.util.Objects;
 
-public class BudgetedUser implements User {
-    private User user;
-    private int budget;
+public final class BudgetedUser implements User {
+    private final User user;
+    private final int budget;
     private int numberOfLabeledPoints;
 
     public BudgetedUser(User user, int budget) {
@@ -16,6 +16,10 @@ public class BudgetedUser implements User {
         this.user = Objects.requireNonNull(user);
         this.budget = budget;
         this.numberOfLabeledPoints = 0;
+    }
+
+    public int getNumberOfLabeledPoints() {
+        return numberOfLabeledPoints;
     }
 
     public boolean isWilling() {

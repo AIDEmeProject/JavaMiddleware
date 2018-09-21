@@ -2,12 +2,13 @@ package explore.statistics;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 /**
  * This class maintains a collection of metric statistics, allowing to add new statistics and update their values.
  */
-class StatisticsCollection {
+public class StatisticsCollection {
     /**
      * mapping metric_name -> statistics
      */
@@ -33,6 +34,10 @@ class StatisticsCollection {
         }
 
         return stat;
+    }
+
+    public Set<Map.Entry<String, Statistics>> getStatistics() {
+        return statistics.entrySet();
     }
 
     /**
