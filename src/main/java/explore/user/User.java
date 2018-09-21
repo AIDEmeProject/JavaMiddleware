@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * An User represents the "oracle" of Active Learning scenario: an expert or human annotator capable of, given a data point,
- * return whether it is a positive (i.e. 1) or a negative (i.e. 0) label.
+ * An User represents the "oracle" of Active Learning scenario, i.e. a human annotator capable of, given a {@link DataPoint},
+ * return whether it is represents a POSITIVE or a NEGATIVE {@link Label}.
  */
 public interface User {
     /**
@@ -26,13 +26,8 @@ public interface User {
      * @return an array containing the labels of each requested row
      */
     default Label[] getLabel(Collection<DataPoint> points){
-        Label[] labels = new Label[points.size()];
-
-        int i = 0;
-        for (DataPoint point : points){
-            labels[i++] = getLabel(point);
-        }
-
-        return labels;
+        return points.stream()
+                .map(this::getLabel)
+                .toArray(Label[]::new);
     }
 }
