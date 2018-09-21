@@ -23,11 +23,11 @@ MODES = [
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
-# Maximum number of labeled points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 20
+# Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
+BUDGET = 10
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [1, 2]
+RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

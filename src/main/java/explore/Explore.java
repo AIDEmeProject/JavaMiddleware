@@ -6,6 +6,7 @@ import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.sampling.InitialSampler;
 import explore.sampling.ReservoirSampler;
+import explore.user.BudgetedUser;
 import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
@@ -44,12 +45,18 @@ public final class Explore {
         resume(id, budget, StandardOpenOption.CREATE_NEW);
     }
 
+    /**
+     * Resume a previous exploration process
+     * @param id: run file id to resume
+     * @param budget: budget on the number of new points labeled by the user
+     */
     public void resume(int id, int budget) {
         resume(id, budget, StandardOpenOption.APPEND);
     }
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
         PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
+        BudgetedUser budgetedUser = new BudgetedUser(user, budget);
 
         for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
             partitionedDataset.update(labeledPoints);
@@ -63,9 +70,8 @@ public final class Explore {
         try (BufferedWriter labeledPointsWriter = Files.newBufferedWriter(folder.getRunFile(id), openOption);
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
-            // TODO: change budget stop criteria to "while user has not labeled 'budget' points"
-            while (partitionedDataset.getNumLabeledPoints() <= budget && partitionedDataset.hasUnknownPoints()) {
-                ranker = runSingleIteration(partitionedDataset, ranker, labeledPointsWriter, metricsWriter);
+            while (budgetedUser.isWilling() && partitionedDataset.hasUnknownPoints()) {
+                ranker = runSingleIteration(partitionedDataset, budgetedUser, ranker, labeledPointsWriter, metricsWriter);
             }
 
         } catch (Exception ex) {
@@ -74,7 +80,7 @@ public final class Explore {
         }
     }
 
-    private Ranker runSingleIteration(PartitionedDataset partitionedDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
+    private Ranker runSingleIteration(PartitionedDataset partitionedDataset, BudgetedUser budgetedUser, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
         Map<String, Double> metrics = new HashMap<>();
         long initialTime, start = System.nanoTime();
 
@@ -85,7 +91,7 @@ public final class Explore {
 
         // ask user for labels
         initialTime = System.nanoTime();
-        List<LabeledPoint> labeledPoints = getDataPointsLabels(partitionedDataset, mostInformativePoints);
+        List<LabeledPoint> labeledPoints = getDataPointsLabels(partitionedDataset, budgetedUser, mostInformativePoints);
         metrics.put("UserTimeMillis", (System.nanoTime() - initialTime) / 1e6);
 
         // update labeled / unlabeled partitions
@@ -109,11 +115,11 @@ public final class Explore {
         return ranker;
     }
 
-    private List<LabeledPoint> getDataPointsLabels(PartitionedDataset partitionedDataset, List<DataPoint> mostInformativePoints) {
+    private List<LabeledPoint> getDataPointsLabels(PartitionedDataset partitionedDataset, BudgetedUser budgetedUser, List<DataPoint> mostInformativePoints) {
         List<LabeledPoint> labeledPoints = new ArrayList<>();
         for (DataPoint dataPoint : mostInformativePoints) {
             ExtendedLabel extendedLabel = partitionedDataset.getLabel(dataPoint);
-            Label label = extendedLabel == ExtendedLabel.UNKNOWN ? user.getLabel(dataPoint) : extendedLabel.toLabel();
+            Label label = extendedLabel == ExtendedLabel.UNKNOWN ? budgetedUser.getLabel(dataPoint) : extendedLabel.toLabel();
             labeledPoints.add(new LabeledPoint(dataPoint, label));
         }
         return labeledPoints;
@@ -121,7 +127,7 @@ public final class Explore {
 
     private List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, Ranker ranker) {
         if (!partitionedDataset.hasLabeledPoints()) {
-            return initialSampler.runInitialSample(partitionedDataset.getUnlabeledPoints(), user);
+            return initialSampler.runInitialSample(partitionedDataset.getUnlabeledPoints(), user);  // do not use BudgetedUser since the initial sampling does not count against the budget
         }
 
         List<DataPoint> unlabeledData = new Random().nextDouble() <= searchUncertainRegionProbability ? partitionedDataset.getUncertainPoints() : partitionedDataset.getUnlabeledPoints();
