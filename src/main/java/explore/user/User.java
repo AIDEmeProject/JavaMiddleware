@@ -35,18 +35,4 @@ public interface User {
 
         return labels;
     }
-
-    default LabeledPoint getLabeledPoint(DataPoint point){
-        return new LabeledPoint(point, getLabel(point));
-    }
-
-    default List<LabeledPoint> getLabeledPoint(List<DataPoint> points){
-        List<LabeledPoint> labeledPoints = new ArrayList<>(points.size());
-
-        for (DataPoint point : points){
-            labeledPoints.add(getLabeledPoint(point));
-        }
-
-        return labeledPoints;
-    }
 }
