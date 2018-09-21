@@ -59,16 +59,16 @@ public class PartitionedDataset {
         return points.subList(unknownStart, points.size());
     }
 
+    public List<DataPoint> getKnownPoints() {
+        return points.subList(0, unknownStart);
+    }
+
     public ExtendedLabel getLabel(DataPoint point) {
         return labels[findPosition(point)];
     }
 
     public ExtendedLabel[] getLabel(Collection<DataPoint> points) {
         return points.stream().map(this::getLabel).toArray(ExtendedLabel[]::new);
-    }
-
-    public int getNumLabeledPoints() {
-        return modelStart;
     }
 
     public boolean hasLabeledPoints() {
