@@ -1,12 +1,9 @@
 package explore.user;
 
 import data.DataPoint;
-import data.LabeledPoint;
 import machinelearning.classifier.Label;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * An User represents the "oracle" of Active Learning scenario, i.e. a human annotator capable of, given a {@link DataPoint},

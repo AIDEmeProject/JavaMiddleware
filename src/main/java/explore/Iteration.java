@@ -1,13 +1,13 @@
 package explore;
 
 import data.DataPoint;
-import data.ExtendedLabel;
 import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.user.User;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Label;
+import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

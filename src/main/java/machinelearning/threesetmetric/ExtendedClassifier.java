@@ -1,7 +1,6 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
-import data.ExtendedLabel;
 import machinelearning.classifier.Label;
 
 import java.util.Collection;

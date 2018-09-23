@@ -1,8 +1,8 @@
 package explore.metrics;
 
-import data.ExtendedLabel;
 import data.PartitionedDataset;
 import explore.user.User;
+import machinelearning.threesetmetric.ExtendedLabel;
 
 public class ThreeSetMetricCalculator implements MetricCalculator {
     @Override

@@ -1,8 +1,8 @@
 package explore.sampling;
 
 import data.DataPoint;
-import explore.user.UserStub;
 import explore.user.User;
+import explore.user.UserStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -2,8 +2,8 @@ package explore;
 
 import data.DataPoint;
 import data.preprocessing.StandardScaler;
-import explore.user.UserStub;
 import explore.user.User;
+import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
 

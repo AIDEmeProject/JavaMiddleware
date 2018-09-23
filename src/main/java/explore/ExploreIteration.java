@@ -6,7 +6,10 @@ import explore.sampling.ReservoirSampler;
 import explore.user.User;
 import machinelearning.active.Ranker;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 class ExploreIteration extends Iteration {
     private final int subsampleSize;

@@ -1,4 +1,4 @@
-package data;
+package machinelearning.threesetmetric;
 
 import machinelearning.classifier.Label;
 

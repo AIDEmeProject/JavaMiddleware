@@ -3,6 +3,7 @@ package data;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedClassifierStub;
+import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.*;
 
