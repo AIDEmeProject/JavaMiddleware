@@ -90,8 +90,8 @@ public final class Explore {
 
     private Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {
         Map<String, Double> sum = new HashMap<>();
-        for (Map.Entry<String, Statistics> entry : metrics.getStatistics()) {
-            sum.put(entry.getKey(), entry.getValue().getSum());
+        for (Statistics statistics : metrics) {
+            sum.put(statistics.getName(), statistics.getSum());
         }
         return sum;
     }
