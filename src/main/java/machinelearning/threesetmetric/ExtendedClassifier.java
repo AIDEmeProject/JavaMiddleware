@@ -1,6 +1,7 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
+import data.LabeledPoint;
 import machinelearning.classifier.Label;
 
 import java.util.Collection;
@@ -15,10 +16,18 @@ import java.util.Collection;
 public interface ExtendedClassifier {
     /**
      * Update the current data model with new labeled data.
-     * @param point: a data point
-     * @param label: the data point's label
+     * @param point: a data array
+     * @param label: the data's label
      */
     void update(double[] point, Label label);
+
+    /**
+     * Update the current data model with new labeled data.
+     * @param labeledPoint a {@link LabeledPoint} instance
+     */
+    default void update(LabeledPoint labeledPoint) {
+        update(labeledPoint.getData(), labeledPoint.getLabel());
+    }
 
     /**
      * @param point: a data point

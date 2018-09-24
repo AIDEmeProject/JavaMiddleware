@@ -23,7 +23,7 @@ class ExploreIteration extends Iteration {
 
     @Override
     List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
-        List<DataPoint> unlabeledData = new Random().nextDouble() <= searchUncertainRegionProbability ? partitionedDataset.getUncertainPoints() : partitionedDataset.getUnlabeledPoints();
+        List<DataPoint> unlabeledData = new Random().nextDouble() <= searchUncertainRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
         Collection<DataPoint> sample = ReservoirSampler.sample(unlabeledData, subsampleSize);
         return Collections.singletonList(ranker.top(sample));
     }
