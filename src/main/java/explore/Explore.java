@@ -27,6 +27,11 @@ public final class Explore {
     private final User user;
     private final ExperimentConfiguration configuration;
 
+    /**
+     * @param folder: the exploration folder where results will be stored
+     * @param dataPoints: unlabeled pool of points
+     * @param user: the user for labeling points
+     */
     public Explore(FolderManager folder, List<DataPoint> dataPoints, User user) {
         this.folder = folder;
         this.dataPoints = dataPoints;
@@ -34,6 +39,11 @@ public final class Explore {
         this.configuration = folder.getExperimentConfig();
     }
 
+    /**
+     * Start a new exploration process
+     * @param id: run file id to create
+     * @param budget: budget on the number of points labeled by the user
+     */
     public void run(int id, int budget) {
         resume(id, budget, StandardOpenOption.CREATE_NEW);
     }
@@ -88,7 +98,7 @@ public final class Explore {
         }
     }
 
-    private Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {
+    private static Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {
         Map<String, Double> sum = new HashMap<>();
         for (Statistics statistics : metrics) {
             sum.put(statistics.getName(), statistics.getSum());

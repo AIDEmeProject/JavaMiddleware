@@ -8,6 +8,9 @@ import machinelearning.active.Ranker;
 
 import java.util.List;
 
+/**
+ * This class represents the very first iteration of the Exploration process, where the Initial Sampling is run.
+ */
 public class InitialIteration extends Iteration {
     private InitialSampler initialSampler;
 
