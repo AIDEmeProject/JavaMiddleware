@@ -56,9 +56,7 @@ public class StatisticsCollection implements Iterable<Statistics> {
      * @param metrics: Metrics object
      */
     public void update(Map<String, Double> metrics){
-        for (Map.Entry<String, Double> entry : metrics.entrySet()){
-            update(entry.getKey(), entry.getValue());
-        }
+        metrics.forEach(this::update);
     }
 
     @Override

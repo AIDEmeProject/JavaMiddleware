@@ -98,11 +98,7 @@ public final class Explore {
 
     private PartitionedDataset getPartitionedDataset(int id) {
         PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
-
-        for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
-            partitionedDataset.update(labeledPoints);
-        }
-
+        folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }
 
