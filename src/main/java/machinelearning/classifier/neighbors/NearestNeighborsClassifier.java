@@ -6,6 +6,8 @@ import machinelearning.classifier.Classifier;
 import utils.OptimumFinder;
 import utils.Validator;
 
+import java.util.Collection;
+
 
 /**
  * A variant of the usual Nearest Neighbors classifier, as described in the paper "Bayesian Optimal Active Search and Surveying".
@@ -64,9 +66,9 @@ public class NearestNeighborsClassifier implements Classifier {
      * @return probability upper bound
      */
     @Override
-    public double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
+    public double computeProbabilityUpperBound(Collection<DataPoint> data, int maxPositivePoints){
         Validator.assertNonNegative(maxPositivePoints);
-        return OptimumFinder.maximizer(data.getUnlabeledPoints(), pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getScore();
+        return OptimumFinder.maximizer(data, pt -> futureProbabilityUpperBound(pt, maxPositivePoints)).getScore();
     }
 
     private double futureProbabilityUpperBound(DataPoint point, int maxPositivePoints){

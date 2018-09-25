@@ -4,8 +4,8 @@ import data.DataPoint;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,8 +50,8 @@ public class DatabaseReader {
      * @param columns: list of data columns to read. Must be of numeric type.
      * @return Indexes dataset instance containing both the keys and the data read from the database
      */
-    public Collection<DataPoint> readTable(String table, String key, String[] columns){
-        Collection<DataPoint> points = new ArrayList<>();
+    public List<DataPoint> readTable(String table, String key, String[] columns){
+        List<DataPoint> points = new ArrayList<>();
 
         // build SQL query
         String SQL = buildSQLString(table, key, columns, "");
@@ -147,6 +147,10 @@ public class DatabaseReader {
             sqlBuilder.append(" WHERE ");
             sqlBuilder.append(predicate);
         }
+
+        // This is necessary because the row order of a query is NOT guaranteed otherwise.
+        sqlBuilder.append(" ORDER BY ");
+        sqlBuilder.append(key);
 
         sqlBuilder.append(';');
 

@@ -8,9 +8,9 @@ import java.util.Collection;
 /**
  * Mathematically, the Version Space corresponds as a collection of all classifiers in a particular hypothesis class which
  * are consistent with the labeled data. In order to implement our Version Space-based Active Learning algorithm, we require
- * to be able to sample hypothesis from it.
+ * an algorithm for sampling consistent hypothesis.
  *
- * @see machinelearning.active.learning.GeneralizedBinarySearch
+ * @see machinelearning.classifier.MajorityVoteLearner
  */
 public interface VersionSpace {
     /**

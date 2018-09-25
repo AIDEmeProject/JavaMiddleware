@@ -8,7 +8,7 @@ import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
  *
  * @see SampleCache
  */
-public class DummySampleCache extends SampleCache {
+public class SampleCacheStub extends SampleCache {
 
     /**
      * A pass-through method, no operation is performed
@@ -24,5 +24,10 @@ public class DummySampleCache extends SampleCache {
     @Override
     public ConvexBody attemptToSetDefaultInteriorPoint(ConvexBody convexBody) {
         return convexBody;
+    }
+
+    @Override
+    public String toString() {
+        return "SampleCacheStub";
     }
 }

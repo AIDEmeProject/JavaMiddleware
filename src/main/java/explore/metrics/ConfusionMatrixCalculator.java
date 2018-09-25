@@ -1,9 +1,9 @@
 package explore.metrics;
 
 import data.LabeledDataset;
-import explore.user.User;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
+import machinelearning.classifier.Learner;
 import utils.Validator;
 
 /**
@@ -11,16 +11,17 @@ import utils.Validator;
  *
  * @see ConfusionMatrix
  */
-public class ConfusionMatrixCalculator implements MetricCalculator{
-    /**
-     * Compute a ConfusionMatrix from the labeled dataset and activeLearner objects.
-     * @param data: dataset containing both features X and true labels y
-     * @param classifier: classifier object
-     * @return a confusion matrix
-     */
+public class ConfusionMatrixCalculator implements MetricCalculator {
+    private Learner learner;
+
+    public ConfusionMatrixCalculator(Learner learner) {
+        this.learner = learner;
+    }
+
     @Override
-    public MetricStorage compute(LabeledDataset data, User user, Classifier classifier) {
-        return compute(user.getLabel(data.getAllPoints()), classifier.predict(data.getAllPoints()));
+    public MetricStorage compute(LabeledDataset data, Label[] trueLabels) {
+        Classifier classifier = learner.fit(data.getLabeledPoints());
+        return compute(trueLabels, classifier.predict(data.getAllPoints()));
     }
 
     /**
@@ -29,15 +30,12 @@ public class ConfusionMatrixCalculator implements MetricCalculator{
      * @param trueLabels: array of true labels
      * @param predictedLabels: array of predicted labels
      * @return a confusion matrix
-     * @throws IllegalArgumentException if inputs have incompatible dimensions, are 0-length arrays, or contain any value
-     * different from 1 or 0.
+     * @throws IllegalArgumentException if inputs have incompatible dimensions or are 0-length arrays
      */
     public ConfusionMatrix compute(Label[] trueLabels, Label[] predictedLabels){
-        // validate input
         Validator.assertEqualLengths(trueLabels, predictedLabels);
         Validator.assertNotEmpty(trueLabels);
 
-        // compute metrics
         int truePositives = 0, trueNegatives = 0, falseNegatives = 0, falsePositives = 0;
 
         for(int i=0; i < trueLabels.length; i++){

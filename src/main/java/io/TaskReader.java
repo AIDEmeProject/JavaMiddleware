@@ -2,7 +2,7 @@ package io;
 
 import data.DataPoint;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +23,7 @@ public class TaskReader {
         reader = new DatabaseReader(connectionConfig.url, datasetConfig.database, connectionConfig.user, connectionConfig.password);
     }
 
-    public Collection<DataPoint> readData(){
+    public List<DataPoint> readData(){
         return reader.readTable(datasetConfig.table, datasetConfig.key, taskConfig.columns);
     }
 

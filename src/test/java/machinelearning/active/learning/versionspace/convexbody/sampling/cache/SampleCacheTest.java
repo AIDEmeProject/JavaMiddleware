@@ -1,7 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.cache;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,8 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.sampling.cache.DummySampleCache;
 import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCache;
+import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCacheStub;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import utils.Validator;
@@ -42,7 +42,7 @@ public class HitAndRunSampler {
         /**
          * {@link SampleCache} sample caching procedure. By default, no caching is performed.
          */
-        private SampleCache cache = new DummySampleCache();
+        private SampleCache cache = new SampleCacheStub();
 
         /**
          * Random number generator. By default, a Random() instance is used.
@@ -95,5 +95,10 @@ public class HitAndRunSampler {
         sampleCache.updateCache(samples);
 
         return samples;
+    }
+
+    @Override
+    public String toString() {
+        return "HitAndRunSampler directionSamplingAlgorithm = " + directionSamplingAlgorithm + ", selector = " + sampleSelector + ", cache = " + sampleCache;
     }
 }

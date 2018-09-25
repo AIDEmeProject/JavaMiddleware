@@ -1,7 +1,7 @@
 package explore.statistics;
 
-import explore.IterationMetrics;
 import io.MultipleFilesReader;
+import io.json.JsonConverter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +40,7 @@ public class StatisticsCalculator {
         StatisticsCollection collection = new StatisticsCollection();
 
         for (String line : lines) {
-            collection.update(IterationMetrics.fromJson(line));
+            collection.update(JsonConverter.deserializeMetricsMap(line));
         }
 
         return collection;

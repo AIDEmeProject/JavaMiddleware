@@ -1,14 +1,16 @@
 package explore.metrics;
 
 import machinelearning.classifier.Label;
+import machinelearning.classifier.Learner;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 public class ConfusionMatrixCalculatorTest {
 
-    private ConfusionMatrixCalculator calculator = new ConfusionMatrixCalculator();
+    private ConfusionMatrixCalculator calculator = new ConfusionMatrixCalculator(mock(Learner.class));
 
     @Test
     void compute_ZeroLengthLabels_ThrowsException() {

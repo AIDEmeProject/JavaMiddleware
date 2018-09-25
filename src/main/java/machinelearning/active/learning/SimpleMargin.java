@@ -1,14 +1,10 @@
 package machinelearning.active.learning;
 
-import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
 import machinelearning.active.ActiveLearner;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.margin.MarginClassifier;
+import machinelearning.active.Ranker;
+import machinelearning.active.ranker.MarginRanker;
 import machinelearning.classifier.svm.SvmLearner;
-import utils.OptimumFinder;
-import utils.Validator;
 
 import java.util.Collection;
 
@@ -24,31 +20,18 @@ import java.util.Collection;
  *
  * @see <a href="http://www.jmlr.org/papers/volume2/tong01a/tong01a.pdf">Original paper</a>
  */
-public class SimpleMargin extends ActiveLearner {
+public class SimpleMargin implements ActiveLearner {
     /**
      * SVM classifier
      */
-    private MarginClassifier classifier;
+    private SvmLearner svmLearner;
 
-    public SimpleMargin(SvmLearner learner) {
-        super(learner);
+    public SimpleMargin(SvmLearner svmLearner) {
+        this.svmLearner = svmLearner;
     }
 
     @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        classifier = (MarginClassifier) super.fit(labeledPoints);
-        return classifier;
-    }
-
-    /**
-     * Retrieve point closest to the decision boundary
-     * @param data: labeled data object
-     * @return row index of unlabeled point closest to decision boundary
-     * @throws IllegalArgumentException if unlabeled set is empty
-     */
-    @Override
-    public DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data) {
-        Validator.assertNotEmpty(data.getUnlabeledPoints());
-        return OptimumFinder.minimizer(data.getUnlabeledPoints(), pt -> Math.abs(classifier.margin(pt))).getOptimizer();
+    public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+        return new MarginRanker(svmLearner.fit(labeledPoints));
     }
 }

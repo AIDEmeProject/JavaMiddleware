@@ -68,7 +68,7 @@ public interface Classifier {
      * @param maxPositivePoints: maximum number of positive labeled points
      * @return probability upper bound
      */
-    default double computeProbabilityUpperBound(LabeledDataset data, int maxPositivePoints){
+    default double computeProbabilityUpperBound(Collection<DataPoint> data, int maxPositivePoints){
         return Double.POSITIVE_INFINITY;
     }
 }

@@ -1,7 +1,10 @@
-package machinelearning.active.search;
+package machinelearning.active.ranker;
 
+import data.DataPoint;
 import data.LabeledDataset;
 import machinelearning.classifier.Classifier;
+
+import java.util.Collection;
 
 /**
  * Tree Search optimization method described in [1]. The optimization consists of pruning the tree search by
@@ -15,7 +18,7 @@ import machinelearning.classifier.Classifier;
 class UtilityUpperBoundCalculator {
     private double u0, u1;
 
-    public void fit(LabeledDataset data, Classifier classifier, int steps){
+    public void fit(Collection<DataPoint> data, Classifier classifier, int steps){
         u0 = optimalUtilityUpperBound(data, classifier, steps-1, 0);
         u1 = optimalUtilityUpperBound(data, classifier,  steps-1, 1);
     }
@@ -27,7 +30,7 @@ class UtilityUpperBoundCalculator {
      * @param maxLabeledPoints: maximum number of positive points that can be added to current labeled set
      * @return upper bound on optimal utility
      */
-    private double optimalUtilityUpperBound(LabeledDataset data, Classifier classifier, int steps, int maxLabeledPoints){
+    private double optimalUtilityUpperBound(Collection<DataPoint> data, Classifier classifier, int steps, int maxLabeledPoints){
         double pStar = classifier.computeProbabilityUpperBound(data, maxLabeledPoints);
 
         if (steps <= 1 || pStar == Double.POSITIVE_INFINITY){

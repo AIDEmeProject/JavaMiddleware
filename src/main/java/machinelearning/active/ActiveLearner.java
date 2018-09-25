@@ -1,43 +1,20 @@
 package machinelearning.active;
 
-import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
-import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Learner;
-import utils.Validator;
 
 import java.util.Collection;
 
 /**
- * ActiveLearner represents a classifier adapted to the Active Learning scenario. It is augmented with the capacity of
- * "ranking unlabeled points from least to most informative", retrieving the one it deems most informative for labeling.
+ * An ActiveLearner object is responsible for training a {@link Ranker} from labeled data. In can also be thought as a
+ * Factory of Ranker objects.
  *
  * @author luciano
  */
-public abstract class ActiveLearner implements Learner{
-    protected final Learner learner;
-
-    protected ActiveLearner(Learner learner) {
-        this.learner = learner;
-    }
-
-    @Override
-    public void initialize(Collection<DataPoint> points) {
-        learner.initialize(points);
-    }
-
-    @Override
-    public Classifier fit(Collection<LabeledPoint> labeledPoints) {
-        Validator.assertNotEmpty(labeledPoints);
-        return learner.fit(labeledPoints);
-    }
-
+public interface ActiveLearner {
     /**
-     * Retrieve the most informative point for labeling from the unlabeled set.
-     * @param data: labeled data object
-     * @return index of the next unlabeled point to label
-     * @throws IllegalArgumentException if unlabeled set is empty
+     * @param labeledPoints: labeled data to fit Ranker
+     * @return a Ranker trained over the input labeled data
+     * @throws IllegalArgumentException if labeledPoints is empty  TODO: return RandomRanker instead ?
      */
-    public abstract DataPoint retrieveMostInformativeUnlabeledPoint(LabeledDataset data);
+    Ranker fit(Collection<LabeledPoint> labeledPoints);
 }

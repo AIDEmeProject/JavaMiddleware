@@ -1,8 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RandomDirectionAlgorithm;
-import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RandomDirectionSampler;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
