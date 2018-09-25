@@ -2,6 +2,7 @@ package machinelearning.classifier.svm;
 
 import data.DataPoint;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +15,7 @@ abstract class AbstractKernelTest {
 
     @Test
     void compute_vectorsOfDifferentLengths_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> kernel.compute(new double[1], new double[2]));
+        assertThrows(IllegalArgumentException.class, () -> kernel.compute(new Vector(1), new Vector(2)));
     }
 
     @Test

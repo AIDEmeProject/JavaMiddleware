@@ -2,6 +2,7 @@ package machinelearning.threesetmetric;
 
 import data.DataPoint;
 import machinelearning.classifier.Label;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 
@@ -13,7 +14,7 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
      * Nothing is done
      */
     @Override
-    public void update(double[] point, Label label) {
+    public void update(Vector point, Label label) {
         // do nothing
     }
 
@@ -21,7 +22,7 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
      * @return {@link ExtendedLabel#UNKNOWN}
      */
     @Override
-    public ExtendedLabel predict(double[] point) {
+    public ExtendedLabel predict(Vector point) {
         return ExtendedLabel.UNKNOWN;
     }
 

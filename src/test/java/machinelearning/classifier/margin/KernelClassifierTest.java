@@ -4,6 +4,7 @@ import data.DataPoint;
 import machinelearning.classifier.svm.Kernel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +65,7 @@ class KernelClassifierTest {
 
     @Test
     void margin_alwaysOneKernel_returnsCorrectMargin() {
-        when(kernel.compute((Collection<? extends DataPoint>) any(), (double[]) any())).thenReturn(new double[] {1, 1});
-        assertEquals(2, classifier.margin(new double[] {1,2}));
+        when(kernel.compute((Collection<? extends DataPoint>) any(), (Vector) any())).thenReturn(new double[] {1, 1});
+        assertEquals(2, classifier.margin(new Vector(1, 2)));
     }
 }

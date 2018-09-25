@@ -77,7 +77,7 @@ public class PolyhedralCone implements ConvexBody {
         solver.setObjectiveFunction(constrain);
 
         for (LabeledPoint labeledPoint : labeledPoints) {
-            constrain = labeledPoint.addBias().getData();
+            constrain = labeledPoint.getData().addBias().toArray();
             constrain[0] = labeledPoint.getLabel().asSign();
             solver.addLinearConstrain(constrain, labeledPoint.getLabel().isPositive() ? InequalitySign.GEQ : InequalitySign.LEQ, 0);
         }
@@ -121,8 +121,8 @@ public class PolyhedralCone implements ConvexBody {
         // polytope intersection
         for (LabeledPoint point : labeledPoints){
             int signedLabel = point.getLabel().asSign();
-            double numerator = signedLabel * LinearAlgebra.dot(point.getData(), line.getCenter());
-            double denominator = signedLabel * LinearAlgebra.dot(point.getData(), line.getDirection());
+            double numerator = signedLabel * point.getData().dot(line.getCenter());
+            double denominator = signedLabel * point.getData().dot(line.getDirection());
             double value = - numerator / denominator;
 
             if (denominator > 0 && value > leftBound){
@@ -158,6 +158,7 @@ public class PolyhedralCone implements ConvexBody {
      * @param x: a data point
      * @return the separating hyperplane vector (if it exists)
      */
+    //TODO: modify input and output types to Vector
     @Override
     public Optional<double[]> getSeparatingHyperplane(double[] x) {
         Validator.assertEquals(x.length, getDim());
@@ -167,8 +168,8 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         for (LabeledPoint point : labeledPoints) {
-            if (point.getLabel().asSign() * LinearAlgebra.dot(x, point.getData()) < 0){
-                return Optional.of(LinearAlgebra.multiply(point.getData(), -point.getLabel().asSign()));
+            if (point.getLabel().asSign() * point.getData().dot(x) < 0){
+                return Optional.of(point.getData().multiply(-point.getLabel().asSign()).toArray());
             }
         }
 

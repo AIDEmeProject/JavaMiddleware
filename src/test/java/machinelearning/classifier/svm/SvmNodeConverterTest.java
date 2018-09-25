@@ -32,23 +32,6 @@ class SvmNodeConverterTest {
     }
 
     @Test
-    void toSvmNode_ReceivesNonEmptyDoubleMatrix_CorrectConversion() {
-        double[][] values = new double[][] {{10,20},{-10,-20}};
-
-        svm_node[][] result = SvmNodeConverter.toSvmNode(values);
-
-        assertEquals(result[0][0].index, 0);
-        assertEquals(result[0][0].value, 10);
-        assertEquals(result[0][1].index, 1);
-        assertEquals(result[0][1].value, 20);
-
-        assertEquals(result[1][0].index, 0);
-        assertEquals(result[1][0].value, -10);
-        assertEquals(result[1][1].index, 1);
-        assertEquals(result[1][1].value, -20);
-    }
-
-    @Test
     void toDataPoint_emptyInputMatrix_returnsEmptyArray() {
         assertTrue(SvmNodeConverter.toDataPoint(new svm_node[0][]).isEmpty());
     }

@@ -2,6 +2,7 @@ package machinelearning.classifier.svm;
 
 import data.DataPoint;
 import libsvm.svm_parameter;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 
@@ -17,7 +18,7 @@ public abstract class Kernel {
      * @param y: a vector
      * @return the kernel function applied on the input vectors: k(x,y)
      */
-    public abstract double compute(double[] x, double[] y);
+    public abstract double compute(Vector x, Vector y);
 
     /**
      * @param x: a data point
@@ -33,7 +34,7 @@ public abstract class Kernel {
      * @param y a data point
      * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
      */
-    public final double[] compute(Collection<? extends DataPoint> xs, double[] y){
+    public final double[] compute(Collection<? extends DataPoint> xs, Vector y){
         double[] kernelVector = new double[xs.size()];
 
         int i = 0;

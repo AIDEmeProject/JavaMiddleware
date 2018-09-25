@@ -3,6 +3,7 @@ package machinelearning.threesetmetric;
 import data.DataPoint;
 import data.LabeledPoint;
 import machinelearning.classifier.Label;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 
@@ -19,7 +20,7 @@ public interface ExtendedClassifier {
      * @param point: a data array
      * @param label: the data's label
      */
-    void update(double[] point, Label label);
+    void update(Vector point, Label label);
 
     /**
      * Update the current data model with new labeled data.
@@ -33,7 +34,7 @@ public interface ExtendedClassifier {
      * @param point: a data point
      * @return the predicted label for input point
      */
-    ExtendedLabel predict(double[] point);
+    ExtendedLabel predict(Vector point);
 
     /**
      * @param dataPoint: a data point

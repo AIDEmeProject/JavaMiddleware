@@ -3,6 +3,7 @@ package machinelearning.classifier.margin;
 import data.DataPoint;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 
@@ -64,8 +65,8 @@ public class KernelClassifier extends MarginClassifier {
     }
 
     @Override
-    public double margin(double[] x) {
+    public double margin(Vector x) {
         double[] kernelVector = kernel.compute(supportVectors, x);
-        return linearClassifier.margin(kernelVector);
+        return linearClassifier.margin(new Vector(kernelVector));
     }
 }

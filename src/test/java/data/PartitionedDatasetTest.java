@@ -6,6 +6,7 @@ import machinelearning.threesetmetric.ExtendedLabel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
+import utils.linalg.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +99,7 @@ class PartitionedDatasetTest {
 
     private ExtendedClassifier getExtendedClassifierStub(long index) {
         ExtendedClassifier classifier = mock(ExtendedClassifier.class);
-        doNothing().when(classifier).update(isA(double[].class), isA(Label.class));
+        doNothing().when(classifier).update(isA(Vector.class), isA(Label.class));
         when(classifier.predict((DataPoint) any())).thenAnswer((Answer<ExtendedLabel>) invocationOnMock -> {
             DataPoint dataPoint1 = invocationOnMock.getArgument(0);
             return dataPoint1.getId() == index ? ExtendedLabel.POSITIVE : ExtendedLabel.UNKNOWN;

@@ -2,7 +2,7 @@ package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 
 /**
@@ -35,9 +35,9 @@ public class GaussianKernel extends Kernel {
     }
 
     @Override
-    public double compute(double[] x, double[] y) {
-        double gamma = this.gamma > 0 ? this.gamma : 1.0 / x.length;
-        return Math.exp(-gamma * LinearAlgebra.sqDistance(x, y));
+    public double compute(Vector x, Vector y) {
+        double gamma = this.gamma > 0 ? this.gamma : 1.0 / x.dim();
+        return Math.exp(-gamma * x.squaredDistanceTo(y));
     }
 
     @Override

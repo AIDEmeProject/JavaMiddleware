@@ -1,7 +1,7 @@
 package machinelearning.classifier.margin;
 
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 import java.util.Arrays;
 
@@ -63,8 +63,9 @@ public class LinearClassifier extends MarginClassifier {
     /**
      * Compute bias + weight^T x
      */
-    public double margin(double[] x){
-        return bias + LinearAlgebra.dot(x, weights);
+    @Override
+    public double margin(Vector x){
+        return bias + x.dot(weights);
     }
 
     @Override

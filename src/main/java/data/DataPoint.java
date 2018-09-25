@@ -1,6 +1,7 @@
 package data;
 
 import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Arrays;
 
@@ -37,8 +38,8 @@ public class DataPoint {
         return id;
     }
 
-    public double[] getData() {
-        return data;
+    public Vector getData() {
+        return new Vector(data);
     }
 
     public double get(int i){
@@ -69,7 +70,7 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "{\"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
+        return "{\"id\": " + getId()  + ", \"data\": " + getData() + '}';
     }
 
     public DataPoint clone(double[] newData){
