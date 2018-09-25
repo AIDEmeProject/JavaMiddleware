@@ -1,7 +1,8 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
-import org.apache.commons.math3.linear.CholeskyDecomposition;
-import org.apache.commons.math3.linear.RealMatrix;
+import utils.linalg.CholeskyDecomposition;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 import java.util.Random;
 
@@ -18,16 +19,16 @@ import java.util.Random;
  *      3) Output the vector \( LX \) as the sample
  */
 class EllipsoidSampler implements DirectionSampler {
-    private RealMatrix matrix;
+    private Matrix matrix;
     private RandomDirectionSampler randomDirectionSampler;
 
     /**
      * @param matrix the matrix A in the description.
      * @throws RuntimeException if computing its Cholesky decomposition failed.
      */
-    EllipsoidSampler(RealMatrix matrix) {
+    EllipsoidSampler(Matrix matrix) {
         this.matrix = new CholeskyDecomposition(matrix).getL();
-        this.randomDirectionSampler = new RandomDirectionSampler(matrix.getColumnDimension());
+        this.randomDirectionSampler = new RandomDirectionSampler(matrix.numCols());
     }
 
     /**
@@ -35,7 +36,7 @@ class EllipsoidSampler implements DirectionSampler {
      * @return a random vector X such that X / norm(X) is distributed uniformly over the ellipsoid's surface
      */
     @Override
-    public double[] sampleDirection(Random rand) {
-        return matrix.operate(randomDirectionSampler.sampleDirection(rand));
+    public Vector sampleDirection(Random rand) {
+        return matrix.multiply(randomDirectionSampler.sampleDirection(rand));
     }
 }

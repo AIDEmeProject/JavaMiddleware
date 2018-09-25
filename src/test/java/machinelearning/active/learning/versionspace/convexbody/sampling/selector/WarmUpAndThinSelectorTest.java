@@ -3,8 +3,10 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.selecto
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -20,7 +22,7 @@ class WarmUpAndThinSelectorTest extends AbstractSampleSelectorTest {
         sampleSelector = new WarmUpAndThinSelector(warmUp, thin);
 
         chain = mock(HitAndRun.Chain.class);
-        when(chain.advance(anyInt())).thenReturn(new double[]{0}, new double[]{1}, new double[]{2});
+        when(chain.advance(anyInt())).thenReturn(Vector.FACTORY.make(0), Vector.FACTORY.make(1), Vector.FACTORY.make(2));
 
         hitAndRun = mock(HitAndRun.class);
         when(hitAndRun.newChain()).thenReturn(chain);
@@ -56,7 +58,7 @@ class WarmUpAndThinSelectorTest extends AbstractSampleSelectorTest {
 
     @Test
     void select_stubbedHitAndRunChainResults_selectReturnsStubbedSamples() {
-        double[][] result = sampleSelector.select(hitAndRun, numSamples);
-        assertArrayEquals(new double[][] {{0}, {1}, {2}}, result);
+        Vector[] result = sampleSelector.select(hitAndRun, numSamples);
+        assertArrayEquals(new Vector[] {Vector.FACTORY.make(0), Vector.FACTORY.make(1), Vector.FACTORY.make(2)}, result);
     }
 }

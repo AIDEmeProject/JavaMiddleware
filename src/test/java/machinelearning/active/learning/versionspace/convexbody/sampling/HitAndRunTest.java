@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
+import utils.linalg.Vector;
 
 import java.util.Random;
 
@@ -80,7 +81,7 @@ class HitAndRunTest {
 
         when(convexBodyStub.getDim()).thenReturn(1);  // one-dimensional
 
-        when(convexBodyStub.getInteriorPoint()).thenReturn(new double[1]);  // [0] is interior point
+        when(convexBodyStub.getInteriorPoint()).thenReturn(Vector.FACTORY.zeros(1));  // [0] is interior point
 
         ArgumentCaptor<Line> argument = ArgumentCaptor.forClass(Line.class);  // clip lines to [-1, 1] range
         when(convexBodyStub.computeLineIntersection(argument.capture())).thenAnswer(
@@ -92,7 +93,7 @@ class HitAndRunTest {
     // always returns [1]
     private DirectionSampler getDirectionSamplerMock() {
         DirectionSampler directionSamplerMock = mock(DirectionSampler.class);
-        when(directionSamplerMock.sampleDirection(any())).thenReturn(new double[]{1});
+        when(directionSamplerMock.sampleDirection(any())).thenReturn(Vector.FACTORY.make(1));
         return directionSamplerMock;
     }
 

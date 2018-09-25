@@ -3,7 +3,7 @@ package machinelearning.active.learning.versionspace.convexbody;
 import data.LabeledPoint;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
@@ -44,7 +44,7 @@ public class PolyhedralCone implements ConvexBody {
     }
 
     @Override
-    public boolean isInside(double[] x) {
+    public boolean isInside(Vector x) {
         return !getSeparatingHyperplane(x).isPresent();
     }
 
@@ -60,13 +60,13 @@ public class PolyhedralCone implements ConvexBody {
      */
     // TODO: is there a mechanism to stop the LP solver once a s > 0 point has been found?
     @Override
-    public double[] getInteriorPoint() {
+    public Vector getInteriorPoint() {
         LinearProgramSolver solver = solverFactory.getSolver(getDim()+1);
         configureLinearProgrammingProblem(solver);
 
         double[] interiorPoint = parseLinearProgramSolution(solver.findMinimizer());
 
-        return LinearAlgebra.normalize(interiorPoint, 0.9);  // normalize point so it is contained on the unit ball
+        return Vector.FACTORY.make(interiorPoint).normalize(0.9);  // normalize point so it is contained on the unit ball
     }
 
     private void configureLinearProgrammingProblem(LinearProgramSolver solver) {
@@ -160,16 +160,16 @@ public class PolyhedralCone implements ConvexBody {
      */
     //TODO: modify input and output types to Vector
     @Override
-    public Optional<double[]> getSeparatingHyperplane(double[] x) {
-        Validator.assertEquals(x.length, getDim());
+    public Optional<Vector> getSeparatingHyperplane(Vector x) {
+        Validator.assertEquals(x.dim(), getDim());
 
-        if (LinearAlgebra.sqNorm(x) > 1) {
+        if (x.squaredNorm() > 1) {
             return Optional.of(x);
         }
 
         for (LabeledPoint point : labeledPoints) {
             if (point.getLabel().asSign() * point.getData().dot(x) < 0){
-                return Optional.of(point.getData().multiply(-point.getLabel().asSign()).toArray());
+                return Optional.of(point.getData().multiply(-point.getLabel().asSign()));
             }
         }
 

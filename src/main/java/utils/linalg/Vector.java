@@ -5,7 +5,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import utils.Validator;
 
-import java.util.Arrays;
+import java.util.StringJoiner;
 
 public class Vector {
     RealVector vector;
@@ -35,11 +35,14 @@ public class Vector {
     }
 
     public double get(int index) {
-        try {
-            return vector.getEntry(index);
-        } catch (OutOfRangeException ex) {
-            throw new IndexOutOfBoundsException();
+        return vector.getEntry(index);
+    }
+
+    public Vector slice(int from, int to) {
+        if (from == to) {
+            throw new IllegalArgumentException();
         }
+        return new Vector(vector.getSubVector(from, to-from));
     }
 
     public Vector add(Vector other) {
@@ -54,14 +57,12 @@ public class Vector {
         return new Vector(vector.mapMultiply(value));
     }
 
-    public double dot(Vector other) {
-        return vector.dotProduct(other.vector);
+    public Vector divide(double value) {
+        return new Vector(vector.mapDivide(value));
     }
 
-    //TODO: remove this if possible
-    public double dot(double[] other) {
-        RealVector realVector = new ArrayRealVector(other, false);
-        return vector.dotProduct(realVector);
+    public double dot(Vector other) {
+        return vector.dotProduct(other.vector);
     }
 
     public double squaredNorm() {
@@ -104,8 +105,8 @@ public class Vector {
         }
     }
 
-    public Matrix outerProduct() {
-        return new Matrix(vector.outerProduct(vector));
+    public Matrix outerProduct(Vector other) {
+        return new Matrix(vector.outerProduct(other.vector));
     }
 
 
@@ -140,6 +141,10 @@ public class Vector {
 
     @Override
     public String toString() {
-        return vector.toString();
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        for (int i = 0; i < dim(); i++) {
+            joiner.add(Double.toString(get(i)));
+        }
+        return joiner.toString();
     }
 }

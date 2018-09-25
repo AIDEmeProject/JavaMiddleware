@@ -6,6 +6,7 @@ import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
+import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.Collection;
@@ -70,7 +71,7 @@ public class LinearVersionSpace implements VersionSpace {
 
         ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
 
-        double[][] samples = hitAndRunSampler.sample(cone, numSamples);
+        Vector[] samples = hitAndRunSampler.sample(cone, numSamples);
 
         return getLinearClassifiers(samples);
     }
@@ -85,7 +86,7 @@ public class LinearVersionSpace implements VersionSpace {
                 .collect(Collectors.toList());
     }
 
-    private LinearClassifier[] getLinearClassifiers(double[][] samples) {
+    private LinearClassifier[] getLinearClassifiers(Vector[] samples) {
         LinearClassifier[] classifiers = new LinearClassifier[samples.length];
 
         for (int i = 0; i < samples.length; i++) {

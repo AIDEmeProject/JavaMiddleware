@@ -1,7 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
 import utils.linalg.Vector;
 
 /**
@@ -28,17 +27,16 @@ public class Line {
     /**
      * @param center: any point on the line
      * @param direction: the direction of the line. It will NOT be normalized or changed anyhow.
-     * @throws IllegalArgumentException if center and direction have different lengths, if they are empty arrays, or direction is the zero vector
+     * @throws IllegalArgumentException if center and direction have different lengths, or direction is the zero vector
      */
-    public Line(double[] center, double[] direction) {  // TODO: change input to Vector
-        Validator.assertEqualLengths(center, direction);
-
-        this.center = Vector.FACTORY.make(center);
-        this.direction = Vector.FACTORY.make(direction);
-
-        if (this.direction.squaredNorm() == 0) {
+    public Line(Vector center, Vector direction) {
+        Validator.assertEquals(center.dim(), direction.dim());
+        if (direction.squaredNorm() == 0) {
             throw new IllegalArgumentException("Direction cannot be zero vector.");
         }
+
+        this.center = center;
+        this.direction = direction;
     }
 
     public Vector getCenter() {
@@ -60,8 +58,8 @@ public class Line {
      * @param t: position of the requested point on the line
      * @return the point center + t * direction
      */
-    public double[] getPoint(double t){
-        return center.add(direction.multiply(t)).toArray();  // TODO: remove toArray() call
+    public Vector getPoint(double t){
+        return center.add(direction.multiply(t));
     }
 
     /**

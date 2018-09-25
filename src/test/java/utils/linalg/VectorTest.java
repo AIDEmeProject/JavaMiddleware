@@ -16,12 +16,12 @@ public class VectorTest {
 
     @Test
     void get_negativeIndex_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> vector1.get(-1));
+        assertThrows(IllegalArgumentException.class, () -> vector1.get(-1));
     }
 
     @Test
     void get_indexEqualsDim_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> vector1.get(vector1.dim()));
+        assertThrows(IllegalArgumentException.class, () -> vector1.get(vector1.dim()));
     }
 
     @Test
@@ -33,54 +33,30 @@ public class VectorTest {
         assertEquals(5, vector1.get(4));
     }
 
-//    @Test
-//    void set_negativeIndex_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> vector1.set(-1, 0));
-//    }
-//
-//    @Test
-//    void set_indexEqualsDim_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> vector1.set(vector1.dim(), 0));
-//    }
-//
-//    @Test
-//    void set_indexFromZeroToDimMinusOne_valuesCorrectlyModifiedReturned() {
-//        vector1.set(0, -1);
-//        vector1.set(1, -2);
-//        vector1.set(2, -3);
-//        vector1.set(3, -4);
-//        vector1.set(4, -5);
-//        assertEquals(-1, vector1.get(0));
-//        assertEquals(-2, vector1.get(1));
-//        assertEquals(-3, vector1.get(2));
-//        assertEquals(-4, vector1.get(3));
-//        assertEquals(-5, vector1.get(4));
-//    }
+    @Test
+    void slice_firstIndexIsNegative_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> vector1.slice(-1, 1));
+    }
 
-//    @Test
-//    void slice_firstIndexIsNegative_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> vector1.slice(-1, 1));
-//    }
-//
-//    @Test
-//    void slice_secondIndexLargerThanDim_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> vector1.slice(0, vector1.dim() + 1));
-//    }
-//
-//    @Test
-//    void slice_fistIndexEqualToSecondIndex_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> vector1.slice(1, 1));
-//    }
-//
-//    @Test
-//    void slice_getSliceFromZeroToDim_returnsVectorIdenticalToOriginal() {
-//        assertEquals(vector1, vector1.slice(0, vector1.dim()));
-//    }
-//
-//    @Test
-//    void slice_getSliceFromOneToDimMinusOne_returnsExpectedSlice() {
-//        assertEquals(Vector.FACTORY.make(2, 3, 4), vector1.slice(1, vector1.dim()-1));
-//    }
+    @Test
+    void slice_secondIndexLargerThanDim_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> vector1.slice(0, vector1.dim() + 1));
+    }
+
+    @Test
+    void slice_fistIndexEqualToSecondIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> vector1.slice(1, 1));
+    }
+
+    @Test
+    void slice_getSliceFromZeroToDim_returnsVectorIdenticalToOriginal() {
+        assertEquals(vector1, vector1.slice(0, vector1.dim()));
+    }
+
+    @Test
+    void slice_getSliceFromOneToDimMinusOne_returnsExpectedSlice() {
+        assertEquals(Vector.FACTORY.make(2, 3, 4), vector1.slice(1, vector1.dim()-1));
+    }
 
     @Test
     void dim_fiveDimensionalVector_returnsFive() {
@@ -360,21 +336,21 @@ public class VectorTest {
 //        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1);
 //    }
 //
-//    @Test
-//    void scalarDivide_divideByOne_resultIdenticalToInputVector() {
-//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarDivide(1));
-//    }
-//
-//    @Test
-//    void scalarDivide_divideByTwo_resultVectorHasAllComponentsDividedByTwo() {
-//        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1.scalarDivide(2));
-//    }
-//
-//    @Test
-//    void scalarDivide_divideByTwo_originalVectorRemainsUnchanged() {
-//        vector1.scalarDivide(2);
-//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
-//    }
+    @Test
+    void divide_divideByOne_resultIdenticalToInputVector() {
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.divide(1));
+    }
+
+    @Test
+    void divide_divideByTwo_resultVectorHasAllComponentsDividedByTwo() {
+        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1.divide(2));
+    }
+
+    @Test
+    void divide_divideByTwo_originalVectorRemainsUnchanged() {
+        vector1.divide(2);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
+    }
 //
 //    @Test
 //    void iDivide_AnyValue_outputIsTheSameObjectAsThis() {

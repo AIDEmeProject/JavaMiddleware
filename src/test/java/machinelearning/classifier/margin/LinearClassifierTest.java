@@ -13,12 +13,7 @@ class LinearClassifierTest {
 
     @BeforeEach
     void setUp() {
-        classifier = new LinearClassifier(1, new double[] {-1,2});
-    }
-
-    @Test
-    void biasAndWeightConstructor_EmptyWeightArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new LinearClassifier(0, new double[0]));
+        classifier = new LinearClassifier(1, Vector.FACTORY.make(-1,2));
     }
 
     @Test

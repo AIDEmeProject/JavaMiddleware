@@ -29,7 +29,7 @@ class KernelClassifierTest {
         support.add(new DataPoint(0, new double[] {1,1}));
         support.add(new DataPoint(1, new double[] {2,3}));
 
-        classifier = new KernelClassifier(1, new double[] {-2,3}, support, kernel);
+        classifier = new KernelClassifier(1, Vector.FACTORY.make(-2,3), support, kernel);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Random;
 
@@ -33,14 +34,14 @@ public class RandomDirectionSampler implements DirectionSampler {
      * @return a random vector X such that X / norm(X) is distributed uniformly over the unit sphere
      */
     @Override
-    public double[] sampleDirection(Random rand) {
+    public Vector sampleDirection(Random rand) {
         double[] direction = new double[dim];
 
         for (int i = 0; i < dim; i++) {
             direction[i] = rand.nextGaussian();
         }
 
-        return direction;
+        return Vector.FACTORY.make(direction);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class KernelClassifier extends MarginClassifier {
      * @throws NullPointerException if kernel is null
      * @throws IllegalArgumentException if the number of weights and support vectors are different
      */
-    public KernelClassifier(double bias, double[] weights, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
+    public KernelClassifier(double bias, Vector weights, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
         this(new LinearClassifier(bias, weights), supportVectors, kernel);
     }
 

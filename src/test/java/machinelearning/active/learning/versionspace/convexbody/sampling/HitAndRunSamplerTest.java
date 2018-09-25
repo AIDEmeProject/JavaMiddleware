@@ -9,6 +9,7 @@ import machinelearning.active.learning.versionspace.convexbody.sampling.selector
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +28,11 @@ class HitAndRunSamplerTest {
         when(directionSamplingAlgorithm.fit(any())).thenReturn(mock(DirectionSampler.class));
 
         selector = mock(SampleSelector.class);
-        when(selector.select(any(), anyInt())).thenReturn(new double[][]{{0}, {1}, {2}});
+        when(selector.select(any(), anyInt())).thenReturn(new Vector[]{
+                Vector.FACTORY.make(0),
+                Vector.FACTORY.make(1),
+                Vector.FACTORY.make(2)
+        });
 
         cache = Mockito.spy(SampleCacheStub.class);
         sampler = new HitAndRunSampler
@@ -69,7 +74,7 @@ class HitAndRunSamplerTest {
     void sample_mockSampleCache_cacheMethodsAreCalledOnce() {
         ConvexBody body = mock(ConvexBody.class);
 
-        double[][] result = sampler.sample(body, 3);
+        Vector[] result = sampler.sample(body, 3);
 
         verify(cache).attemptToSetDefaultInteriorPoint(body);
         verify(cache).updateCache(result);

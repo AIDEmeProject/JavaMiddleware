@@ -2,6 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.selecto
 
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import utils.Validator;
+import utils.linalg.Vector;
 
 /**
  * This module selects "n" independent samples from a Markov Chain by simulating "n" independent chains for a given number
@@ -24,10 +25,10 @@ public class IndependentChainsSelector implements SampleSelector {
     }
 
     @Override
-    public double[][] select(HitAndRun hitAndRun, int numSamples) {
+    public Vector[] select(HitAndRun hitAndRun, int numSamples) {
         Validator.assertPositive(numSamples);
 
-        double[][] samples = new double[numSamples][];
+        Vector[] samples = new Vector[numSamples];
 
         for (int i = 0; i < numSamples; i++) {
             samples[i] = hitAndRun.newChain().advance(chainLength);

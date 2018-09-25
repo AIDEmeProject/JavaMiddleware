@@ -1,5 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
+import utils.linalg.Vector;
+
 import java.util.Optional;
 
 /**
@@ -24,12 +26,12 @@ public interface ConvexBody {
      * @return whether the point x is inside or outside the convex body
      * @throws IllegalArgumentException if x.length and getDim() are different
      */
-    boolean isInside(double[] x);
+    boolean isInside(Vector x);
 
     /**
      * @return any point in the interior of the convex body
      */
-    double[] getInteriorPoint();
+    Vector getInteriorPoint();
 
     /**
      * @param line: straight line intersecting the convex body
@@ -57,5 +59,5 @@ public interface ConvexBody {
      * the convex body, Optional.empty() is returned instead.
      * @throws IllegalArgumentException if x.length and getDim() are different
      */
-    Optional<double[]> getSeparatingHyperplane(double[] x);
+    Optional<Vector> getSeparatingHyperplane(Vector x);
 }

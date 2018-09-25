@@ -49,10 +49,7 @@ public class LabeledPoint extends DataPoint {
      * @return a new Labeled Point with the value 1 appended to its left
      */
     public LabeledPoint addBias(){
-        double[] dataWithBias = new double[getDim()+1];
-        dataWithBias[0] = 1;
-        System.arraycopy(data, 0, dataWithBias, 1, getDim());
-        return new LabeledPoint(id, dataWithBias, label);
+        return new LabeledPoint(id, data.addBias(), label);
     }
 
     /**

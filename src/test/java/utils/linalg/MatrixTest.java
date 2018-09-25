@@ -26,22 +26,22 @@ public class MatrixTest {
 
     @Test
     void get_negativeRowIndex_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.get(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.get(-1, 0));
     }
 
     @Test
     void get_rowIndexEqualsNumRows_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.get(matrix1.numRows(), 0));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.get(matrix1.numRows(), 0));
     }
 
     @Test
     void get_negativeColumnIndex_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.get(0, -1));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.get(0, -1));
     }
 
     @Test
     void get_columnIndexEqualsNumCols_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.get(0, matrix1.numCols()));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.get(0, matrix1.numCols()));
     }
 
     @Test
@@ -54,41 +54,21 @@ public class MatrixTest {
         assertEquals(6, matrix1.get(1,2));
     }
 
-//    @Test
-//    void set_negativeRowIndex_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.set(-1, 0, 0));
-//    }
-//
-//    @Test
-//    void set_rowIndexEqualsNumRows_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.set(matrix1.numRows(), 0, 0));
-//    }
-//
-//    @Test
-//    void set_negativeColumnIndex_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.set(0, -1, 0));
-//    }
-//
-//    @Test
-//    void set_columnIndexEqualsNumCols_throwsException() {
-//        assertThrows(IndexOutOfBoundsException.class, () -> matrix1.set(0, matrix1.numCols(), 0));
-//    }
-//
-//    @Test
-//    void set_runOverAllValidIndexes_correctValuesReturned() {
-//        matrix1.set(0, 0, -1);
-//        matrix1.set(0, 1, -2);
-//        matrix1.set(0, 2, -3);
-//        matrix1.set(1, 0, -4);
-//        matrix1.set(1, 1, -5);
-//        matrix1.set(1, 2, -6);
-//        assertEquals(-1, matrix1.get(0,0));
-//        assertEquals(-2, matrix1.get(0,1));
-//        assertEquals(-3, matrix1.get(0,2));
-//        assertEquals(-4, matrix1.get(1,0));
-//        assertEquals(-5, matrix1.get(1,1));
-//        assertEquals(-6, matrix1.get(1,2));
-//    }
+    @Test
+    void getRow_negativeIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRow(-1));
+    }
+
+    @Test
+    void getRow_indexEqualsNumRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRow(matrix1.numRows()));
+    }
+
+    @Test
+    void getROw_runOverAllValidIndexes_correctVectorsReturned() {
+        assertEquals(Vector.FACTORY.make(1, 2, 3), matrix1.getRow(0));
+        assertEquals(Vector.FACTORY.make(4, 5, 6), matrix1.getRow(1));
+    }
 
     /* *************************************
      *              ADDITION

@@ -6,6 +6,8 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import utils.Validator;
 
+import java.util.StringJoiner;
+
 public class Matrix {
     RealMatrix matrix;
 
@@ -53,11 +55,11 @@ public class Matrix {
     }
 
     public double get(int i, int j) {
-        try {
-            return matrix.getEntry(i, j);
-        } catch (OutOfRangeException ex) {
-            throw new IndexOutOfBoundsException();
-        }
+        return matrix.getEntry(i, j);
+    }
+
+    public Vector getRow(int i) {
+        return new Vector(matrix.getRowVector(i));
     }
 
     public Matrix add(Matrix other) {
@@ -105,6 +107,10 @@ public class Matrix {
 
     @Override
     public String toString() {
-        return matrix.toString();
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        for (int i = 0; i < numRows(); i++) {
+            joiner.add(getRow(i).toString());
+        }
+        return joiner.toString();
     }
 }

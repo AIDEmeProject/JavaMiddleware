@@ -3,7 +3,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.cache;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
 import machinelearning.active.learning.versionspace.convexbody.LineSegment;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 import java.util.Optional;
 
@@ -20,13 +20,13 @@ public class SampleCache {
     /**
      * cache samples
      */
-    private double[][] cachedSamples;
+    private Vector[] cachedSamples;
 
     /**
      * Initialize object with a empty cache
      */
     public SampleCache() {
-        cachedSamples = new double[0][];
+        cachedSamples = new Vector[0];
     }
 
     /**
@@ -34,7 +34,7 @@ public class SampleCache {
      *
      * @param samples new sample to cache
      */
-    public void updateCache(double[][] samples) {
+    public void updateCache(Vector[] samples) {
         cachedSamples = samples;
     }
 
@@ -47,9 +47,9 @@ public class SampleCache {
      * @return the wrapped convex body
      */
     public ConvexBody attemptToSetDefaultInteriorPoint(ConvexBody convexBody) {
-        for (double[] cachedSample : cachedSamples){
+        for (Vector cachedSample : cachedSamples){
             // TODO: make this line testable / push this dependency logic to KernelVersionSpace somehow ?
-            cachedSample = LinearAlgebra.truncateOrPaddleWithZeros(cachedSample, convexBody.getDim());
+            cachedSample = cachedSample.resize(convexBody.getDim());
 
             if (convexBody.isInside(cachedSample)) {
                 return new ConvexBodyWrapper(convexBody, cachedSample);
@@ -61,9 +61,9 @@ public class SampleCache {
 
     private static class ConvexBodyWrapper implements ConvexBody {
         private ConvexBody convexBody;
-        private double[] interiorPointCache;
+        private Vector interiorPointCache;
 
-        public ConvexBodyWrapper(ConvexBody convexBody, double[] interiorPointCache) {
+        public ConvexBodyWrapper(ConvexBody convexBody, Vector interiorPointCache) {
             this.convexBody = convexBody;
             this.interiorPointCache = interiorPointCache;
         }
@@ -74,12 +74,12 @@ public class SampleCache {
         }
 
         @Override
-        public boolean isInside(double[] x) {
+        public boolean isInside(Vector x) {
             return convexBody.isInside(x);
         }
 
         @Override
-        public double[] getInteriorPoint() {
+        public Vector getInteriorPoint() {
             return interiorPointCache;
         }
 
@@ -89,7 +89,7 @@ public class SampleCache {
         }
 
         @Override
-        public Optional<double[]> getSeparatingHyperplane(double[] x) {
+        public Optional<Vector> getSeparatingHyperplane(Vector x) {
             return convexBody.getSeparatingHyperplane(x);
         }
     }
