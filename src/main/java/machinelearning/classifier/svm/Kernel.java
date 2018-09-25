@@ -21,15 +21,6 @@ public abstract class Kernel {
     public abstract double compute(Vector x, Vector y);
 
     /**
-     * @param x: a data point
-     * @param y: a data point
-     * @return the kernel function applied on the input data points: k(x,y)
-     */
-    public final double compute(DataPoint x, DataPoint y){
-        return compute(x.getData(), y.getData());
-    }
-
-    /**
      * @param xs a collection of data points
      * @param y a data point
      * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)

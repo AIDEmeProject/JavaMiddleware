@@ -19,14 +19,6 @@ abstract class AbstractKernelTest {
     }
 
     @Test
-    void compute_DataPointsOfDifferentLengths_throwsException() {
-        DataPoint x, y;
-        x = new DataPoint(0, new double[1]);
-        y = new DataPoint(1, new double[2]);
-        assertThrows(IllegalArgumentException.class, () -> kernel.compute(x, y));
-    }
-
-    @Test
     void compute_emptyDataPointCollection_returnsEmptyArray() {
         assertArrayEquals(new double[0], kernel.compute(Collections.EMPTY_LIST, new DataPoint(0, new double[1])));
     }
@@ -37,9 +29,9 @@ abstract class AbstractKernelTest {
     }
 
     void assertKernelFunctionIsCorrect(double expected, double[] arr1, double[] arr2) {
-        DataPoint x, y;
-        x = new DataPoint(0, arr1);
-        y = new DataPoint(1, arr2);
+        Vector x, y;
+        x = new Vector(arr1);
+        y = new Vector(arr2);
         assertEquals(expected, kernel.compute(x, y));
     }
 
