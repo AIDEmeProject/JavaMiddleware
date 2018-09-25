@@ -13,7 +13,7 @@ import java.util.*;
  * @author lppeng, enhui
  */
 
-public class TsmLearner {
+public class TsmLearner extends CatTSM {
 
     /**
      * Reservoir of initial pos points
@@ -333,7 +333,7 @@ public class TsmLearner {
      * @param flag true if pos region is convex, false otherwise
      * @return true if the point is in the positive region, false otherwise
      */
-    public boolean isInPositiveRegion (LabeledPoint sample, boolean flag) {
+    public boolean isInPositiveRegion (DataPoint sample, boolean flag) {
         if(dim ==1){
             if(flag){
                 ArrayList<Double> convexLineSeg = oneDimTSM.getConvexLineSeg();
@@ -362,7 +362,7 @@ public class TsmLearner {
      * @param flag true if pos region is convex, false otherwise
      * @return true if the point is in the negative region, false otherwise
      */
-    public boolean isInNegativeRegion (LabeledPoint sample, boolean flag) {
+    public boolean isInNegativeRegion (DataPoint sample, boolean flag) {
         if(dim == 1){
             if(flag){
                 ArrayList<Double> concaveRay = oneDimTSM.getConcaveRay();

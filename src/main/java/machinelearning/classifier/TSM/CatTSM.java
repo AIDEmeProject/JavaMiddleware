@@ -1,5 +1,6 @@
 package machinelearning.classifier.TSM;
 
+import data.DataPoint;
 import data.LabeledPoint;
 
 import java.util.*;
@@ -59,13 +60,14 @@ public class CatTSM {
 //        System.out.println("falseLines contains: " + Arrays.toString(falseLines.toArray()));
     }
 
+
     /**
      * Check whether an attribute is positive or not
      * @param sample data point
      * @param indices indices of categorical attributes
      * @return true if the attribute belongs to positive set, false otherwise
      */
-    public boolean isOnTruthLines(LabeledPoint sample, int[] indices) { return isInside(sample, truthLines, indices); }
+    public boolean isOnTruthLines(DataPoint sample, int[] indices) { return isInside(sample, truthLines, indices); }
 
 
     /**
@@ -74,7 +76,7 @@ public class CatTSM {
      * @param indices indices of categorical attributes
      * @return true if the attribute belongs to negative set, false otherwise
      */
-    public boolean isOnFalseLines(LabeledPoint sample, int[] indices) {
+    public boolean isOnFalseLines(DataPoint sample, int[] indices) {
         return isInside(sample, falseLines, indices);
     }
 
@@ -85,7 +87,7 @@ public class CatTSM {
      * @param indices indices of categorical attributes
      * @return true if the attribute belongs to the specific set, false otherwise
      */
-    private boolean isInside(LabeledPoint sample, HashSet<Integer> lines, int[] indices) {
+    private boolean isInside(DataPoint sample, HashSet<Integer> lines, int[] indices) {
         if(lines.size() == 0){
             return false;
         }
@@ -98,7 +100,14 @@ public class CatTSM {
             }
         }
         if(count > 1 ){
-            throw new IllegalArgumentException(Arrays.toString(sample.getSelectedAttributes(indices)) + "is positive to multiple features");
+            throw new IllegalArgumentException(Arrays.toString(sample.getSelectedAttributes(indices)) + "is positive/negative to multiple features");
         }else return count == 1;
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Truth line is:"+ truthLines.toString() + "\n");
+        sb.append("False line is:"+ falseLines.toString() + "\n");
+        return sb.toString();
     }
 }
