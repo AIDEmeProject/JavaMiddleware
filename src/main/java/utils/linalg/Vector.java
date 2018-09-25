@@ -8,17 +8,25 @@ import utils.Validator;
 import java.util.Arrays;
 
 public class Vector {
-    private RealVector vector;
+    RealVector vector;
 
-    public Vector(int dim) {
-        this(new double[dim]);
+    public static class FACTORY {
+        public static Vector make(double... values) {
+            Validator.assertNotEmpty(values);
+            return new Vector(new ArrayRealVector(values));
+        }
+
+        public static Vector zeros(int dim) {
+            Validator.assertPositive(dim);
+            return make(new double[dim]);
+        }
+
+        public static Vector zeroslike(Vector vector) {
+            return zeros(vector.dim());
+        }
     }
 
-    public Vector(double... values) {
-        this(new ArrayRealVector(values));
-    }
-
-    private Vector(RealVector vector) {
+    Vector(RealVector vector) {
         this.vector = vector;
     }
 
@@ -96,6 +104,11 @@ public class Vector {
         }
     }
 
+    public Matrix outerProduct() {
+        return new Matrix(vector.outerProduct(vector));
+    }
+
+
     public Vector addBias() {
         RealVector realVector = new ArrayRealVector(vector.getDimension() + 1);
         realVector.setEntry(0, 1.0);
@@ -127,6 +140,6 @@ public class Vector {
 
     @Override
     public String toString() {
-        return Arrays.toString(vector.toArray());
+        return vector.toString();
     }
 }

@@ -67,6 +67,6 @@ public class KernelClassifier extends MarginClassifier {
     @Override
     public double margin(Vector x) {
         double[] kernelVector = kernel.compute(supportVectors, x);
-        return linearClassifier.margin(new Vector(kernelVector));
+        return linearClassifier.margin(Vector.FACTORY.make(kernelVector));
     }
 }

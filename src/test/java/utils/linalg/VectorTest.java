@@ -10,8 +10,8 @@ public class VectorTest {
     
     @BeforeEach
     void setUp() {
-        vector1 = new Vector(1, 2, 3, 4, 5);
-        vector2 = new Vector(10, 20, 30, 40, 50);
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
+        vector2 = Vector.FACTORY.make(10, 20, 30, 40, 50);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class VectorTest {
 //
 //    @Test
 //    void slice_getSliceFromOneToDimMinusOne_returnsExpectedSlice() {
-//        assertEquals(new Vector(2, 3, 4), vector1.slice(1, vector1.dim()-1));
+//        assertEquals(Vector.FACTORY.make(2, 3, 4), vector1.slice(1, vector1.dim()-1));
 //    }
 
     @Test
@@ -99,29 +99,29 @@ public class VectorTest {
 //    @Test
 //    void iScalarAdd_addZero_resultIdenticalToInputVector() {
 //        vector1.iScalarAdd(0);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iScalarAdd_addOne_originalVectorHasAllComponentsAddedOne() {
 //        vector1.iScalarAdd(1);
-//        assertEquals(new Vector(2, 3, 4, 5, 6), vector1);
+//        assertEquals(Vector.FACTORY.make(2, 3, 4, 5, 6), vector1);
 //    }
 //
 //    @Test
 //    void scalarAdd_addZero_resultIdenticalToInputVector() {
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.scalarAdd(0));
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarAdd(0));
 //    }
 //
 //    @Test
 //    void scalarAdd_addOne_resultVectorHasAllComponentsAddedOne() {
-//        assertEquals(new Vector(2, 3, 4, 5, 6), vector1.scalarAdd(1));
+//        assertEquals(Vector.FACTORY.make(2, 3, 4, 5, 6), vector1.scalarAdd(1));
 //    }
 //
 //    @Test
 //    void scalarAdd_addOne_originalVectorRemainsUnchanged() {
 //        vector1.scalarAdd(1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
@@ -131,44 +131,44 @@ public class VectorTest {
 //
 //    @Test
 //    void iAdd_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.iAdd(vector2));
 //    }
 //
 //    @Test
 //    void iAdd_addZeroVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(vector1.dim());
+//        vector2 = Vector.FACTORY.make(vector1.dim());
 //        vector1.iAdd(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iAdd_addCompatibleVector_originalVectorHasAllComponentsAdded() {
 //        vector1.iAdd(vector2);
-//        assertEquals(new Vector(11, 22, 33, 44, 55), vector1);
+//        assertEquals(Vector.FACTORY.make(11, 22, 33, 44, 55), vector1);
 //    }
 
     @Test
     void add_differentDimensionVector_throwsException() {
-        vector2 = new Vector(vector1.dim() - 1);
+        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
         assertThrows(IllegalArgumentException.class, () -> vector1.add(vector2));
     }
 
     @Test
     void add_addZeroVector_resultIdenticalToInputVector() {
-        vector2 = new Vector(vector1.dim());
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.add(vector2));
+        vector2 = Vector.FACTORY.zeroslike(vector1);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.add(vector2));
     }
 
     @Test
     void add_addNonZeroVector_returnsExpectedResult() {
-        assertEquals(new Vector(11, 22, 33, 44, 55), vector1.add(vector2));
+        assertEquals(Vector.FACTORY.make(11, 22, 33, 44, 55), vector1.add(vector2));
     }
 
     @Test
     void add_addNonZeroVector_originalVectorRemainsUnchanged() {
         vector1.add(vector2);
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
 
     /* *************************************
@@ -183,29 +183,29 @@ public class VectorTest {
 //    @Test
 //    void iScalarSubtract_subtractZero_resultIdenticalToInputVector() {
 //        vector1.iScalarSubtract(0);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iScalarSubtract_subtractOne_originalVectorHasAllComponentsSubtractedOne() {
 //        vector1.iScalarSubtract(1);
-//        assertEquals(new Vector(0, 1, 2, 3, 4), vector1);
+//        assertEquals(Vector.FACTORY.make(0, 1, 2, 3, 4), vector1);
 //    }
 //
 //    @Test
 //    void scalarSubtract_subtractZero_resultIdenticalToInputVector() {
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.scalarSubtract(0));
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarSubtract(0));
 //    }
 //
 //    @Test
 //    void scalarSubtract_subtractOne_resultVectorHasAllComponentsSubtractedOne() {
-//        assertEquals(new Vector(0, 1, 2, 3, 4), vector1.scalarSubtract(1));
+//        assertEquals(Vector.FACTORY.make(0, 1, 2, 3, 4), vector1.scalarSubtract(1));
 //    }
 //
 //    @Test
 //    void scalarSubtract_subtractOne_originalVectorRemainsUnchanged() {
 //        vector1.scalarSubtract(1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
@@ -215,44 +215,44 @@ public class VectorTest {
 //
 //    @Test
 //    void iSubtract_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.iSubtract(vector2));
 //    }
 //
 //    @Test
 //    void iSubtract_subtractZeroVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(vector1.dim());
+//        vector2 = Vector.FACTORY.zeroslike(vector1);
 //        vector1.iSubtract(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iSubtract_subtractCompatibleVector_originalVectorHasAllComponentsSubtracted() {
 //        vector1.iSubtract(vector2);
-//        assertEquals(new Vector(-9, -18, -27, -36, -45), vector1);
+//        assertEquals(Vector.FACTORY.make(-9, -18, -27, -36, -45), vector1);
 //    }
 
     @Test
     void subtract_differentDimensionVector_throwsException() {
-        vector2 = new Vector(vector1.dim() - 1);
+        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
         assertThrows(IllegalArgumentException.class, () -> vector1.subtract(vector2));
     }
 
     @Test
     void subtract_subtractZeroVector_resultIdenticalToInputVector() {
-        vector2 = new Vector(vector1.dim());
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.subtract(vector2));
+        vector2 = Vector.FACTORY.zeroslike(vector1);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.subtract(vector2));
     }
 
     @Test
     void subtract_subtractNonZeroVector_returnsExpectedResult() {
-        assertEquals(new Vector(-9, -18, -27, -36, -45), vector1.subtract(vector2));
+        assertEquals(Vector.FACTORY.make(-9, -18, -27, -36, -45), vector1.subtract(vector2));
     }
 
     @Test
     void subtract_subtractNonZeroVector_originalVectorRemainsUnchanged() {
         vector1.subtract(vector2);
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
 
     /* *************************************
@@ -267,29 +267,29 @@ public class VectorTest {
 //    @Test
 //    void iScalarMultiply_multiplyByOne_resultIdenticalToInputVector() {
 //        vector1.iScalarMultiply(1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iScalarMultiply_multiplyByTwo_originalVectorHasAllComponentsMultipliedByTwo() {
 //        vector1.iScalarMultiply(2);
-//        assertEquals(new Vector(2, 4, 6, 8, 10), vector1);
+//        assertEquals(Vector.FACTORY.make(2, 4, 6, 8, 10), vector1);
 //    }
 
     @Test
     void scalarMultiply_multiplyByOne_resultIdenticalToInputVector() {
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.multiply(1));
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.multiply(1));
     }
 
     @Test
     void scalarMultiply_multiplyByTwo_resultVectorHasAllComponentsMultipliedByTwo() {
-        assertEquals(new Vector(2, 4, 6, 8, 10), vector1.multiply(2));
+        assertEquals(Vector.FACTORY.make(2, 4, 6, 8, 10), vector1.multiply(2));
     }
 
     @Test
     void scalarMultiply_multiplyByTwo_originalVectorRemainsUnchanged() {
         vector1.multiply(2);
-        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
 
 //    @Test
@@ -299,44 +299,44 @@ public class VectorTest {
 //
 //    @Test
 //    void iMultiply_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.iMultiply(vector2));
 //    }
 //
 //    @Test
 //    void iMultiply_multiplyByOnesVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(1, 1, 1, 1, 1);
+//        vector2 = Vector.FACTORY.make(1, 1, 1, 1, 1);
 //        vector1.iMultiply(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iMultiply_multiplyCompatibleVector_originalVectorHasAllComponentsMultiplied() {
 //        vector1.iMultiply(vector2);
-//        assertEquals(new Vector(10, 40, 90, 160, 250), vector1);
+//        assertEquals(Vector.FACTORY.make(10, 40, 90, 160, 250), vector1);
 //    }
 
 //    @Test
 //    void multiply_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.multiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByOnesVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(1, 1, 1, 1, 1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.multiply(vector2));
+//        vector2 = Vector.FACTORY.make(1, 1, 1, 1, 1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.multiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesVector_returnsExpectedResult() {
-//        assertEquals(new Vector(10, 40, 90, 160, 250), vector1.multiply(vector2));
+//        assertEquals(Vector.FACTORY.make(10, 40, 90, 160, 250), vector1.multiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesVector_originalVectorRemainsUnchanged() {
 //        vector1.multiply(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 
     /* *************************************
@@ -351,29 +351,29 @@ public class VectorTest {
 //    @Test
 //    void iScalarDivide_divideByOne_resultIdenticalToInputVector() {
 //        vector1.iScalarDivide(1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iScalarDivide_divideByTwo_originalVectorHasAllComponentsDividedByTwo() {
 //        vector1.iScalarDivide(2);
-//        assertEquals(new Vector(0.5, 1, 1.5, 2, 2.5), vector1);
+//        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1);
 //    }
 //
 //    @Test
 //    void scalarDivide_divideByOne_resultIdenticalToInputVector() {
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.scalarDivide(1));
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarDivide(1));
 //    }
 //
 //    @Test
 //    void scalarDivide_divideByTwo_resultVectorHasAllComponentsDividedByTwo() {
-//        assertEquals(new Vector(0.5, 1, 1.5, 2, 2.5), vector1.scalarDivide(2));
+//        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1.scalarDivide(2));
 //    }
 //
 //    @Test
 //    void scalarDivide_divideByTwo_originalVectorRemainsUnchanged() {
 //        vector1.scalarDivide(2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
@@ -383,44 +383,44 @@ public class VectorTest {
 //
 //    @Test
 //    void iDivide_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.iDivide(vector2));
 //    }
 //
 //    @Test
 //    void iDivide_divideByOnesVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(1, 1, 1, 1, 1);
+//        vector2 = Vector.FACTORY.make(1, 1, 1, 1, 1);
 //        vector1.iDivide(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 //
 //    @Test
 //    void iDivide_divideCompatibleVector_originalVectorHasAllComponentsDivided() {
 //        vector1.iDivide(vector2);
-//        assertEquals(new Vector(0.1, 0.1, 0.1, 0.1, 0.1), vector1);
+//        assertEquals(Vector.FACTORY.make(0.1, 0.1, 0.1, 0.1, 0.1), vector1);
 //    }
 //
 //    @Test
 //    void divide_differentDimensionVector_throwsException() {
-//        vector2 = new Vector(vector1.dim() - 1);
+//        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
 //        assertThrows(IllegalArgumentException.class, () -> vector1.divide(vector2));
 //    }
 //
 //    @Test
 //    void divide_divideByOnesVector_resultIdenticalToInputVector() {
-//        vector2 = new Vector(1, 1, 1, 1, 1);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1.divide(vector2));
+//        vector2 = Vector.FACTORY.make(1, 1, 1, 1, 1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.divide(vector2));
 //    }
 //
 //    @Test
 //    void divide_divideByCompatibleVector_returnsExpectedResult() {
-//        assertEquals(new Vector(0.1, 0.1, 0.1, 0.1, 0.1), vector1.divide(vector2));
+//        assertEquals(Vector.FACTORY.make(0.1, 0.1, 0.1, 0.1, 0.1), vector1.divide(vector2));
 //    }
 //
 //    @Test
 //    void divide_divideByCompatibleVector_originalVectorRemainsUnchanged() {
 //        vector1.divide(vector2);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 
     /* *************************************
@@ -429,65 +429,65 @@ public class VectorTest {
      */
     @Test
     void squaredNorm_zeroVector_returnsZero() {
-        assertEquals(0, new Vector(2).squaredNorm());
+        assertEquals(0, Vector.FACTORY.zeros(2).squaredNorm());
     }
 
     @Test
     void squaredNorm_nonZeroVector_returnsCorrectValue() {
-        assertEquals(1., new Vector(1, 0).squaredNorm());
-        assertEquals(1., new Vector(0, -1).squaredNorm());
-        assertEquals(2., new Vector(1, 1).squaredNorm());
-        assertEquals(2., new Vector(-1, -1).squaredNorm());
+        assertEquals(1., Vector.FACTORY.make(1, 0).squaredNorm());
+        assertEquals(1., Vector.FACTORY.make(0, -1).squaredNorm());
+        assertEquals(2., Vector.FACTORY.make(1, 1).squaredNorm());
+        assertEquals(2., Vector.FACTORY.make(-1, -1).squaredNorm());
     }
 
     @Test
     void norm_zeroVector_returnsZero() {
-        assertEquals(0, new Vector(2).norm());
+        assertEquals(0, Vector.FACTORY.zeros(2).norm());
     }
 
     @Test
     void norm_nonZeroVector_returnsCorrectValue() {
-        assertEquals(1., new Vector(1, 0).norm());
-        assertEquals(1., new Vector(0, -1).norm());
-        assertEquals(Math.sqrt(2.), new Vector(1, 1).norm());
-        assertEquals(Math.sqrt(2.), new Vector(-1, -1).norm());
+        assertEquals(1., Vector.FACTORY.make(1, 0).norm());
+        assertEquals(1., Vector.FACTORY.make(0, -1).norm());
+        assertEquals(Math.sqrt(2.), Vector.FACTORY.make(1, 1).norm());
+        assertEquals(Math.sqrt(2.), Vector.FACTORY.make(-1, -1).norm());
     }
 
     @Test
     void normalize_zeroVector_throwsException() {
-        vector1 = new Vector(0, 0);
+        vector1 = Vector.FACTORY.zeros(2);
         assertThrows(IllegalStateException.class, () -> vector1.normalize(1));
     }
 
     @Test
     void normalize_zeroNewNorm_throwsException() {
-        vector1 = new Vector(1, 0);
+        vector1 = Vector.FACTORY.make(1, 0);
         assertThrows(IllegalArgumentException.class, () -> vector1.normalize(0));
     }
 
     @Test
     void normalize_negativeNewNorm_throwsException() {
-        vector1 = new Vector(1, 0);
+        vector1 = Vector.FACTORY.make(1, 0);
         assertThrows(IllegalArgumentException.class, () -> vector1.normalize(-1));
     }
 
     @Test
     void normalize_newNormEqualToOne_returnsExpectedVector() {
-        assertEquals(new Vector(1, 0), new Vector(10, 0).normalize(1));
-        assertEquals(new Vector(0, -1), new Vector(0, -10).normalize(1));
-        assertEquals(new Vector(-1/Math.sqrt(2), 1/Math.sqrt(2)), new Vector(-1, 1).normalize(1));
+        assertEquals(Vector.FACTORY.make(1, 0), Vector.FACTORY.make(10, 0).normalize(1));
+        assertEquals(Vector.FACTORY.make(0, -1), Vector.FACTORY.make(0, -10).normalize(1));
+        assertEquals(Vector.FACTORY.make(-1/Math.sqrt(2), 1/Math.sqrt(2)), Vector.FACTORY.make(-1, 1).normalize(1));
     }
 
     @Test
     void normalize_newNormEqualToTwo_returnsExpectedVector() {
-        assertEquals(new Vector(2, 0), new Vector(10, 0).normalize(2));
-        assertEquals(new Vector(0, -2), new Vector(0, -10).normalize(2));
-        assertTrue(new Vector(-Math.sqrt(2), Math.sqrt(2)).equals(new Vector(-1, 1).normalize(2), 1e-10));
+        assertEquals(Vector.FACTORY.make(2, 0), Vector.FACTORY.make(10, 0).normalize(2));
+        assertEquals(Vector.FACTORY.make(0, -2), Vector.FACTORY.make(0, -10).normalize(2));
+        assertTrue(Vector.FACTORY.make(-Math.sqrt(2), Math.sqrt(2)).equals(Vector.FACTORY.make(-1, 1).normalize(2), 1e-10));
     }
 
     @Test
     void squaredDistanceTo_vectorOfDifferentDimensions_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.squaredDistanceTo(new Vector(3)));
+        assertThrows(IllegalArgumentException.class, () -> vector1.squaredDistanceTo(Vector.FACTORY.zeros(3)));
     }
 
     @Test
@@ -502,7 +502,7 @@ public class VectorTest {
 
     @Test
     void distanceTo_vectorOfDifferentDimensions_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.distanceTo(new Vector(3)));
+        assertThrows(IllegalArgumentException.class, () -> vector1.distanceTo(Vector.FACTORY.zeros(3)));
     }
 
     @Test
@@ -522,36 +522,36 @@ public class VectorTest {
     @Test
     void resize_negativeSize_throwsException() {
         int size = -1;
-        vector1 = new Vector(1, 2, 3, 4, 5);
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
         assertThrows(IllegalArgumentException.class, () -> vector1.resize(size));
     }
 
     @Test
     void resize_zeroSize_throwsException() {
         int size = 0;
-        vector1 = new Vector(1, 2, 3, 4, 5);
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
         assertThrows(IllegalArgumentException.class, () -> vector1.resize(size));
     }
 
     @Test
     void resize_sizeLessThanArraySize_returnsCorrectTruncatedArray() {
         int size = 3;
-        vector1 = new Vector(1, 2, 3, 4, 5);
-        assertEquals(new Vector(1, 2, 3), vector1.resize(size));
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
+        assertEquals(Vector.FACTORY.make(1, 2, 3), vector1.resize(size));
     }
 
     @Test
     void resize_sizeEqualsArraySize_theInputArrayIsReturnedWithoutCopying() {
         int size = 5;
-        vector1 = new Vector(1, 2, 3, 4, 5);
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
         assertSame(vector1, vector1.resize(size));
     }
 
     @Test
     void resize_sizeLargerThanArraySize_returnsInputArrayPaddedWithZeros() {
         int size = 7;
-        vector1 = new Vector(1, 2, 3, 4, 5);
-        assertEquals(new Vector(1, 2, 3, 4, 5, 0, 0), vector1.resize(size));
+        vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5, 0, 0), vector1.resize(size));
     }
 
 //    @Test
@@ -568,7 +568,7 @@ public class VectorTest {
 //
 //    @Test
 //    void outerProduct_vectorsOfDifferentDimensions_returnsCorrectOuterProduct() {
-//        vector2 = new Vector(10, 20, 30);
+//        vector2 = Vector.FACTORY.make(10, 20, 30);
 //        assertEquals(
 //                linearAlgebra.matrix(vector1.dim(), vector2.dim(),
 //                        10,  20,  30,
@@ -582,7 +582,7 @@ public class VectorTest {
 
     @Test
     void addBias_anyVector_returnsNewVectorWithAOneAppendedLeft() {
-        assertEquals(new Vector(1, 1, 2, 3, 4, 5), vector1.addBias());
+        assertEquals(Vector.FACTORY.make(1, 1, 2, 3, 4, 5), vector1.addBias());
     }
 
     /* *************************************
@@ -610,6 +610,6 @@ public class VectorTest {
 //    void clone_anyVector_changingCloneDoesNotModifyOriginalVector() {
 //        Vector clone = vector1.clone();
 //        clone.iScalarAdd(10);
-//        assertEquals(new Vector(1, 2, 3, 4, 5), vector1);
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 }

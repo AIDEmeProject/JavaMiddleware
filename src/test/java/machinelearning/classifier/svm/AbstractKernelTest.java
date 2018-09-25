@@ -15,7 +15,7 @@ abstract class AbstractKernelTest {
 
     @Test
     void compute_vectorsOfDifferentLengths_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> kernel.compute(new Vector(1), new Vector(2)));
+        assertThrows(IllegalArgumentException.class, () -> kernel.compute(Vector.FACTORY.zeros(1), Vector.FACTORY.zeros(2)));
     }
 
     @Test
@@ -30,8 +30,8 @@ abstract class AbstractKernelTest {
 
     void assertKernelFunctionIsCorrect(double expected, double[] arr1, double[] arr2) {
         Vector x, y;
-        x = new Vector(arr1);
-        y = new Vector(arr2);
+        x = Vector.FACTORY.make(arr1);
+        y = Vector.FACTORY.make(arr2);
         assertEquals(expected, kernel.compute(x, y));
     }
 

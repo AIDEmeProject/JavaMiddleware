@@ -33,8 +33,8 @@ public class Line {
     public Line(double[] center, double[] direction) {  // TODO: change input to Vector
         Validator.assertEqualLengths(center, direction);
 
-        this.center = new Vector(center);
-        this.direction = new Vector(direction);
+        this.center = Vector.FACTORY.make(center);
+        this.direction = Vector.FACTORY.make(direction);
 
         if (this.direction.squaredNorm() == 0) {
             throw new IllegalArgumentException("Direction cannot be zero vector.");
