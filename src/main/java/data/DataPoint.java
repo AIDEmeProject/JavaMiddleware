@@ -21,7 +21,7 @@ public class DataPoint {
     /**
      * data point's values
      */
-    protected double[] data;
+    protected Vector data;
 
     /**
      * @param id: data point's unique ID
@@ -29,7 +29,10 @@ public class DataPoint {
      * @throws IllegalArgumentException if data is emtpy
      */
     public DataPoint(long id, double[] data) {
-        Validator.assertNotEmpty(data);
+        this(id, Vector.FACTORY.make(data));
+    }
+
+    public DataPoint(long id, Vector data) {
         this.id = id;
         this.data = data;
     }
@@ -39,18 +42,18 @@ public class DataPoint {
     }
 
     public Vector getData() {
-        return new Vector(data);
+        return data;
     }
 
     public double get(int i){
-        return data[i];
+        return data.get(i);
     }
 
     /**
      * @return data point's dimension (i.e. number of features)
      */
     public int getDim(){
-        return data.length;
+        return data.dim();
     }
 
     @Override
@@ -60,7 +63,7 @@ public class DataPoint {
 
         DataPoint dataPoint = (DataPoint) o;
 
-        return id == dataPoint.id && Arrays.equals(data, dataPoint.data);
+        return id == dataPoint.id && data.equals(dataPoint.data);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "{\"id\": " + getId()  + ", \"data\": " + getData() + '}';
+        return "{\"id\": " + getId()  + ", \"data\": " + data + '}';
     }
 
     public DataPoint clone(double[] newData){

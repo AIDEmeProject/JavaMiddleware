@@ -1,8 +1,8 @@
 package data;
 
 import machinelearning.classifier.Label;
+import utils.linalg.Vector;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -23,6 +23,11 @@ public class LabeledPoint extends DataPoint {
      * @throws IllegalArgumentException if data is empty or label is {@code null}
      */
     public LabeledPoint(long id, double[] data, Label label) {
+        super(id, data);
+        this.label = Objects.requireNonNull(label);
+    }
+
+    public LabeledPoint(long id, Vector data, Label label) {
         super(id, data);
         this.label = Objects.requireNonNull(label);
     }
@@ -55,7 +60,7 @@ public class LabeledPoint extends DataPoint {
      */
     @Override
     public String toString() {
-        return "{\"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": \"" + label + "\"}";
+        return "{\"id\": " + id  + ", \"data\": " + data + ", \"label\": \"" + label + "\"}";
     }
 
     /**
