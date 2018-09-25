@@ -29,6 +29,10 @@ public class Vector {
         return vector.getEntry(index);
     }
 
+    public Vector add(Vector other) {
+        return new Vector(vector.add(other.vector));
+    }
+
     public Vector subtract(Vector other) {
         return new Vector(vector.subtract(other.vector));
     }

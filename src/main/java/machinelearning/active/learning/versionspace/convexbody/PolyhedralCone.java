@@ -135,9 +135,9 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         // ball intersection
-        double a = LinearAlgebra.sqNorm(line.getDirection());
-        double b = LinearAlgebra.dot(line.getCenter(), line.getDirection());
-        double c = LinearAlgebra.sqNorm(line.getCenter()) - 1;  //line.getDim();
+        double a = line.getDirection().squaredNorm();
+        double b = line.getCenter().dot(line.getDirection());
+        double c = line.getCenter().squaredNorm() - 1;
         SecondDegreeEquationSolver.SecondDegreeEquationSolution solution = SecondDegreeEquationSolver.solve(a, b, c);
         leftBound = Math.max(leftBound, solution.getFirst());
         rightBound = Math.min(rightBound, solution.getSecond());

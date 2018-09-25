@@ -2,6 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
 import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 /**
  * This class represents a Line Segment in euclidean space. A line is defined by two elements:
@@ -17,31 +18,34 @@ public class Line {
     /**
      * A point on the line
      */
-    private double[] center;
+    private Vector center;
 
     /**
      * The line's direction
      */
-    private double[] direction;
+    private Vector direction;
 
     /**
      * @param center: any point on the line
      * @param direction: the direction of the line. It will NOT be normalized or changed anyhow.
      * @throws IllegalArgumentException if center and direction have different lengths, if they are empty arrays, or direction is the zero vector
      */
-    public Line(double[] center, double[] direction) {
+    public Line(double[] center, double[] direction) {  // TODO: change input to Vector
         Validator.assertEqualLengths(center, direction);
-        Validator.assertPositive(LinearAlgebra.sqNorm(direction));
 
-        this.center = center;
-        this.direction = direction;
+        this.center = new Vector(center);
+        this.direction = new Vector(direction);
+
+        if (this.direction.squaredNorm() == 0) {
+            throw new IllegalArgumentException("Direction cannot be zero vector.");
+        }
     }
 
-    public double[] getCenter() {
+    public Vector getCenter() {
         return center;
     }
 
-    public double[] getDirection() {
+    public Vector getDirection() {
         return direction;
     }
 
@@ -49,7 +53,7 @@ public class Line {
      * @return the dimension of the euclidean space containing this line
      */
     public int getDim(){
-        return center.length;
+        return center.dim();
     }
 
     /**
@@ -57,13 +61,7 @@ public class Line {
      * @return the point center + t * direction
      */
     public double[] getPoint(double t){
-        double[] point = new double[center.length];
-
-        for (int i = 0; i < center.length; i++) {
-            point[i] = center[i] + t * direction[i];
-        }
-
-        return point;
+        return center.add(direction.multiply(t)).toArray();  // TODO: remove toArray() call
     }
 
     /**
