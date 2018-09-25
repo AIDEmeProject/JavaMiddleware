@@ -1,5 +1,6 @@
 package utils.linalg;
 
+import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import utils.Validator;
@@ -26,7 +27,11 @@ public class Vector {
     }
 
     public double get(int index) {
-        return vector.getEntry(index);
+        try {
+            return vector.getEntry(index);
+        } catch (OutOfRangeException ex) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     public Vector add(Vector other) {
@@ -81,13 +86,14 @@ public class Vector {
     public Vector resize(int newDim) {
         Validator.assertPositive(newDim);
 
-        if (newDim == dim()) {
-            return this;
+        switch (Integer.compare(newDim, dim())) {
+            case -1:
+                return new Vector(vector.getSubVector(0, newDim));
+            case 0:
+                return this;
+            default:
+                return new Vector(vector.append(new ArrayRealVector(newDim - dim())));
         }
-
-        double[] result = new double[newDim];
-        System.arraycopy(vector.toArray(), 0, result, 0, newDim);
-        return new Vector(result);
     }
 
     public Vector addBias() {
@@ -99,6 +105,24 @@ public class Vector {
 
     public double[] toArray() {
         return vector.toArray();
+    }
+
+    public boolean equals(Vector other, double precision) {
+        if (dim() != other.dim()) return false;
+        for (int i = 0; i < dim(); i++) {
+            if (Math.abs(vector.getEntry(i) - other.get(i)) > precision) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector vector1 = (Vector) o;
+        return vector.equals(vector1.vector);
     }
 
     @Override
