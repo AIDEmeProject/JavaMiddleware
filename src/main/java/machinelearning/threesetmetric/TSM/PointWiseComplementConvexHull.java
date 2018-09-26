@@ -1,4 +1,4 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import org.apache.commons.math3.util.Pair;
 

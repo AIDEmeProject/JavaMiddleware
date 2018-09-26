@@ -3,6 +3,7 @@ package data;
 import utils.Validator;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A DataPoint is an indexed collection of values. More specifically, it is composed of two entities:
@@ -43,6 +44,34 @@ public class DataPoint {
 
     public double get(int i){
         return data[i];
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public HashMap<Integer, Double> getSelectedAttributesMap(int[] indices) {
+        Arrays.sort(indices);
+
+        HashMap<Integer, Double> selectedAttributes = new HashMap<>();
+        for(int index: indices){
+            selectedAttributes.put(index, data[index]);
+        }
+        return selectedAttributes;
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public double[] getSelectedAttributes(int[] indices) {
+        Arrays.sort(indices);
+
+        double[] selected = new double[indices.length];
+        for(int index: indices){
+            selected[index] = data[index];
+        }
+        return selected;
     }
 
     /**

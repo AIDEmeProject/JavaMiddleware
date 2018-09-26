@@ -1,4 +1,4 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
 import data.LabeledPoint;
@@ -8,6 +8,7 @@ import java.util.*;
 
 /**
  * This class deals with Three-Set partition of space spanned by one-hot encoding features that converted from categorical attributes
+ * Note that this class only works for one-hot encoded categorical attributes
  *
  * @author enhui
  */
@@ -56,8 +57,6 @@ public class CatTSM {
                 }
             }
         }
-//        System.out.println("truthLines contains: " + Arrays.toString(truthLines.toArray()));
-//        System.out.println("falseLines contains: " + Arrays.toString(falseLines.toArray()));
     }
 
 

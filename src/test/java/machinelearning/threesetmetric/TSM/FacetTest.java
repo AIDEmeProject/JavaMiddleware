@@ -1,8 +1,7 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

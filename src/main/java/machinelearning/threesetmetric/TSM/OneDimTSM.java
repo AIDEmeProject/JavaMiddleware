@@ -1,4 +1,4 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import utils.ObjectWithDistance;
 import java.util.*;

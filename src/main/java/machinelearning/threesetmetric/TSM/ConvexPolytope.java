@@ -1,6 +1,5 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
-import java.io.IOException;
 import java.util.*;
 import utils.LinearAlgebra;
 

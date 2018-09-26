@@ -1,7 +1,6 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import java.util.Arrays;
-import java.util.TreeSet;
 
 
 /**

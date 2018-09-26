@@ -1,7 +1,6 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
 
 import java.util.*;
@@ -98,7 +97,7 @@ public class TsmLearner extends CatTSM {
         this.dataPoints = dataPoints;
         positiveSamples = new HashSet<>();
         negativeSamples = new HashSet<>();
-        uncertainSamples = LabeledDataset.getIdSet(dataPoints);
+        uncertainSamples = getIdSet(dataPoints);
 
         pos = new double[dim + 1][];
         posCount = 0;
@@ -461,6 +460,19 @@ public class TsmLearner extends CatTSM {
                 }
             }
         }
+    }
+
+    /**
+     * Extract the Ids of points for TSM Evaluation
+     * @param dataPoints points for TSM Evaluation
+     * @return the set of indices of unknown points
+     */
+    public static HashSet<Long> getIdSet(Collection<DataPoint> dataPoints){
+        HashSet<Long> indices = new HashSet<>();
+        for(DataPoint point:dataPoints){
+            indices.add(point.getId());
+        }
+        return indices;
     }
 
 }

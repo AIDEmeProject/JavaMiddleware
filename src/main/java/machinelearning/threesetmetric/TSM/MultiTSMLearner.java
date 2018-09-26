@@ -1,13 +1,12 @@
-package machinelearning.classifier.TSM;
+package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
-import data.LabeledDataset;
 import data.LabeledPoint;
+import machinelearning.classifier.Label;
+import machinelearning.threesetmetric.ExtendedClassifier;
+import machinelearning.threesetmetric.ExtendedLabel;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * Given a partition of an attributes set, we create a TSM on each subspace spanned by attributes in a certain partition.
@@ -16,7 +15,7 @@ import java.util.stream.IntStream;
  * @author enhui
  */
 
-public class MultiTSMLearner {
+public class MultiTSMLearner implements ExtendedClassifier {
     /**
      * List of TSMs on each subspace
      */
@@ -38,7 +37,6 @@ public class MultiTSMLearner {
      * second element: true --> categorical; false --> numerical
      */
     private final ArrayList<boolean[]> tsmFlags;
-    //final ArrayList<HashSet<Long>> truthKeySet;
 
     // Evaluation
     /**
@@ -88,10 +86,6 @@ public class MultiTSMLearner {
      */
     private static int threshold = 1;
 
-    /**
-     * TSM value := |positiveSamples|/(|positiveSamples| + |uncertainSamples|)
-     */
-    double value;
 
     private ArrayList<HashSet<Long>> truthKeySet;
 
@@ -102,14 +96,15 @@ public class MultiTSMLearner {
      * @param feaGroups partition of attributes represented by indices
      * @param testPoints examples for TSM evaluation
      * @param tsmFlags a list of indicators that correspond to attributes partition
+     * @param truthKeySet ids of positive points on each subspace
      */
-    public MultiTSMLearner(ArrayList<int[]> feaGroups, Collection<DataPoint> testPoints,  ArrayList<boolean[]> tsmFlags) {
+    public MultiTSMLearner(ArrayList<int[]> feaGroups, Collection<DataPoint> testPoints,  ArrayList<boolean[]> tsmFlags, ArrayList<HashSet<Long>> truthKeySet) {
         this.feaGroups = feaGroups;
         this.testPoints = testPoints;
         this.tsmFlags = tsmFlags;
+        this.truthKeySet = truthKeySet;
 
         tsmSet = new ArrayList<>();
-        truthKeySet = new ArrayList<>();
         testStates = new ArrayList<>();
         backupTsmSet = new ArrayList<>();
 
@@ -123,7 +118,6 @@ public class MultiTSMLearner {
             // initialize each TSM on each subspace
             TsmLearner tsm = new TsmLearner(selected_set.length, factorizeFeatures(testPoints, selected_set));
             tsmSet.add(tsm);
-            truthKeySet.add(getTrueKeys(selected_set));
             //for hypothesis test
             testStates.add(0);
             // backup tsm is constructed according to the asssumption that negative region is convex
@@ -135,7 +129,7 @@ public class MultiTSMLearner {
         positiveSamples = new HashSet<>();
         negativeSamples = new HashSet<>();
         // assign test data for TSM evaluation
-        uncertainSamples = LabeledDataset.getIdSet(testPoints);
+        uncertainSamples = TsmLearner.getIdSet(testPoints);
     }
 
     /**
@@ -195,14 +189,15 @@ public class MultiTSMLearner {
      * Update TSM on each subspace and combine them together based on the conjunctive assumption
      * @param labeledSamples labeled examples for TSM construction
      */
-    public void updateRatio(Collection<LabeledPoint> labeledSamples) {
+    @Override
+    public void update(Collection<LabeledPoint> labeledSamples) {
         for(int i=0;i < tsmSet.size();i++){
             if(tsmFlags.get(i)[1]){
                 // if the second element of flags array is true, the corresponding attribute is a categorical attribute
                 if(tsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null){
-                            tsmSet.get(i).updateCat(factorizeFeaturesUnscaled(labeledSamples, feaGroups.get(i), truthKeySet.get(i), i), feaGroups.get(i));
+                            tsmSet.get(i).updateCat(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)), feaGroups.get(i));
                         }
                     }catch (IllegalArgumentException e){
                         errTSM[i]++;
@@ -217,7 +212,7 @@ public class MultiTSMLearner {
                 if(tsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null) {
-                            tsmSet.get(i).updatePosRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i), i));
+                            tsmSet.get(i).updatePosRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)));
                         }
                         //System.out.println("partition: " + feaGroups.get(i) + " with flag: " + tsmFlags.get(i));
                         //System.out.println(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)).size());
@@ -236,7 +231,7 @@ public class MultiTSMLearner {
                 if(backupTsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null){
-                            backupTsmSet.get(i).updateNegRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i), i));
+                            backupTsmSet.get(i).updateNegRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)));
                         }
                     }catch (Exception e){
                         errBackTSM[i]++;
@@ -280,61 +275,21 @@ public class MultiTSMLearner {
 //        System.out.println("Tsm flag of convex assumption is: " + Arrays.deepToString(tsmFlags.toArray()));
     }
 
-    public double getTsmValue() throws Exception {
-        boolean result = IntStream.of(isFlagChanged).anyMatch(x -> x==1);
-        // if the flag has been changed, check the correctness of three sets
-        if(result){
-            System.out.println("Three sets need double check!" + Arrays.deepToString(tsmFlags.toArray()));
-            positiveSamples = new HashSet<Long>();
-            negativeSamples = new HashSet<Long>();
-            uncertainSamples = new HashSet<Long>(ep.points.keySet());
-//            if(positiveSamples.size() > 0){
-//                for(Iterator<Long> posId = positiveSamples.iterator(); posId.hasNext();){
-//                    Long key = posId.next();
-//                    Tuple posSample = ep.points.get(key);
-//                    if(!isInPositiveRegion(posSample)){
-//                        posId.remove();
-//                        if(isInNegativeRegion(posSample)){
-//                            negativeSamples.add(key);
-//                        }else {
-//                            uncertainSamples.add(key);
-//                        }
-//                    }
-//                }
-//            }
-//            if(negativeSamples.size() > 0){
-//                for(Iterator<Long> negId = negativeSamples.iterator(); negId.hasNext();){
-//                    Long key = negId.next();
-//                    Tuple negSample = ep.points.get(key);
-//                    if(!isInNegativeRegion(negSample)){
-//                        negId.remove();
-//                        if(isInPositiveRegion(negSample)){
-//                            positiveSamples.add(key);
-//                        }else {
-//                            uncertainSamples.add(key);
-//                        }
-//                    }
-//                }
-//            }
+
+    /**
+     * Prediction of a given point: positive, negative and unknown
+     * @param point
+     * @return three-class label of a given point
+     */
+    @Override
+    public ExtendedLabel predict(DataPoint point) {
+        if(isInPositiveRegion(point)){
+            return ExtendedLabel.POSITIVE;
+        }else if(isInNegativeRegion(point)){
+            return ExtendedLabel.NEGATIVE;
+        }else {
+            return ExtendedLabel.UNKNOWN;
         }
-
-        if(uncertainSamples.size() > 0){
-            for (Iterator<Long> i = uncertainSamples.iterator(); i.hasNext();) {
-                Long key = i.next();
-                Tuple sample = ep.points.get(key);
-                if (isInPositiveRegion(sample)) {
-                    i.remove();
-                    positiveSamples.add(key);
-                }else if (isInNegativeRegion(sample)){
-                    i.remove();
-                    negativeSamples.add(key);
-                }
-            }
-
-
-            value = (double)positiveSamples.size()/(positiveSamples.size()+uncertainSamples.size());
-        }
-        return value;
     }
 
 
@@ -349,7 +304,7 @@ public class MultiTSMLearner {
             // for categorical variables, if the example is not on the truth lines, return false
             if(tsmFlags.get(i)[1]){
                 if(tsmSet.get(i) != null){
-                    catTruth.add(tsmSet.get(i).isOnTruthLines(sample, feaGroups.get(i));
+                    catTruth.add(tsmSet.get(i).isOnTruthLines(sample, feaGroups.get(i)));
                 } else {
                     catTruth.add(false);
                 }
@@ -380,7 +335,7 @@ public class MultiTSMLearner {
     public boolean isInNegativeRegion (DataPoint sample) {
         for(int i=0; i < tsmSet.size(); i++){
             if(tsmFlags.get(i)[1]){
-                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample, feaGroups.get(i)){
+                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample, feaGroups.get(i))){
                     return true;
                 }
             }else {
@@ -416,40 +371,6 @@ public class MultiTSMLearner {
         return true;
     }
 
-    //Todo: check whether this function is necessary or not
-//    public boolean isUsefulSample(DataPoint sample) throws Exception {
-//        if (isInPositiveRegion(sample)) {
-//            sample.setLabel(1d);
-//            return false;
-//        }
-//        if (isInNegativeRegion(sample)) {
-//            sample.setLabel(-1d);
-//            return false;
-//        }
-//        return true;
-//    }
-
-
-
-    public ArrayList<int[]> getErrorIndexwithFlag(){
-        ArrayList<int[]> res = new ArrayList<>();
-        for(int i = 0; i < errTSM.length; i++){
-            if(errTSM[i] >= Configuration.getTsmErrors()){
-                res.add(new int[] {i, 1});
-            }
-        }
-        for(int i = 0; i < errBackTSM.length; i++){
-            if(errBackTSM[i] >= Configuration.getTsmErrors()){
-                res.add(new int[] {i, -1});
-            }
-        }
-        if(res.size() > 0){
-            return res;
-        }else {
-            return null;
-        }
-    }
-
     /*
     Test whether all partitions have been null or not
      */
@@ -458,21 +379,13 @@ public class MultiTSMLearner {
     }
 
 
-    public Collection<Tuple> factorizeFeatures(Collection<Tuple> labeledSamples, ArrayList<Integer> select_set, HashSet<Long> truthKeys, int index) throws Exception {
-        for (Tuple t : labeledSamples) {
-            // define the partial truth
-            t.setTsmLabel(truthKeys, index);
-            for (int i = 0; i < t.getScaledAV().length; i++) {
-                if (select_set.contains(i)) {
-                    t.selectAttribute(i);
-                } else {
-                    t.unselectAttribute(i);
-                }
-
-            }
-            //System.out.println("before modeling:"+ t.getSelectedScaledAV());
+    public Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, HashSet<Long> truthKeys) {
+        Collection<LabeledPoint> dataPointsCopy = new ArrayList<>();
+        for(LabeledPoint dataPoint : labeledSamples){
+            LabeledPoint partialPoint = new LabeledPoint(new DataPoint(dataPoint.getId(),dataPoint.getSelectedAttributes(select_set)), isTruthKeys(truthKeys, dataPoint.getId()));
+            dataPointsCopy.add(partialPoint);
         }
-        return labeledSamples;
+        return dataPointsCopy;
     }
 
 
@@ -485,7 +398,7 @@ public class MultiTSMLearner {
     public Collection<DataPoint> factorizeFeatures(Collection<DataPoint> dataPoints, int[] select_set) {
         Collection<DataPoint> dataPointsCopy = new ArrayList<>();
         for(DataPoint dataPoint : dataPoints){
-            DataPoint partialPoint = new DataPoint(dataPoint.getRow(),dataPoint.getSelectedAttributes(select_set));
+            DataPoint partialPoint = new DataPoint(dataPoint.getId(),dataPoint.getSelectedAttributes(select_set));
             dataPointsCopy.add(partialPoint);
         }
         return dataPointsCopy;
@@ -498,59 +411,109 @@ public class MultiTSMLearner {
      * @return point projected onto a subspace
      */
     public DataPoint factorizeFeatures(DataPoint testSample, int[] select_set) {
-        return new DataPoint(testSample.getRow(), testSample.getSelectedAttributes(select_set));
+        return new DataPoint(testSample.getId(), testSample.getSelectedAttributes(select_set));
     }
 
 
-    public HashSet<Long> getTrueKeys(ArrayList<Integer> select_set){
-        HashSet<Long> trueKeys = new HashSet<Long>();
-        Integer index = feaGroups.indexOf(select_set);
-        if(Configuration.isDebug()) {
-            System.out.println("loading ground truth....");
-        }
-
-        String sql = "select " + Configuration.getKeyAttribute() + " from " + Configuration.getTableName() + " where " + Configuration.getSubPredicates().get(index) + ";";
-
-        try {
-            ResultSet rs = Context.getStmt().executeQuery(sql);
-            while(rs.next()){
-                long key = rs.getLong(1);
-                trueKeys.add(key);
-            }
-            rs.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if(Configuration.isDebug()) {
-            System.out.println(sql);
-            System.out.println(trueKeys.size() + " results");
-        }
-
-        return trueKeys;
+    /**
+     * Verify partial labels on a subspace for a given point
+     * @param truthKeys ids of positive examples on a subspace
+     * @param id
+     * @return POSITIVE if the example is in the truthkeys set, Negative otherwise.
+     */
+    public Label isTruthKeys(HashSet<Long> truthKeys, Long id){
+        return truthKeys.contains(id)? Label.POSITIVE : Label.NEGATIVE;
     }
 
 
-    // factorization on unscaled av
-    public Collection<LabeledPoint> factorizeFeaturesLabeled(Collection<LabeledPoint> labeledSamples, int[] select_set, HashSet<Long> truthKeys, int index) throws Exception {
-        for (Tuple t : labeledSamples) {
-            // define the partial truth, for categorical attributes, noise labeling isn't allowed
-            t.setTsmLabel(truthKeys, index);
-            // t.setTsmCatLabel(truthKeys);
-            for (int i = 0; i < t.getUnscaledAV().length; i++) {
-                if (select_set.contains(i)) {
-                    t.selectAttribute(i);
-                } else {
-                    t.unselectAttribute(i);
-                }
+    //TODO: three-set metric will be calculated from the outside
+//    public double getTsmValue() throws Exception {
+//        boolean result = IntStream.of(isFlagChanged).anyMatch(x -> x==1);
+//        // if the flag has been changed, check the correctness of three sets
+//        if(result){
+//            System.out.println("Three sets need double check!" + Arrays.deepToString(tsmFlags.toArray()));
+//            positiveSamples = new HashSet<Long>();
+//            negativeSamples = new HashSet<Long>();
+//            uncertainSamples = new HashSet<Long>(ep.points.keySet());
+////            if(positiveSamples.size() > 0){
+////                for(Iterator<Long> posId = positiveSamples.iterator(); posId.hasNext();){
+////                    Long key = posId.next();
+////                    Tuple posSample = ep.points.get(key);
+////                    if(!isInPositiveRegion(posSample)){
+////                        posId.remove();
+////                        if(isInNegativeRegion(posSample)){
+////                            negativeSamples.add(key);
+////                        }else {
+////                            uncertainSamples.add(key);
+////                        }
+////                    }
+////                }
+////            }
+////            if(negativeSamples.size() > 0){
+////                for(Iterator<Long> negId = negativeSamples.iterator(); negId.hasNext();){
+////                    Long key = negId.next();
+////                    Tuple negSample = ep.points.get(key);
+////                    if(!isInNegativeRegion(negSample)){
+////                        negId.remove();
+////                        if(isInPositiveRegion(negSample)){
+////                            positiveSamples.add(key);
+////                        }else {
+////                            uncertainSamples.add(key);
+////                        }
+////                    }
+////                }
+////            }
+//        }
+//
+//        if(uncertainSamples.size() > 0){
+//            for (Iterator<Long> i = uncertainSamples.iterator(); i.hasNext();) {
+//                Long key = i.next();
+//                Tuple sample = ep.points.get(key);
+//                if (isInPositiveRegion(sample)) {
+//                    i.remove();
+//                    positiveSamples.add(key);
+//                }else if (isInNegativeRegion(sample)){
+//                    i.remove();
+//                    negativeSamples.add(key);
+//                }
+//            }
+//
+//
+//            value = (double)positiveSamples.size()/(positiveSamples.size()+uncertainSamples.size());
+//        }
+//        return value;
+//    }
 
-            }
-            //System.out.println("before modeling:"+ t.getSelectedScaledAV());
-            if(Configuration.isDebug()){
-                System.out.println("before modeling:"+ t.getSelectedUnscaledAV());
-            }
-        }
-        return labeledSamples;
-    }
+
+
+
+//    public HashSet<Long> getTrueKeys(ArrayList<Integer> select_set){
+//        HashSet<Long> trueKeys = new HashSet<Long>();
+//        Integer index = feaGroups.indexOf(select_set);
+//        if(Configuration.isDebug()) {
+//            System.out.println("loading ground truth....");
+//        }
+//
+//        String sql = "select " + Configuration.getKeyAttribute() + " from " + Configuration.getTableName() + " where " + Configuration.getSubPredicates().get(index) + ";";
+//
+//        try {
+//            ResultSet rs = Context.getStmt().executeQuery(sql);
+//            while(rs.next()){
+//                long key = rs.getLong(1);
+//                trueKeys.add(key);
+//            }
+//            rs.close();
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if(Configuration.isDebug()) {
+//            System.out.println(sql);
+//            System.out.println(trueKeys.size() + " results");
+//        }
+//
+//        return trueKeys;
+//    }
+
 }

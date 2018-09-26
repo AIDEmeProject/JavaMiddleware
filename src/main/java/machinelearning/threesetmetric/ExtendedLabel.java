@@ -11,7 +11,7 @@ import machinelearning.classifier.Label;
  *  - UNKNOWN: unsure about the true label
  */
 public enum ExtendedLabel {
-    POSITIVE, NEGATIVE, UNKNOWN;
+    NEGATIVE, POSITIVE, UNKNOWN;
 
     /**
      * Attempts to convert this ExtendedLabel into the corresponding {@link Label} object.
@@ -35,5 +35,19 @@ public enum ExtendedLabel {
      */
     public static ExtendedLabel fromLabel(Label label) {
         return label == Label.POSITIVE ? POSITIVE : NEGATIVE;
+    }
+
+
+    /**
+     * @return 1 if POSITIVE, -1 if NEGATIVE, 0 if UNKNOWN
+     */
+    public int asSign() {
+        if(this == POSITIVE){
+            return 1;
+        }else if(this == NEGATIVE){
+            return -1;
+        }else {
+            return 0;
+        }
     }
 }
