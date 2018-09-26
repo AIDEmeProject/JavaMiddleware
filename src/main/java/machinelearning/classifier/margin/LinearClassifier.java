@@ -1,9 +1,6 @@
 package machinelearning.classifier.margin;
 
-import utils.Validator;
 import utils.linalg.Vector;
-
-import java.util.Arrays;
 
 /**
  * A linear classifier. It is defined by two parameters: bias and weight. Predictions are made as in Logistic Regression:

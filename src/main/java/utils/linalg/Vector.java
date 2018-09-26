@@ -1,6 +1,5 @@
 package utils.linalg;
 
-import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import utils.Validator;

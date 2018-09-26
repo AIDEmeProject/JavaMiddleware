@@ -1,9 +1,6 @@
 package data;
 
-import utils.Validator;
 import utils.linalg.Vector;
-
-import java.util.Arrays;
 
 /**
  * A DataPoint is an indexed collection of values. More specifically, it is composed of two entities:

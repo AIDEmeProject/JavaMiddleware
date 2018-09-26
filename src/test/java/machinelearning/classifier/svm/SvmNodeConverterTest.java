@@ -3,6 +3,7 @@ package machinelearning.classifier.svm;
 import data.DataPoint;
 import libsvm.svm_node;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import java.util.List;
 
@@ -11,24 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SvmNodeConverterTest {
 
-    private double[] values;
-
     @Test
     void toSvmNode_ReceivesNonEmptyArray_CorrectConversion() {
-        values = new double[] {-3, 10};
+        Vector values = Vector.FACTORY.make( -3, 10);
         svm_node[] result = SvmNodeConverter.toSvmNode(values);
 
         assertEquals(0, result[0].index);
         assertEquals(-3, result[0].value);
         assertEquals(1, result[1].index);
         assertEquals(10, result[1].value);
-    }
-
-    @Test
-    void toSvmNode_ReceivesEmptyArray_returnsEmptyArray() {
-        values = new double[0];
-        svm_node[] result =  SvmNodeConverter.toSvmNode(values);
-        assertEquals(0, result.length);
     }
 
     @Test
