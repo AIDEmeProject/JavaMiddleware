@@ -59,7 +59,7 @@ public class Line {
      * @return the point center + t * direction
      */
     public Vector getPoint(double t){
-        return center.add(direction.multiply(t));
+        return center.add(direction.scalarMultiply(t));
     }
 
     /**

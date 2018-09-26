@@ -15,6 +15,76 @@ public class MatrixTest {
     }
 
     @Test
+    void make_emptyArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[0][]));
+    }
+
+    @Test
+    void make_allRowsAreEmpty_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[2][0]));
+    }
+
+    @Test
+    void make_rowsHaveDistinctLengths_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[][] {{1}, {2, 3}}));
+    }
+
+    @Test
+    void make_zeroNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(0, 1));
+    }
+
+    @Test
+    void make_negativeNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(-1, 1));
+    }
+
+    @Test
+    void make_zeroNumberOfColumns_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, 0));
+    }
+
+    @Test
+    void make_negativeNumberOfColumns_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, -1));
+    }
+
+    @Test
+    void make_matrixDimensionsAndValueHaveIncompatibleLengths_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, 1, 10.0, 20.0));
+    }
+
+    @Test
+    void make_valueInputParameters_constructsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(new double[][] {{1}, {2}}), Matrix.FACTORY.make(2, 1, 1.0, 2.0));
+    }
+
+    @Test
+    void zeros_zeroNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(0, 1));
+    }
+
+    @Test
+    void zeros_negativeNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(-1, 1));
+    }
+
+    @Test
+    void zeros_zeroNumberOfColumns_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(1, 0));
+    }
+
+    @Test
+    void zeros_negativeNumberOfColumns_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(1, -1));
+    }
+
+    @Test
+    void zeroslike_TwoByThreeDimensionalInputMatrix_returnsTwoByThreeDimensionalZeroMatrix() {
+        assertEquals(Matrix.FACTORY.zeros(2, 3), Matrix.FACTORY.zeroslike(matrix1));
+    }
+
+    @Test
     void numRows_matrixWithTwoRows_returnsTwo() {
         assertEquals(2, matrix1.numRows());
     }
@@ -333,29 +403,29 @@ public class MatrixTest {
 //    @Test
 //    void multiply_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.multiply(matrix2));
+//        assertThrows(IllegalArgumentException.class, () -> matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void multiply_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.multiply(matrix2));
+//        assertThrows(IllegalArgumentException.class, () -> matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByOnesMatrix_resultIdenticalToInputMatrix() {
 //        matrix2 = Matrix.FACTORY.zeros(2, 3, 1, 1, 1, 1, 1, 1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.multiply(matrix2));
+//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesMatrix_returnsExpectedResult() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 10, 40, 90, 160, 250, 360), matrix1.multiply(matrix2));
+//        assertEquals(Matrix.FACTORY.zeros(2, 3, 10, 40, 90, 160, 250, 360), matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesMatrix_originalMatrixRemainsUnchanged() {
-//        matrix1.multiply(matrix2);
+//        matrix1.scalarMultiply(matrix2);
 //        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
 //    }
 

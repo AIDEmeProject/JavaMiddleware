@@ -15,6 +15,26 @@ public class VectorTest {
     }
 
     @Test
+    void make_emptyArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, Vector.FACTORY::make);
+    }
+
+    @Test
+    void zeros_zeroDimension_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Vector.FACTORY.zeros(0));
+    }
+
+    @Test
+    void zeros_negativeDimension_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> Vector.FACTORY.zeros(-1));
+    }
+
+    @Test
+    void zeroslike_fiveDimensionalInputVector_returnsFiveDimensionalZeroVector() {
+        assertEquals(Vector.FACTORY.zeros(5), Vector.FACTORY.zeroslike(vector1));
+    }
+
+    @Test
     void get_negativeIndex_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> vector1.get(-1));
     }
@@ -254,17 +274,17 @@ public class VectorTest {
 
     @Test
     void scalarMultiply_multiplyByOne_resultIdenticalToInputVector() {
-        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.multiply(1));
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarMultiply(1));
     }
 
     @Test
     void scalarMultiply_multiplyByTwo_resultVectorHasAllComponentsMultipliedByTwo() {
-        assertEquals(Vector.FACTORY.make(2, 4, 6, 8, 10), vector1.multiply(2));
+        assertEquals(Vector.FACTORY.make(2, 4, 6, 8, 10), vector1.scalarMultiply(2));
     }
 
     @Test
     void scalarMultiply_multiplyByTwo_originalVectorRemainsUnchanged() {
-        vector1.multiply(2);
+        vector1.scalarMultiply(2);
         assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
 
@@ -295,23 +315,23 @@ public class VectorTest {
 //    @Test
 //    void multiply_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.multiply(vector2));
+//        assertThrows(IllegalArgumentException.class, () -> vector1.scalarMultiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByOnesVector_resultIdenticalToInputVector() {
 //        vector2 = Vector.FACTORY.make(1, 1, 1, 1, 1);
-//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.multiply(vector2));
+//        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarMultiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesVector_returnsExpectedResult() {
-//        assertEquals(Vector.FACTORY.make(10, 40, 90, 160, 250), vector1.multiply(vector2));
+//        assertEquals(Vector.FACTORY.make(10, 40, 90, 160, 250), vector1.scalarMultiply(vector2));
 //    }
 //
 //    @Test
 //    void multiply_multiplyByNonOnesVector_originalVectorRemainsUnchanged() {
-//        vector1.multiply(vector2);
+//        vector1.scalarMultiply(vector2);
 //        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
 //    }
 
@@ -338,17 +358,17 @@ public class VectorTest {
 //
     @Test
     void divide_divideByOne_resultIdenticalToInputVector() {
-        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.divide(1));
+        assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1.scalarDivide(1));
     }
 
     @Test
     void divide_divideByTwo_resultVectorHasAllComponentsDividedByTwo() {
-        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1.divide(2));
+        assertEquals(Vector.FACTORY.make(0.5, 1, 1.5, 2, 2.5), vector1.scalarDivide(2));
     }
 
     @Test
     void divide_divideByTwo_originalVectorRemainsUnchanged() {
-        vector1.divide(2);
+        vector1.scalarDivide(2);
         assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
 //

@@ -100,10 +100,10 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      */
     private void ellipsoidMethodUpdate(Vector g) {
         Vector Pg = matrix.multiply(g);
-        Pg = Pg.divide(Math.sqrt(Pg.dot(g)));
+        Pg = Pg.scalarDivide(Math.sqrt(Pg.dot(g)));
 
         int n = center.dim();
-        center = center.subtract(Pg.divide(n + 1.));
+        center = center.subtract(Pg.scalarDivide(n + 1.));
         matrix = matrix.subtract(Pg.outerProduct(Pg).scalarMultiply(2./(n + 1))).scalarMultiply(n*n/(n*n - 1.));
     }
 
@@ -142,7 +142,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
             double eigenvalue = decomposition.getEigenvalue(index);
             Vector ellipsoidSemiAxisDirection = decomposition.getEigenvector(index);
-            Vector scaledAxisDirection = ellipsoidSemiAxisDirection.multiply(sign * Math.sqrt(eigenvalue) / (center.dim() + 1.));
+            Vector scaledAxisDirection = ellipsoidSemiAxisDirection.scalarMultiply(sign * Math.sqrt(eigenvalue) / (center.dim() + 1.));
 
             return center.add(scaledAxisDirection);
         }

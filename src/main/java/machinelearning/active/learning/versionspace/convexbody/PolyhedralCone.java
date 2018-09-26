@@ -169,7 +169,7 @@ public class PolyhedralCone implements ConvexBody {
 
         for (LabeledPoint point : labeledPoints) {
             if (point.getLabel().asSign() * point.getData().dot(x) < 0){
-                return Optional.of(point.getData().multiply(-point.getLabel().asSign()));
+                return Optional.of(point.getData().scalarMultiply(-point.getLabel().asSign()));
             }
         }
 
