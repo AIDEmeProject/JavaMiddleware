@@ -61,9 +61,6 @@ public class DatabaseReader {
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL)
         ) {
-            // row number
-            int row = 0;
-
             // number of features
             int size = rs.getMetaData().getColumnCount() - 1;
 
@@ -78,8 +75,7 @@ public class DatabaseReader {
                     data[i] = rs.getDouble(i+2);
                 }
 
-                points.add(new DataPoint(row, id, data));
-                row++;
+                points.add(new DataPoint(id, data));
             }
 
         } catch (SQLException ex) {
@@ -147,10 +143,6 @@ public class DatabaseReader {
             sqlBuilder.append(" WHERE ");
             sqlBuilder.append(predicate);
         }
-
-        // This is necessary because the row order of a query is NOT guaranteed otherwise.
-        sqlBuilder.append(" ORDER BY ");
-        sqlBuilder.append(key);
 
         sqlBuilder.append(';');
 

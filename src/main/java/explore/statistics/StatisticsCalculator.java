@@ -38,11 +38,7 @@ public class StatisticsCalculator {
 
     private static StatisticsCollection aggregateLineMetrics(Collection<String> lines){
         StatisticsCollection collection = new StatisticsCollection();
-
-        for (String line : lines) {
-            collection.update(JsonConverter.deserializeMetricsMap(line));
-        }
-
+        lines.forEach(line -> collection.update(JsonConverter.deserializeMetricsMap(line)));
         return collection;
     }
 }

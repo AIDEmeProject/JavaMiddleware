@@ -10,6 +10,7 @@ public final class ExperimentConfiguration {
 
     private InitialSampler initialSampler = new StratifiedSampler(1, 1);
     private int subsampleSize = Integer.MAX_VALUE;
+    private double searchUncertainRegionProbability = 0;
 
     public String getTask() {
         return task;
@@ -25,6 +26,10 @@ public final class ExperimentConfiguration {
 
     public ActiveLearner getActiveLearner() {
         return activeLearner;
+    }
+
+    public double getSearchUncertainRegionProbability() {
+        return searchUncertainRegionProbability;
     }
 
     private ExperimentConfiguration() {

@@ -1,13 +1,14 @@
 package explore.statistics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringJoiner;
 
 /**
  * This class maintains a collection of metric statistics, allowing to add new statistics and update their values.
  */
-class StatisticsCollection {
+public class StatisticsCollection implements Iterable<Statistics> {
     /**
      * mapping metric_name -> statistics
      */
@@ -55,9 +56,12 @@ class StatisticsCollection {
      * @param metrics: Metrics object
      */
     public void update(Map<String, Double> metrics){
-        for (Map.Entry<String, Double> entry : metrics.entrySet()){
-            update(entry.getKey(), entry.getValue());
-        }
+        metrics.forEach(this::update);
+    }
+
+    @Override
+    public Iterator<Statistics> iterator() {
+        return statistics.values().iterator();
     }
 
     /**

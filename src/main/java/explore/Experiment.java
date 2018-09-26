@@ -2,8 +2,8 @@ package explore;
 
 import data.DataPoint;
 import data.preprocessing.StandardScaler;
-import explore.user.DummyUser;
 import explore.user.User;
+import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
 
@@ -30,7 +30,7 @@ public final class Experiment {
         List<DataPoint> dataPoints = Collections.unmodifiableList(StandardScaler.fitAndTransform(reader.readData()));
 
         Set<Long> positiveKeys = reader.readTargetSetKeys();
-        User user = new DummyUser(positiveKeys);
+        User user = new UserStub(positiveKeys);
 
         explore = new Explore(experimentFolder, dataPoints, user);
         evaluate = new Evaluate(experimentFolder, dataPoints, user);

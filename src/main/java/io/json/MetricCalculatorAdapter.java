@@ -14,8 +14,8 @@ public class MetricCalculatorAdapter extends JsonDeserializedAdapter<MetricCalcu
         switch (identifier.toUpperCase()) {
             case "CONFUSIONMATRIX":
                 return "ConfusionMatrixCalculator";
-            case "TARGETSETACCURACY":
-                return "TargetSetAccuracyCalculator";
+            case "THREESETMETRIC":
+                return "ThreeSetMetricCalculator";
             default:
                 throw new UnknownClassIdentifierException("MetricCalculator", identifier);
         }

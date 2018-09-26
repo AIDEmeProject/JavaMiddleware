@@ -3,7 +3,7 @@ package machinelearning.active.ranker;
 import data.DataPoint;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
-import utils.OptimumFinder;
+import utils.LinearSearch;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -20,6 +20,6 @@ public class ProbabilityRanker implements Ranker {
      */
     @Override
     public DataPoint top(Collection<DataPoint> unlabeledSet) {
-        return OptimumFinder.minimizer(unlabeledSet, pt -> Math.abs(classifier.probability(pt) - 0.5)).getOptimizer();
+        return LinearSearch.findMinimizer(unlabeledSet, pt -> Math.abs(classifier.probability(pt) - 0.5));
     }
 }

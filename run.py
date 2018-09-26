@@ -12,10 +12,14 @@ TASK = "sdss_Q1_0.1%"
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
 
+# Probability of sampling from the uncertain set instead of the entire unlabeled set.
+# Used together with the TSM algorithm. It has no effect otherwise.
+UNCERTAIN_SET_SAMPLE_PROBABILITY = 0.5
+
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',       # run new exploration
-    'RESUME',    # resume a previous exploration
+    'NEW',       # run new exploration
+    #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -23,24 +27,23 @@ MODES = [
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
-# Maximum number of labeled points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 20
+# Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
+BUDGET = 10
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [1, 2]
+RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
     ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    TargetSetAccuracy()
+    ThreeSetMetric()
 ]
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
-# ACTIVE_LEARNER = ActiveTreeSearch(KNN(k=100, gamma=0.1), lookahead=1)
 ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
@@ -61,7 +64,8 @@ assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
 # BUILD EXPERIMENT
 experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
-experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER)
+experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER,
+                        sample_from_uncertain_region_probability=UNCERTAIN_SET_SAMPLE_PROBABILITY)
 experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
 # BUILD COMMAND LINE ARGUMENTS

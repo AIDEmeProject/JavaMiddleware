@@ -41,6 +41,10 @@ public class Statistics {
         return name;
     }
 
+    public double getSum() {
+        return mean * sampleSize;
+    }
+
     public double getMean() {
         return mean;
     }

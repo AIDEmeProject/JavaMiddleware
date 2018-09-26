@@ -2,7 +2,6 @@ package machinelearning.classifier;
 
 
 import data.DataPoint;
-import data.LabeledDataset;
 
 import java.util.Collection;
 

@@ -1,8 +1,8 @@
 package explore.sampling;
 
 import data.DataPoint;
-import explore.user.DummyUser;
 import explore.user.User;
+import explore.user.UserStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +43,7 @@ class StratifiedSamplerTest {
     void sample_sampleMorePositivePointsThanPossible_throwsException() {
         Set<Long> keys = new HashSet<>();
         keys.add(3L);
-        user = new DummyUser(keys);
+        user = new UserStub(keys);
 
         assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }
@@ -54,7 +54,7 @@ class StratifiedSamplerTest {
         keys.add(0L);
         keys.add(1L);
         keys.add(2L);
-        user = new DummyUser(keys);
+        user = new UserStub(keys);
 
         assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }
