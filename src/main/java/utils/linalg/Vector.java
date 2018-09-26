@@ -235,8 +235,7 @@ public class Vector {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Vector vector1 = (Vector) o;
-        return vector.equals(vector1.vector);
+        return this.equals((Vector) o, 0);
     }
 
     @Override

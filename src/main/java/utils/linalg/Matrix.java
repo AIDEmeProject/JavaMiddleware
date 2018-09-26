@@ -167,23 +167,24 @@ public class Matrix {
         return matrix.getData();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Matrix other = (Matrix) o;
-
+    public boolean equals(Matrix other, double precision) {
         if (numRows() != other.numRows() || numCols() != other.numCols()) return false;
 
         for (int i = 0; i < numRows(); i++) {
             for (int j = 0; j < numCols(); j++) {
-                if (get(i, j) != other.get(i, j)) {
+                if (Math.abs(get(i, j) - other.get(i, j)) > precision) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return this.equals((Matrix) o, 0);
     }
 
     @Override
