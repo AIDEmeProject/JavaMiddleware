@@ -2,7 +2,6 @@ package explore.user;
 
 import data.DataPoint;
 import machinelearning.classifier.Label;
-import machinelearning.classifier.UserLabel;
 
 import java.util.Collection;
 

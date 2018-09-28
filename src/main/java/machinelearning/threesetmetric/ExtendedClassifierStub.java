@@ -1,7 +1,7 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
-import machinelearning.classifier.UserLabel;
+import explore.user.UserLabel;
 import utils.linalg.Vector;
 
 import java.util.Collection;

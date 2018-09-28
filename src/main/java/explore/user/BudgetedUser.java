@@ -1,7 +1,6 @@
 package explore.user;
 
 import data.DataPoint;
-import machinelearning.classifier.UserLabel;
 import utils.Validator;
 
 import java.util.Objects;

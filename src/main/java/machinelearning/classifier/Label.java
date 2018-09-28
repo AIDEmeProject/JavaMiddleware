@@ -1,5 +1,7 @@
 package machinelearning.classifier;
 
+import explore.user.UserLabel;
+
 /**
  * Binary labels, used for classification. There are only two instances of this class: POSITIVE and NEGATIVE.
  */

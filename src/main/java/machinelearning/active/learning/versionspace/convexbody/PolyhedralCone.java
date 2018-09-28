@@ -158,7 +158,6 @@ public class PolyhedralCone implements ConvexBody {
      * @param x: a data point
      * @return the separating hyperplane vector (if it exists)
      */
-    //TODO: modify input and output types to Vector
     @Override
     public Optional<Vector> getSeparatingHyperplane(Vector x) {
         Validator.assertEquals(x.dim(), getDim());

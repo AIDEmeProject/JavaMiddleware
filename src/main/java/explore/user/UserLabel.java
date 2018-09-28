@@ -1,4 +1,4 @@
-package machinelearning.classifier;
+package explore.user;
 
 public interface UserLabel {
     /**

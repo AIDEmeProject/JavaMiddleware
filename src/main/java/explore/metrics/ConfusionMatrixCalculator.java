@@ -6,7 +6,7 @@ import explore.user.User;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-import machinelearning.classifier.UserLabel;
+import explore.user.UserLabel;
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.Validator;
 

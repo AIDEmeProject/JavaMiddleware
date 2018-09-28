@@ -6,8 +6,7 @@ import data.PartitionedDataset;
 import explore.user.User;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
-import machinelearning.classifier.Label;
-import machinelearning.classifier.UserLabel;
+import explore.user.UserLabel;
 import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.ArrayList;
