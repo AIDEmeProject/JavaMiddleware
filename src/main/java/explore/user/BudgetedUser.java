@@ -1,7 +1,7 @@
 package explore.user;
 
 import data.DataPoint;
-import machinelearning.classifier.Label;
+import machinelearning.classifier.UserLabel;
 import utils.Validator;
 
 import java.util.Objects;
@@ -58,7 +58,7 @@ public final class BudgetedUser implements User {
      * @throws IllegalStateException if attempting to label a data point when the budget has already been met.
      */
     @Override
-    public Label getLabel(DataPoint point) {
+    public UserLabel getLabel(DataPoint point) {
         if (!isWilling()) {
             throw new IllegalStateException("Attempting to request label after budget was reached.");
         }

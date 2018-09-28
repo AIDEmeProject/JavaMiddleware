@@ -6,6 +6,7 @@ import explore.user.User;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
+import machinelearning.classifier.UserLabel;
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.Validator;
 
@@ -23,7 +24,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
 
     @Override
     public MetricStorage compute(PartitionedDataset data, User user) {
-        Label[] trueLabels = user.getLabel(data.getAllPoints());  // TODO: can we avoid recomputing these labels
+        UserLabel[] trueLabels = user.getLabel(data.getAllPoints());  // TODO: can we avoid recomputing these labels
 
         Classifier classifier = learner.fit(data.getLabeledPoints());
 
@@ -47,7 +48,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
      * @return a confusion matrix
      * @throws IllegalArgumentException if inputs have incompatible dimensions or are 0-length arrays
      */
-    public ConfusionMatrix compute(Label[] trueLabels, Label[] predictedLabels){
+    public ConfusionMatrix compute(UserLabel[] trueLabels, UserLabel[] predictedLabels){
         Validator.assertEqualLengths(trueLabels, predictedLabels);
         Validator.assertNotEmpty(trueLabels);
 

@@ -1,6 +1,7 @@
 package data;
 
 import machinelearning.classifier.Label;
+import machinelearning.classifier.UserLabel;
 import utils.linalg.Vector;
 
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 public class LabeledPoint extends DataPoint {
 
-    private Label label;
+    private UserLabel label;
 
     /**
      * @param id: data point's identifier
@@ -22,12 +23,12 @@ public class LabeledPoint extends DataPoint {
      * @param label: data point's label
      * @throws IllegalArgumentException if data is empty or label is {@code null}
      */
-    public LabeledPoint(long id, double[] data, Label label) {
+    public LabeledPoint(long id, double[] data, UserLabel label) {
         super(id, data);
         this.label = Objects.requireNonNull(label);
     }
 
-    public LabeledPoint(long id, Vector data, Label label) {
+    public LabeledPoint(long id, Vector data, UserLabel label) {
         super(id, data);
         this.label = Objects.requireNonNull(label);
     }
@@ -37,11 +38,11 @@ public class LabeledPoint extends DataPoint {
      * @param label: label
      * @throws IllegalArgumentException if label is {@code null}
      */
-    public LabeledPoint(DataPoint point, Label label) {
+    public LabeledPoint(DataPoint point, UserLabel label) {
         this(point.id, point.data, label);
     }
 
-    public Label getLabel() {
+    public UserLabel getLabel() {
         return label;
     }
 

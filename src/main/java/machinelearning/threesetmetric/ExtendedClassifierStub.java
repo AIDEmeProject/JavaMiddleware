@@ -1,7 +1,7 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
-import machinelearning.classifier.Label;
+import machinelearning.classifier.UserLabel;
 import utils.linalg.Vector;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
      * Nothing is done
      */
     @Override
-    public void update(Vector point, Label label) {
+    public void update(Vector point, UserLabel label) {
         // do nothing
     }
 
