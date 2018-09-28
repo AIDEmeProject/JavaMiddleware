@@ -4,6 +4,8 @@ import explore.user.UserLabel;
 import machinelearning.classifier.Label;
 import utils.Validator;
 
+import java.util.Arrays;
+
 /**
  * A LabelGroup will store a collection of partial labels given by the user. The final label is considered to be the
  * CONJUNCTION of all partial labels (i.e. POSITIVE if, and only if, all partial labels are POSITIVE).
@@ -52,5 +54,13 @@ public class LabelGroup implements UserLabel {
     @Override
     public Label[] getLabelsForEachSubspace() {
         return partialLabels;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LabelGroup that = (LabelGroup) o;
+        return Arrays.equals(partialLabels, that.partialLabels);
     }
 }

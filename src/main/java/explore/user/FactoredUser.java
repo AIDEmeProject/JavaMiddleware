@@ -3,6 +3,7 @@ package explore.user;
 import data.DataPoint;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.LabelGroup;
+import utils.Validator;
 
 import java.util.List;
 import java.util.Set;
@@ -16,10 +17,12 @@ public class FactoredUser implements User {
     private final List<UserStub> partialUsers;
 
     /**
-     * @param listOfPositiveKeysPerSubspace: list of all positive keys in each subspace
+     * @param listOfPositiveKeys: list of all positive keys in each subspace
+     * @throws IllegalArgumentException if input is empty
      */
-    public FactoredUser(List<Set<Long>> listOfPositiveKeysPerSubspace) {
-        this.partialUsers = listOfPositiveKeysPerSubspace.stream()
+    public FactoredUser(List<Set<Long>> listOfPositiveKeys) {
+        Validator.assertNotEmpty(listOfPositiveKeys);
+        this.partialUsers = listOfPositiveKeys.stream()
                 .map(UserStub::new)
                 .collect(Collectors.toList());
     }
