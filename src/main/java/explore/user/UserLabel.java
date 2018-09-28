@@ -1,5 +1,7 @@
 package explore.user;
 
+import machinelearning.classifier.Label;
+
 public interface UserLabel {
     /**
      * @return whether the label is POSITIVE
@@ -10,6 +12,11 @@ public interface UserLabel {
      * @return whether the label is NEGATIVE
      */
     boolean isNegative();
+
+    /**
+     * @return an array of labels for each group of features (used for MultipleTsm)
+     */
+    Label[] getLabelsForEachSubspace();
 
     /**
      * @return 1 if POSITIVE, 0 if NEGATIVE
@@ -24,5 +31,4 @@ public interface UserLabel {
     default int asSign(){
         return isPositive() ? 1 : -1;
     }
-
 }

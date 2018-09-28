@@ -40,6 +40,11 @@ public class Label implements UserLabel {
     }
 
     @Override
+    public Label[] getLabelsForEachSubspace() {
+        return new Label[] {isPositive ? POSITIVE : NEGATIVE};
+    }
+
+    @Override
     public String toString() {
         return isPositive() ? "POSITIVE" : "NEGATIVE";
     }
