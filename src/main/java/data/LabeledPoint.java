@@ -20,7 +20,7 @@ public class LabeledPoint extends DataPoint {
     /**
      * @param id: data point's identifier
      * @param data: values array
-     * @param label: data point's label
+     * @param label: user provided label for this data point
      * @throws IllegalArgumentException if data is empty or label is {@code null}
      */
     public LabeledPoint(long id, double[] data, UserLabel label) {
@@ -58,7 +58,7 @@ public class LabeledPoint extends DataPoint {
      */
     @Override
     public String toString() {
-        return "{\"id\": " + id  + ", \"data\": " + data + ", \"label\": \"" + label + "\"}";
+        return "{\"id\": " + id  + ", \"data\": " + data + ", \"label\": " + label + "}";
     }
 
     /**

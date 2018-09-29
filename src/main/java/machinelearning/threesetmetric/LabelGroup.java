@@ -63,4 +63,9 @@ public class LabelGroup implements UserLabel {
         LabelGroup that = (LabelGroup) o;
         return Arrays.equals(partialLabels, that.partialLabels);
     }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(partialLabels);
+    }
 }

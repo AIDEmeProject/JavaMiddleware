@@ -14,12 +14,12 @@ SUBSAMPLE_SIZE = 50000
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
 # Used together with the TSM algorithm. It has no effect otherwise.
-UNCERTAIN_SET_SAMPLE_PROBABILITY = 0.5
+UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    'NEW',       # run new exploration
-    #'RESUME',    # resume a previous exploration
+    #'NEW',       # run new exploration
+    'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -65,7 +65,7 @@ assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 # BUILD EXPERIMENT
 experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
 experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER,
-                        sample_from_uncertain_region_probability=UNCERTAIN_SET_SAMPLE_PROBABILITY)
+                        sample_from_unknown_region_probability=UNKNOWN_SET_SAMPLE_PROBABILITY)
 experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
 # BUILD COMMAND LINE ARGUMENTS
