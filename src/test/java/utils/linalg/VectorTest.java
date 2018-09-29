@@ -550,30 +550,30 @@ public class VectorTest {
         assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5, 0, 0), vector1.resize(size));
     }
 
-//    @Test
-//    void outerProduct_vectorsOfEqualDimensions_returnsCorrectOuterProduct() {
-//        assertEquals(
-//                linearAlgebra.matrix(vector1.dim(), vector2.dim(),
-//                        10,  20,  30,  40,  50,
-//                        20,  40,  60,  80, 100,
-//                        30,  60,  90, 120, 150,
-//                        40,  80, 120, 160, 200,
-//                        50, 100, 150, 200, 250),
-//                vector1.outerProduct(vector2));
-//    }
-//
-//    @Test
-//    void outerProduct_vectorsOfDifferentDimensions_returnsCorrectOuterProduct() {
-//        vector2 = Vector.FACTORY.make(10, 20, 30);
-//        assertEquals(
-//                linearAlgebra.matrix(vector1.dim(), vector2.dim(),
-//                        10,  20,  30,
-//                        20,  40,  60,
-//                        30,  60,  90,
-//                        40,  80, 120,
-//                        50, 100, 150),
-//                vector1.outerProduct(vector2));
-//    }
+    @Test
+    void outerProduct_vectorsOfEqualDimensions_returnsCorrectOuterProduct() {
+        assertEquals(
+                Matrix.FACTORY.make(vector1.dim(), vector2.dim(),
+                        10,  20,  30,  40,  50,
+                        20,  40,  60,  80, 100,
+                        30,  60,  90, 120, 150,
+                        40,  80, 120, 160, 200,
+                        50, 100, 150, 200, 250),
+                vector1.outerProduct(vector2));
+    }
+
+    @Test
+    void outerProduct_vectorsOfDifferentDimensions_returnsCorrectOuterProduct() {
+        vector2 = Vector.FACTORY.make(10, 20, 30);
+        assertEquals(
+                Matrix.FACTORY.make(vector1.dim(), vector2.dim(),
+                        10,  20,  30,
+                        20,  40,  60,
+                        30,  60,  90,
+                        40,  80, 120,
+                        50, 100, 150),
+                vector1.outerProduct(vector2));
+    }
 
 
     @Test
