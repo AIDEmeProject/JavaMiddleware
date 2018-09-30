@@ -1,8 +1,7 @@
 package utils.linalg;
 
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -13,25 +12,38 @@ public class EigenvalueDecomposition {
     /**
      * The resulting decomposition object from Apache Commons Math library
      */
-    private Matrix D;
-    private Matrix V;
-    private Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();
+    private Vector eigenvalues;
+    private Matrix eigenvectors;
+
     /**
      * @param matrix: {@link Matrix} to compute decomposition
      * @throws IllegalArgumentException if matrix is not square, or does not have a eigenvalue decomposition over the real numbers
      */
     public EigenvalueDecomposition(Matrix matrix) {
-        decomposition.decompose(PrimitiveDenseStore.FACTORY.copy(matrix.matrix));
+        Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();
+        decomposition.decompose(matrix.matrix.asCollectable2D());
 
-        for (ComplexNumber complexNumber : decomposition.getEigenvalues()) {
-            if (!complexNumber.isReal()) {
-                throw new RuntimeException("Matrix does not have real decomposition.");
-            }
+        eigenvalues = getEigenvalues(decomposition);
+        eigenvectors = getEigenvectors(decomposition);
+    }
+
+    private static Vector getEigenvalues(Eigenvalue<Double> decomposition) {
+        Array1D<ComplexNumber> eigenvalues = decomposition.getEigenvalues();
+
+        double[] values = eigenvalues.stream()
+                .filter(x -> x.isReal())
+                .mapToDouble(ComplexNumber::doubleValue)
+                .toArray();
+
+        if (values.length != eigenvalues.length) {
+            throw new RuntimeException("Matrix does not have real eigenvalue decomposition.");
         }
 
-        D = new Matrix(PrimitiveMatrix.FACTORY.copy(decomposition.getD()));  //TODO: get eigenvalues only
-        V = new Matrix(PrimitiveMatrix.FACTORY.copy(decomposition.getV()));
+        return Vector.FACTORY.make(values);
+    }
 
+    private static Matrix getEigenvectors(Eigenvalue<Double> decomposition) {
+        return Matrix.FACTORY.fromMatrixStore(decomposition.getV());
     }
 
     /**
@@ -40,7 +52,7 @@ public class EigenvalueDecomposition {
      * @throws ArrayIndexOutOfBoundsException if index is negative or larger than or equal to matrix dimension
      */
     public double getEigenvalue(int index) {
-        return D.get(index, index);
+        return eigenvalues.get(index);
     }
 
     /**
@@ -49,6 +61,6 @@ public class EigenvalueDecomposition {
      * @throws ArrayIndexOutOfBoundsException if index is negative or larger than or equal to matrix dimension
      */
     public Vector getEigenvector(int index) {
-        return V.getRow(index);
+        return eigenvectors.getRow(index);
     }
 }

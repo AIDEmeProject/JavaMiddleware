@@ -1,6 +1,7 @@
 package utils.linalg;
 
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.MatrixStore;
 import utils.Validator;
 
 import java.util.StringJoiner;
@@ -85,6 +86,11 @@ public class Matrix {
          */
         public static Matrix identity(int dim) {
             return new Matrix(PrimitiveMatrix.FACTORY.makeEye(dim, dim));
+        }
+
+        // TODO: can we remove this function?
+        static Matrix fromMatrixStore(MatrixStore<Double> basicMatrix) {
+            return new Matrix(PrimitiveMatrix.FACTORY.copy(basicMatrix));
         }
     }
 
