@@ -122,8 +122,8 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public double dot(Vector other) {
-        // TODO: can we use the dot function?
-        return vector.transpose().multiply(other.vector).doubleValue(0);
+        Validator.assertEquals(dim(), other.dim());
+        return vector.dot(other.vector);
     }
 
     /**
