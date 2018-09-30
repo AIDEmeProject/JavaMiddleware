@@ -18,7 +18,7 @@ class LinearClassifierTest {
 
     @Test
     void margin_incompatibleDimension_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> classifier.margin(Vector.FACTORY.zeros(3)));
+        assertThrows(RuntimeException.class, () -> classifier.margin(Vector.FACTORY.zeros(3)));
     }
 
     @Test
@@ -42,12 +42,12 @@ class LinearClassifierTest {
     @Test
     void predict_incompatibleDimension_throwsException() {
         DataPoint point = new DataPoint(0, new double[3]);
-        assertThrows(IllegalArgumentException.class, () -> classifier.predict(point));
+        assertThrows(RuntimeException.class, () -> classifier.predict(point));
     }
 
     @Test
     void probability_incompatibleDimension_throwsException() {
         DataPoint point = new DataPoint(0, new double[3]);
-        assertThrows(IllegalArgumentException.class, () -> classifier.probability(point));
+        assertThrows(RuntimeException.class, () -> classifier.probability(point));
     }
 }

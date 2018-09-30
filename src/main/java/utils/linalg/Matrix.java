@@ -1,22 +1,20 @@
 package utils.linalg;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import utils.Validator;
 
 import java.util.StringJoiner;
 
 /**
- * A Matrix represents a mathematical real matrix. Basically, this module is a wrapper of the Apache Commons Math's
- * Array2DRowRealMatrix class. Note that all Matrix instances are immutable, i.e. we do not allow modifying its inner
+ * A Matrix represents a mathematical real matrix. Basically, this module is a wrapper of the Ojalgo's
+ * PrimitiveMatrix class. Note that all Matrix instances are immutable, i.e. we do not allow modifying its inner
  * values directly. Consequently, all Matrix operations create new Matrix instances, leaving the operands untouched.
  */
 public class Matrix {
     /**
      * A matrix object from Apache Commons Math library
      */
-    RealMatrix matrix;
+    PrimitiveMatrix matrix;
 
     /**
      * This is a static factory for matrix creation. It provides several utility methods for instantiating matrices.
@@ -28,7 +26,17 @@ public class Matrix {
          * @throws IllegalArgumentException if input is empty or any two rows have different lengths
          */
         public static Matrix make(double[][] values) {
-            return new Matrix(new Array2DRowRealMatrix(values));
+            Validator.assertNotEmpty(values);
+            Validator.assertNotEmpty(values[0]);
+
+            int dim = values[0].length;
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].length != dim){
+                    throw new RuntimeException();
+                }
+            }
+
+            return new Matrix(PrimitiveMatrix.FACTORY.rows(values));
         }
 
         /**
@@ -41,14 +49,13 @@ public class Matrix {
         public static Matrix make(int rows, int cols, double... values) {
             Validator.assertEquals(rows * cols, values.length);
 
-            RealMatrix matrix = new Array2DRowRealMatrix(rows, cols);
+            double[][] matrix = new double[rows][cols];
+
             for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    matrix.setEntry(i, j, values[i*cols+j]);
-                }
+                System.arraycopy(values, i * cols, matrix[i], 0, cols);
             }
 
-            return new Matrix(matrix);
+            return make(matrix);
         }
 
         /**
@@ -58,7 +65,9 @@ public class Matrix {
          * @throws IllegalArgumentException if either rows or cols are not positive
          */
         public static Matrix zeros(int rows, int cols) {
-            return new Matrix(new Array2DRowRealMatrix(rows, cols));
+            Validator.assertPositive(rows);
+            Validator.assertPositive(cols);
+            return new Matrix(PrimitiveMatrix.FACTORY.makeZero(rows, cols));
         }
 
         /**
@@ -75,11 +84,11 @@ public class Matrix {
          * @throws IllegalArgumentException if dim is not positive
          */
         public static Matrix identity(int dim) {
-            return new Matrix(MatrixUtils.createRealIdentityMatrix(dim));
+            return new Matrix(PrimitiveMatrix.FACTORY.makeEye(dim, dim));
         }
     }
 
-    Matrix(RealMatrix matrix) {
+    Matrix(PrimitiveMatrix matrix) {
         this.matrix = matrix;
     }
 
@@ -87,14 +96,14 @@ public class Matrix {
      * @return number of rows
      */
     public int numRows() {
-        return matrix.getRowDimension();
+        return (int) matrix.countRows();
     }
 
     /**
      * @return number of columns
      */
     public int numCols() {
-        return matrix.getColumnDimension();
+        return (int) matrix.countColumns();
     }
 
     /**
@@ -104,7 +113,9 @@ public class Matrix {
      * @throws IllegalArgumentException if either i or j is out of bounds
      */
     public double get(int i, int j) {
-        return matrix.getEntry(i, j);
+        Validator.assertIndexInBounds(i, 0, numRows());
+        Validator.assertIndexInBounds(j, 0, numCols());
+        return matrix.get(i, j);
     }
 
     /**
@@ -113,7 +124,8 @@ public class Matrix {
      * @throws IllegalArgumentException if row index is out of bounds
      */
     public Vector getRow(int i) {
-        return new Vector(matrix.getRowVector(i));
+        Validator.assertIndexInBounds(i, 0, numRows());
+        return new Vector(matrix.getRowsRange(i, i+1).transpose());
     }
 
     /**
@@ -139,7 +151,7 @@ public class Matrix {
      * @return a matrix whose every component equals the multiplication of {@code this} by value
      */
     public Matrix scalarMultiply(double value) {
-        return new Matrix(matrix.scalarMultiply(value));
+        return new Matrix(matrix.multiply(value));
     }
 
     /**
@@ -148,7 +160,7 @@ public class Matrix {
      * @throws IllegalArgumentException if the number of columns {@code this} if different from the vector's dimension
      */
     public Vector multiply(Vector vector) {
-        return new Vector(matrix.operate(vector.vector));
+        return new Vector(matrix.multiply(vector.vector));
     }
 
     /**
@@ -164,27 +176,19 @@ public class Matrix {
      * @return a copy of {@code this} as a double's array
      */
     public double[][] toArray() {
-        return matrix.getData();
+        return matrix.toRawCopy2D();
     }
 
     public boolean equals(Matrix other, double precision) {
         if (numRows() != other.numRows() || numCols() != other.numCols()) return false;
-
-        for (int i = 0; i < numRows(); i++) {
-            for (int j = 0; j < numCols(); j++) {
-                if (Math.abs(get(i, j) - other.get(i, j)) > precision) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return matrix.subtract(other.matrix).isAllSmall(precision / 1E-15);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        return this.equals((Matrix) o, 0);
+        return this.equals((Matrix) o, 1E-15);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package machinelearning.threesetmetric;
 
-import machinelearning.classifier.Label;
 import explore.user.UserLabel;
+import machinelearning.classifier.Label;
 
 /**
  * This enum is basically an extension of {@link Label} for {@link machinelearning.threesetmetric.ExtendedClassifier}.

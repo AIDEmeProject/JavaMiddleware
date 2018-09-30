@@ -16,42 +16,42 @@ public class MatrixTest {
 
     @Test
     void make_emptyArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[0][]));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(new double[0][]));
     }
 
     @Test
     void make_allRowsAreEmpty_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[2][0]));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(new double[2][0]));
     }
 
     @Test
     void make_rowsHaveDistinctLengths_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(new double[][] {{1}, {2, 3}}));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(new double[][] {{1}, {2, 3}}));
     }
 
     @Test
     void make_zeroNumberOfRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(0, 1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(0, 1));
     }
 
     @Test
     void make_negativeNumberOfRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(-1, 1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(-1, 1));
     }
 
     @Test
     void make_zeroNumberOfColumns_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, 0));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(1, 0));
     }
 
     @Test
     void make_negativeNumberOfColumns_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, -1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(1, -1));
     }
 
     @Test
     void make_matrixDimensionsAndValueHaveIncompatibleLengths_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.make(1, 1, 10.0, 20.0));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.make(1, 1, 10.0, 20.0));
     }
 
     @Test
@@ -61,22 +61,22 @@ public class MatrixTest {
 
     @Test
     void zeros_zeroNumberOfRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(0, 1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.zeros(0, 1));
     }
 
     @Test
     void zeros_negativeNumberOfRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(-1, 1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.zeros(-1, 1));
     }
 
     @Test
     void zeros_zeroNumberOfColumns_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(1, 0));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.zeros(1, 0));
     }
 
     @Test
     void zeros_negativeNumberOfColumns_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Matrix.FACTORY.zeros(1, -1));
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.zeros(1, -1));
     }
 
     @Test
@@ -96,22 +96,22 @@ public class MatrixTest {
 
     @Test
     void get_negativeRowIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.get(-1, 0));
+        assertThrows(RuntimeException.class, () -> matrix1.get(-1, 0));
     }
 
     @Test
     void get_rowIndexEqualsNumRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.get(matrix1.numRows(), 0));
+        assertThrows(RuntimeException.class, () -> matrix1.get(matrix1.numRows(), 0));
     }
 
     @Test
     void get_negativeColumnIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.get(0, -1));
+        assertThrows(RuntimeException.class, () -> matrix1.get(0, -1));
     }
 
     @Test
     void get_columnIndexEqualsNumCols_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.get(0, matrix1.numCols()));
+        assertThrows(RuntimeException.class, () -> matrix1.get(0, matrix1.numCols()));
     }
 
     @Test
@@ -126,12 +126,12 @@ public class MatrixTest {
 
     @Test
     void getRow_negativeIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.getRow(-1));
+        assertThrows(RuntimeException.class, () -> matrix1.getRow(-1));
     }
 
     @Test
     void getRow_indexEqualsNumRows_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.getRow(matrix1.numRows()));
+        assertThrows(RuntimeException.class, () -> matrix1.getRow(matrix1.numRows()));
     }
 
     @Test
@@ -186,13 +186,13 @@ public class MatrixTest {
 //    @Test
 //    void iAdd_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iAdd(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
 //    }
 //
 //    @Test
 //    void iAdd_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iAdd(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
 //    }
 //
 //    @Test
@@ -211,13 +211,13 @@ public class MatrixTest {
     @Test
     void add_incompatibleNumberOfRows_throwsException() {
         matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-        assertThrows(IllegalArgumentException.class, () -> matrix1.add(matrix2));
+        assertThrows(RuntimeException.class, () -> matrix1.add(matrix2));
     }
 
     @Test
     void add_incompatibleNumberOfColumns_throwsException() {
         matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-        assertThrows(IllegalArgumentException.class, () -> matrix1.add(matrix2));
+        assertThrows(RuntimeException.class, () -> matrix1.add(matrix2));
     }
 
     @Test
@@ -282,13 +282,13 @@ public class MatrixTest {
 //    @Test
 //    void iSubtract_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iSubtract(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
 //    }
 //
 //    @Test
 //    void iSubtract_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iSubtract(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
 //    }
 //
 //    @Test
@@ -307,13 +307,13 @@ public class MatrixTest {
     @Test
     void subtract_incompatibleNumberOfRows_throwsException() {
         matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-        assertThrows(IllegalArgumentException.class, () -> matrix1.subtract(matrix2));
+        assertThrows(RuntimeException.class, () -> matrix1.subtract(matrix2));
     }
 
     @Test
     void subtract_incompatibleNumberOfColumns_throwsException() {
         matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-        assertThrows(IllegalArgumentException.class, () -> matrix1.subtract(matrix2));
+        assertThrows(RuntimeException.class, () -> matrix1.subtract(matrix2));
     }
 
     @Test
@@ -378,13 +378,13 @@ public class MatrixTest {
 //    @Test
 //    void iMultiply_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iMultiply(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void iMultiply_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iMultiply(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
 //    }
 //
 //    @Test
@@ -403,13 +403,13 @@ public class MatrixTest {
 //    @Test
 //    void multiply_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.scalarMultiply(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
 //    void multiply_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.scalarMultiply(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.scalarMultiply(matrix2));
 //    }
 //
 //    @Test
@@ -431,7 +431,7 @@ public class MatrixTest {
 
     @Test
     void multiply_vectorOfIncompatibleDimension_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.multiply(Vector.FACTORY.make(1.0)));
+        assertThrows(RuntimeException.class, () -> matrix1.multiply(Vector.FACTORY.make(1.0)));
     }
 
     @Test
@@ -448,7 +448,7 @@ public class MatrixTest {
 
     @Test
     void multiply_matrixOfIncompatibleDimensions_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> matrix1.multiply(Matrix.FACTORY.zeros(1, 3)));
+        assertThrows(RuntimeException.class, () -> matrix1.multiply(Matrix.FACTORY.zeros(1, 3)));
     }
 
     @Test
@@ -514,13 +514,13 @@ public class MatrixTest {
 //    @Test
 //    void iDivide_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iDivide(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
 //    }
 //
 //    @Test
 //    void iDivide_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.iDivide(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
 //    }
 //
 //    @Test
@@ -539,13 +539,13 @@ public class MatrixTest {
 //    @Test
 //    void divide_incompatibleNumberOfRows_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.divide(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
 //    }
 //
 //    @Test
 //    void divide_incompatibleNumberOfColumns_throwsException() {
 //        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(IllegalArgumentException.class, () -> matrix1.divide(matrix2));
+//        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
 //    }
 //
 //    @Test

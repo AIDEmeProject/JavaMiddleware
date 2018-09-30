@@ -1,6 +1,9 @@
 package utils.linalg;
 
-import org.apache.commons.math3.linear.EigenDecomposition;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * This class computes the real Eigenvalue decomposition of a real, symmetric {@link Matrix}. It is basically a wrapper over
@@ -10,18 +13,25 @@ public class EigenvalueDecomposition {
     /**
      * The resulting decomposition object from Apache Commons Math library
      */
-    private EigenDecomposition decomposition;
-
+    private Matrix D;
+    private Matrix V;
+    private Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();
     /**
      * @param matrix: {@link Matrix} to compute decomposition
      * @throws IllegalArgumentException if matrix is not square, or does not have a eigenvalue decomposition over the real numbers
      */
     public EigenvalueDecomposition(Matrix matrix) {
-        this.decomposition = new EigenDecomposition(matrix.matrix);
+        decomposition.decompose(PrimitiveDenseStore.FACTORY.copy(matrix.matrix));
 
-        if (decomposition.hasComplexEigenvalues()) {
-            throw new IllegalArgumentException("Input matrix does not have real eigenvalue decomposition.");
+        for (ComplexNumber complexNumber : decomposition.getEigenvalues()) {
+            if (!complexNumber.isReal()) {
+                throw new RuntimeException("Matrix does not have real decomposition.");
+            }
         }
+
+        D = new Matrix(PrimitiveMatrix.FACTORY.copy(decomposition.getD()));  //TODO: get eigenvalues only
+        V = new Matrix(PrimitiveMatrix.FACTORY.copy(decomposition.getV()));
+
     }
 
     /**
@@ -30,7 +40,7 @@ public class EigenvalueDecomposition {
      * @throws ArrayIndexOutOfBoundsException if index is negative or larger than or equal to matrix dimension
      */
     public double getEigenvalue(int index) {
-        return decomposition.getRealEigenvalue(index);
+        return D.get(index, index);
     }
 
     /**
@@ -39,6 +49,6 @@ public class EigenvalueDecomposition {
      * @throws ArrayIndexOutOfBoundsException if index is negative or larger than or equal to matrix dimension
      */
     public Vector getEigenvector(int index) {
-        return new Vector(decomposition.getEigenvector(index));
+        return V.getRow(index);
     }
 }

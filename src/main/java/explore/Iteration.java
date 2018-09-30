@@ -4,9 +4,9 @@ import data.DataPoint;
 import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.user.User;
+import explore.user.UserLabel;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
-import explore.user.UserLabel;
 import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.ArrayList;

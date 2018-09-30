@@ -16,17 +16,17 @@ public class VectorTest {
 
     @Test
     void make_emptyArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, Vector.FACTORY::make);
+        assertThrows(RuntimeException.class, Vector.FACTORY::make);
     }
 
     @Test
     void zeros_zeroDimension_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Vector.FACTORY.zeros(0));
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.zeros(0));
     }
 
     @Test
     void zeros_negativeDimension_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> Vector.FACTORY.zeros(-1));
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.zeros(-1));
     }
 
     @Test
@@ -36,12 +36,12 @@ public class VectorTest {
 
     @Test
     void get_negativeIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.get(-1));
+        assertThrows(RuntimeException.class, () -> vector1.get(-1));
     }
 
     @Test
     void get_indexEqualsDim_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.get(vector1.dim()));
+        assertThrows(RuntimeException.class, () -> vector1.get(vector1.dim()));
     }
 
     @Test
@@ -55,17 +55,17 @@ public class VectorTest {
 
     @Test
     void slice_firstIndexIsNegative_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.slice(-1, 1));
+        assertThrows(RuntimeException.class, () -> vector1.slice(-1, 1));
     }
 
     @Test
     void slice_secondIndexLargerThanDim_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.slice(0, vector1.dim() + 1));
+        assertThrows(RuntimeException.class, () -> vector1.slice(0, vector1.dim() + 1));
     }
 
     @Test
     void slice_fistIndexEqualToSecondIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.slice(1, 1));
+        assertThrows(RuntimeException.class, () -> vector1.slice(1, 1));
     }
 
     @Test
@@ -128,7 +128,7 @@ public class VectorTest {
 //    @Test
 //    void iAdd_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.iAdd(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.iAdd(vector2));
 //    }
 //
 //    @Test
@@ -147,7 +147,7 @@ public class VectorTest {
     @Test
     void add_differentDimensionVector_throwsException() {
         vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
-        assertThrows(IllegalArgumentException.class, () -> vector1.add(vector2));
+        assertThrows(RuntimeException.class, () -> vector1.add(vector2));
     }
 
     @Test
@@ -212,7 +212,7 @@ public class VectorTest {
 //    @Test
 //    void iSubtract_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.iSubtract(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.iSubtract(vector2));
 //    }
 //
 //    @Test
@@ -231,7 +231,7 @@ public class VectorTest {
     @Test
     void subtract_differentDimensionVector_throwsException() {
         vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
-        assertThrows(IllegalArgumentException.class, () -> vector1.subtract(vector2));
+        assertThrows(RuntimeException.class, () -> vector1.subtract(vector2));
     }
 
     @Test
@@ -296,7 +296,7 @@ public class VectorTest {
 //    @Test
 //    void iMultiply_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.iMultiply(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.iMultiply(vector2));
 //    }
 //
 //    @Test
@@ -315,7 +315,7 @@ public class VectorTest {
 //    @Test
 //    void multiply_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.scalarMultiply(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.scalarMultiply(vector2));
 //    }
 //
 //    @Test
@@ -380,7 +380,7 @@ public class VectorTest {
 //    @Test
 //    void iDivide_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.zeros(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.iDivide(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.iDivide(vector2));
 //    }
 //
 //    @Test
@@ -399,7 +399,7 @@ public class VectorTest {
 //    @Test
 //    void divide_differentDimensionVector_throwsException() {
 //        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
-//        assertThrows(IllegalArgumentException.class, () -> vector1.divide(vector2));
+//        assertThrows(RuntimeException.class, () -> vector1.divide(vector2));
 //    }
 //
 //    @Test
@@ -423,6 +423,18 @@ public class VectorTest {
      *           NORM OPERATIONS
      * *************************************
      */
+
+    @Test
+    void dot__differentDimensionVector_throwsException() {
+        vector2 = Vector.FACTORY.make(vector1.dim() - 1);
+        assertThrows(RuntimeException.class, () -> vector1.dot(vector2));
+    }
+
+    @Test
+    void dot__sameDimensionVector_throwsException() {
+        assertEquals(550, vector1.dot(vector2));
+    }
+
     @Test
     void squaredNorm_zeroVector_returnsZero() {
         assertEquals(0, Vector.FACTORY.zeros(2).squaredNorm());
@@ -458,13 +470,13 @@ public class VectorTest {
     @Test
     void normalize_zeroNewNorm_throwsException() {
         vector1 = Vector.FACTORY.make(1, 0);
-        assertThrows(IllegalArgumentException.class, () -> vector1.normalize(0));
+        assertThrows(RuntimeException.class, () -> vector1.normalize(0));
     }
 
     @Test
     void normalize_negativeNewNorm_throwsException() {
         vector1 = Vector.FACTORY.make(1, 0);
-        assertThrows(IllegalArgumentException.class, () -> vector1.normalize(-1));
+        assertThrows(RuntimeException.class, () -> vector1.normalize(-1));
     }
 
     @Test
@@ -478,12 +490,12 @@ public class VectorTest {
     void normalize_newNormEqualToTwo_returnsExpectedVector() {
         assertEquals(Vector.FACTORY.make(2, 0), Vector.FACTORY.make(10, 0).normalize(2));
         assertEquals(Vector.FACTORY.make(0, -2), Vector.FACTORY.make(0, -10).normalize(2));
-        assertTrue(Vector.FACTORY.make(-Math.sqrt(2), Math.sqrt(2)).equals(Vector.FACTORY.make(-1, 1).normalize(2), 1e-10));
+        assertEquals(Vector.FACTORY.make(-Math.sqrt(2), Math.sqrt(2)), Vector.FACTORY.make(-1, 1).normalize(2));
     }
 
     @Test
     void squaredDistanceTo_vectorOfDifferentDimensions_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.squaredDistanceTo(Vector.FACTORY.zeros(3)));
+        assertThrows(RuntimeException.class, () -> vector1.squaredDistanceTo(Vector.FACTORY.zeros(3)));
     }
 
     @Test
@@ -498,7 +510,7 @@ public class VectorTest {
 
     @Test
     void distanceTo_vectorOfDifferentDimensions_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> vector1.distanceTo(Vector.FACTORY.zeros(3)));
+        assertThrows(RuntimeException.class, () -> vector1.distanceTo(Vector.FACTORY.zeros(3)));
     }
 
     @Test
@@ -519,14 +531,14 @@ public class VectorTest {
     void resize_negativeSize_throwsException() {
         int size = -1;
         vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
-        assertThrows(IllegalArgumentException.class, () -> vector1.resize(size));
+        assertThrows(RuntimeException.class, () -> vector1.resize(size));
     }
 
     @Test
     void resize_zeroSize_throwsException() {
         int size = 0;
         vector1 = Vector.FACTORY.make(1, 2, 3, 4, 5);
-        assertThrows(IllegalArgumentException.class, () -> vector1.resize(size));
+        assertThrows(RuntimeException.class, () -> vector1.resize(size));
     }
 
     @Test

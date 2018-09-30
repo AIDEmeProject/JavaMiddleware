@@ -2,31 +2,32 @@ package utils.linalg;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CholeskyDecompositionTest {
     @Test
     void constructor_nonSquareMatrix_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 1, 10.0, 20.0);
-        assertThrows(IllegalArgumentException.class, () -> new CholeskyDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new CholeskyDecomposition(matrix));
     }
 
     @Test
     void constructor_NonSymmetricMatrix_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 2, 10.0, 20.0, 30.0, 40.0);
-        assertThrows(IllegalArgumentException.class, () -> new CholeskyDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new CholeskyDecomposition(matrix));
     }
 
     @Test
     void constructor_SymmetricButNotPositiveDefiniteMatrix_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 2, 1.0, 0, 0, -1.0);
-        assertThrows(IllegalArgumentException.class, () -> new CholeskyDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new CholeskyDecomposition(matrix));
     }
 
     @Test
     void constructor_PositiveSemiDefiniteMatrix_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 2, 1.0, 0, 0, 0.0);
-        assertThrows(IllegalArgumentException.class, () -> new CholeskyDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new CholeskyDecomposition(matrix));
     }
 
     @Test

@@ -18,33 +18,33 @@ class EigenvalueDecompositionTest {
     @Test
     void constructor_nonSquareMatrix_throwsException() {
         matrix = Matrix.FACTORY.make(2, 1, 10.0, 20.0);
-        assertThrows(IllegalArgumentException.class, () -> new EigenvalueDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new EigenvalueDecomposition(matrix));
     }
 
     @Test
     void constructor_matrixWithoutRealDecomposition_throwsException() {
         matrix = Matrix.FACTORY.make(2, 2, 0, -1, 1, 0);
-        assertThrows(IllegalArgumentException.class, () -> new EigenvalueDecomposition(matrix));
+        assertThrows(RuntimeException.class, () -> new EigenvalueDecomposition(matrix));
     }
 
     @Test
     void getEigenvalue_negativeIndex_throwsException() {
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> decomposition.getEigenvalue(-1));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvalue(-1));
     }
 
     @Test
     void getEigenvalue_indexEqualToMatrixDimension_throwsException() {
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> decomposition.getEigenvalue(matrix.numRows()));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvalue(matrix.numRows()));
     }
 
     @Test
     void getEigenvector_negativeIndex_throwsException() {
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> decomposition.getEigenvector(-1));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvector(-1));
     }
 
     @Test
     void getEigenvector_indexEqualToMatrixDimension_throwsException() {
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> decomposition.getEigenvector(matrix.numRows()));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvector(matrix.numRows()));
     }
 
     @Test

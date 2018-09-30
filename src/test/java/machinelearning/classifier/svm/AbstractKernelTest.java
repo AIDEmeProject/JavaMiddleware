@@ -15,7 +15,7 @@ abstract class AbstractKernelTest {
 
     @Test
     void compute_vectorsOfDifferentLengths_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> kernel.compute(Vector.FACTORY.zeros(1), Vector.FACTORY.zeros(2)));
+        assertThrows(RuntimeException.class, () -> kernel.compute(Vector.FACTORY.zeros(1), Vector.FACTORY.zeros(2)));
     }
 
     @Test

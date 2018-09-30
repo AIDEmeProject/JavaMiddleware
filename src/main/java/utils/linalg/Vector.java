@@ -1,34 +1,33 @@
 package utils.linalg;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import utils.Validator;
 
 import java.util.StringJoiner;
 
 /**
- * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Apache Commons Math's
- * ArrayRealVector class. Note that all Xector instances are immutable, i.e. we do not allow modifying a Vector's inner
+ * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Ojalgo's
+ * PrimitiveMatrix class. Note that all Vector instances are immutable, i.e. we do not allow modifying a Vector's inner
  * values directly. Consequently, all Vector operations create new Vector instances, leaving the operands untouched.
  */
 public class Vector {
     /**
      * A vector object from Apache Commons Math library
      */
-    final RealVector vector;
+    final PrimitiveMatrix vector;
+
 
     /**
      * This is a static factory for vector creation. It provides several utility methods for instantiating vectors.
      */
     public static class FACTORY {
-
         /**
          * @param values: array of vector values. Input array will be copied by default.
          * @return a Vector built from the input array of values
          */
         public static Vector make(double... values) {
             Validator.assertNotEmpty(values);
-            return new Vector(new ArrayRealVector(values));
+            return new Vector(PrimitiveMatrix.FACTORY.columns(values));
         }
 
         /**
@@ -38,7 +37,7 @@ public class Vector {
          */
         public static Vector zeros(int dim) {
             Validator.assertPositive(dim);
-            return make(new double[dim]);
+            return new Vector(PrimitiveMatrix.FACTORY.makeZero(dim, 1));
         }
 
         /**
@@ -50,7 +49,7 @@ public class Vector {
         }
     }
 
-    Vector(RealVector vector) {
+    Vector(PrimitiveMatrix vector) {
         this.vector = vector;
     }
 
@@ -58,7 +57,7 @@ public class Vector {
      * @return the number of components of this vector (i.e. its dimension)
      */
     public int dim() {
-        return vector.getDimension();
+        return (int) vector.countRows();
     }
 
     /**
@@ -67,7 +66,7 @@ public class Vector {
      * @throws IllegalArgumentException if index is out of bounds (i.e. negative or larger than or equal to the dimension)
      */
     public double get(int index) {
-        return vector.getEntry(index);
+        return vector.get(index);
     }
 
     /**
@@ -77,10 +76,10 @@ public class Vector {
      * @throws IllegalArgumentException if either "from" or "to" are out of bounds, or "from" is not smaller than "to"
      */
     public Vector slice(int from, int to) {
-        if (from == to) {
+        if (from < 0 || from == to || to > dim()) {
             throw new IllegalArgumentException();
         }
-        return new Vector(vector.getSubVector(from, to-from));
+        return new Vector(vector.getRowsRange(from, to));
     }
 
     /**
@@ -106,7 +105,7 @@ public class Vector {
      * @return a vector whose every component equals the multiplication of {@code this} by value
      */
     public Vector scalarMultiply(double value) {
-        return new Vector(vector.mapMultiply(value));
+        return new Vector(vector.multiply(value));
     }
 
     /**
@@ -114,7 +113,7 @@ public class Vector {
      * @return a vector whose every component equals the division of {@code this} by value
      */
     public Vector scalarDivide(double value) {
-        return new Vector(vector.mapDivide(value));
+        return new Vector(vector.divide(value));
     }
 
     /**
@@ -123,21 +122,22 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public double dot(Vector other) {
-        return vector.dotProduct(other.vector);
+        // TODO: can we use the dot function?
+        return vector.transpose().multiply(other.vector).doubleValue(0);
     }
 
     /**
      * @return the squared norm of this vector
      */
     public double squaredNorm() {
-        return vector.dotProduct(vector);
+        return dot(this);
     }
 
     /**
      * @return the norm of this vector
      */
     public double norm() {
-        return vector.getNorm();
+        return vector.norm();
     }
 
     /**
@@ -148,12 +148,12 @@ public class Vector {
     public Vector normalize(double newNorm) {
         Validator.assertPositive(newNorm);
 
-        double norm = vector.getNorm();
+        double norm = vector.norm();
         if (norm == 0) {
             throw new IllegalStateException("Cannot normalize zero vector");
         }
 
-        return new Vector(vector.mapMultiply(newNorm / norm));
+        return scalarMultiply(newNorm / norm);
     }
 
     /**
@@ -169,7 +169,7 @@ public class Vector {
      * @return the distance between {@code this} and the input vector
      */
     public double distanceTo(Vector other) {
-        return vector.getDistance(other.vector);
+        return Math.sqrt(squaredDistanceTo(other));
     }
 
     /**
@@ -183,11 +183,11 @@ public class Vector {
 
         switch (Integer.compare(newDim, dim())) {
             case -1:
-                return new Vector(vector.getSubVector(0, newDim));
+                return slice(0, newDim);
             case 0:
                 return this;
             default:
-                return new Vector(vector.append(new ArrayRealVector(newDim - dim())));
+                return new Vector(vector.mergeColumns(PrimitiveMatrix.FACTORY.makeZero(newDim - dim(), 1)));
         }
     }
 
@@ -195,10 +195,7 @@ public class Vector {
      * @return a new Vector with the number 1.0 appended to the right of {@code this}
      */
     public Vector addBias() {
-        RealVector realVector = new ArrayRealVector(vector.getDimension() + 1);
-        realVector.setEntry(0, 1.0);
-        realVector.setSubVector(1, vector);
-        return new Vector(realVector);
+        return new Vector(PrimitiveMatrix.FACTORY.rows(new double[]{1}).mergeColumns(vector));
     }
 
     /**
@@ -206,14 +203,14 @@ public class Vector {
      * @return the outer product of {@code this} and the input vector
      */
     public Matrix outerProduct(Vector other) {
-        return new Matrix(vector.outerProduct(other.vector));
+        return new Matrix(vector.multiply(other.vector.conjugate()));
     }
 
     /**
      * @return an array copy of {@code this}'s content
      */
     public double[] toArray() {
-        return vector.toArray();
+        return vector.toRawCopy1D();
     }
 
     /**
@@ -223,19 +220,14 @@ public class Vector {
      */
     public boolean equals(Vector other, double precision) {
         if (dim() != other.dim()) return false;
-        for (int i = 0; i < dim(); i++) {
-            if (Math.abs(vector.getEntry(i) - other.get(i)) > precision) {
-                return false;
-            }
-        }
-        return true;
+        return vector.subtract(other.vector).isAllSmall(precision / 1E-15);  // value <= 1E-15 * precision
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        return this.equals((Vector) o, 0);
+        return this.equals((Vector) o, 1E-15);
     }
 
     @Override

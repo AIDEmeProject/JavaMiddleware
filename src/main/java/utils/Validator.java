@@ -160,6 +160,12 @@ public class Validator {
         }
     }
 
+    public static void assertIndexInBounds(int value, int lower, int upper){
+        if (value < lower || value >= upper){
+            throw new IllegalArgumentException("Value must be comprised between " + lower + " and " + upper);
+        }
+    }
+
     public static void assertIsFinite(double value){
         if (!Double.isFinite(value)){
             throw new IllegalArgumentException("Value must be finite, obtained " + value);
