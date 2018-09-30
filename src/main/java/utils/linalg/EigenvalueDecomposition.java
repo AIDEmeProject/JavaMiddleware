@@ -36,6 +36,7 @@ public class EigenvalueDecomposition {
                 .toArray();
 
         if (values.length != eigenvalues.length) {
+            System.out.println(eigenvalues);
             throw new RuntimeException("Matrix does not have real eigenvalue decomposition.");
         }
 
@@ -43,7 +44,7 @@ public class EigenvalueDecomposition {
     }
 
     private static Matrix getEigenvectors(Eigenvalue<Double> decomposition) {
-        return Matrix.FACTORY.fromMatrixStore(decomposition.getV());
+        return Matrix.FACTORY.fromMatrixStore(decomposition.getV().transpose());
     }
 
     /**

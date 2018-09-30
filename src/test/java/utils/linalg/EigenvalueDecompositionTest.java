@@ -63,13 +63,21 @@ class EigenvalueDecompositionTest {
     void getEigenvector_nonDiagonalMatrix_characteristicEquationsAreSatisfied() {
         matrix = Matrix.FACTORY.make(2, 2, 0, 1, 1, 0);
         decomposition = new EigenvalueDecomposition(matrix);
-        assertEigenvectorSatisfyCharacteristicEquation(0);
-        assertEigenvectorSatisfyCharacteristicEquation(1);
+        assertEigenvectorSatisfyCharacteristicEquation();
     }
 
-    private void assertEigenvectorSatisfyCharacteristicEquation(int i) {
-        Vector leftHandSide = matrix.multiply(decomposition.getEigenvector(i));
-        Vector rightHandSide = decomposition.getEigenvector(i).scalarMultiply(decomposition.getEigenvalue(i));
-        assertTrue(leftHandSide.equals(rightHandSide, 1e-10));
+    @Test
+    void getEigenvector_eigenvectorMatrixDifferentFromIdentity_characteristicEquationsAreSatisfied() {
+        matrix = Matrix.FACTORY.make(3, 3, 1, -0.5, -0.5, -0.5, 1, -0.1, -0.5, -0.1, 1);
+        decomposition = new EigenvalueDecomposition(matrix);
+        assertEigenvectorSatisfyCharacteristicEquation();
+    }
+
+    private void assertEigenvectorSatisfyCharacteristicEquation() {
+        for (int i = 0; i < matrix.numRows(); i++) {
+            Vector leftHandSide = matrix.multiply(decomposition.getEigenvector(i));
+            Vector rightHandSide = decomposition.getEigenvector(i).scalarMultiply(decomposition.getEigenvalue(i));
+            assertTrue(leftHandSide.equals(rightHandSide, 1e-10));
+        }
     }
 }
