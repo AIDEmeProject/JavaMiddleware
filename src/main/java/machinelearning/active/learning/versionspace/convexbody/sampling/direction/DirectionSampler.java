@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import utils.linalg.Vector;
 
 import java.util.Random;
 
@@ -14,5 +15,5 @@ public interface DirectionSampler {
      * @param rand a random number generator instance
      * @return a random direction. We do NOT guarantee the output will have unit norm.
      */
-    double[] sampleDirection(Random rand);
+    Vector sampleDirection(Random rand);
 }

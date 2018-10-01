@@ -1,9 +1,6 @@
 package machinelearning.classifier.margin;
 
-import utils.Validator;
-import utils.linalg.LinearAlgebra;
-
-import java.util.Arrays;
+import utils.linalg.Vector;
 
 /**
  * A linear classifier. It is defined by two parameters: bias and weight. Predictions are made as in Logistic Regression:
@@ -19,18 +16,16 @@ public class LinearClassifier extends MarginClassifier {
     /**
      * Weight vector
      */
-    private final double[] weights;
+    private final Vector weights;
 
     /**
      * @param bias: bias parameters
      * @param weights: weight vector
      * @throws IllegalArgumentException if weights are empty
      */
-    public LinearClassifier(double bias, double[] weights) {
-        Validator.assertNotEmpty(weights);
-
+    public LinearClassifier(double bias, Vector weights) {
         this.bias = bias;
-        this.weights = weights;  //TODO: copy weights array to avoid unintended changes?
+        this.weights = weights;
     }
 
     /**
@@ -40,14 +35,13 @@ public class LinearClassifier extends MarginClassifier {
      * @param hasBias: whether treat weights[0] as the bias
      * @throws IllegalArgumentException if weights is an empty array, or if it contains a single element while hasBias is true
      */
-    public LinearClassifier(double[] weights, boolean hasBias) {
-        if (weights.length <= (hasBias ? 1 : 0)){
-            throw new IllegalArgumentException("Weights array too small: expected at least " + (hasBias ? 1 : 0) + ", but received " + Arrays.toString(weights));
+    public LinearClassifier(Vector weights, boolean hasBias) {
+        if (weights.dim() <= (hasBias ? 1 : 0)){
+            throw new IllegalArgumentException("Weights array too small: expected at least " + (hasBias ? 1 : 0) + ", but received " + weights);
         }
         if (hasBias){
-            this.bias = weights[0];
-            this.weights = new double[weights.length-1];
-            System.arraycopy(weights, 1, this.weights, 0, this.weights.length);
+            this.bias = weights.get(0);
+            this.weights = weights.slice(1, weights.dim());
         }
         else {
             this.bias = 0;
@@ -58,13 +52,14 @@ public class LinearClassifier extends MarginClassifier {
     /**
      * @return dimension of hyperplane
      */
-    public int getDim() { return weights.length; }
+    public int getDim() { return weights.dim(); }
 
     /**
      * Compute bias + weight^T x
      */
-    public double margin(double[] x){
-        return bias + LinearAlgebra.dot(x, weights);
+    @Override
+    public double margin(Vector x){
+        return bias + x.dot(weights);
     }
 
     @Override
@@ -72,6 +67,6 @@ public class LinearClassifier extends MarginClassifier {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LinearClassifier that = (LinearClassifier) o;
-        return Double.compare(that.bias, bias) == 0 && Arrays.equals(weights, that.weights);
+        return Double.compare(that.bias, bias) == 0 && weights.equals(that.weights);
     }
 }

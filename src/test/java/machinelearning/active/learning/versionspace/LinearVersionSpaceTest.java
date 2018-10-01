@@ -5,6 +5,7 @@ import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRu
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
@@ -21,13 +22,17 @@ class LinearVersionSpaceTest {
     private List<LabeledPoint> trainingData;
     private HitAndRunSampler sampler;
     private LinearVersionSpace versionSpace;
-    private double[][] hitAndRunSamples;
+    private Vector[] hitAndRunSamples;
 
     @BeforeEach
     void setUp() {
         trainingData = Arrays.asList(mock(LabeledPoint.class));
 
-        hitAndRunSamples = new double[][] {{1,2}, {3,4}, {5,6}};
+        hitAndRunSamples = new Vector[] {
+                Vector.FACTORY.make(1,2),
+                Vector.FACTORY.make(3,4),
+                Vector.FACTORY.make(5,6)
+        };
 
         sampler = mock(HitAndRunSampler.class);
         when(sampler.sample(any(), anyInt())).thenReturn(hitAndRunSamples);

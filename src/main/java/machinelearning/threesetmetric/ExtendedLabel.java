@@ -1,6 +1,7 @@
 package machinelearning.threesetmetric;
 
 import machinelearning.classifier.Label;
+import explore.user.UserLabel;
 
 /**
  * This enum is basically an extension of {@link Label} for {@link machinelearning.threesetmetric.ExtendedClassifier}.
@@ -33,8 +34,8 @@ public enum ExtendedLabel {
      * @param label a {@link Label} used in Machine Learning classifiers
      * @return an ExtendedLabel of same name (i.e. POSITIVE/NEGATIVE is converted into POSITIVE/NEGATIVE)
      */
-    public static ExtendedLabel fromLabel(Label label) {
-        return label == Label.POSITIVE ? POSITIVE : NEGATIVE;
+    public static ExtendedLabel fromLabel(UserLabel label) {
+        return label.isPositive() ? POSITIVE : NEGATIVE;
     }
 
 

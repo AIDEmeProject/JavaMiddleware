@@ -2,54 +2,46 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LineTest {
-    private double[] center;
-    private double[] direction;
+    private Vector center;
+    private Vector direction;
     private Line line;
 
     @BeforeEach
     void setUp() {
-        center = new double[] {3,-2};
-        direction = new double[] {-1,1};
+        center = Vector.FACTORY.make(3, -2);
+        direction = Vector.FACTORY.make(-1, 1);
         line = new Line(center, direction);
     }
 
     @Test
     void constructor_CenterAndDirectionHaveIncompatibleLengths_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new Line(center, new double[] {1}));
-    }
-
-    @Test
-    void constructor_CenterIsEmptyArray_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new Line(new double[0], direction));
-    }
-
-    @Test
-    void constructor_DirectionIsEmptyArray_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new Line(center, new double[0]));
+        assertThrows(IllegalArgumentException.class, () -> new Line(center, Vector.FACTORY.make(1)));
     }
 
     @Test
     void constructor_DirectionIsZeroVector_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new Line(center, new double[] {0,0}));
+        assertThrows(IllegalArgumentException.class, () -> new Line(center, Vector.FACTORY.zeros(2)));
     }
 
     @Test
     void getDim_TwoDimensionalLine_CorrectDimensionReturned() {
-        assertEquals(center.length, line.getDim());
+        assertEquals(center.dim(), line.getDim());
     }
 
     @Test
     void getPoint_PositionEqualsToZero_CenterIsReturned() {
-        assertArrayEquals(center, line.getPoint(0.));
+        assertEquals(center, line.getPoint(0.));
     }
 
     @Test
     void getPoint_PositionDifferentFromZero_CorrectPointIsReturned() {
-        assertArrayEquals(new double[] {2, -1}, line.getPoint(1.));
+        assertEquals(Vector.FACTORY.make(2, -1), line.getPoint(1.));
     }
 
     @Test

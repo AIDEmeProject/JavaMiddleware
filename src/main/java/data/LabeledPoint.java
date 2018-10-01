@@ -1,8 +1,9 @@
 package data;
 
 import machinelearning.classifier.Label;
+import explore.user.UserLabel;
+import utils.linalg.Vector;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -14,15 +15,20 @@ import java.util.Objects;
  */
 public class LabeledPoint extends DataPoint {
 
-    private Label label;
+    private UserLabel label;
 
     /**
      * @param id: data point's identifier
      * @param data: values array
-     * @param label: data point's label
+     * @param label: user provided label for this data point
      * @throws IllegalArgumentException if data is empty or label is {@code null}
      */
-    public LabeledPoint(long id, double[] data, Label label) {
+    public LabeledPoint(long id, double[] data, UserLabel label) {
+        super(id, data);
+        this.label = Objects.requireNonNull(label);
+    }
+
+    public LabeledPoint(long id, Vector data, UserLabel label) {
         super(id, data);
         this.label = Objects.requireNonNull(label);
     }
@@ -32,23 +38,11 @@ public class LabeledPoint extends DataPoint {
      * @param label: label
      * @throws IllegalArgumentException if label is {@code null}
      */
-    public LabeledPoint(DataPoint point, Label label) {
+    public LabeledPoint(DataPoint point, UserLabel label) {
         this(point.id, point.data, label);
     }
 
-    /**
-     * Set label by values
-     * @param value
-     */
-    public void setLabel(int value){
-        if(value > 0){
-            label = Label.POSITIVE;
-        }else {
-            label = Label.NEGATIVE;
-        }
-    }
-
-    public Label getLabel() {
+    public UserLabel getLabel() {
         return label;
     }
 
@@ -56,10 +50,7 @@ public class LabeledPoint extends DataPoint {
      * @return a new Labeled Point with the value 1 appended to its left
      */
     public LabeledPoint addBias(){
-        double[] dataWithBias = new double[getDim()+1];
-        dataWithBias[0] = 1;
-        System.arraycopy(data, 0, dataWithBias, 1, getDim());
-        return new LabeledPoint(id, dataWithBias, label);
+        return new LabeledPoint(id, data.addBias(), label);
     }
 
     /**
@@ -67,7 +58,7 @@ public class LabeledPoint extends DataPoint {
      */
     @Override
     public String toString() {
-        return "{\"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": \"" + label + "\"}";
+        return "{\"id\": " + id  + ", \"data\": " + data + ", \"label\": " + label + "}";
     }
 
     /**

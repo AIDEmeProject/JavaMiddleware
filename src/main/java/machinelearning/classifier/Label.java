@@ -1,16 +1,29 @@
 package machinelearning.classifier;
 
-/**
- * Binary labels enum. There are only two possibilities: POSITIVE and NEGATIVE labels.
- */
-public enum Label {
-    POSITIVE(true), NEGATIVE(false);
+import explore.user.UserLabel;
 
+/**
+ * Binary labels, used for classification. There are only two instances of this class: POSITIVE and NEGATIVE.
+ */
+public class Label implements UserLabel {
+    /**
+     * Whether this label is the POSITIVE or the NEGATIVE one
+     */
     private boolean isPositive;
 
-    Label(boolean isPositive) {
+    private Label(boolean isPositive) {
         this.isPositive = isPositive;
     }
+
+    /**
+     * POSITIVE label
+     */
+    public final static Label POSITIVE = new Label(true);
+
+    /**
+     * NEGATIVE label
+     */
+    public final static Label NEGATIVE = new Label(false);
 
     /**
      * @return whether the label is POSITIVE
@@ -26,18 +39,9 @@ public enum Label {
         return !isPositive;
     }
 
-    /**
-     * @return 1 if POSITIVE, 0 if NEGATIVE
-     */
-    public int asBinary(){
-        return isPositive ? 1 : 0;
-    }
-
-    /**
-     * @return 1 if POSITIVE, -1 if NEGATIVE
-     */
-    public int asSign(){
-        return isPositive ? 1 : -1;
+    @Override
+    public Label[] getLabelsForEachSubspace() {
+        return new Label[] {isPositive ? POSITIVE : NEGATIVE};
     }
 
     @Override

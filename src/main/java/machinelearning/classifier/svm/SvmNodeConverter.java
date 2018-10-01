@@ -2,6 +2,7 @@ package machinelearning.classifier.svm;
 
 import data.DataPoint;
 import libsvm.svm_node;
+import utils.linalg.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,28 +20,13 @@ class SvmNodeConverter {
      * @param x: matrix to be converted
      * @return converted matrix
      */
-    static svm_node[] toSvmNode(double[] x){
-        svm_node[] converted = new svm_node[x.length];
+    static svm_node[] toSvmNode(Vector x) {
+        svm_node[] converted = new svm_node[x.dim()];
 
-        for (int i = 0; i < x.length; i++) {
+        for (int i = 0; i < x.dim(); i++) {
             converted[i] = new svm_node();
             converted[i].index = i;
-            converted[i].value = x[i];
-        }
-
-        return converted;
-    }
-
-    /**
-     * Convert a double matrix into a svm_node matrix
-     * @param x: matrix to be converted
-     * @return converted matrix
-     */
-    static svm_node[][] toSvmNode(double[][] x){
-        svm_node[][] converted = new svm_node[x.length][x[0].length];
-
-        for (int i = 0; i < x.length; i++) {
-            converted[i] = toSvmNode(x[i]);
+            converted[i].value = x.get(i);
         }
 
         return converted;

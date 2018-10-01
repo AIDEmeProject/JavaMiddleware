@@ -3,6 +3,7 @@ package machinelearning.classifier.margin;
 import data.DataPoint;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -13,42 +14,42 @@ class MarginClassifierTest {
     @Test
     void predict_positiveMargin_returnPositiveLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(1.);
+        when(classifier.margin((Vector) any())).thenReturn(1.);
         assertEquals(Label.POSITIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test
     void predict_negativeMargin_returnNegativeLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(-1.);
+        when(classifier.margin((Vector) any())).thenReturn(-1.);
         assertEquals(Label.NEGATIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test
     void predict_zeroMargin_returnNegativeLabel() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(0.);
+        when(classifier.margin((Vector) any())).thenReturn(0.);
         assertEquals(Label.NEGATIVE, classifier.predict(mock(DataPoint.class)));
     }
 
     @Test
     void probability_positiveMargin_returnExpectedProbability() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(1.);
+        when(classifier.margin((Vector) any())).thenReturn(1.);
         assertEquals(0.731058579, classifier.probability(mock(DataPoint.class)), 1e-8);
     }
 
     @Test
     void probability_negativeMargin_returnExpectedProbability() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(-1.);
+        when(classifier.margin((Vector) any())).thenReturn(-1.);
         assertEquals(0.268941421, classifier.probability(mock(DataPoint.class)), 1e-8);
     }
 
     @Test
     void probability_zeroMargin_returnOneHalf() {
         classifier = mock(MarginClassifier.class, CALLS_REAL_METHODS);
-        when(classifier.margin((double[]) any())).thenReturn(0.);
+        when(classifier.margin((Vector) any())).thenReturn(0.);
         assertEquals(0.5, classifier.probability(mock(DataPoint.class)), 1e-8);
     }
 }

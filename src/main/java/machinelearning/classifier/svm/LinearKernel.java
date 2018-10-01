@@ -1,7 +1,7 @@
 package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 /**
  * Linear kernel function. It is defined by the scalar product function:
@@ -10,8 +10,8 @@ import utils.linalg.LinearAlgebra;
  */
 public class LinearKernel extends Kernel {
     @Override
-    public double compute(double[] x, double[] y) {
-        return LinearAlgebra.dot(x, y);
+    public double compute(Vector x, Vector y) {
+        return x.dot(y);
     }
 
     @Override

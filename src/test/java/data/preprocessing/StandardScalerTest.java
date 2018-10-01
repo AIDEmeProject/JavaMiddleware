@@ -73,7 +73,7 @@ class StandardScalerTest {
 
         int i = 0;
         for (DataPoint point : scaled) {
-            assertArrayEquals(expected[i++], point.getData(), 1e-8);
+            assertArrayEquals(expected[i++], point.getData().toArray(), 1e-8);
         }
     }
 }

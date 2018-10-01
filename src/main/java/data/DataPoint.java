@@ -1,9 +1,6 @@
 package data;
 
-import utils.Validator;
-
-import java.util.Arrays;
-import java.util.HashMap;
+import utils.linalg.Vector;
 
 /**
  * A DataPoint is an indexed collection of values. More specifically, it is composed of two entities:
@@ -21,7 +18,7 @@ public class DataPoint {
     /**
      * data point's values
      */
-    protected double[] data;
+    protected Vector data;
 
     /**
      * @param id: data point's unique ID
@@ -29,7 +26,10 @@ public class DataPoint {
      * @throws IllegalArgumentException if data is emtpy
      */
     public DataPoint(long id, double[] data) {
-        Validator.assertNotEmpty(data);
+        this(id, Vector.FACTORY.make(data));
+    }
+
+    public DataPoint(long id, Vector data) {
         this.id = id;
         this.data = data;
     }
@@ -38,47 +38,19 @@ public class DataPoint {
         return id;
     }
 
-    public double[] getData() {
+    public Vector getData() {
         return data;
     }
 
     public double get(int i){
-        return data[i];
-    }
-
-    /**
-     * @param indices indices of selected attributes
-     * @return map of the indices and the corresponding values
-     */
-    public HashMap<Integer, Double> getSelectedAttributesMap(int[] indices) {
-        Arrays.sort(indices);
-
-        HashMap<Integer, Double> selectedAttributes = new HashMap<>();
-        for(int index: indices){
-            selectedAttributes.put(index, data[index]);
-        }
-        return selectedAttributes;
-    }
-
-    /**
-     * @param indices indices of selected attributes
-     * @return map of the indices and the corresponding values
-     */
-    public double[] getSelectedAttributes(int[] indices) {
-        Arrays.sort(indices);
-
-        double[] selected = new double[indices.length];
-        for(int index: indices){
-            selected[index] = data[index];
-        }
-        return selected;
+        return data.get(i);
     }
 
     /**
      * @return data point's dimension (i.e. number of features)
      */
     public int getDim(){
-        return data.length;
+        return data.dim();
     }
 
     @Override
@@ -88,7 +60,7 @@ public class DataPoint {
 
         DataPoint dataPoint = (DataPoint) o;
 
-        return id == dataPoint.id && Arrays.equals(data, dataPoint.data);
+        return id == dataPoint.id && data.equals(dataPoint.data);
     }
 
     @Override
@@ -98,7 +70,7 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "{\"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
+        return "{\"id\": " + getId()  + ", \"data\": " + data + '}';
     }
 
     public DataPoint clone(double[] newData){

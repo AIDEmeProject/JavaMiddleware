@@ -6,6 +6,7 @@ import libsvm.*;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.margin.KernelClassifier;
 import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 import java.util.List;
@@ -106,13 +107,8 @@ public class SvmLearner implements Learner {
     }
 
     private KernelClassifier parseKernelClassifierFromSvmModel(svm_model model) {
-        assert model.rho.length == 1;
         double bias = -model.rho[0];
-
-        assert model.sv_coef.length == 1;
-        double[] alpha = model.sv_coef[0];
-
-        assert model.sv_coef[0].length == model.SV.length;
+        Vector alpha = Vector.FACTORY.make(model.sv_coef[0]);
         List<DataPoint> sv = SvmNodeConverter.toDataPoint(model.SV);
 
         return new KernelClassifier(bias, alpha, sv, kernel);

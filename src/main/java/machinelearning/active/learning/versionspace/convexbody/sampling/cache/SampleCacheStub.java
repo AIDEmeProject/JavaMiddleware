@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.cache;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import utils.linalg.Vector;
 
 /**
  * This is a dummy {@link SampleCache} object, which performs no caching operation. This is used when caching behavior
@@ -14,7 +15,7 @@ public class SampleCacheStub extends SampleCache {
      * A pass-through method, no operation is performed
      */
     @Override
-    public void updateCache(double[][] samples) {
+    public void updateCache(Vector[] samples) {
         // do nothing
     }
 

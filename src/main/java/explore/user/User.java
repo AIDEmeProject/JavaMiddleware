@@ -15,14 +15,14 @@ public interface User {
      * @param point: point to label
      * @return label of data[row]
      */
-    Label getLabel(DataPoint point);
+    UserLabel getLabel(DataPoint point);
 
     /**
      * Return the labels of a batch of rows
      * @param points: collection of data points
      * @return an array containing the labels of each requested row
      */
-    default Label[] getLabel(Collection<DataPoint> points){
+    default UserLabel[] getLabel(Collection<DataPoint> points){
         return points.stream()
                 .map(this::getLabel)
                 .toArray(Label[]::new);

@@ -2,7 +2,8 @@ package machinelearning.threesetmetric;
 
 import data.DataPoint;
 import data.LabeledPoint;
-import machinelearning.classifier.Label;
+import explore.user.UserLabel;
+import utils.linalg.Vector;
 
 import java.util.Collection;
 
@@ -14,29 +15,34 @@ import java.util.Collection;
  * POSITIVE, NEGATIVE, or UNKNOWN. See {@link ExtendedLabel} for more details.
  */
 public interface ExtendedClassifier {
-//    /**
-//     * Update the current data model with new labeled data.
-//     * @param point: a data array
-//     * @param label: the data's label
-//     */
-//    void update(double[] point, Label label);
+    /**
+     * Update the current data model with new labeled data.
+     * @param point: a data array
+     * @param label: the data's label
+     */
+    void update(Vector point, UserLabel label);
 
     /**
      * Update the current data model with new labeled data.
-     * @param labeledPoints a {@link LabeledPoint} instance
+     * @param labeledPoint a {@link LabeledPoint} instance
      */
-    void update(Collection<LabeledPoint> labeledPoints);
-//    /**
-//     * @param point: a data point
-//     * @return the predicted label for input point
-//     */
-//    ExtendedLabel predict(double[] point);
+    default void update(LabeledPoint labeledPoint) {
+        update(labeledPoint.getData(), labeledPoint.getLabel());
+    }
+
+    /**
+     * @param point: a data point
+     * @return the predicted label for input point
+     */
+    ExtendedLabel predict(Vector point);
 
     /**
      * @param dataPoint: a data point
      * @return the predicted label for input point
      */
-    ExtendedLabel predict(DataPoint dataPoint);
+    default ExtendedLabel predict(DataPoint dataPoint) {
+        return predict(dataPoint.getData());
+    }
 
     /**
      * @param points: a collection of data point

@@ -3,6 +3,7 @@ package machinelearning.classifier.margin;
 import data.DataPoint;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
+import utils.linalg.Vector;
 
 /**
  * A margin classifier is defined by:
@@ -19,7 +20,7 @@ public abstract class MarginClassifier implements Classifier {
      * @param x: a data point
      * @return the margin of this point
      */
-    public abstract double margin(double[] x);
+    public abstract double margin(Vector x);
 
     /**
      * @param point: a data point

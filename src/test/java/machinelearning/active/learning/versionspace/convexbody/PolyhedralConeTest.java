@@ -4,7 +4,7 @@ import data.LabeledPoint;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
@@ -41,25 +41,25 @@ class PolyhedralConeTest {
 
     @Test
     void isInside_invalidDimensionInput_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> cone.isInside(new double[1]));
+        assertThrows(IllegalArgumentException.class, () -> cone.isInside(Vector.FACTORY.zeros(1)));
     }
 
     @Test
     void isInside_pointOnInteriorOfCone_returnsTrue() {
-        assertTrue(cone.isInside(new double[] {0.5, -0.5}));
+        assertTrue(cone.isInside(Vector.FACTORY.make(0.5, -0.5)));
     }
 
     @Test
     void isInside_pointOnExteriorOfCone_returnsFalse() {
-        assertFalse(cone.isInside(new double[] {-1, 1}));
-        assertFalse(cone.isInside(new double[] {-1, -1}));
-        assertFalse(cone.isInside(new double[] {1, 1}));
+        assertFalse(cone.isInside(Vector.FACTORY.make(-1, 1)));
+        assertFalse(cone.isInside(Vector.FACTORY.make(-1, -1)));
+        assertFalse(cone.isInside(Vector.FACTORY.make(1, 1)));
     }
 
     @Test
     void isInside_pointOnBoundaryOfCone_returnsTrue() {
-        assertTrue(cone.isInside(new double[] {1, 0}));
-        assertTrue(cone.isInside(new double[] {0, -1}));
+        assertTrue(cone.isInside(Vector.FACTORY.make(1, 0)));
+        assertTrue(cone.isInside(Vector.FACTORY.make(0, -1)));
     }
 
     @Test
@@ -104,32 +104,32 @@ class PolyhedralConeTest {
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
 
         cone = new PolyhedralCone(points, solverFactory);
-        double[] result = cone.getInteriorPoint();
+        Vector result = cone.getInteriorPoint();
 
-        assertArrayEquals(LinearAlgebra.normalize(new double[] {1, -1}, 0.9), result);
+        assertEquals(Vector.FACTORY.make(1, -1).normalize(0.9), result);
     }
 
     @Test
     void computeLineIntersection_lineOfWrongDimension_throwsException() {
-        Line line = new Line(new double[]{0, 0, 0}, new double[]{1, 1, 1});
+        Line line = new Line(Vector.FACTORY.zeros(3), Vector.FACTORY.make(1, 1, 1));
         assertThrows(IllegalArgumentException.class, () -> cone.computeLineIntersection(line));
     }
 
     @Test
     void computeLineIntersection_lineDoesNotInterceptPolytope_throwsException() {
-        Line line = new Line(new double[]{0, 0}, new double[]{1, 1});
+        Line line = new Line(Vector.FACTORY.zeros(2), Vector.FACTORY.make(1, 1));
         assertThrows(RuntimeException.class, () -> cone.computeLineIntersection(line));
     }
 
     @Test
     void computeLineIntersection_lineContainsBoundaryOfPolytope_throwsException() {
-        Line line = new Line(new double[]{0, 0}, new double[]{1, 0});
+        Line line = new Line(Vector.FACTORY.zeros(2), Vector.FACTORY.make(1, 0));
         assertThrows(RuntimeException.class, () -> cone.computeLineIntersection(line));
     }
 
     @Test
     void computeLineIntersection_lineIntersectsPolytope_lineSegmentCorrectlyComputed() {
-        Line line = new Line(new double[]{0.5, -0.5}, new double[]{1, 0});
+        Line line = new Line(Vector.FACTORY.make(0.5, -0.5), Vector.FACTORY.make(1, 0));
         LineSegment segment = cone.computeLineIntersection(line);
         assertEquals(-0.5, segment.getLeftBound());
         assertEquals(Math.sqrt(0.75) - 0.5, segment.getRightBound());
@@ -137,39 +137,39 @@ class PolyhedralConeTest {
 
     @Test
     void getSeparatingHyperplane_InputNormLargerThanOne_returnsHyperplanePerpendicularToInput() {
-        double[] x = new double[]{1, 1};
-        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
+        Vector x = Vector.FACTORY.make(1, 1);
+        Optional<Vector> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertArrayEquals(x, hyperplane.get(), 1e-10);
+        assertTrue(x.equals(hyperplane.get(), 1e-10));
     }
 
     @Test
     void getSeparatingHyperplane_InputOnInteriorOfCone_returnsEmptyOption() {
-        double[] x = new double[]{0.5, -0.5};
-        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
+        Vector x = Vector.FACTORY.make(0.5, -0.5);
+        Optional<Vector> hyperplane = cone.getSeparatingHyperplane(x);
         assertFalse(hyperplane.isPresent());
     }
 
     @Test
     void getSeparatingHyperplane_InputOnBoundaryOfCone_returnsEmptyOption() {
-        double[] x = new double[]{0.5, 0};
-        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
+        Vector x = Vector.FACTORY.make(0.5, 0);
+        Optional<Vector> hyperplane = cone.getSeparatingHyperplane(x);
         assertFalse(hyperplane.isPresent());
     }
 
     @Test
     void getSeparatingHyperplane_InputWithNegativeFirstCoordinateButInsideUnitBall_returnsConesXAxisConstraint() {
-        double[] x = new double[]{-0.5, -0.5};
-        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
+        Vector x = Vector.FACTORY.make(-0.5, -0.5);
+        Optional<Vector> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertArrayEquals(new double[] {-1, 0}, hyperplane.get(), 1e-10);
+        assertTrue(Vector.FACTORY.make(-1, 0).equals(hyperplane.get(), 1e-10));
     }
 
     @Test
     void getSeparatingHyperplane_InputWithPositiveFirstAndSecondCoordinatesButInsideUnitBall_returnsConesYAxisConstraint() {
-        double[] x = new double[]{0.5, 0.5};
-        Optional<double[]> hyperplane = cone.getSeparatingHyperplane(x);
+        Vector x = Vector.FACTORY.make(0.5, 0.5);
+        Optional<Vector> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertArrayEquals(new double[] {0, 1}, hyperplane.get(), 1e-10);
+        assertTrue(Vector.FACTORY.make(0, 1).equals(hyperplane.get(), 1e-10));
     }
 }

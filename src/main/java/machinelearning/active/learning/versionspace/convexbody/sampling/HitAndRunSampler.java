@@ -6,6 +6,7 @@ import machinelearning.active.learning.versionspace.convexbody.sampling.cache.Sa
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Objects;
 import java.util.Random;
@@ -84,13 +85,13 @@ public class HitAndRunSampler {
      * @param numSamples: number of samples to retrieve
      * @return an array of numSamples samples from the input body
      */
-    public double[][] sample(ConvexBody body, int numSamples) {
+    public Vector[] sample(ConvexBody body, int numSamples) {
         Validator.assertPositive(numSamples);
 
         body = sampleCache.attemptToSetDefaultInteriorPoint(body);
 
         HitAndRun chain = new HitAndRun(body, directionSamplingAlgorithm.fit(body), random);
-        double[][] samples = sampleSelector.select(chain, numSamples);
+        Vector[] samples = sampleSelector.select(chain, numSamples);
 
         sampleCache.updateCache(samples);
 
