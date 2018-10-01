@@ -24,7 +24,7 @@ public class EigenvalueDecomposition {
      * @throws IllegalArgumentException if matrix is not square, or does not have a eigenvalue decomposition over the real numbers
      */
     public EigenvalueDecomposition(Matrix matrix) {
-        Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();  // TODO: use constructor (Matrix, boolean) for symmetric matrices
         decomposition.decompose(matrix.matrix);
 
         eigenvalues = getEigenvalues(decomposition);

@@ -31,8 +31,8 @@ public class Matrix {
             Validator.assertNotEmpty(values[0]);
 
             int dim = values[0].length;
-            for (int i = 0; i < values.length; i++) {
-                if (values[i].length != dim){
+            for (double[] value : values) {
+                if (value.length != dim) {
                     throw new RuntimeException();
                 }
             }
@@ -86,11 +86,6 @@ public class Matrix {
          */
         public static Matrix identity(int dim) {
             return new Matrix(PrimitiveDenseStore.FACTORY.makeEye(dim, dim));
-        }
-
-        // TODO: can we remove this function?
-        static Matrix fromMatrixStore(MatrixStore<Double> basicMatrix) {
-            return new Matrix(PrimitiveDenseStore.FACTORY.copy(basicMatrix));
         }
     }
 

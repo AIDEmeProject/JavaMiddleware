@@ -133,7 +133,7 @@ public class Vector {
      * @return the squared norm of this vector
      */
     public double squaredNorm() {
-        return dot(this);
+        return vector.dot(vector);
     }
 
     /**
