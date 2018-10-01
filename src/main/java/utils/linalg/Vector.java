@@ -1,6 +1,7 @@
 package utils.linalg;
 
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import utils.Validator;
 
 import java.util.StringJoiner;
@@ -14,7 +15,7 @@ public class Vector {
     /**
      * A vector object from Apache Commons Math library
      */
-    final PrimitiveMatrix vector;
+    final MatrixStore<Double> vector;
 
 
     /**
@@ -27,7 +28,7 @@ public class Vector {
          */
         public static Vector make(double... values) {
             Validator.assertNotEmpty(values);
-            return new Vector(PrimitiveMatrix.FACTORY.columns(values));
+            return new Vector(PrimitiveDenseStore.FACTORY.columns(values));
         }
 
         /**
@@ -37,7 +38,7 @@ public class Vector {
          */
         public static Vector zeros(int dim) {
             Validator.assertPositive(dim);
-            return new Vector(PrimitiveMatrix.FACTORY.makeZero(dim, 1));
+            return new Vector(PrimitiveDenseStore.FACTORY.makeZero(dim, 1));
         }
 
         /**
@@ -49,7 +50,7 @@ public class Vector {
         }
     }
 
-    Vector(PrimitiveMatrix vector) {
+    Vector(MatrixStore<Double> vector) {
         this.vector = vector;
     }
 
@@ -79,7 +80,7 @@ public class Vector {
         if (from < 0 || from == to || to > dim()) {
             throw new IllegalArgumentException();
         }
-        return new Vector(vector.getRowsRange(from, to));
+        return new Vector(vector.logical().offsets(from, -1).limits(to-from, -1).get());
     }
 
     /**
@@ -88,6 +89,7 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public Vector add(Vector other) {
+        Validator.assertEquals(dim(), other.dim());
         return new Vector(vector.add(other.vector));
     }
 
@@ -97,6 +99,7 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public Vector subtract(Vector other) {
+        Validator.assertEquals(dim(), other.dim());
         return new Vector(vector.subtract(other.vector));
     }
 
@@ -113,7 +116,7 @@ public class Vector {
      * @return a vector whose every component equals the division of {@code this} by value
      */
     public Vector scalarDivide(double value) {
-        return new Vector(vector.divide(value));
+        return new Vector(vector.multiply(1.0 / value));
     }
 
     /**
@@ -187,7 +190,7 @@ public class Vector {
             case 0:
                 return this;
             default:
-                return new Vector(vector.mergeColumns(PrimitiveMatrix.FACTORY.makeZero(newDim - dim(), 1)));
+                return new Vector(vector.logical().below(PrimitiveDenseStore.FACTORY.makeZero(newDim - dim(), 1)).get());
         }
     }
 
@@ -195,7 +198,7 @@ public class Vector {
      * @return a new Vector with the number 1.0 appended to the right of {@code this}
      */
     public Vector addBias() {
-        return new Vector(PrimitiveMatrix.FACTORY.rows(new double[]{1}).mergeColumns(vector));
+        return new Vector(vector.logical().above(1D).get());
     }
 
     /**

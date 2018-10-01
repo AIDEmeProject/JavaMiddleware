@@ -10,9 +10,13 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public class EigenvalueDecomposition {
     /**
-     * The resulting decomposition object from Apache Commons Math library
+     * The computed real eigenvectors
      */
     private Vector eigenvalues;
+
+    /**
+     * The computed eigenvectors, disposed row-wise
+     */
     private Matrix eigenvectors;
 
     /**
@@ -21,7 +25,7 @@ public class EigenvalueDecomposition {
      */
     public EigenvalueDecomposition(Matrix matrix) {
         Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();
-        decomposition.decompose(matrix.matrix.asCollectable2D());
+        decomposition.decompose(matrix.matrix);
 
         eigenvalues = getEigenvalues(decomposition);
         eigenvectors = getEigenvectors(decomposition);
@@ -44,7 +48,7 @@ public class EigenvalueDecomposition {
     }
 
     private static Matrix getEigenvectors(Eigenvalue<Double> decomposition) {
-        return Matrix.FACTORY.fromMatrixStore(decomposition.getV().transpose());
+        return new Matrix(decomposition.getV().transpose());
     }
 
     /**

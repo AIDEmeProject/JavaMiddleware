@@ -1,7 +1,7 @@
 package utils.linalg;
 
-import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import utils.Validator;
 
 import java.util.StringJoiner;
@@ -15,7 +15,7 @@ public class Matrix {
     /**
      * A matrix object from Apache Commons Math library
      */
-    PrimitiveMatrix matrix;
+    MatrixStore<Double> matrix;
 
     /**
      * This is a static factory for matrix creation. It provides several utility methods for instantiating matrices.
@@ -37,7 +37,7 @@ public class Matrix {
                 }
             }
 
-            return new Matrix(PrimitiveMatrix.FACTORY.rows(values));
+            return new Matrix(PrimitiveDenseStore.FACTORY.rows(values));
         }
 
         /**
@@ -68,7 +68,7 @@ public class Matrix {
         public static Matrix zeros(int rows, int cols) {
             Validator.assertPositive(rows);
             Validator.assertPositive(cols);
-            return new Matrix(PrimitiveMatrix.FACTORY.makeZero(rows, cols));
+            return new Matrix(PrimitiveDenseStore.FACTORY.makeZero(rows, cols));
         }
 
         /**
@@ -85,16 +85,16 @@ public class Matrix {
          * @throws IllegalArgumentException if dim is not positive
          */
         public static Matrix identity(int dim) {
-            return new Matrix(PrimitiveMatrix.FACTORY.makeEye(dim, dim));
+            return new Matrix(PrimitiveDenseStore.FACTORY.makeEye(dim, dim));
         }
 
         // TODO: can we remove this function?
         static Matrix fromMatrixStore(MatrixStore<Double> basicMatrix) {
-            return new Matrix(PrimitiveMatrix.FACTORY.copy(basicMatrix));
+            return new Matrix(PrimitiveDenseStore.FACTORY.copy(basicMatrix));
         }
     }
 
-    Matrix(PrimitiveMatrix matrix) {
+    Matrix(MatrixStore<Double> matrix) {
         this.matrix = matrix;
     }
 
@@ -131,7 +131,7 @@ public class Matrix {
      */
     public Vector getRow(int i) {
         Validator.assertIndexInBounds(i, 0, numRows());
-        return new Vector(matrix.getRowsRange(i, i+1).transpose());
+        return new Vector(matrix.logical().row(i).transpose().get());
     }
 
     /**
@@ -140,6 +140,9 @@ public class Matrix {
      * @throws IllegalArgumentException if matrices have incompatible dimensions
      */
     public Matrix add(Matrix other) {
+        if (numRows() != other.numRows() || numCols() != other.numCols()) {
+            throw new IllegalArgumentException();
+        }
         return new Matrix(matrix.add(other.matrix));
     }
 
@@ -149,6 +152,9 @@ public class Matrix {
      * @throws IllegalArgumentException if matrices have incompatible dimensions
      */
     public Matrix subtract(Matrix other) {
+        if (numRows() != other.numRows() || numCols() != other.numCols()) {
+            throw new IllegalArgumentException();
+        }
         return new Matrix(matrix.subtract(other.matrix));
     }
 
@@ -166,6 +172,9 @@ public class Matrix {
      * @throws IllegalArgumentException if the number of columns {@code this} if different from the vector's dimension
      */
     public Vector multiply(Vector vector) {
+        if (numCols() != vector.dim()) {
+            throw new IllegalArgumentException();
+        }
         return new Vector(matrix.multiply(vector.vector));
     }
 
@@ -175,6 +184,9 @@ public class Matrix {
      * @throws IllegalArgumentException if the number of columns of {@code this} and the number of rows of {@code other} are distinct
      */
     public Matrix multiply(Matrix other) {
+        if (numCols() != other.numRows()) {
+            throw new IllegalArgumentException();
+        }
         return new Matrix(matrix.multiply(other.matrix));
     }
 

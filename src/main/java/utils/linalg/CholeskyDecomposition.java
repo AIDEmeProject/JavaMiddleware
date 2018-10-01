@@ -17,7 +17,7 @@ public class CholeskyDecomposition {
      * @throws IllegalArgumentException if matrix is non-square, or not symmetric, or not positive-definite
      */
     public CholeskyDecomposition(Matrix matrix) {
-        decomposition.decompose(matrix.matrix.asCollectable2D());
+        decomposition.decompose(matrix.matrix);
 
         if (!decomposition.isSPD()) {
             throw new RuntimeException();
@@ -28,6 +28,6 @@ public class CholeskyDecomposition {
      * @return Cholesky lower-triangular factorization of input matrix
      */
     public Matrix getL() {
-        return Matrix.FACTORY.fromMatrixStore(decomposition.getL());
+        return new Matrix(decomposition.getL());
     }
 }
