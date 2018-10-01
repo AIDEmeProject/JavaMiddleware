@@ -178,6 +178,10 @@ public class Matrix {
         return new Matrix(matrix.multiply(other.matrix));
     }
 
+    public Matrix transpose() {
+        return new Matrix(matrix.transpose());
+    }
+
     /**
      * @return a copy of {@code this} as a double's array
      */

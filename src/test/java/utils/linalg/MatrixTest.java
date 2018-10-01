@@ -135,7 +135,7 @@ public class MatrixTest {
     }
 
     @Test
-    void getROw_runOverAllValidIndexes_correctVectorsReturned() {
+    void getRow_runOverAllValidIndexes_correctVectorsReturned() {
         assertEquals(Vector.FACTORY.make(1, 2, 3), matrix1.getRow(0));
         assertEquals(Vector.FACTORY.make(4, 5, 6), matrix1.getRow(1));
     }
@@ -569,6 +569,11 @@ public class MatrixTest {
      *           UTILITY METHODS
      * *************************************
      */
+    @Test
+    void transpose_nonSquareMatrix_returnsCorrectTranspose() {
+        assertEquals(Matrix.FACTORY.make(3, 2, 1, 4, 2, 5, 3, 6), matrix1.transpose());
+    }
+
     @Test
     void toArray_anyMatrix_returnsArrayOfMatrixEntries() {
         double[][] array = matrix1.toArray();
