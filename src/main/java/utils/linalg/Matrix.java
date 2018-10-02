@@ -198,6 +198,13 @@ public class Matrix {
     }
 
     /**
+     * @return the transpose of {@code this}
+     */
+    public Matrix transpose() {
+        return new Matrix(matrix.transpose());
+    }
+
+    /**
      * @return a copy of {@code this} as a double's array
      */
     public double[][] toArray() {
