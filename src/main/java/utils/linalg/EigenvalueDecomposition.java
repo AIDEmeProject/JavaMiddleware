@@ -2,6 +2,8 @@ package utils.linalg;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -48,7 +50,8 @@ public class EigenvalueDecomposition {
     }
 
     private static Matrix getEigenvectors(Eigenvalue<Double> decomposition) {
-        return new Matrix(decomposition.getV().transpose());
+        MatrixStore<Double> VT = decomposition.getV().transpose();
+        return new Matrix(PrimitiveDenseStore.FACTORY.copy(VT));  // copy VT as PrimitiveDenseStore, which is a more efficient Matrix implementation
     }
 
     /**

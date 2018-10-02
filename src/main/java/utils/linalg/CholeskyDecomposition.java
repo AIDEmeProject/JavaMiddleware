@@ -1,6 +1,8 @@
 package utils.linalg;
 
 import org.ojalgo.matrix.decomposition.Cholesky;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 /**
  * This class computes the Cholesky decomposition of a real, symmetric, positive-definite {@link Matrix}. It is basically
@@ -10,7 +12,7 @@ public class CholeskyDecomposition {
     /**
      * The resulting decomposition object from Apache Commons Math library
      */
-    private final Cholesky<Double> decomposition = Cholesky.PRIMITIVE.make();
+    private static final Cholesky<Double> decomposition = Cholesky.PRIMITIVE.make();
 
     /**
      * @param matrix: {@link Matrix} to compute decomposition
@@ -28,6 +30,7 @@ public class CholeskyDecomposition {
      * @return Cholesky lower-triangular factorization of input matrix
      */
     public Matrix getL() {
-        return new Matrix(decomposition.getL());
+        MatrixStore<Double> L = decomposition.getL();
+        return new Matrix(PrimitiveDenseStore.FACTORY.copy(L));  // copy L as PrimitiveDenseStore, which is a more efficient Matrix implementation
     }
 }
