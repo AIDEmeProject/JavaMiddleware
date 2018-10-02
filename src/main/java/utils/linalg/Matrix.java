@@ -193,10 +193,6 @@ public class Matrix {
         return new Matrix(matrix.multiply(other.matrix));
     }
 
-    public Matrix transpose() {
-        return new Matrix(matrix.transpose());
-    }
-
     /**
      * @return the transpose of {@code this}
      */

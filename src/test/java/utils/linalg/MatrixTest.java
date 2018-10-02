@@ -569,12 +569,6 @@ public class MatrixTest {
      *           UTILITY METHODS
      * *************************************
      */
-
-    @Test
-    void transpose_nonSquareMatrix_returnsCorrectTranspose() {
-        assertEquals(Matrix.FACTORY.make(3, 2, 1, 4, 2, 5, 3, 6), matrix1.transpose());
-    }
-
     @Test
     void transpose_nonSquareMatrix_returnsCorrectTranspose() {
         assertEquals(Matrix.FACTORY.make(3, 2, 1, 4, 2, 5, 3, 6), matrix1.transpose());
