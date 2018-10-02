@@ -444,8 +444,8 @@ public class VectorTest {
     void squaredNorm_nonZeroVector_returnsCorrectValue() {
         assertEquals(1., Vector.FACTORY.make(1, 0).squaredNorm());
         assertEquals(1., Vector.FACTORY.make(0, -1).squaredNorm());
-        assertEquals(2., Vector.FACTORY.make(1, 1).squaredNorm());
-        assertEquals(2., Vector.FACTORY.make(-1, -1).squaredNorm());
+        assertEquals(13., Vector.FACTORY.make(2, 3).squaredNorm());
+        assertEquals(13., Vector.FACTORY.make(-2, -3).squaredNorm());
     }
 
     @Test

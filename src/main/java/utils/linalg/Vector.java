@@ -6,6 +6,8 @@ import utils.Validator;
 
 import java.util.StringJoiner;
 
+import static org.ojalgo.function.PrimitiveFunction.*;
+
 /**
  * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Ojalgo's
  * PrimitiveMatrix class. Note that all Vector instances are immutable, i.e. we do not allow modifying a Vector's inner
@@ -16,7 +18,6 @@ public class Vector {
      * A vector object from Apache Commons Math library
      */
     final MatrixStore<Double> vector;
-
 
     /**
      * This is a static factory for vector creation. It provides several utility methods for instantiating vectors.
@@ -58,7 +59,7 @@ public class Vector {
      * @return the number of components of this vector (i.e. its dimension)
      */
     public int dim() {
-        return (int) vector.countRows();
+        return (int) vector.count();
     }
 
     /**
@@ -90,7 +91,9 @@ public class Vector {
      */
     public Vector add(Vector other) {
         Validator.assertEquals(dim(), other.dim());
-        return new Vector(vector.add(other.vector));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
+        result.fillMatching(vector, ADD, other.vector);
+        return new Vector(result);
     }
 
     /**
@@ -100,7 +103,9 @@ public class Vector {
      */
     public Vector subtract(Vector other) {
         Validator.assertEquals(dim(), other.dim());
-        return new Vector(vector.subtract(other.vector));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
+        result.fillMatching(vector, SUBTRACT, other.vector);
+        return new Vector(result);
     }
 
     /**
@@ -108,7 +113,9 @@ public class Vector {
      * @return a vector whose every component equals the multiplication of {@code this} by value
      */
     public Vector scalarMultiply(double value) {
-        return new Vector(vector.multiply(value));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
+        result.fillMatching(MULTIPLY.second(value), vector);
+        return new Vector(result);
     }
 
     /**
@@ -116,7 +123,9 @@ public class Vector {
      * @return a vector whose every component equals the division of {@code this} by value
      */
     public Vector scalarDivide(double value) {
-        return new Vector(vector.multiply(1.0 / value));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
+        result.fillMatching(DIVIDE.second(value), vector);
+        return new Vector(result);
     }
 
     /**
@@ -151,7 +160,7 @@ public class Vector {
     public Vector normalize(double newNorm) {
         Validator.assertPositive(newNorm);
 
-        double norm = vector.norm();
+        double norm = norm();
         if (norm == 0) {
             throw new IllegalStateException("Cannot normalize zero vector");
         }
@@ -206,7 +215,7 @@ public class Vector {
      * @return the outer product of {@code this} and the input vector
      */
     public Matrix outerProduct(Vector other) {
-        return new Matrix(vector.multiply(other.vector.conjugate()));
+        return new Matrix(vector.multiply(other.vector.transpose()));
     }
 
     /**

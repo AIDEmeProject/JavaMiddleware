@@ -6,6 +6,8 @@ import utils.Validator;
 
 import java.util.StringJoiner;
 
+import static org.ojalgo.function.PrimitiveFunction.*;
+
 /**
  * A Matrix represents a mathematical real matrix. Basically, this module is a wrapper of the Ojalgo's
  * PrimitiveMatrix class. Note that all Matrix instances are immutable, i.e. we do not allow modifying its inner
@@ -138,7 +140,9 @@ public class Matrix {
         if (numRows() != other.numRows() || numCols() != other.numCols()) {
             throw new IllegalArgumentException();
         }
-        return new Matrix(matrix.add(other.matrix));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
+        result.fillMatching(matrix, ADD, other.matrix);
+        return new Matrix(result);
     }
 
     /**
@@ -150,7 +154,9 @@ public class Matrix {
         if (numRows() != other.numRows() || numCols() != other.numCols()) {
             throw new IllegalArgumentException();
         }
-        return new Matrix(matrix.subtract(other.matrix));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
+        result.fillMatching(matrix, SUBTRACT, other.matrix);
+        return new Matrix(result);
     }
 
     /**
@@ -158,7 +164,9 @@ public class Matrix {
      * @return a matrix whose every component equals the multiplication of {@code this} by value
      */
     public Matrix scalarMultiply(double value) {
-        return new Matrix(matrix.multiply(value));
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
+        result.fillMatching(MULTIPLY.second(value), matrix);
+        return new Matrix(result);
     }
 
     /**
@@ -170,7 +178,7 @@ public class Matrix {
         if (numCols() != vector.dim()) {
             throw new IllegalArgumentException();
         }
-        return new Vector(matrix.multiply(vector.vector));
+        return new Vector(matrix.multiply(vector.vector).transpose());
     }
 
     /**
