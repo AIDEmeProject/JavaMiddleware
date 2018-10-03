@@ -84,6 +84,21 @@ public class Vector {
     }
 
     /**
+     * @param indexes: indexes to extract from vector
+     * @return a slice of the original vector containing the specified indexes, in the given order
+     * @throws IllegalArgumentException if indexes is empty, or any index is out of bounds
+     */
+    public Vector slice(int... indexes) {
+        Validator.assertPositive(indexes.length);
+
+        double[] slice = new double[indexes.length];
+        for (int i = 0; i < indexes.length; i++) {
+            slice[i] = vector.getEntry(indexes[i]);
+        }
+        return new Vector(new ArrayRealVector(slice));
+    }
+
+    /**
      * @param other: vector to be added
      * @return the sum of {@code this} and {@code other}
      * @throws IllegalArgumentException if vectors have incompatible dimensions

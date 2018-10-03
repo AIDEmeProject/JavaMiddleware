@@ -55,7 +55,7 @@ public class JsonConverter {
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
 
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
-
+        // TODO: add TSM metrics
         return builder.create();
     }
 

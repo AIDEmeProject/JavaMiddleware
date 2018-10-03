@@ -2,10 +2,9 @@ package machinelearning.threesetmetric;
 
 import data.DataPoint;
 import data.LabeledPoint;
-import explore.user.UserLabel;
-import utils.linalg.Vector;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A ExtendedClassifier is responsible for building an accurate model of the user interest and disinterest regions. This model
@@ -15,21 +14,14 @@ import java.util.Collection;
  * POSITIVE, NEGATIVE, or UNKNOWN. See {@link ExtendedLabel} for more details.
  */
 public interface ExtendedClassifier {
-//    /**
-//     * Update the current data model with new labeled data.
-//     * @param point: a data array
-//     * @param label: the data's label
-//     */
-//    void update(Vector point, UserLabel label);
-//
-//    /**
-//     * Update the current data model with new labeled data.
-//     * @param labeledPoint a {@link LabeledPoint} instance
-//     */
-//    default void update(LabeledPoint labeledPoint) {
-//        update(labeledPoint.getData(), labeledPoint.getLabel());
-//    }
 
+    /**
+     * Update the current data model with new labeled data.
+     * @param labeledPoint a {@link LabeledPoint} instance
+     */
+    default void update(LabeledPoint labeledPoint) {
+        update(Collections.singleton(labeledPoint));
+    }
 
     /**
      * Update the current data model with new labeled data.
@@ -37,12 +29,6 @@ public interface ExtendedClassifier {
      */
     //
     void update(Collection<LabeledPoint> labeledPoint);
-
-//    /**
-//     * @param point: a data point
-//     * @return the predicted label for input point
-//     */
-//    ExtendedLabel predict(Vector point);
 
     /**
      * @param dataPoint: a data point

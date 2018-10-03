@@ -166,7 +166,7 @@ public final class PartitionedDataset {
      */
     public void update(LabeledPoint labeledPoint) {
         updateMostInformativePointsPartition(labeledPoint);
-        classifier.update((Collection<LabeledPoint>) labeledPoint);
+        classifier.update(labeledPoint);
         updateInferredLabelsPartition();
     }
 

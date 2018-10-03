@@ -107,7 +107,7 @@ public final class Explore {
     }
 
     private PartitionedDataset getPartitionedDataset(int id) {
-        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
+        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);  // TODO: add TSM here
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

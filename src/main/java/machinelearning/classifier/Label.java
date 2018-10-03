@@ -1,7 +1,6 @@
 package machinelearning.classifier;
 
 import explore.user.UserLabel;
-import machinelearning.threesetmetric.LabelGroup;
 
 /**
  * Binary labels, used for classification. There are only two instances of this class: POSITIVE and NEGATIVE.
@@ -11,9 +10,6 @@ public class Label implements UserLabel {
      * Whether this label is the POSITIVE or the NEGATIVE one
      */
     private boolean isPositive;
-
-    private LabelGroup labelGroup = null;
-
 
     public Label(boolean isPositive) {
         this.isPositive = isPositive;
@@ -43,18 +39,10 @@ public class Label implements UserLabel {
         return !isPositive;
     }
 
-    // todo: this function is problematic
-//    @Override
-//    public Label[] getLabelsForEachSubspace() {
-//        return new Label[] {isPositive ? POSITIVE : NEGATIVE};
-//    }
-
-    public void setLabelGroup(Label[] partialLabels){
-        labelGroup = new LabelGroup(partialLabels);
-    }
-
     @Override
-    public Label[] getLabelsForEachSubspace() { return labelGroup.getLabelsForEachSubspace();}
+    public Label[] getLabelsForEachSubspace() {
+        return new Label[] {isPositive ? POSITIVE : NEGATIVE};
+    }
 
     @Override
     public String toString() {

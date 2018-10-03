@@ -12,6 +12,8 @@ public final class ExperimentConfiguration {
     private int subsampleSize = Integer.MAX_VALUE;
     private double searchUncertainRegionProbability = 0;
 
+    // TODO: add TSM model here
+
     public String getTask() {
         return task;
     }

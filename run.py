@@ -40,6 +40,8 @@ METRICS = [
     ThreeSetMetric()
 ]
 
+# TODO: add TSM config
+
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)

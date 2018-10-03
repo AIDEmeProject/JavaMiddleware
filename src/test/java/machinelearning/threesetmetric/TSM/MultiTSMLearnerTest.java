@@ -17,7 +17,6 @@ class MultiTSMLearnerTest {
     private MultiTSMLearner multiTSMLearner;
     private Collection<LabeledPoint> labeledPoints;
     private ArrayList<int[]> featureGroup;
-    private LabelGroup labelGroup;
     private ArrayList<boolean[]> tsmFlags;
 
     @BeforeEach
@@ -63,49 +62,38 @@ class MultiTSMLearnerTest {
 
         labeledPoints = new ArrayList<>();
 
-        Label label_1 = new Label(true);
-        label_1.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_1 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(1, new double[]{7,1.5,2.5,2016,69390,0,0,1,0}), label_1));
 
-        Label label_2 = new Label(true);
-        label_2.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_2 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(2, new double[]{5.26796,1.9,2.5,2017,77904,0,0,1,0}), label_2));
 
-        Label label_3 = new Label(true);
-        label_3.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_3 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(3, new double[]{5.26288,1.48082,1.94818,2017,98764,0,0,1,0}), label_3));
 
-        Label label_4 = new Label(false);
-        label_4.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.NEGATIVE, Label.POSITIVE});
+        LabelGroup label_4 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.NEGATIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(4, new double[]{5.26288,1.48082,1.94818,2017,123881,0,0,1,0}), label_4));
 
-        Label label_5 = new Label(false);
-        label_5.setLabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_5 = new LabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(5, new double[]{5.25526,1.4605,1.89992,2017,73818,0,0,1,0}), label_5));
 
-        Label label_6 = new Label(true);
-        label_6.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_6 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(6, new double[]{5.26288,1.48082,1.94818,2016,91868,0,0,1,0}), label_6));
 
-        Label label_7 = new Label(true);
-        label_7.setLabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_7 = new LabelGroup(new Label[]{Label.POSITIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(7, new double[]{6.30936,1.88214,2.00914,2017,50723,0,0,1,0}), label_7));
 
-        Label label_8 = new Label(false);
-        label_8.setLabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_8 = new LabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(8, new double[]{5.10032,1.48082,1.905,2017,43545,0,0,1,0}), label_8));
 
-        Label label_9 = new Label(false);
-        label_9.setLabelGroup(new Label[]{Label.NEGATIVE, Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE});
+        LabelGroup label_9 = new LabelGroup(new Label[]{Label.NEGATIVE, Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(9, new double[]{5.207,1.48082,1.87452,2015,67108,0,0,1,0}), label_9));
 
-        Label label_10 = new Label(false);
-        label_10.setLabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.NEGATIVE});
+        LabelGroup label_10 = new LabelGroup(new Label[]{Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE, Label.NEGATIVE});
         labeledPoints.add(new LabeledPoint(new DataPoint(10, new double[]{5.2451,1.49098,1.89992,2017,82247,0,0,0,1}), label_10));
 
         multiTSMLearner = new MultiTSMLearner(featureGroup, tsmFlags);
         multiTSMLearner.update(labeledPoints);
-
     }
 
     @Test
@@ -125,7 +113,7 @@ class MultiTSMLearnerTest {
 
     @Test
     void isInConvexRegion_t() {
-        assertEquals(true, multiTSMLearner.isInConvexRegion(new DataPoint(0, new double[]{6,1.7,2.25,2016,69390,0,0,1,0})));
+        assertTrue(multiTSMLearner.isInConvexRegion(new DataPoint(0, new double[]{6, 1.7, 2.25, 2016, 69390, 0, 0, 1, 0})));
     }
 
     @Test

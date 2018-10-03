@@ -80,38 +80,13 @@ public class DataPoint {
         return new DataPoint(id, newData);
     }
 
-
-
-    //Todo: move this part to Vector
     /**
      * @param indices indices of selected attributes
      * @return map of the indices and the corresponding values
      */
-    public HashMap<Integer, Double> getSelectedAttributesMap(int[] indices) {
+    public DataPoint getSelectedAttributes(int[] indices) {
         Arrays.sort(indices);
-
-        HashMap<Integer, Double> selectedAttributes = new HashMap<>();
-        for(int index: indices){
-            selectedAttributes.put(index, data.toArray()[index]);
-        }
-        return selectedAttributes;
-    }
-
-    /**
-     * @param indices indices of selected attributes
-     * @return map of the indices and the corresponding values
-     */
-    public double[] getSelectedAttributes(int[] indices) {
-        Arrays.sort(indices);
-
-        double[] selected = new double[indices.length];
-        int selected_index = 0;
-        for(int index: indices){
-            selected[selected_index] = data.toArray()[index];
-            selected_index++;
-        }
-        //System.out.println("The factorized vector: " + Arrays.toString(selected));
-        return selected;
+        return new DataPoint(id, data.slice(indices));
     }
 
 }

@@ -174,7 +174,7 @@ public class OneDimTSM {
      * @return true if the point is in the interval, false otherwise
      */
     public boolean isInConvexSeg(double sample){
-        return sample >= convexLineSeg.get(0) && sample <= convexLineSeg.get(1);
+        return (convexLineSeg.size() == 2 && sample >= convexLineSeg.get(0) && sample <= convexLineSeg.get(1)) || (convexLineSeg.size() > 0 && sample == convexLineSeg.get(0));
     }
 
     /**

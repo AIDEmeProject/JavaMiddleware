@@ -29,7 +29,7 @@ public final class Experiment {
 
         List<DataPoint> dataPoints = Collections.unmodifiableList(StandardScaler.fitAndTransform(reader.readData()));
 
-        Set<Long> positiveKeys = reader.readTargetSetKeys();
+        Set<Long> positiveKeys = reader.readTargetSetKeys();  // TODO: pass feature groups
         User user = new UserStub(positiveKeys);
 
         explore = new Explore(experimentFolder, dataPoints, user);
