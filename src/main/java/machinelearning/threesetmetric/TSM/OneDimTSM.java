@@ -231,4 +231,13 @@ public class OneDimTSM {
 
         return res;
     }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("It's 1-dim tsm, the convex line segment is: ");
+        sb.append(Arrays.deepToString(convexLineSeg.toArray()));
+        sb.append(" and the concave ray end points are: ");
+        sb.append(Arrays.deepToString(concaveRay.toArray()));
+        return sb.toString();
+    }
 }

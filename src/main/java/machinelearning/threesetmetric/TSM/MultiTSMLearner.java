@@ -2,7 +2,7 @@ package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
 import data.LabeledPoint;
-import machinelearning.classifier.Label;
+import explore.user.UserLabel;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedLabel;
 
@@ -26,10 +26,10 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     private final ArrayList<int[]> feaGroups;
 
-    /**
-     * The collection of points used for TSM evaluation
-     */
-    private final Collection<DataPoint> testPoints;
+//    /**
+//     * The collection of points used for TSM evaluation
+//     */
+//    private final Collection<DataPoint> testPoints;
 
     /**
      * Indicator of the type of attributes and the shape of pos and neg regions
@@ -38,21 +38,21 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     private final ArrayList<boolean[]> tsmFlags;
 
-    // Evaluation
-    /**
-     * Indices of positive examples
-     */
-    private HashSet<Long> positiveSamples;
-
-    /**
-     * Indices of negative examples
-     */
-    private HashSet<Long> negativeSamples;
-
-    /**
-     * Indices of uncertain examples
-     */
-    private HashSet<Long> uncertainSamples;
+//    // Evaluation
+//    /**
+//     * Indices of positive examples
+//     */
+//    private HashSet<Long> positiveSamples;
+//
+//    /**
+//     * Indices of negative examples
+//     */
+//    private HashSet<Long> negativeSamples;
+//
+//    /**
+//     * Indices of uncertain examples
+//     */
+//    private HashSet<Long> uncertainSamples;
 
     /**
      * Test the correctness of TSMs construction. For each element:
@@ -87,22 +87,16 @@ public class MultiTSMLearner implements ExtendedClassifier {
     private static int threshold = 1;
 
 
-    private ArrayList<HashSet<Long>> truthKeySet;
-
-
-
 
     /**
      * @param feaGroups partition of attributes represented by indices
-     * @param testPoints examples for TSM evaluation
+//     * @param testPoints examples for TSM evaluation
      * @param tsmFlags a list of indicators that correspond to attributes partition
-     * @param truthKeySet ids of positive points on each subspace
      */
-    public MultiTSMLearner(ArrayList<int[]> feaGroups, Collection<DataPoint> testPoints,  ArrayList<boolean[]> tsmFlags, ArrayList<HashSet<Long>> truthKeySet) {
+    public MultiTSMLearner(ArrayList<int[]> feaGroups,  ArrayList<boolean[]> tsmFlags) {
         this.feaGroups = feaGroups;
-        this.testPoints = testPoints;
+//        this.testPoints = testPoints;
         this.tsmFlags = tsmFlags;
-        this.truthKeySet = truthKeySet;
 
         tsmSet = new ArrayList<>();
         testStates = new ArrayList<>();
@@ -116,68 +110,69 @@ public class MultiTSMLearner implements ExtendedClassifier {
 
         for(int[] selected_set : feaGroups){
             // initialize each TSM on each subspace
-            TsmLearner tsm = new TsmLearner(selected_set.length, factorizeFeatures(testPoints, selected_set));
+           // TsmLearner tsm = new TsmLearner(selected_set.length, factorizeFeatures(testPoints, selected_set));
+            TsmLearner tsm = new TsmLearner(selected_set.length);
             tsmSet.add(tsm);
             //for hypothesis test
             testStates.add(0);
             // backup tsm is constructed according to the asssumption that negative region is convex
-            TsmLearner backupTsm = new TsmLearner(selected_set.length, factorizeFeatures(testPoints, selected_set));
+            TsmLearner backupTsm = new TsmLearner(selected_set.length);
             backupTsmSet.add(backupTsm);
         }
         System.out.println( "the number of tsms: " + tsmSet.size());
 
-        positiveSamples = new HashSet<>();
-        negativeSamples = new HashSet<>();
-        // assign test data for TSM evaluation
-        uncertainSamples = TsmLearner.getIdSet(testPoints);
+//        positiveSamples = new HashSet<>();
+//        negativeSamples = new HashSet<>();
+//        // assign test data for TSM evaluation
+//        uncertainSamples = TsmLearner.getIdSet(testPoints);
     }
 
-    /**
-     * @return ids of positive examples known by TSM
-     */
-    public HashSet<Long> getPositiveSamplesIds(){
-        return positiveSamples;
-    }
-
-    /**
-     * @return ids of negative examples known by TSM
-     */
-    public HashSet<Long> getNegativeSamplesIds() {
-        return negativeSamples;
-    }
-
-    /**
-     * @return ids of examples unknown for TSM
-     */
-    public HashSet<Long> getUncertainSamplesIds() { return uncertainSamples; }
-
-    /**
-     * Rejection sampling of a positive sample from unlabeled data
-     * @param labeledSampleIds ids of labeled points
-     * @return id of a positive point that has not been labeled
-     */
-    public Long getRandomPositiveIdNotIn (HashSet<Long> labeledSampleIds) {
-        for (Long posSampleId: positiveSamples) {
-            if (!labeledSampleIds.contains(posSampleId)) {
-                return posSampleId;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Rejection sampling of a negative sample from unlabeled data
-     * @param labeledSampleIds ids of labeled points
-     * @return id of a negative point that has not been labeled
-     */
-    public Long getRandomNegativeIdNotIn (HashSet<Long> labeledSampleIds) {
-        for (Long negSampleId: negativeSamples) {
-            if (!labeledSampleIds.contains(negSampleId)) {
-                return negSampleId;
-            }
-        }
-        return null;
-    }
+//    /**
+//     * @return ids of positive examples known by TSM
+//     */
+//    public HashSet<Long> getPositiveSamplesIds(){
+//        return positiveSamples;
+//    }
+//
+//    /**
+//     * @return ids of negative examples known by TSM
+//     */
+//    public HashSet<Long> getNegativeSamplesIds() {
+//        return negativeSamples;
+//    }
+//
+//    /**
+//     * @return ids of examples unknown for TSM
+//     */
+//    public HashSet<Long> getUncertainSamplesIds() { return uncertainSamples; }
+//
+//    /**
+//     * Rejection sampling of a positive sample from unlabeled data
+//     * @param labeledSampleIds ids of labeled points
+//     * @return id of a positive point that has not been labeled
+//     */
+//    public Long getRandomPositiveIdNotIn (HashSet<Long> labeledSampleIds) {
+//        for (Long posSampleId: positiveSamples) {
+//            if (!labeledSampleIds.contains(posSampleId)) {
+//                return posSampleId;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    /**
+//     * Rejection sampling of a negative sample from unlabeled data
+//     * @param labeledSampleIds ids of labeled points
+//     * @return id of a negative point that has not been labeled
+//     */
+//    public Long getRandomNegativeIdNotIn (HashSet<Long> labeledSampleIds) {
+//        for (Long negSampleId: negativeSamples) {
+//            if (!labeledSampleIds.contains(negSampleId)) {
+//                return negSampleId;
+//            }
+//        }
+//        return null;
+//    }
 
     //Todo: retrive a point by the ids
 //    public Tuple getEvaluatingTupleById (Long id) {
@@ -192,12 +187,13 @@ public class MultiTSMLearner implements ExtendedClassifier {
     @Override
     public void update(Collection<LabeledPoint> labeledSamples) {
         for(int i=0;i < tsmSet.size();i++){
+            //System.out.println("The index of tsm is: " + i  +" --- and feature group is: " + Arrays.toString(feaGroups.get(i)));
             if(tsmFlags.get(i)[1]){
                 // if the second element of flags array is true, the corresponding attribute is a categorical attribute
                 if(tsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null){
-                            tsmSet.get(i).updateCat(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)), feaGroups.get(i));
+                            tsmSet.get(i).updateCat(factorizeFeatures(labeledSamples, feaGroups.get(i), i));
                         }
                     }catch (IllegalArgumentException e){
                         errTSM[i]++;
@@ -212,7 +208,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 if(tsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null) {
-                            tsmSet.get(i).updatePosRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)));
+                            tsmSet.get(i).updatePosRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), i));
                         }
                         //System.out.println("partition: " + feaGroups.get(i) + " with flag: " + tsmFlags.get(i));
                         //System.out.println(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)).size());
@@ -231,7 +227,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 if(backupTsmSet.get(i)!=null){
                     try{
                         if(labeledSamples!=null){
-                            backupTsmSet.get(i).updateNegRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), truthKeySet.get(i)));
+                            backupTsmSet.get(i).updateNegRatio(factorizeFeatures(labeledSamples, feaGroups.get(i), i));
                         }
                     }catch (Exception e){
                         errBackTSM[i]++;
@@ -283,9 +279,9 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     @Override
     public ExtendedLabel predict(DataPoint point) {
-        if(isInPositiveRegion(point)){
+        if(isInConvexRegion(point)){
             return ExtendedLabel.POSITIVE;
-        }else if(isInNegativeRegion(point)){
+        }else if(isInConcaveRegion(point)){
             return ExtendedLabel.NEGATIVE;
         }else {
             return ExtendedLabel.UNKNOWN;
@@ -298,13 +294,13 @@ public class MultiTSMLearner implements ExtendedClassifier {
      * @param sample an example to be checked
      * @return true if the example is in the positive region, false otherwise
      */
-    public boolean isInPositiveRegion (DataPoint sample) {
+    public boolean isInConvexRegion (DataPoint sample) {
         ArrayList<Boolean> catTruth = new ArrayList<> ();
         for(int i=0; i < tsmSet.size(); i++){
             // for categorical variables, if the example is not on the truth lines, return false
             if(tsmFlags.get(i)[1]){
                 if(tsmSet.get(i) != null){
-                    catTruth.add(tsmSet.get(i).isOnTruthLines(sample, feaGroups.get(i)));
+                    catTruth.add(tsmSet.get(i).isOnTruthLines(sample));
                 } else {
                     catTruth.add(false);
                 }
@@ -313,11 +309,11 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
                 if(flag){
-                    if(tsmSet.get(i) == null || !tsmSet.get(i).isInPositiveRegion(newSample, true)){
+                    if(tsmSet.get(i) == null || !tsmSet.get(i).isInConvexRegion(newSample, true)){
                         return false;
                     }
                 }else {
-                    if(backupTsmSet.get(i)==null || !backupTsmSet.get(i).isInPositiveRegion(newSample, false)){
+                    if(backupTsmSet.get(i)==null || !backupTsmSet.get(i).isInConvexRegion(newSample, false)){
                         return false;
                     }
                 }
@@ -332,22 +328,22 @@ public class MultiTSMLearner implements ExtendedClassifier {
      * @param sample an example to be checked
      * @return true if the example is in the negative region, false otherwise
      */
-    public boolean isInNegativeRegion (DataPoint sample) {
+    public boolean isInConcaveRegion (DataPoint sample) {
         for(int i=0; i < tsmSet.size(); i++){
             if(tsmFlags.get(i)[1]){
-                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample, feaGroups.get(i))){
+                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample)){
                     return true;
                 }
             }else {
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
                 if(flag){
-                    if(tsmSet.get(i)!= null && tsmSet.get(i).isInNegativeRegion(newSample, true)) {
+                    if(tsmSet.get(i)!= null && tsmSet.get(i).isInConcaveRegion(newSample, true)) {
                         return true;
                     }
                 }else {
                     //todo: remove tsmFlags from threeset metric
-                    if(backupTsmSet.get(i)!= null && backupTsmSet.get(i).isInNegativeRegion(newSample, false)) {
+                    if(backupTsmSet.get(i)!= null && backupTsmSet.get(i).isInConcaveRegion(newSample, false)) {
                         return true;
                     }
                 }
@@ -356,20 +352,20 @@ public class MultiTSMLearner implements ExtendedClassifier {
         return false;
     }
 
-    /**
-     * Verify if an example is neither positive nor negative
-     * @param sample an example to be checked
-     * @return true if the example is in the unknown region, false otherwise
-     */
-    public boolean isUncertainSample(DataPoint sample) throws Exception {
-        if (isInPositiveRegion(sample)) {
-            return false;
-        }
-        if (isInNegativeRegion(sample)) {
-            return false;
-        }
-        return true;
-    }
+//    /**
+//     * Verify if an example is neither positive nor negative
+//     * @param sample an example to be checked
+//     * @return true if the example is in the unknown region, false otherwise
+//     */
+//    public boolean isUncertainSample(DataPoint sample) {
+//        if (isInConvexRegion(sample)) {
+//            return false;
+//        }
+//        if (isInConcaveRegion(sample)) {
+//            return false;
+//        }
+//        return true;
+//    }
 
     /*
     Test whether all partitions have been null or not
@@ -379,10 +375,13 @@ public class MultiTSMLearner implements ExtendedClassifier {
     }
 
 
-    public Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, HashSet<Long> truthKeys) {
+    public Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, int index) {
         Collection<LabeledPoint> dataPointsCopy = new ArrayList<>();
         for(LabeledPoint dataPoint : labeledSamples){
-            LabeledPoint partialPoint = new LabeledPoint(new DataPoint(dataPoint.getId(),dataPoint.getSelectedAttributes(select_set)), isTruthKeys(truthKeys, dataPoint.getId()));
+            //System.out.println("The partialLabels: " + Arrays.toString(dataPoint.getLabel().getLabelsForEachSubspace()));
+            UserLabel label = dataPoint.getLabel().getLabelsForEachSubspace()[index];
+            LabeledPoint partialPoint = new LabeledPoint(new DataPoint(dataPoint.getId(),dataPoint.getSelectedAttributes(select_set)), label);
+            //System.out.println("The size of factorized point: " + partialPoint.getDim() + " The size of original point: " + dataPoint.getDim());
             dataPointsCopy.add(partialPoint);
         }
         return dataPointsCopy;
@@ -414,16 +413,16 @@ public class MultiTSMLearner implements ExtendedClassifier {
         return new DataPoint(testSample.getId(), testSample.getSelectedAttributes(select_set));
     }
 
-
-    /**
-     * Verify partial labels on a subspace for a given point
-     * @param truthKeys ids of positive examples on a subspace
-     * @param id
-     * @return POSITIVE if the example is in the truthkeys set, Negative otherwise.
-     */
-    public Label isTruthKeys(HashSet<Long> truthKeys, Long id){
-        return truthKeys.contains(id)? Label.POSITIVE : Label.NEGATIVE;
-    }
+//
+//    /**
+//     * Verify partial labels on a subspace for a given point
+//     * @param truthKeys ids of positive examples on a subspace
+//     * @param id
+//     * @return POSITIVE if the example is in the truthkeys set, Negative otherwise.
+//     */
+//    public Label isTruthKeys(HashSet<Long> truthKeys, Long id){
+//        return truthKeys.contains(id)? Label.POSITIVE : Label.NEGATIVE;
+//    }
 
 
     //TODO: three-set metric will be calculated from the outside
@@ -439,9 +438,9 @@ public class MultiTSMLearner implements ExtendedClassifier {
 ////                for(Iterator<Long> posId = positiveSamples.iterator(); posId.hasNext();){
 ////                    Long key = posId.next();
 ////                    Tuple posSample = ep.points.get(key);
-////                    if(!isInPositiveRegion(posSample)){
+////                    if(!isInConvexRegion(posSample)){
 ////                        posId.remove();
-////                        if(isInNegativeRegion(posSample)){
+////                        if(isInConcaveRegion(posSample)){
 ////                            negativeSamples.add(key);
 ////                        }else {
 ////                            uncertainSamples.add(key);
@@ -453,9 +452,9 @@ public class MultiTSMLearner implements ExtendedClassifier {
 ////                for(Iterator<Long> negId = negativeSamples.iterator(); negId.hasNext();){
 ////                    Long key = negId.next();
 ////                    Tuple negSample = ep.points.get(key);
-////                    if(!isInNegativeRegion(negSample)){
+////                    if(!isInConcaveRegion(negSample)){
 ////                        negId.remove();
-////                        if(isInPositiveRegion(negSample)){
+////                        if(isInConvexRegion(negSample)){
 ////                            positiveSamples.add(key);
 ////                        }else {
 ////                            uncertainSamples.add(key);
@@ -469,10 +468,10 @@ public class MultiTSMLearner implements ExtendedClassifier {
 //            for (Iterator<Long> i = uncertainSamples.iterator(); i.hasNext();) {
 //                Long key = i.next();
 //                Tuple sample = ep.points.get(key);
-//                if (isInPositiveRegion(sample)) {
+//                if (isInConvexRegion(sample)) {
 //                    i.remove();
 //                    positiveSamples.add(key);
-//                }else if (isInNegativeRegion(sample)){
+//                }else if (isInConcaveRegion(sample)){
 //                    i.remove();
 //                    negativeSamples.add(key);
 //                }
@@ -515,5 +514,23 @@ public class MultiTSMLearner implements ExtendedClassifier {
 //
 //        return trueKeys;
 //    }
+
+    public int tsmCount(){ return feaGroups.size();}
+
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        int num = 0;
+        for(TsmLearner tsm: tsmSet){
+            sb.append("The " + num + "th tsm is:" + "\n");
+            if(tsmFlags.get(num)[1]){
+                sb.append(tsm.catTSMtoString());
+            }else {
+                sb.append(tsm.toString() + "\n");
+            }
+            num++;
+        }
+        return sb.toString();
+    }
 
 }

@@ -36,19 +36,17 @@ public class CatTSM {
     /**
      * Update the recorded information about categorical attributes
      * @param labeledSamples
-     * @param indices indices of categorical attributes
      */
-    public void updateCat(Collection<LabeledPoint> labeledSamples, int[] indices) {
+    public void updateCat(Collection<LabeledPoint> labeledSamples) {
         for(LabeledPoint t: labeledSamples) {
-            HashMap<Integer, Double> selectedAttributesMap = t.getSelectedAttributesMap(indices);
-            for(Integer index : selectedAttributesMap.keySet()){
-                if(t.getLabel().asSign() > 0 && selectedAttributesMap.get(index) > 0){
+            for(int index=0;index<t.getDim();index++){
+                if(t.getLabel().asSign() > 0 && t.get(index) > 0){
                     // check whether the true value is in false value list
                     if(falseLines.contains(index)){
                         throw new IllegalArgumentException("A false value: " + index + " cannot be true!");
                     }
                     truthLines.add(index);
-                }else if(t.getLabel().asSign() < 0 && selectedAttributesMap.get(index) > 0){
+                }else if(t.getLabel().asSign() < 0 && t.get(index) > 0){
                     // check whether the false value is in true value list
                     if(truthLines.contains(index)){
                         throw new IllegalArgumentException("A true value: " + index + " cannot be false!");
@@ -63,50 +61,49 @@ public class CatTSM {
     /**
      * Check whether an attribute is positive or not
      * @param sample data point
-     * @param indices indices of categorical attributes
      * @return true if the attribute belongs to positive set, false otherwise
      */
-    public boolean isOnTruthLines(DataPoint sample, int[] indices) { return isInside(sample, truthLines, indices); }
+    public boolean isOnTruthLines(DataPoint sample) { return isInside(sample, truthLines); }
 
 
     /**
      * Check whether an attribute is negative or not
      * @param sample data point
-     * @param indices indices of categorical attributes
      * @return true if the attribute belongs to negative set, false otherwise
      */
-    public boolean isOnFalseLines(DataPoint sample, int[] indices) {
-        return isInside(sample, falseLines, indices);
-    }
+    public boolean isOnFalseLines(DataPoint sample) { return isInside(sample, falseLines); }
 
 
     /**
      * Check whether an attribute belongs to a set or not
      * @param sample data point
-     * @param indices indices of categorical attributes
      * @return true if the attribute belongs to the specific set, false otherwise
      */
-    private boolean isInside(DataPoint sample, HashSet<Integer> lines, int[] indices) {
+    private boolean isInside(DataPoint sample, HashSet<Integer> lines) {
         if(lines.size() == 0){
             return false;
         }
 
         int count = 0;
-        HashMap<Integer, Double> selectedAttributesMap = sample.getSelectedAttributesMap(indices);
-        for(Integer index: selectedAttributesMap.keySet()){
-            if(lines.contains(index) && selectedAttributesMap.get(index) > 0){
+        for(int index=0; index < sample.getDim(); index++){
+            if(lines.contains(index) && sample.get(index) > 0){
                 count+=1;
             }
         }
         if(count > 1 ){
-            throw new IllegalArgumentException(Arrays.toString(sample.getSelectedAttributes(indices)) + "is positive/negative to multiple features");
+            throw new IllegalArgumentException(Arrays.toString(sample.getData().toArray()) + "is positive/negative to multiple features");
         }else return count == 1;
     }
 
-    public String toString(){
+    public String catTSMtoString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Truth line is:"+ truthLines.toString() + "\n");
+        sb.append("Truth line is:"+ truthLines.toString() + ", ");
         sb.append("False line is:"+ falseLines.toString() + "\n");
         return sb.toString();
     }
+
+
+    public HashSet<Integer> getTruthLines(){return truthLines;}
+
+    public HashSet<Integer> getFalseLines(){return falseLines;}
 }

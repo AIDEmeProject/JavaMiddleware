@@ -99,7 +99,7 @@ class PartitionedDatasetTest {
 
     private ExtendedClassifier getExtendedClassifierStub(long index) {
         ExtendedClassifier classifier = mock(ExtendedClassifier.class);
-        doNothing().when(classifier).update(isA(Vector.class), isA(Label.class));
+        //doNothing().when(classifier).update(isA(Vector.class), isA(Label.class));
         when(classifier.predict((DataPoint) any())).thenAnswer((Answer<ExtendedLabel>) invocationOnMock -> {
             DataPoint dataPoint1 = invocationOnMock.getArgument(0);
             return dataPoint1.getId() == index ? ExtendedLabel.POSITIVE : ExtendedLabel.UNKNOWN;

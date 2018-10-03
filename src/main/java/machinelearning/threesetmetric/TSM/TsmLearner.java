@@ -15,29 +15,29 @@ import java.util.*;
 public class TsmLearner extends CatTSM {
 
     /**
-     * Reservoir of initial pos points
+     * Reservoir of initial points in convex region
      */
-    private double[][] pos;
+    private double[][] convex;
 
     /**
-     * Count of pos points
+     * Count of points in convex region
      */
-    private int posCount;
+    private int convexCount;
 
     /**
-     * Reservoir of initial neg points
+     * Reservoir of initial points in concave region
      */
-    private ArrayList<double[]> neg;
+    private ArrayList<double[]> concave;
 
     /**
-     * True if the pos region has been initialized, false otherwise
+     * True if the convex region has been initialized, false otherwise
      */
-    private boolean posInitialized = false;
+    private boolean convexInitialized = false;
 
     /**
-     * True if the neg region has been initialized, false otherwise
+     * True if the concave region has been initialized, false otherwise
      */
-    private boolean negInitialized = false;
+    private boolean concaveInitialized = false;
 
     /**
      * Dim of vertices
@@ -47,32 +47,32 @@ public class TsmLearner extends CatTSM {
     /**
      * Convex polytope
      */
-    private ConvexPolytope positiveRegion;
+    private ConvexPolytope convexRegion;
 
     /**
      * The union of convex cones
      */
-    private final ArrayList<PointWiseComplementConvexHull> negativeRegions;
+    private final ArrayList<PointWiseComplementConvexHull> concaveRegions;
 
-    /**
-     * Points for evaluation
-     */
-    private final Collection<DataPoint> dataPoints;
+//    /**
+//     * Points for evaluation
+//     */
+//    private final Collection<DataPoint> dataPoints;
 
-    /**
-     * Positive samples recognized by TSM
-     */
-    private final HashSet<Long> positiveSamples;
-
-    /**
-     * Negative samples recognized by TSM
-     */
-    private final HashSet<Long> negativeSamples;
-
-    /**
-     * Points remaining unknown to TSM
-     */
-    private HashSet<Long> uncertainSamples;
+//    /**
+//     * Positive samples recognized by TSM
+//     */
+//    private final HashSet<Long> positiveSamples;
+//
+//    /**
+//     * Negative samples recognized by TSM
+//     */
+//    private final HashSet<Long> negativeSamples;
+//
+//    /**
+//     * Points remaining unknown to TSM
+//     */
+//    private HashSet<Long> uncertainSamples;
 
     // record vertices to remove duplicates
     /**
@@ -89,78 +89,78 @@ public class TsmLearner extends CatTSM {
     /**
      * Create Three-Set Partition for any dimensional space
      * @param dim dim of vertices
-     * @param dataPoints points for evaluation
+//     * @param dataPoints points for evaluation
      */
-    public TsmLearner(int dim, Collection<DataPoint> dataPoints) {
+    public TsmLearner(int dim) {
         this.dim = dim;
 
-        this.dataPoints = dataPoints;
-        positiveSamples = new HashSet<>();
-        negativeSamples = new HashSet<>();
-        uncertainSamples = getIdSet(dataPoints);
+//        this.dataPoints = dataPoints;
+//        positiveSamples = new HashSet<>();
+//        negativeSamples = new HashSet<>();
+//        uncertainSamples = getIdSet(dataPoints);
 
-        pos = new double[dim + 1][];
-        posCount = 0;
-        neg = new ArrayList<>();
-        negativeRegions = new ArrayList<>();
+        convex = new double[dim + 1][];
+        convexCount = 0;
+        concave = new ArrayList<>();
+        concaveRegions = new ArrayList<>();
         oneDimTSM = new OneDimTSM();
     }
 
-    /**
-     * Rejection sampling of a positive sample from unlabeled data
-     * @param labeledSampleIds ids of labeled points
-     * @return id of a positive point that has not been labeled
-     */
-    public Long getRandomPositiveIdNotIn(HashSet<Long> labeledSampleIds) {
-        for (Long posSampleId : positiveSamples) {
-            if (!labeledSampleIds.contains(posSampleId)) {
-                return posSampleId;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Rejection sampling of a negative sample from unlabeled data
-     * @param labeledSampleIds ids of labeled points
-     * @return id of a negative point that has not been labeled
-     */
-    public Long getRandomNegativeIdNotIn(HashSet<Long> labeledSampleIds) {
-        for (Long negSampleId : negativeSamples) {
-            if (!labeledSampleIds.contains(negSampleId)) {
-                return negSampleId;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return Ids of positive examples
-     */
-    public HashSet<Long> getPositiveSamplesIds() {
-        return positiveSamples;
-    }
-
-    /**
-     * @return Ids of negative examples
-     */
-    public HashSet<Long> getNegativeSamplesIds() {
-        return negativeSamples;
-    }
-
-    /**
-     * @return Ids of uncertain examples
-     */
-    public HashSet<Long> getUncertainSamplesIds() {
-        return uncertainSamples;
-    }
-
-    /**
-     * @return collection of data points for TSM
-     */
-    public Collection<DataPoint> getEpFromTSM(){
-        return dataPoints;
-    }
+//    /**
+//     * Rejection sampling of a positive sample from unlabeled data
+//     * @param labeledSampleIds ids of labeled points
+//     * @return id of a positive point that has not been labeled
+//     */
+//    public Long getRandomPositiveIdNotIn(HashSet<Long> labeledSampleIds) {
+//        for (Long posSampleId : positiveSamples) {
+//            if (!labeledSampleIds.contains(posSampleId)) {
+//                return posSampleId;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    /**
+//     * Rejection sampling of a negative sample from unlabeled data
+//     * @param labeledSampleIds ids of labeled points
+//     * @return id of a negative point that has not been labeled
+//     */
+//    public Long getRandomNegativeIdNotIn(HashSet<Long> labeledSampleIds) {
+//        for (Long negSampleId : negativeSamples) {
+//            if (!labeledSampleIds.contains(negSampleId)) {
+//                return negSampleId;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    /**
+//     * @return Ids of positive examples
+//     */
+//    public HashSet<Long> getPositiveSamplesIds() {
+//        return positiveSamples;
+//    }
+//
+//    /**
+//     * @return Ids of negative examples
+//     */
+//    public HashSet<Long> getNegativeSamplesIds() {
+//        return negativeSamples;
+//    }
+//
+//    /**
+//     * @return Ids of uncertain examples
+//     */
+//    public HashSet<Long> getUncertainSamplesIds() {
+//        return uncertainSamples;
+//    }
+//
+//    /**
+//     * @return collection of data points for TSM
+//     */
+//    public Collection<DataPoint> getEpFromTSM(){
+//        return dataPoints;
+//    }
 
 //    public DataPoint getEvaluatingTupleById(Long id) {
 //        //Todo: find how to retrieve a point by its id
@@ -174,27 +174,27 @@ public class TsmLearner extends CatTSM {
      */
     public void updatePosRatio(Collection<LabeledPoint> labeledSamples) {
         for (LabeledPoint t : labeledSamples) {
-            double[] point = t.getData();
+            double[] point = t.getData().toArray();
             if(dim==1) {
                 oneDimTSM.updatePos(point[0], t.getLabel().asSign());
             }else {
                 // check the label on a subspace
                 if (t.getLabel().asSign() > 0) {
                     // check whether a positive point(including the boundary) is inside the concave region or not
-                    if(negativeRegions!=null && negativeRegions.contains(point)){
+                    if(concaveRegions!=null && concaveRegions.contains(point)){
                         throw new IllegalArgumentException("a positive point cannot be inside the concave(negative) region: " + Arrays.toString(point));
                     }
                     updateConvexRegion(point);
                 } else {
                     // check whether a negative point (including the boundary) is inside the convex region or not
-                    if(positiveRegion!=null && positiveRegion.containsPoint(point)){
+                    if(convexRegion!=null && convexRegion.containsPoint(point)){
                         throw new IllegalArgumentException("a negative point cannot be inside the convex(positive) region: " + Arrays.toString(point));
                     }
                     updateConcaveRegion(point);
                 }
 
                 // get the vertices of both pos and neg regions
-                vertices = getVertices(positiveRegion, negativeRegions);
+                vertices = getVertices(convexRegion, concaveRegions);
             }
         }
 
@@ -207,19 +207,19 @@ public class TsmLearner extends CatTSM {
      */
     public void updateNegRatio(Collection<LabeledPoint> labeledSamples) {
         for(LabeledPoint t: labeledSamples) {
-            double[] point = t.getData();
+            double[] point = t.getData().toArray();
             if(dim==1) {
                 oneDimTSM.updateNeg(point[0], t.getLabel().asSign());
             }else {
                 if (t.getLabel().asSign() < 0) {
                     // check whether a negative point(including the boundary) is inside the concave region or not
-                    if(negativeRegions!=null && negativeRegions.contains(point)){
+                    if(concaveRegions!=null && concaveRegions.contains(point)){
                         throw new IllegalArgumentException("a negative point cannot be inside the concave(negative) region: " + Arrays.toString(point));
                     }
                     updateConvexRegion(point);
                 } else {
                     // check whether a positive point( including the boundary) is inside the convex region or not
-                    if(positiveRegion!=null && positiveRegion.containsPoint(point)){
+                    if(convexRegion!=null && convexRegion.containsPoint(point)){
                         throw new IllegalArgumentException("a positive point cannot be inside the convex(negative) region: " + Arrays.toString(point));
                     }
 
@@ -227,7 +227,7 @@ public class TsmLearner extends CatTSM {
                 }
 
                 // get the vertices of both pos and neg regions
-                vertices = getVertices(positiveRegion, negativeRegions);
+                vertices = getVertices(convexRegion, concaveRegions);
             }
         }
     }
@@ -237,27 +237,27 @@ public class TsmLearner extends CatTSM {
      * @param point point to be used for TSM
      */
     private void updateConvexRegion(double[] point) {
-        // posInitialized true means the convex hull has been created
-        if (!posInitialized) {
+        // convexInitialized true means the convex hull has been created
+        if (!convexInitialized) {
             // remove the duplicates from pos points
-            boolean isDuplicates = findDuplicates(pos, point);
+            boolean isDuplicates = findDuplicates(convex, point);
             if (!isDuplicates) {
-                pos[posCount++] = point;
+                convex[convexCount++] = point;
             }
 
             // if this point is the (dim)-th positive sample and there already are some negative samples
-            if (posCount == dim && !neg.isEmpty()) {
+            if (convexCount == dim && !concave.isEmpty()) {
                 // initialize the negative regions
-                for (double[] negPoint : neg) {
-                    negativeRegions.add(new PointWiseComplementConvexHull(dim, negPoint, pos));
+                for (double[] negPoint : concave) {
+                    concaveRegions.add(new PointWiseComplementConvexHull(dim, negPoint, convex));
                 }
-                negInitialized = true;
-                neg.clear();
-            } else if (posCount == dim + 1) {
-                positiveRegion = new ConvexPolytope(dim, pos);
-                posInitialized = true;
-                if (negInitialized) {
-                    for (PointWiseComplementConvexHull nr : negativeRegions) {
+                concaveInitialized = true;
+                concave.clear();
+            } else if (convexCount == dim + 1) {
+                convexRegion = new ConvexPolytope(dim, convex);
+                convexInitialized = true;
+                if (concaveInitialized) {
+                    for (PointWiseComplementConvexHull nr : concaveRegions) {
                         nr.addVertex(point);
                     }
                 }
@@ -266,8 +266,8 @@ public class TsmLearner extends CatTSM {
             //todo: check whether this step is necessary
 
         } else {
-            positiveRegion.addVertex(point);
-            for (PointWiseComplementConvexHull nr : negativeRegions) {
+            convexRegion.addVertex(point);
+            for (PointWiseComplementConvexHull nr : concaveRegions) {
                 nr.addVertex(point);
             }
         }
@@ -278,19 +278,19 @@ public class TsmLearner extends CatTSM {
      * @param point point to be used for TSM
      */
     private void updateConcaveRegion(double[] point) {
-        // negInitialized true means the convex cone has been created
-        if (!negInitialized) {
-            if (posCount < dim) {
+        // concaveInitialized true means the convex cone has been created
+        if (!concaveInitialized) {
+            if (convexCount < dim) {
                 // record the negative points until the convex polytope has been built
-                neg.add(point);
+                concave.add(point);
             } else {
                 // in this case, convex polytope has existed
-                negativeRegions.add(new PointWiseComplementConvexHull(dim, point, pos));
-                negInitialized = true;
+                concaveRegions.add(new PointWiseComplementConvexHull(dim, point, convex));
+                concaveInitialized = true;
             }
         } else {
             boolean createNew = true;
-            for (PointWiseComplementConvexHull nr : negativeRegions) {
+            for (PointWiseComplementConvexHull nr : concaveRegions) {
                 if (nr.containsPoint(point)) {
                     // one of the convex cones contains this point
                     createNew = false;
@@ -298,11 +298,11 @@ public class TsmLearner extends CatTSM {
                 }
             }
             if (createNew) {
-                if (positiveRegion != null) {
-                    negativeRegions.add(new PointWiseComplementConvexHull(dim, point, positiveRegion));
+                if (convexRegion != null) {
+                    concaveRegions.add(new PointWiseComplementConvexHull(dim, point, convexRegion));
                 } else {
                     // although no positive region exists, there must be a facet
-                    negativeRegions.add(new PointWiseComplementConvexHull(dim, point, pos));
+                    concaveRegions.add(new PointWiseComplementConvexHull(dim, point, convex));
                 }
             }
         }
@@ -314,15 +314,14 @@ public class TsmLearner extends CatTSM {
      * @param flag true if pos region is convex, false otherwise
      * @return true if the point is in the uncertain region, false otherwise
      */
-    public boolean isUsefulSample(LabeledPoint sample, boolean flag) {
-        if (isInPositiveRegion(sample,flag)) {
-            sample.setLabel(1);
+    public boolean isUsefulSample(DataPoint sample, boolean flag) {
+        if (isInConvexRegion(sample,flag)) {
             return false;
         }
-        if (isInNegativeRegion(sample,flag)) {
-            sample.setLabel(-1);
+        if (isInConcaveRegion(sample,flag)) {
             return false;
         }
+
         return true;
     }
 
@@ -332,21 +331,21 @@ public class TsmLearner extends CatTSM {
      * @param flag true if pos region is convex, false otherwise
      * @return true if the point is in the positive region, false otherwise
      */
-    public boolean isInPositiveRegion (DataPoint sample, boolean flag) {
+    public boolean isInConvexRegion (DataPoint sample, boolean flag) {
         if(dim ==1){
             if(flag){
                 ArrayList<Double> convexLineSeg = oneDimTSM.getConvexLineSeg();
-                return ((convexLineSeg.size() == 2 && oneDimTSM.isInConvexSeg(sample.getData()[0])) || (convexLineSeg.size() > 0 && sample.getData()[0] == convexLineSeg.get(0)));
+                return ((convexLineSeg.size() == 2 && oneDimTSM.isInConvexSeg(sample.getData().toArray()[0])) || (convexLineSeg.size() > 0 && sample.getData().toArray()[0] == convexLineSeg.get(0)));
             } else {
                 ArrayList<Double> concaveRay = oneDimTSM.getConcaveRay();
-                return (concaveRay.size() == 2 && oneDimTSM.isInConcaveRay(sample.getData()[0]));
+                return (concaveRay.size() == 2 && oneDimTSM.isInConcaveRay(sample.getData().toArray()[0]));
             }
         }else {
             if (flag) {
-                return (positiveRegion != null && positiveRegion.containsPoint(sample.getData()));
+                return (convexRegion != null && convexRegion.containsPoint(sample.getData().toArray()));
             }else {
-                for(PointWiseComplementConvexHull nr:negativeRegions) {
-                    if(nr.containsPoint(sample.getData())) {
+                for(PointWiseComplementConvexHull nr:concaveRegions) {
+                    if(nr.containsPoint(sample.getData().toArray())) {
                         return true;
                     }
                 }
@@ -361,26 +360,26 @@ public class TsmLearner extends CatTSM {
      * @param flag true if pos region is convex, false otherwise
      * @return true if the point is in the negative region, false otherwise
      */
-    public boolean isInNegativeRegion (DataPoint sample, boolean flag) {
+    public boolean isInConcaveRegion (DataPoint sample, boolean flag) {
         if(dim == 1){
             if(flag){
                 ArrayList<Double> concaveRay = oneDimTSM.getConcaveRay();
-                return (concaveRay.size() == 2 && oneDimTSM.isInConcaveRay(sample.getData()[0]));
+                return (concaveRay.size() == 2 && oneDimTSM.isInConcaveRay(sample.getData().toArray()[0]));
             } else{
                 ArrayList<Double> convexLineSeg = oneDimTSM.getConvexLineSeg();
-                return ((convexLineSeg.size() == 2 && oneDimTSM.isInConvexSeg(sample.getData()[0])) || (convexLineSeg.size() > 0 && sample.getData()[0] == convexLineSeg.get(0)));
+                return ((convexLineSeg.size() == 2 && oneDimTSM.isInConvexSeg(sample.getData().toArray()[0])) || (convexLineSeg.size() > 0 && sample.getData().toArray()[0] == convexLineSeg.get(0)));
             }
         }else {
 
             if (flag) {
-                for(PointWiseComplementConvexHull nr:negativeRegions) {
-                    if(nr.containsPoint(sample.getData())) {
+                for(PointWiseComplementConvexHull nr:concaveRegions) {
+                    if(nr.containsPoint(sample.getData().toArray())) {
                         return true;
                     }
                 }
                 return false;
             }else{
-                return (positiveRegion != null && positiveRegion.containsPoint(sample.getData()));
+                return (convexRegion != null && convexRegion.containsPoint(sample.getData().toArray()));
             }
         }
     }
@@ -435,7 +434,7 @@ public class TsmLearner extends CatTSM {
      * @param convexCones
      * @param vertices set of vertices of TSM
      */
-    private void getConvexConesVertices(ArrayList<PointWiseComplementConvexHull> convexCones, HashSet<double[]> vertices) {
+    public void getConvexConesVertices(ArrayList<PointWiseComplementConvexHull> convexCones, HashSet<double[]> vertices) {
         if(convexCones!=null){
             for(PointWiseComplementConvexHull convexCone: convexCones){
                 for(Facet facet: convexCone.getFacets()){
@@ -452,7 +451,7 @@ public class TsmLearner extends CatTSM {
      * @param convexhull
      * @param vertices set of vertices of TSM
      */
-    private void getConvexHullVertices(ConvexPolytope convexhull, HashSet<double[]> vertices){
+    public void getConvexHullVertices(ConvexPolytope convexhull, HashSet<double[]> vertices){
         if(convexhull!=null){
             for(Facet facet : convexhull.getFacets()){
                 for(Vertex vertex: facet.getVertices()){
@@ -473,6 +472,54 @@ public class TsmLearner extends CatTSM {
             indices.add(point.getId());
         }
         return indices;
+    }
+
+
+    /**
+     * @return display the construction of convex region
+     */
+    public String convexPolytopeToString() {
+        if (dim > 1) {
+            return convexRegion != null ? "The concave polytope is: \n" + convexRegion.toString() : "No convex polytope";
+        } else {
+            return oneDimTSM.toString();
+        }
+    }
+
+
+
+
+    /**
+     * @return display the construction of concave region
+     */
+    public String convexConesToString(){
+        if(dim > 1){
+            return concaveRegions != null? "The convex cones are: \n" + concaveRegions.toString(): "No convex cones";
+
+        } else {
+            return oneDimTSM.toString();
+        }
+    }
+
+    /**
+     * @return the construction of convex region
+     */
+    public ConvexPolytope getConvexRegion(){ return convexRegion;}
+
+    /**
+     * @return the construction of concave region
+     */
+    public ArrayList<PointWiseComplementConvexHull> getConcaveRegion(){ return  concaveRegions;}
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        if(dim > 1){
+            sb.append(convexPolytopeToString() + "\n");
+            sb.append(convexConesToString() + "\n");
+        } else{
+            return oneDimTSM.toString();
+        }
+        return sb.toString();
     }
 
 }

@@ -15,34 +15,40 @@ import java.util.Collection;
  * POSITIVE, NEGATIVE, or UNKNOWN. See {@link ExtendedLabel} for more details.
  */
 public interface ExtendedClassifier {
-    /**
-     * Update the current data model with new labeled data.
-     * @param point: a data array
-     * @param label: the data's label
-     */
-    void update(Vector point, UserLabel label);
+//    /**
+//     * Update the current data model with new labeled data.
+//     * @param point: a data array
+//     * @param label: the data's label
+//     */
+//    void update(Vector point, UserLabel label);
+//
+//    /**
+//     * Update the current data model with new labeled data.
+//     * @param labeledPoint a {@link LabeledPoint} instance
+//     */
+//    default void update(LabeledPoint labeledPoint) {
+//        update(labeledPoint.getData(), labeledPoint.getLabel());
+//    }
+
 
     /**
      * Update the current data model with new labeled data.
      * @param labeledPoint a {@link LabeledPoint} instance
      */
-    default void update(LabeledPoint labeledPoint) {
-        update(labeledPoint.getData(), labeledPoint.getLabel());
-    }
+    //
+    void update(Collection<LabeledPoint> labeledPoint);
 
-    /**
-     * @param point: a data point
-     * @return the predicted label for input point
-     */
-    ExtendedLabel predict(Vector point);
+//    /**
+//     * @param point: a data point
+//     * @return the predicted label for input point
+//     */
+//    ExtendedLabel predict(Vector point);
 
     /**
      * @param dataPoint: a data point
      * @return the predicted label for input point
      */
-    default ExtendedLabel predict(DataPoint dataPoint) {
-        return predict(dataPoint.getData());
-    }
+    ExtendedLabel predict(DataPoint dataPoint);
 
     /**
      * @param points: a collection of data point
