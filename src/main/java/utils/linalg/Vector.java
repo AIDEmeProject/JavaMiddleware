@@ -81,7 +81,9 @@ public class Vector {
         if (from < 0 || from == to || to > dim()) {
             throw new IllegalArgumentException();
         }
-        return new Vector(vector.logical().offsets(from, -1).limits(to-from, -1).get());
+        PrimitiveDenseStore slice = PrimitiveDenseStore.FACTORY.makeZero(to-from, 1);
+        vector.logical().offsets(from, -1).limits(to-from, -1).supplyTo(slice);
+        return new Vector(slice);
     }
 
     /**
@@ -199,7 +201,9 @@ public class Vector {
             case 0:
                 return this;
             default:
-                return new Vector(vector.logical().below(PrimitiveDenseStore.FACTORY.makeZero(newDim - dim(), 1)).get());
+                PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(newDim, 1);
+                vector.supplyTo(result);
+                return new Vector(result);
         }
     }
 
@@ -207,7 +211,9 @@ public class Vector {
      * @return a new Vector with the number 1.0 appended to the right of {@code this}
      */
     public Vector addBias() {
-        return new Vector(vector.logical().above(1D).get());
+        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim()+1, 1);
+        vector.logical().above(1D).get().supplyTo(result);
+        return new Vector(result);
     }
 
     /**

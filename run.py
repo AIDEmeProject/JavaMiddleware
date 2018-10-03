@@ -18,17 +18,17 @@ UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',       # run new exploration
-    'RESUME',    # resume a previous exploration
+    'NEW',       # run new exploration
+    #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    'AVERAGE'    # average all evaluation file for a given metric
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 10
+BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1]
@@ -37,7 +37,7 @@ RUNS = [1]
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
     ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    ThreeSetMetric()
+    #ThreeSetMetric()
 ]
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.

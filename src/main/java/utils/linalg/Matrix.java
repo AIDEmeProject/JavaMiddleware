@@ -128,7 +128,9 @@ public class Matrix {
      */
     public Vector getRow(int i) {
         Validator.assertIndexInBounds(i, 0, numRows());
-        return new Vector(matrix.logical().row(i).transpose().get());
+        PrimitiveDenseStore row = PrimitiveDenseStore.FACTORY.makeZero(numCols(), 1);
+        matrix.logical().row(i).transpose().supplyTo(row);
+        return new Vector(row);
     }
 
     /**
