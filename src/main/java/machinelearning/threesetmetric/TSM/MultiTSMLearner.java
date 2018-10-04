@@ -8,6 +8,7 @@ import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Given a partition of an attributes set, we create a TSM on each subspace spanned by attributes in a certain partition.
@@ -20,30 +21,30 @@ public class MultiTSMLearner implements ExtendedClassifier {
     /**
      * List of TSMs on each subspace
      */
-    private final ArrayList<TsmLearner> tsmSet;
+    private final List<TsmLearner> tsmSet;
 
     /**
      * Partition of the indices of attributes
      */
-    private final ArrayList<int[]> feaGroups;
+    private final List<int[]> feaGroups;
 
     /**
      * Indicator of the type of attributes and the shape of pos and neg regions
      * first element: true --> pos in convex; false --> pos in concave
      * second element: true --> categorical; false --> numerical
      */
-    private final ArrayList<boolean[]> tsmFlags;
+    private final List<boolean[]> tsmFlags;
 
     /**
      * Test the correctness of TSMs construction. For each element:
      * 0: untested; 1: TSM is invalid and assigned to be null, release memory
      */
-    private ArrayList<Integer> testStates;
+    private List<Integer> testStates;
 
     /**
      * The opposite way to create TSM -- build convex polytope for negative regions
      */
-    private final ArrayList<TsmLearner> backupTsmSet;
+    private final List<TsmLearner> backupTsmSet;
 
     /**
      * Record the errors occurring in standard TSM
@@ -70,7 +71,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
      * @param feaGroups partition of attributes represented by indices
      * @param tsmFlags a list of indicators that correspond to attributes partition
      */
-    public MultiTSMLearner(ArrayList<int[]> feaGroups,  ArrayList<boolean[]> tsmFlags) {
+    public MultiTSMLearner(List<int[]> feaGroups,  List<boolean[]> tsmFlags) {
         this.feaGroups = feaGroups;
         this.tsmFlags = tsmFlags;
 
