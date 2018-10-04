@@ -36,10 +36,6 @@ public final class ExperimentConfiguration {
         return multiTSM.hasTsm;
     }
 
-    public double getSearchUncertainRegionProbability() {
-        return multiTSM.searchUnknownRegionProbability;
-    }
-
     public TsmConfiguration getTsmConfiguration() {
         return multiTSM;
     }
@@ -62,8 +58,11 @@ public final class ExperimentConfiguration {
             this.hasTsm = hasTsm;
         }
 
+        /**
+         * @return the probability of searching the Unknown region (as specified in run time). If TSM is not being used, return 0.
+         */
         public double getSearchUnknownRegionProbability() {
-            return searchUnknownRegionProbability;
+            return hasTsm ? searchUnknownRegionProbability : 0D;
         }
 
         public List<boolean[]> getFlags() {
