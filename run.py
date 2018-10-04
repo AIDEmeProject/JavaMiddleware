@@ -12,15 +12,11 @@ TASK = "sdss_Q1_0.1%"
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
 
-# Probability of sampling from the uncertain set instead of the entire unlabeled set.
-# Used together with the TSM algorithm. It has no effect otherwise.
-UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
-
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',       # run new exploration
-    'RESUME',    # resume a previous exploration
-    'EVAL',      # run evaluation procedure over finished runs
+    'NEW',       # run new exploration
+    #'RESUME',    # resume a previous exploration
+    #'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
 
@@ -40,7 +36,20 @@ METRICS = [
     ThreeSetMetric()
 ]
 
-# TODO: add TSM config
+FEATURE_GROUPS = [
+    # you can override the default feature groups by specifying them here
+]
+
+TSM_FLAGS = [
+    # you can override the default TSM flags by specifying them here
+]
+
+# Probability of sampling from the uncertain set instead of the entire unlabeled set.
+SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.1
+
+# Multiple TSM configuration. Set as None if you do now want it to be used.
+mTSM = None
+#mTSM = MultipleTSM(FEATURE_GROUPS, TSM_FLAGS, SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
@@ -65,16 +74,22 @@ assert_positive("BUDGET", BUDGET)
 assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
 # BUILD EXPERIMENT
-experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
-experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER,
-                        sample_from_unknown_region_probability=UNKNOWN_SET_SAMPLE_PROBABILITY)
+experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE,
+                        active_learner=ACTIVE_LEARNER, mTSM=mTSM)
+
+folder_elems = [ACTIVE_LEARNER.name]
+if SUBSAMPLE_SIZE < float('inf'): folder_elems.append('ss=%d' % SUBSAMPLE_SIZE)
+if mTSM: folder_elems.append(str(mTSM))
+folder = '_'.join(folder_elems)
+
+experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
 experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
 # BUILD COMMAND LINE ARGUMENTS
 command_line = [
     "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
-    "--experiment_dir", experiment_dir,
-    "--mode", ' '.join(MODES),
+    "--experiment_dir \"", experiment_dir,
+    "\" --mode", ' '.join(MODES),
     "--num_runs", str(NUM_RUNS),
     "--budget", str(BUDGET),
 ]
