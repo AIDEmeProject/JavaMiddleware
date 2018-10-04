@@ -25,6 +25,6 @@ public interface User {
     default UserLabel[] getLabel(Collection<DataPoint> points){
         return points.stream()
                 .map(this::getLabel)
-                .toArray(Label[]::new);
+                .toArray(UserLabel[]::new);
     }
 }

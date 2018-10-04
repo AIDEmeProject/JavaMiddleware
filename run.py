@@ -7,7 +7,7 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-TASK = "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%"
+TASK = "sdss_Q1_0.1%"
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
@@ -16,8 +16,8 @@ SUBSAMPLE_SIZE = 50000
 MODES = [
     'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
-    #'EVAL',      # run evaluation procedure over finished runs
-    'AVERAGE'    # average all evaluation file for a given metric
+    'EVAL',      # run evaluation procedure over finished runs
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
@@ -59,14 +59,14 @@ mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UN
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-# ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
+ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
-ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
-    num_samples=8,
-    warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
-    kernel='gaussian', gamma=0,  # kernel
-    add_intercept=True, solver="ojalgo")  # extra
-)
+# ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
+#     num_samples=8,
+#     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
+#     kernel='gaussian', gamma=0,  # kernel
+#     add_intercept=True, solver="ojalgo")  # extra
+# )
 
 
 #############################

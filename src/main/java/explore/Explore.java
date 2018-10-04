@@ -10,15 +10,14 @@ import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
 import machinelearning.active.Ranker;
+import machinelearning.threesetmetric.ExtendedClassifier;
+import machinelearning.threesetmetric.TSM.MultiTSMLearner;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public final class Explore {
@@ -107,7 +106,12 @@ public final class Explore {
     }
 
     private PartitionedDataset getPartitionedDataset(int id) {
-        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);  // TODO: add TSM here
+        PartitionedDataset partitionedDataset = configuration
+                .getTsmConfiguration()
+                .getMultiTsmModel()
+                .map(x -> new PartitionedDataset(dataPoints, x))
+                .orElseGet(() -> new PartitionedDataset(dataPoints));
+        System.out.println(configuration.getTsmConfiguration().getMultiTsmModel().isPresent() ? "with TSM" : "no TSM");
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

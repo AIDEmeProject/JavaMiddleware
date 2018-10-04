@@ -38,6 +38,8 @@ public class TaskReader {
 
     public List<Set<Long>> readFactorizedTargetSetKeys(ExperimentConfiguration.TsmConfiguration tsmConfiguration){
         // if no factorization structure is specified in run.py, set default ones
+        tsmConfiguration.setColumns(taskConfig.columns);
+
         if (tsmConfiguration.emptyFactorizationStructure()) {
             tsmConfiguration.setFlags(taskConfig.tsmFlags);
             tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);

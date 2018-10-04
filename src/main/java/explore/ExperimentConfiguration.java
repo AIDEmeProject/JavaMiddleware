@@ -3,10 +3,14 @@ package explore;
 import explore.sampling.InitialSampler;
 import explore.sampling.StratifiedSampler;
 import machinelearning.active.ActiveLearner;
+import machinelearning.threesetmetric.ExtendedClassifier;
+import machinelearning.threesetmetric.TSM.MultiTSMLearner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class ExperimentConfiguration {
     private String task;
@@ -14,6 +18,7 @@ public final class ExperimentConfiguration {
 
     private InitialSampler initialSampler = new StratifiedSampler(1, 1);
     private int subsampleSize = Integer.MAX_VALUE;
+
     private TsmConfiguration multiTSM = new TsmConfiguration(false);
 
     public String getTask() {
@@ -49,6 +54,7 @@ public final class ExperimentConfiguration {
         private double searchUnknownRegionProbability = 0D;
         private List<boolean[]> flags = new ArrayList<>();
         private List<String[]> featureGroups = new ArrayList<>();
+        private String[] columns = new String[0];
 
         public TsmConfiguration() {
             this(true);
@@ -85,10 +91,43 @@ public final class ExperimentConfiguration {
             return flags.isEmpty();
         }
 
+        public Optional<ExtendedClassifier> getMultiTsmModel() {
+            if (!hasTsm) {
+                return Optional.empty();
+            }
+
+            List<int[]> featureGroupIndexes = featureGroups.stream()
+                    .map(this::getColumnIndex)
+                    .collect(Collectors.toList());
+            System.out.println(featureGroups.size());
+            System.out.println(Arrays.toString(featureGroupIndexes.get(0)));
+            return Optional.of(new MultiTSMLearner(featureGroupIndexes, flags));
+        }
+
+        private int[] getColumnIndex(String[] attributes) {
+            return Arrays.stream(attributes).mapToInt(this::getColumnIndex).toArray();
+        }
+
+        private int getColumnIndex(String column) {
+            int i = 0;
+            for (String col : columns) {
+                if (column.equals(col)) {
+                    return i;
+                }
+                i++;
+            }
+            throw new IllegalArgumentException("Column " + column + " not in columns list " + Arrays.toString(columns));
+        }
+
+        public void setColumns(String[] columns) {
+            this.columns = columns;
+        }
+
         @Override
         public String toString() {
             return "TsmConfiguration{" +
-                    "searchUnknownRegionProbability=" + searchUnknownRegionProbability +
+                    "hasTSM=" + hasTsm +
+                    ", searchUnknownRegionProbability=" + searchUnknownRegionProbability +
                     ", flags=" + flags.stream().map(Arrays::toString).reduce("", (x, y) -> x+", "+y).substring(2) +
                     ", featureGroups=" + featureGroups.stream().map(Arrays::toString).reduce("", (x, y) -> x+", "+y).substring(2) +
                     '}';

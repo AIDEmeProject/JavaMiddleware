@@ -7,6 +7,7 @@ import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedLabel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -74,6 +75,8 @@ public class MultiTSMLearner implements ExtendedClassifier {
     public MultiTSMLearner(List<int[]> feaGroups,  List<boolean[]> tsmFlags) {
         this.feaGroups = feaGroups;
         this.tsmFlags = tsmFlags;
+        System.out.println(Arrays.toString(feaGroups.get(0)));
+        System.out.println(Arrays.toString(tsmFlags.get(0)));
 
         tsmSet = new ArrayList<>();
         testStates = new ArrayList<>();
