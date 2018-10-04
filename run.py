@@ -7,7 +7,7 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-TASK = "sdss_Q1_0.1%"
+TASK = "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%"
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
@@ -36,20 +36,26 @@ METRICS = [
     ThreeSetMetric()
 ]
 
+# you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
+# note that must override all the three configurations at once
 FEATURE_GROUPS = [
-    # you can override the default feature groups by specifying them here
+    #['rowc', 'colc'],
 ]
 
-TSM_FLAGS = [
-    # you can override the default TSM flags by specifying them here
+IS_CONVEX_POSITIVE = [
+    #True, False
+]
+
+IS_CATEGORICAL = [
+    #True, False
 ]
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
 SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.1
 
 # Multiple TSM configuration. Set as None if you do now want it to be used.
-mTSM = None
-#mTSM = MultipleTSM(FEATURE_GROUPS, TSM_FLAGS, SAMPLE_UNKNOWN_REGION_PROBABILITY)
+#mTSM = None
+mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities

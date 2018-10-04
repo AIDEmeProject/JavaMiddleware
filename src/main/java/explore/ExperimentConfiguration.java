@@ -40,11 +40,15 @@ public final class ExperimentConfiguration {
         return multiTSM.searchUnknownRegionProbability;
     }
 
+    public TsmConfiguration getTsmConfiguration() {
+        return multiTSM;
+    }
+
     private ExperimentConfiguration() {
         // avoid instantiating this class
     }
 
-    private static class TsmConfiguration {
+    public static class TsmConfiguration {
         private boolean hasTsm = true;
         private double searchUnknownRegionProbability = 0D;
         private List<boolean[]> flags = new ArrayList<>();
@@ -56,6 +60,39 @@ public final class ExperimentConfiguration {
 
         public TsmConfiguration(boolean hasTsm) {
             this.hasTsm = hasTsm;
+        }
+
+        public double getSearchUnknownRegionProbability() {
+            return searchUnknownRegionProbability;
+        }
+
+        public List<boolean[]> getFlags() {
+            return flags;
+        }
+
+        public List<String[]> getFeatureGroups() {
+            return featureGroups;
+        }
+
+        public void setFlags(List<boolean[]> flags) {
+            this.flags = flags;
+        }
+
+        public void setFeatureGroups(List<String[]> featureGroups) {
+            this.featureGroups = featureGroups;
+        }
+
+        public boolean emptyFactorizationStructure() {
+            return flags.isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            return "TsmConfiguration{" +
+                    "searchUnknownRegionProbability=" + searchUnknownRegionProbability +
+                    ", flags=" + flags.stream().map(Arrays::toString).reduce("", (x, y) -> x+", "+y).substring(2) +
+                    ", featureGroups=" + featureGroups.stream().map(Arrays::toString).reduce("", (x, y) -> x+", "+y).substring(2) +
+                    '}';
         }
     }
 }
