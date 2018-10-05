@@ -1,7 +1,6 @@
 package utils.linalg;
 
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 /**
@@ -19,7 +18,7 @@ public class CholeskyDecomposition {
      * @throws IllegalArgumentException if matrix is non-square, or not symmetric, or not positive-definite
      */
     public CholeskyDecomposition(Matrix matrix) {
-        decomposition.decompose(matrix.matrix);
+        decomposition.decompose(PrimitiveDenseStore.FACTORY.rows(matrix.toArray()));
 
         if (!decomposition.isSPD()) {
             throw new RuntimeException();
@@ -30,7 +29,6 @@ public class CholeskyDecomposition {
      * @return Cholesky lower-triangular factorization of input matrix
      */
     public Matrix getL() {
-        MatrixStore<Double> L = decomposition.getL();
-        return new Matrix(PrimitiveDenseStore.FACTORY.copy(L));  // copy L as PrimitiveDenseStore, which is a more efficient Matrix implementation
+        return Matrix.FACTORY.make(decomposition.getL().toRawCopy2D());
     }
 }

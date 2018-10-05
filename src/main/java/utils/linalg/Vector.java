@@ -1,12 +1,10 @@
 package utils.linalg;
 
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import utils.Validator;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
-
-import static org.ojalgo.function.PrimitiveFunction.*;
+import java.util.function.BiFunction;
 
 /**
  * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Ojalgo's
@@ -17,7 +15,7 @@ public class Vector {
     /**
      * A vector object from Apache Commons Math library
      */
-    final MatrixStore<Double> vector;
+    final double[] vector;
 
     /**
      * This is a static factory for vector creation. It provides several utility methods for instantiating vectors.
@@ -29,7 +27,7 @@ public class Vector {
          */
         public static Vector make(double... values) {
             Validator.assertNotEmpty(values);
-            return new Vector(PrimitiveDenseStore.FACTORY.columns(values));
+            return new Vector(values);
         }
 
         /**
@@ -39,7 +37,7 @@ public class Vector {
          */
         public static Vector zeros(int dim) {
             Validator.assertPositive(dim);
-            return new Vector(PrimitiveDenseStore.FACTORY.makeZero(dim, 1));
+            return new Vector(new double[dim]);
         }
 
         /**
@@ -51,7 +49,7 @@ public class Vector {
         }
     }
 
-    Vector(MatrixStore<Double> vector) {
+    Vector(double[] vector) {
         this.vector = vector;
     }
 
@@ -59,7 +57,7 @@ public class Vector {
      * @return the number of components of this vector (i.e. its dimension)
      */
     public int dim() {
-        return (int) vector.count();
+        return (int) vector.length;
     }
 
     /**
@@ -68,7 +66,7 @@ public class Vector {
      * @throws IllegalArgumentException if index is out of bounds (i.e. negative or larger than or equal to the dimension)
      */
     public double get(int index) {
-        return vector.get(index);
+        return vector[index];
     }
 
     /**
@@ -81,9 +79,34 @@ public class Vector {
         if (from < 0 || from == to || to > dim()) {
             throw new IllegalArgumentException();
         }
-        PrimitiveDenseStore slice = PrimitiveDenseStore.FACTORY.makeZero(to-from, 1);
-        vector.logical().offsets(from, -1).limits(to-from, -1).supplyTo(slice);
-        return new Vector(slice);
+        double[] result = new double[to - from];
+        System.arraycopy(vector, from, result, 0, result.length);
+        return new Vector(result);
+    }
+
+    private static BiFunction<Double, Double, Double> ADD = (x,y) -> x+y;
+    private static BiFunction<Double, Double, Double> SUB = (x,y) -> x-y;
+    private static BiFunction<Double, Double, Double> MUL = (x,y) -> x*y;
+    private static BiFunction<Double, Double, Double> DIV = (x,y) -> x/y;
+
+    private Vector applyBinaryFunction(double[] rhs, BiFunction<Double, Double, Double> op) {
+        Validator.assertEqualLengths(vector, rhs);
+
+        double[] result = new double[vector.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = op.apply(vector[i], rhs[i]);
+        }
+
+        return new Vector(result);
+    }
+
+    private Vector applyBinaryFunction(double value, BiFunction<Double, Double, Double> op) {
+        double[] result = new double[vector.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = op.apply(vector[i], value);
+        }
+
+        return new Vector(result);
     }
 
     /**
@@ -92,10 +115,7 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public Vector add(Vector other) {
-        Validator.assertEquals(dim(), other.dim());
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
-        result.fillMatching(vector, ADD, other.vector);
-        return new Vector(result);
+        return applyBinaryFunction(other.vector, ADD);
     }
 
     /**
@@ -104,10 +124,7 @@ public class Vector {
      * @throws IllegalArgumentException if vectors have incompatible dimensions
      */
     public Vector subtract(Vector other) {
-        Validator.assertEquals(dim(), other.dim());
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
-        result.fillMatching(vector, SUBTRACT, other.vector);
-        return new Vector(result);
+        return applyBinaryFunction(other.vector, SUB);
     }
 
     /**
@@ -115,9 +132,7 @@ public class Vector {
      * @return a vector whose every component equals the multiplication of {@code this} by value
      */
     public Vector scalarMultiply(double value) {
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
-        result.fillMatching(MULTIPLY.second(value), vector);
-        return new Vector(result);
+        return applyBinaryFunction(value, MUL);
     }
 
     /**
@@ -125,9 +140,7 @@ public class Vector {
      * @return a vector whose every component equals the division of {@code this} by value
      */
     public Vector scalarDivide(double value) {
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim(), 1);
-        result.fillMatching(DIVIDE.second(value), vector);
-        return new Vector(result);
+        return applyBinaryFunction(value, DIV);
     }
 
     /**
@@ -137,21 +150,25 @@ public class Vector {
      */
     public double dot(Vector other) {
         Validator.assertEquals(dim(), other.dim());
-        return vector.dot(other.vector);
+        double sum = 0;
+        for (int i = 0; i < vector.length; i++) {
+            sum += vector[i] * other.get(i);
+        }
+        return sum;
     }
 
     /**
      * @return the squared norm of this vector
      */
     public double squaredNorm() {
-        return vector.dot(vector);
+        return dot(this);
     }
 
     /**
      * @return the norm of this vector
      */
     public double norm() {
-        return vector.norm();
+        return Math.sqrt(squaredNorm());
     }
 
     /**
@@ -175,7 +192,14 @@ public class Vector {
      * @return the squared distance between {@code this} and the input vector
      */
     public double squaredDistanceTo(Vector other) {
-        return this.subtract(other).squaredNorm();
+        Validator.assertEqualLengths(vector, other.vector);
+
+        double sqDistance = 0;
+        for (int i = 0; i < dim(); i++) {
+            double diff = vector[i] - other.get(i);
+            sqDistance += diff * diff;
+        }
+        return sqDistance;
     }
 
     /**
@@ -195,24 +219,22 @@ public class Vector {
     public Vector resize(int newDim) {
         Validator.assertPositive(newDim);
 
-        switch (Integer.compare(newDim, dim())) {
-            case -1:
-                return slice(0, newDim);
-            case 0:
-                return this;
-            default:
-                PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(newDim, 1);
-                vector.supplyTo(result);
-                return new Vector(result);
+        if (newDim == dim()) {
+            return this;
         }
+
+        double[] result = new double[newDim];
+        System.arraycopy(vector, 0, result, 0, Math.min(dim(), newDim));
+        return new Vector(result);
     }
 
     /**
      * @return a new Vector with the number 1.0 appended to the right of {@code this}
      */
     public Vector addBias() {
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(dim()+1, 1);
-        vector.logical().above(1D).get().supplyTo(result);
+        double[] result = new double[dim() + 1];
+        result[0] = 1.0;
+        System.arraycopy(vector, 0, result, 1, dim());
         return new Vector(result);
     }
 
@@ -221,14 +243,22 @@ public class Vector {
      * @return the outer product of {@code this} and the input vector
      */
     public Matrix outerProduct(Vector other) {
-        return new Matrix(vector.multiply(other.vector.transpose()));
+        int rows = dim(), cols = other.dim();
+        double[] matrix = new double[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i * cols + j] = vector[i] * other.get(j);
+            }
+        }
+
+        return new Matrix(rows, cols, matrix);
     }
 
     /**
      * @return an array copy of {@code this}'s content
      */
     public double[] toArray() {
-        return vector.toRawCopy1D();
+        return Arrays.copyOf(vector, dim());
     }
 
     /**
@@ -238,7 +268,13 @@ public class Vector {
      */
     public boolean equals(Vector other, double precision) {
         if (dim() != other.dim()) return false;
-        return vector.subtract(other.vector).isAllSmall(precision / 1E-15);  // value <= 1E-15 * precision
+
+        for (int i = 0; i < dim(); i++) {
+            if (Math.abs(vector[i] - other.get(i)) > precision) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

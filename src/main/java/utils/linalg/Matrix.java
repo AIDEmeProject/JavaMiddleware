@@ -4,7 +4,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import utils.Validator;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
+import java.util.function.BiFunction;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
@@ -17,7 +19,8 @@ public class Matrix {
     /**
      * A matrix object from Apache Commons Math library
      */
-    MatrixStore<Double> matrix;
+    double[] matrix;
+    private int rows, cols;
 
     /**
      * This is a static factory for matrix creation. It provides several utility methods for instantiating matrices.
@@ -29,17 +32,22 @@ public class Matrix {
          * @throws IllegalArgumentException if input is empty or any two rows have different lengths
          */
         public static Matrix make(double[][] values) {
-            Validator.assertNotEmpty(values);
-            Validator.assertNotEmpty(values[0]);
+            int rows = values.length;
+            int cols = values[0].length;
 
-            int dim = values[0].length;
-            for (double[] value : values) {
-                if (value.length != dim) {
+            Validator.assertPositive(rows);
+            Validator.assertPositive(cols);
+
+            double[] matrix = new double[rows * cols];
+
+            for (int i = 0; i < rows; i++) {
+                if (values[i].length != cols) {
                     throw new RuntimeException();
                 }
+                System.arraycopy(values[i], 0, matrix, i*cols, cols);
             }
 
-            return new Matrix(PrimitiveDenseStore.FACTORY.rows(values));
+            return new Matrix(rows, cols, matrix);
         }
 
         /**
@@ -50,15 +58,10 @@ public class Matrix {
          * @throws IllegalArgumentException if either rows or cols are not positive, or values.length is different from rows * cols
          */
         public static Matrix make(int rows, int cols, double... values) {
+            Validator.assertPositive(rows);
+            Validator.assertPositive(cols);
             Validator.assertEquals(rows * cols, values.length);
-
-            double[][] matrix = new double[rows][cols];
-
-            for (int i = 0; i < rows; i++) {
-                System.arraycopy(values, i * cols, matrix[i], 0, cols);
-            }
-
-            return make(matrix);
+            return new Matrix(rows, cols, values);
         }
 
         /**
@@ -70,7 +73,7 @@ public class Matrix {
         public static Matrix zeros(int rows, int cols) {
             Validator.assertPositive(rows);
             Validator.assertPositive(cols);
-            return new Matrix(PrimitiveDenseStore.FACTORY.makeZero(rows, cols));
+            return new Matrix(rows, cols, new double[rows * cols]);
         }
 
         /**
@@ -87,26 +90,33 @@ public class Matrix {
          * @throws IllegalArgumentException if dim is not positive
          */
         public static Matrix identity(int dim) {
-            return new Matrix(PrimitiveDenseStore.FACTORY.makeEye(dim, dim));
+            Validator.assertPositive(dim);
+            double[] matrix = new double[dim * dim];
+            for (int i = 0; i < dim; i++) {
+                matrix[i * (dim+1)] = 1.0;
+            }
+            return new Matrix(dim, dim, matrix);
         }
     }
 
-    Matrix(MatrixStore<Double> matrix) {
+    Matrix(int rows, int cols, double[] matrix) {
         this.matrix = matrix;
+        this.rows = rows;
+        this.cols = cols;
     }
 
     /**
      * @return number of rows
      */
     public int numRows() {
-        return (int) matrix.countRows();
+        return rows;
     }
 
     /**
      * @return number of columns
      */
     public int numCols() {
-        return (int) matrix.countColumns();
+        return cols;
     }
 
     /**
@@ -118,7 +128,7 @@ public class Matrix {
     public double get(int i, int j) {
         Validator.assertIndexInBounds(i, 0, numRows());
         Validator.assertIndexInBounds(j, 0, numCols());
-        return matrix.get(i, j);
+        return matrix[i * cols + j];
     }
 
     /**
@@ -128,9 +138,35 @@ public class Matrix {
      */
     public Vector getRow(int i) {
         Validator.assertIndexInBounds(i, 0, numRows());
-        PrimitiveDenseStore row = PrimitiveDenseStore.FACTORY.makeZero(numCols(), 1);
-        matrix.logical().row(i).transpose().supplyTo(row);
+        double[] row = new double[cols];
+        System.arraycopy(matrix, i * cols, row, 0, cols);
         return new Vector(row);
+    }
+
+    private static BiFunction<Double, Double, Double> ADD = (x,y) -> x+y;
+    private static BiFunction<Double, Double, Double> SUB = (x,y) -> x-y;
+    private static BiFunction<Double, Double, Double> MUL = (x,y) -> x*y;
+    private static BiFunction<Double, Double, Double> DIV = (x,y) -> x/y;
+
+    private Matrix applyBinaryFunction(Matrix rhs, BiFunction<Double, Double, Double> op) {
+        Validator.assertEquals(rows, rhs.rows);
+        Validator.assertEquals(cols, rhs.cols);
+
+        double[] result = new double[matrix.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = op.apply(matrix[i], rhs.matrix[i]);
+        }
+
+        return new Matrix(rows, cols, result);
+    }
+
+    private Matrix applyBinaryFunction(double value, BiFunction<Double, Double, Double> op) {
+        double[] result = new double[matrix.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = op.apply(matrix[i], value);
+        }
+
+        return new Matrix(rows, cols, result);
     }
 
     /**
@@ -139,12 +175,7 @@ public class Matrix {
      * @throws IllegalArgumentException if matrices have incompatible dimensions
      */
     public Matrix add(Matrix other) {
-        if (numRows() != other.numRows() || numCols() != other.numCols()) {
-            throw new IllegalArgumentException();
-        }
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
-        result.fillMatching(matrix, ADD, other.matrix);
-        return new Matrix(result);
+        return applyBinaryFunction(other, ADD);
     }
 
     /**
@@ -153,12 +184,7 @@ public class Matrix {
      * @throws IllegalArgumentException if matrices have incompatible dimensions
      */
     public Matrix subtract(Matrix other) {
-        if (numRows() != other.numRows() || numCols() != other.numCols()) {
-            throw new IllegalArgumentException();
-        }
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
-        result.fillMatching(matrix, SUBTRACT, other.matrix);
-        return new Matrix(result);
+        return applyBinaryFunction(other, SUB);
     }
 
     /**
@@ -166,9 +192,7 @@ public class Matrix {
      * @return a matrix whose every component equals the multiplication of {@code this} by value
      */
     public Matrix scalarMultiply(double value) {
-        PrimitiveDenseStore result = PrimitiveDenseStore.FACTORY.makeZero(numRows(), numCols());
-        result.fillMatching(MULTIPLY.second(value), matrix);
-        return new Matrix(result);
+        return applyBinaryFunction(value, MUL);
     }
 
     /**
@@ -177,10 +201,22 @@ public class Matrix {
      * @throws IllegalArgumentException if the number of columns {@code this} if different from the vector's dimension
      */
     public Vector multiply(Vector vector) {
-        if (numCols() != vector.dim()) {
+        if (cols != vector.dim()) {
             throw new IllegalArgumentException();
         }
-        return new Vector(matrix.multiply(vector.vector).transpose());
+
+        int offset = 0;
+        double[] result = new double[rows];
+        for (int i = 0; i < rows; i++) {
+            double sum = 0;
+            for (int j = 0; j < cols; j++) {
+                sum += matrix[offset + j] * vector.vector[j];
+            }
+            offset += cols;
+            result[i] = sum;
+        }
+
+        return new Vector(result);
     }
 
     /**
@@ -192,26 +228,53 @@ public class Matrix {
         if (numCols() != other.numRows()) {
             throw new IllegalArgumentException();
         }
-        return new Matrix(matrix.multiply(other.matrix));
+        int size = rows * other.cols;
+        double[] values = new double[size];
+
+        for (int p = 0; p < size; p++) {
+            int i = (p / other.cols) * cols, j = p % other.cols;
+            for (int k = 0; k < cols; k++) {
+                values[p] += matrix[i + k] * other.matrix[k * other.cols + j];
+            }
+        }
+
+        return new Matrix(rows, other.cols, values);
     }
 
     /**
      * @return the transpose of {@code this}
      */
     public Matrix transpose() {
-        return new Matrix(matrix.transpose());
+        double[] transpose = new double[rows * cols];
+        for (int p = 0; p < transpose.length; p++) {
+            int i = p % rows, j = p / rows;
+            transpose[p] = matrix[i * cols + j];
+        }
+        return new Matrix(cols, rows, transpose);
     }
 
     /**
      * @return a copy of {@code this} as a double's array
      */
     public double[][] toArray() {
-        return matrix.toRawCopy2D();
+        double[][] array = new double[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                array[i][j] = get(i, j);
+            }
+        }
+        return array;
     }
 
     public boolean equals(Matrix other, double precision) {
         if (numRows() != other.numRows() || numCols() != other.numCols()) return false;
-        return matrix.subtract(other.matrix).isAllSmall(precision / 1E-15);
+
+        for (int i = 0; i < matrix.length; i++) {
+            if (Math.abs(matrix[i] - other.matrix[i]) > precision) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

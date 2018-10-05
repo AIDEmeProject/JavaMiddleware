@@ -27,7 +27,7 @@ public class EigenvalueDecomposition {
      */
     public EigenvalueDecomposition(Matrix matrix) {
         Eigenvalue<Double> decomposition = Eigenvalue.PRIMITIVE.make();  // TODO: use constructor (Matrix, boolean) for symmetric matrices
-        decomposition.decompose(matrix.matrix);
+        decomposition.decompose(PrimitiveDenseStore.FACTORY.rows(matrix.toArray()));
 
         eigenvalues = getEigenvalues(decomposition);
         eigenvectors = getEigenvectors(decomposition);
@@ -51,7 +51,7 @@ public class EigenvalueDecomposition {
 
     private static Matrix getEigenvectors(Eigenvalue<Double> decomposition) {
         MatrixStore<Double> VT = decomposition.getV().transpose();
-        return new Matrix(PrimitiveDenseStore.FACTORY.copy(VT));  // copy VT as PrimitiveDenseStore, which is a more efficient Matrix implementation
+        return Matrix.FACTORY.make(VT.toRawCopy2D());
     }
 
     /**
