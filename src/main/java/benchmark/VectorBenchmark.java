@@ -1,6 +1,7 @@
 package benchmark;
 
 import org.openjdk.jmh.annotations.*;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 import java.util.Random;
@@ -61,5 +62,10 @@ public class VectorBenchmark {
     @Benchmark
     public double squaredDistance() {
         return a.squaredDistanceTo(b);
+    }
+
+    @Benchmark
+    public Matrix outerProduct() {
+        return a.outerProduct(b);
     }
 }

@@ -245,9 +245,11 @@ public class Vector {
     public Matrix outerProduct(Vector other) {
         int rows = dim(), cols = other.dim();
         double[] matrix = new double[rows * cols];
+
+        int pos = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                matrix[i * cols + j] = vector[i] * other.get(j);
+                matrix[pos++] = vector[i] * other.get(j);
             }
         }
 
