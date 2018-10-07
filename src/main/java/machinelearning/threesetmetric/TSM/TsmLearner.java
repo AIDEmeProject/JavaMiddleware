@@ -127,7 +127,7 @@ public class TsmLearner extends CatTSM {
             if(dim==1) {
                 oneDimTSM.updateNeg(point[0], t.getLabel().asSign());
             }else {
-                if (t.getLabel().asSign() < 0) {
+                if (t.getLabel().isNegative()) {
                     // check whether a negative point(including the boundary) is inside the concave region or not
                     if(isInConcaveRegion(point)){
                         throw new IllegalArgumentException("a negative point cannot be inside the concave(negative) region: " + Arrays.toString(point));
@@ -245,24 +245,10 @@ public class TsmLearner extends CatTSM {
      */
     public boolean isInConvexRegion (DataPoint sample, boolean flag) {
         if(dim ==1){
-            if(flag){
-                ArrayList<Double> convexLineSeg = oneDimTSM.getConvexLineSeg();
-                return ((convexLineSeg.size() == 2 && oneDimTSM.isInConvexSeg(sample.getData().toArray()[0])) || (convexLineSeg.size() > 0 && sample.getData().toArray()[0] == convexLineSeg.get(0)));
-            } else {
-                ArrayList<Double> concaveRay = oneDimTSM.getConcaveRay();
-                return (concaveRay.size() == 2 && oneDimTSM.isInConcaveRay(sample.getData().toArray()[0]));
-            }
+            return flag ? oneDimTSM.isInConvexSeg(sample.get(0)) : oneDimTSM.isInConcaveRay(sample.get(0));
         }else {
-            if (flag) {
-                return (convexRegion != null && convexRegion.containsPoint(sample.getData().toArray()));
-            }else {
-                for(PointWiseComplementConvexHull nr:concaveRegions) {
-                    if(nr.containsPoint(sample.getData().toArray())) {
-                        return true;
-                    }
-                }
-                return false;
-            }
+            double[] point = sample.getData().toArray();
+            return flag ? isInConvexRegion(point) : isInConcaveRegion(point);
         }
     }
 
@@ -307,12 +293,7 @@ public class TsmLearner extends CatTSM {
      */
     // find duplicates in later iteration
     public static boolean findDuplicates(HashSet<double[]> dSets, double[] point){
-        for(double[] item: dSets){
-            if(Arrays.equals(item, point)){
-                return true;
-            }
-        }
-        return false;
+        return dSets.stream().anyMatch(x -> Arrays.equals(x,point));
     }
 
     /**
@@ -397,8 +378,8 @@ public class TsmLearner extends CatTSM {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         if(dim > 1){
-            sb.append(convexPolytopeToString() + "\n");
-            sb.append(convexConesToString() + "\n");
+            sb.append(convexPolytopeToString()).append("\n");
+            sb.append(convexConesToString()).append("\n");
         } else{
             return oneDimTSM.toString();
         }
