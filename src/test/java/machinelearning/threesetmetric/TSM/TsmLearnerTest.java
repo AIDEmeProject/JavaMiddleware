@@ -43,16 +43,16 @@ class TsmLearnerTest {
          */
         dim = 2;
         labeledPoints = new ArrayList<>();
-        labeledPoints.add(new LabeledPoint(new DataPoint(1, new double[]{732.906982,1096.43994}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(2, new double[]{632.432007,450.998993}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(3, new double[]{196.979004,923.468994}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(4, new double[]{328.699005,1666.70996}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(5, new double[]{1028.14001,1807.05005}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(6, new double[]{732.708008,1583.72998}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(7, new double[]{1223.82996,948.091003}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(8, new double[]{425.289001,887.221008}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(9, new double[]{668.385986,960.786011}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(10, new double[]{626.927002,1030.94995}), new Label(true)));
+        labeledPoints.add(new LabeledPoint(new DataPoint(1, new double[]{732.906982,1096.43994}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(2, new double[]{632.432007,450.998993}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(3, new double[]{196.979004,923.468994}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(4, new double[]{328.699005,1666.70996}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(5, new double[]{1028.14001,1807.05005}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(6, new double[]{732.708008,1583.72998}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(7, new double[]{1223.82996,948.091003}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(8, new double[]{425.289001,887.221008}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(9, new double[]{668.385986,960.786011}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(10, new double[]{626.927002,1030.94995}), Label.POSITIVE));
 
         tsmLearner = new TsmLearner(dim);
         tsmLearner.updatePosRatio(labeledPoints);
@@ -60,7 +60,7 @@ class TsmLearnerTest {
         tsmLearner_neg = new TsmLearner(dim);
         Collection<LabeledPoint> negLabeledPoints = new ArrayList<>();
         for(LabeledPoint point : labeledPoints){
-            negLabeledPoints.add(new LabeledPoint(new DataPoint(point.getId(), point.getData().toArray()), point.getLabel().isPositive()? new Label(false): new Label(true)));
+            negLabeledPoints.add(new LabeledPoint(new DataPoint(point.getId(), point.getData().toArray()), point.getLabel().isPositive()? Label.NEGATIVE: Label.POSITIVE));
         }
         tsmLearner_neg.updateNegRatio(negLabeledPoints);
     }

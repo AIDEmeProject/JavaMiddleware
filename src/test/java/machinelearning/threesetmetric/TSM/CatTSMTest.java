@@ -54,14 +54,14 @@ class CatTSMTest {
          */
         indices = new int[]{9, 10};
         labeledPoints = new ArrayList<>();
-        labeledPoints.add(new LabeledPoint(new DataPoint(1, new double[]{0,0,0,0,0,0,0,1,0}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(2, new double[]{0,1,0,0,0,0,0,0,0}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(3, new double[]{0,0,0,1,0,0,0,0,0}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(4, new double[]{0,0,0,0,0,0,0,1,0}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(5, new double[]{0,0,0,0,1,0,0,0,0}), new Label(false)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(6, new double[]{0,0,0,0,0,0,0,1,0}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(7, new double[]{0,0,0,0,0,0,1,0,0}), new Label(true)));
-        labeledPoints.add(new LabeledPoint(new DataPoint(8, new double[]{0,0,1,0,0,0,0,0,0}), new Label(false)));
+        labeledPoints.add(new LabeledPoint(new DataPoint(1, new double[]{0,0,0,0,0,0,0,1,0}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(2, new double[]{0,1,0,0,0,0,0,0,0}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(3, new double[]{0,0,0,1,0,0,0,0,0}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(4, new double[]{0,0,0,0,0,0,0,1,0}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(5, new double[]{0,0,0,0,1,0,0,0,0}), Label.NEGATIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(6, new double[]{0,0,0,0,0,0,0,1,0}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(7, new double[]{0,0,0,0,0,0,1,0,0}), Label.POSITIVE));
+        labeledPoints.add(new LabeledPoint(new DataPoint(8, new double[]{0,0,1,0,0,0,0,0,0}), Label.NEGATIVE));
         catTSM = new CatTSM();
         catTSM.updateCat(labeledPoints);
     }

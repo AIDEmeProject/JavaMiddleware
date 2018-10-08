@@ -37,7 +37,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
 
     private Label getLabel(DataPoint point, PartitionedDataset partitionedDataset, Classifier classifier){
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(point);
-        return extendedLabel == ExtendedLabel.UNKNOWN ? classifier.predict(point) : extendedLabel.toLabel();
+        return extendedLabel.isUnknown() ? classifier.predict(point) : extendedLabel.toLabel();
     }
 
     /**

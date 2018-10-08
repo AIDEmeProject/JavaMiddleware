@@ -9,7 +9,7 @@ public class ThreeSetMetricCalculator implements MetricCalculator {
     public MetricStorage compute(PartitionedDataset data, User user) {
         double numPositivePoints = data.getKnownPoints().stream()
                 .map(data::getLabel)
-                .filter(x -> x == ExtendedLabel.POSITIVE)
+                .filter(ExtendedLabel::isPositive)
                 .count();
 
         double numUncertainPoints = data.getUnknownPoints().size();
