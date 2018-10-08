@@ -75,8 +75,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
     public MultiTSMLearner(List<int[]> feaGroups,  List<boolean[]> tsmFlags) {
         this.feaGroups = feaGroups;
         this.tsmFlags = tsmFlags;
-        System.out.println(Arrays.toString(feaGroups.get(0)));
-        System.out.println(Arrays.toString(tsmFlags.get(0)));
 
         tsmSet = new ArrayList<>();
         testStates = new ArrayList<>();
@@ -266,6 +264,8 @@ public class MultiTSMLearner implements ExtendedClassifier {
     private static Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, int index) {
         Collection<LabeledPoint> dataPointsCopy = new ArrayList<>();
         for(LabeledPoint dataPoint : labeledSamples){
+            System.out.println("the size of label list: " + dataPoint.getLabel().getLabelsForEachSubspace().length);
+            System.out.println("the type of labels: " + dataPoint.getLabel().getLabelsForEachSubspace());
             UserLabel label = dataPoint.getLabel().getLabelsForEachSubspace()[index];
             LabeledPoint partialPoint = new LabeledPoint(dataPoint.getSelectedAttributes(select_set), label);
             dataPointsCopy.add(partialPoint);

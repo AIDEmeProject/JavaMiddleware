@@ -7,10 +7,11 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-TASK = "sdss_Q1_0.1%"
+#TASK = "sdss_Q1_0.1%"
+TASK = "sdss_Q2_circle_1%_Q3_rect_1%"
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000
+SUBSAMPLE_SIZE = 5000
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -24,7 +25,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 10
+BUDGET = 300
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1]
@@ -32,26 +33,26 @@ RUNS = [1]
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
+    ConfusionMatrix(SVM(C=1024, kernel='gaussian')),
     ThreeSetMetric()
 ]
 
 # you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
 # note that must override all the three configurations at once
 FEATURE_GROUPS = [
-    #['rowc', 'colc'],
+    #['rowc', 'colc'], ['ra', 'dec']
 ]
 
 IS_CONVEX_POSITIVE = [
-    #True, False
+    #True, True
 ]
 
 IS_CATEGORICAL = [
-    #True, False
+   # False, False
 ]
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
-SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.1
+SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
 # Multiple TSM configuration. Set as None if you do now want it to be used.
 #mTSM = None
@@ -59,7 +60,7 @@ mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UN
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0.5)
 # ACTIVE_LEARNER = RandomSampler()
 # ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
 #     num_samples=8,

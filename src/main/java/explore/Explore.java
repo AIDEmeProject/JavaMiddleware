@@ -111,7 +111,8 @@ public final class Explore {
                 .getMultiTsmModel()
                 .map(x -> new PartitionedDataset(dataPoints, x))
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
-        System.out.println(configuration.getTsmConfiguration().getMultiTsmModel().isPresent() ? "with TSM" : "no TSM");
+        //System.out.println(configuration.getTsmConfiguration().getMultiTsmModel().isPresent() ? "with TSM" : "no TSM");
+        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().size());
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }
