@@ -1,9 +1,8 @@
 package explore.user;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import machinelearning.classifier.Label;
-
-import java.util.Collection;
 
 /**
  * An User represents the "oracle" of Active Learning scenario, i.e. a human annotator capable of, given a {@link DataPoint},
@@ -22,7 +21,7 @@ public interface User {
      * @param points: collection of data points
      * @return an array containing the labels of each requested row
      */
-    default UserLabel[] getLabel(Collection<DataPoint> points){
+    default UserLabel[] getLabel(IndexedDataset points){
         return points.stream()
                 .map(this::getLabel)
                 .toArray(Label[]::new);

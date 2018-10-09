@@ -1,12 +1,11 @@
 package explore;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import data.PartitionedDataset;
-import explore.sampling.ReservoirSampler;
 import explore.user.User;
 import machinelearning.active.Ranker;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -43,8 +42,8 @@ class ExploreIteration extends Iteration {
 
     @Override
     List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
-        List<DataPoint> unlabeledData = new Random().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
-        Collection<DataPoint> sample = ReservoirSampler.sample(unlabeledData, subsampleSize);
+        IndexedDataset unlabeledData = new Random().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
+        IndexedDataset sample = unlabeledData.sample(subsampleSize);
         return Collections.singletonList(ranker.top(sample));
     }
 }

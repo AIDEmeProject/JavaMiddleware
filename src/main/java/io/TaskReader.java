@@ -1,8 +1,7 @@
 package io;
 
-import data.DataPoint;
+import data.IndexedDataset;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +22,7 @@ public class TaskReader {
         reader = new DatabaseReader(connectionConfig.url, datasetConfig.database, connectionConfig.user, connectionConfig.password);
     }
 
-    public List<DataPoint> readData(){
+    public IndexedDataset readData(){
         return reader.readTable(datasetConfig.table, datasetConfig.key, taskConfig.columns);
     }
 

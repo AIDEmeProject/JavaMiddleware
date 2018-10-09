@@ -1,6 +1,5 @@
 package utils;
 
-import java.util.Collection;
 import java.util.function.Function;
 
 /**
@@ -14,9 +13,7 @@ public class LinearSearch {
      * @return an object containing both the minimum function value and the an element achieving the minimum.
      * @throws IllegalArgumentException if collection is emtpy
      */
-    public static <T> T findMinimizer(Collection<T> collection, Function<T, Double> function){
-        Validator.assertNotEmpty(collection);
-
+    public static <T> T findMinimizer(Iterable<T> collection, Function<T, Double> function){
         T minimizer = null;
         Double minimum = Double.POSITIVE_INFINITY;
 
@@ -29,6 +26,10 @@ public class LinearSearch {
             }
         }
 
+        if (minimizer == null) {
+            throw new IllegalArgumentException("Empty input.");
+        }
+
         return minimizer;
     }
 
@@ -39,7 +40,7 @@ public class LinearSearch {
      * @return an object containing both the minimum function value and the an element achieving the maximum.
      * @throws IllegalArgumentException if collection is emtpy
      */
-    public static <T> T findMaximizer(Collection<T> collection, Function<T, Double> function){
+    public static <T> T findMaximizer(Iterable<T> collection, Function<T, Double> function){
         return findMinimizer(collection, x -> -function.apply(x));
     }
 }

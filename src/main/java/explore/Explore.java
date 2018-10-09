@@ -1,6 +1,6 @@
 package explore;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.statistics.Statistics;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 public final class Explore {
     private final FolderManager folder;
-    private final List<DataPoint> dataPoints;
+    private final IndexedDataset dataPoints;
     private final User user;
     private final ExperimentConfiguration configuration;
 
@@ -32,7 +32,7 @@ public final class Explore {
      * @param dataPoints: unlabeled pool of points
      * @param user: the user for labeling points
      */
-    public Explore(FolderManager folder, List<DataPoint> dataPoints, User user) {
+    public Explore(FolderManager folder, IndexedDataset dataPoints, User user) {
         this.folder = folder;
         this.dataPoints = dataPoints;
         this.user = user;

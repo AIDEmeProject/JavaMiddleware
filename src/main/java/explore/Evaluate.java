@@ -1,6 +1,6 @@
 package explore;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.metrics.MetricCalculator;
@@ -19,9 +19,9 @@ import java.util.Map;
 public final class Evaluate {
     private FolderManager folder;
     private User user;
-    private List<DataPoint> dataPoints;
+    private IndexedDataset dataPoints;
 
-    public Evaluate(FolderManager folder, List<DataPoint> dataPoints, User user) {
+    public Evaluate(FolderManager folder, IndexedDataset dataPoints, User user) {
         this.folder = folder;
         this.user = user;
         this.dataPoints = dataPoints;

@@ -1,33 +1,30 @@
 package explore.user;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserStubTest {
-    private Collection<DataPoint> points;
+    private IndexedDataset points;
     private UserStub user;
 
     @BeforeEach
     void setUp() {
-        points = new ArrayList<>();
-
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
         for (int i = 0; i < 4; i++) {
-            points.add(new DataPoint(i, new double[]{i+1}));
+            builder.add(i, new double[]{i+1});
         }
+        points = builder.build();
 
-        Set<Long> positiveKeys = new HashSet<>();
-        positiveKeys.add(1L);
-        positiveKeys.add(2L);
-
+        Set<Long> positiveKeys = new HashSet<>(Arrays.asList(1L, 2L));
         user = new UserStub(positiveKeys);
     }
 

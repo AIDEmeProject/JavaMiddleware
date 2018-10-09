@@ -1,13 +1,9 @@
 package data.preprocessing;
 
-import data.DataPoint;
 import explore.statistics.Statistics;
 import utils.Validator;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 /**
  * This class is responsible for standardizing each column of a double matrix; in other words, after processing, each
@@ -20,14 +16,14 @@ public class StandardScaler {
     /**
      * Mean of each column
      */
-    private double[] mean;
+    private Vector mean;
 
     /**
      * Standard deviation of each column
      */
-    private double[] std;
+    private Vector std;
 
-    private StandardScaler(double[] mean, double[] std) {
+    private StandardScaler(Vector mean, Vector std) {
         this.mean = mean;
         this.std = std;
     }
@@ -39,70 +35,38 @@ public class StandardScaler {
      * @throws IllegalArgumentException if points is empty, or if any two points have different dimensions, or if
      * standard deviation of any column is zero
      */
-    public static StandardScaler fit(List<DataPoint> points){
-        Validator.assertNotEmpty(points);
+    public static StandardScaler fit(Matrix points){
+        Statistics[] statistics = points.columnStatistics();
 
-        Statistics[] statistics = computeStatisticsOfEachFeature(points);
-
-        double[] mean = getMeanArrayFromStatistics(statistics);
-        double[] std = getStandardDeviationArrayFromStatistics(statistics);
+        Vector mean = getMeanFromStatistics(statistics);
+        Vector std = getStandardDeviationFromStatistics(statistics);
 
         return new StandardScaler(mean, std);
     }
 
-    public static List<DataPoint> fitAndTransform(List<DataPoint> points) {
+    public static Matrix fitAndTransform(Matrix points) {
         return fit(points).transform(points);
     }
 
-    private static Statistics[] computeStatisticsOfEachFeature(Collection<DataPoint> points) {
-        Iterator<DataPoint> pointIterator = points.iterator();
-
-        DataPoint point = pointIterator.next();
-        int dim = point.getDim();
-
-        Statistics[] statistics = new Statistics[dim];
-        for (int i = 0; i < dim; i++) {
-            statistics[i] = new Statistics("column", point.get(i));
-        }
-
-        pointIterator.forEachRemaining(pt -> updateStatisticsGivenNewDataPoint(pt, statistics));
-
-        return statistics;
-    }
-
-    private static void updateStatisticsGivenNewDataPoint(DataPoint point, Statistics[] statistics) {
-        Validator.assertEquals(point.getDim(), statistics.length);
-
-        for (int i = 0; i < statistics.length; i++) {
-            statistics[i].update(point.get(i));
-        }
-    }
-
-    private static double[] getMeanArrayFromStatistics(Statistics[] statistics) {
+    private static Vector getMeanFromStatistics(Statistics[] statistics) {
         double[] mean = new double[statistics.length];
 
         for (int i = 0; i < statistics.length; i++) {
             mean[i] = statistics[i].getMean();
         }
 
-        return mean;
+        return Vector.FACTORY.make(mean);
     }
 
-    private static double[] getStandardDeviationArrayFromStatistics(Statistics[] statistics) {
+    private static Vector getStandardDeviationFromStatistics(Statistics[] statistics) {
         double[] std = new double[statistics.length];
 
         for (int i = 0; i < statistics.length; i++) {
             std[i] = statistics[i].getStandardDeviation();
-            validateStandardDeviation(std[i], i);
+            Validator.assertPositive(std[i]);
         }
 
-        return std;
-    }
-
-    private static void validateStandardDeviation(double standardDeviation, int column) {
-        if (standardDeviation == 0){
-            throw new IllegalArgumentException("Column number " + column + " has zero standard deviation.");
-        }
+        return Vector.FACTORY.make(std);
     }
 
     /**
@@ -111,19 +75,7 @@ public class StandardScaler {
      * @return a new standardized collection of points
      * @throws IllegalArgumentException if data points have different dimension from fitted data
      */
-    public List<DataPoint> transform(List<DataPoint> dataPoints){
-        return dataPoints.stream().map(this::transform).collect(Collectors.toList());
-    }
-
-    private DataPoint transform(DataPoint point){
-        Validator.assertEquals(point.getDim(), mean.length);
-
-        double[] scaledData = new double[point.getDim()];
-
-        for (int j = 0; j < point.getDim(); j++) {
-            scaledData[j] = (point.get(j) - mean[j]) / std[j];
-        }
-
-        return point.clone(scaledData);
+    public Matrix transform(Matrix dataPoints){
+        return dataPoints.subtractRow(mean).divideRow(std);
     }
 }

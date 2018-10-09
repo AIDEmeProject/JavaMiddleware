@@ -1,10 +1,8 @@
 package machinelearning.threesetmetric;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import explore.user.UserLabel;
 import utils.linalg.Vector;
-
-import java.util.Collection;
 
 /**
  * A stub for a {@link ExtendedClassifier}.
@@ -30,7 +28,7 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
      * @return an empty array
      */
     @Override
-    public ExtendedLabel[] predict(Collection<DataPoint> points) {
+    public ExtendedLabel[] predict(IndexedDataset points) {
         return new ExtendedLabel[0];
     }
 }

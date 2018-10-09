@@ -22,14 +22,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Python 3.6 interpreter library" level="application" />
-    <orderEntry type="library" name="Maven: org.ojalgo:ojalgo:46.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-core:1.21" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.jopt-simple:jopt-simple:4.6" level="project" />
-    <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-generator-annprocess:1.21" level="project" />
-    <orderEntry type="library" name="Maven: org.ojalgo:ojalgo:46.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-core:1.21" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.jopt-simple:jopt-simple:4.6" level="project" />
-    <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-generator-annprocess:1.21" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.2.0" level="project" />

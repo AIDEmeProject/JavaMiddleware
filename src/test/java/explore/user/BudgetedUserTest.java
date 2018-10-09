@@ -1,12 +1,10 @@
 package explore.user;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -82,11 +80,12 @@ class BudgetedUserTest {
     }
 
     @Test
-    void getLabel_dataPointCollectionLargetThanBudget_throwsException() {
-        Collection<DataPoint> dataPoints = new ArrayList<>();
+    void getLabel_dataPointCollectionLargerThanBudget_throwsException() {
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
         for (int i = 0; i < budget+1; i++) {
-            dataPoints.add(dataPoint);
+            builder.add(dataPoint);
         }
-        assertThrows(IllegalStateException.class, () -> budgetedUser.getLabel(dataPoints));
+
+        assertThrows(IllegalStateException.class, () -> budgetedUser.getLabel(builder.build()));
     }
 }

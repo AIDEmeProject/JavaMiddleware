@@ -1,14 +1,10 @@
 package utils.linalg;
 
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import explore.statistics.Statistics;
 import utils.Validator;
 
-import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
-
-import static org.ojalgo.function.PrimitiveFunction.*;
 
 /**
  * A Matrix represents a mathematical real matrix. Basically, this module is a wrapper of the Ojalgo's
@@ -143,6 +139,56 @@ public class Matrix {
         return new Vector(row);
     }
 
+    public Matrix getRows(int... rows) {
+        double[] slice = new double[rows.length * cols];
+        for (int i = 0; i < rows.length; i++) {
+            System.arraycopy(matrix, rows[i] * cols, slice, i * cols, cols);
+        }
+        return new Matrix(rows.length, cols, slice);
+    }
+
+    public Matrix getRowSlice(int from, int to) {
+        if (from < 0 || from > to || to > rows) {
+            throw new IllegalArgumentException("Indexes " + from + ", " + to + " of bounds for matrix of " + rows + " rows");
+        }
+
+        int size = to - from;
+        double[] slice = new double[size * cols];
+        System.arraycopy(matrix, from * cols, slice, 0, slice.length);
+        return new Matrix(size, cols, slice);
+    }
+
+    public void swapRows(int i, int j) {
+        Validator.assertIndexInBounds(i, 0, rows);
+        Validator.assertIndexInBounds(j, 0, rows);
+
+        if (i != j) {
+            int offsetI = i * cols, offsetJ = j * cols;
+            for (int k = 0; k < cols; k++) {
+                double tmp = matrix[offsetI];
+                matrix[offsetI++] = matrix[offsetJ];
+                matrix[offsetJ++] = tmp;
+            }
+        }
+    }
+
+    public Statistics[] columnStatistics() {
+        Statistics[] statistics = new Statistics[cols];
+
+        for (int j = 0; j < cols; j++) {
+            statistics[j] = new Statistics("column_" + j, matrix[j]);
+        }
+
+        int p = cols;
+        for (int i = 1; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                statistics[j].update(matrix[p++]);
+            }
+        }
+
+        return statistics;
+    }
+
     private static BiFunction<Double, Double, Double> ADD = (x,y) -> x+y;
     private static BiFunction<Double, Double, Double> SUB = (x,y) -> x-y;
     private static BiFunction<Double, Double, Double> MUL = (x,y) -> x*y;
@@ -169,6 +215,24 @@ public class Matrix {
         return new Matrix(rows, cols, result);
     }
 
+    private Matrix applyBinaryFunctionToRows(Vector vector, BiFunction<Double, Double, Double> op) {
+        Validator.assertEquals(cols, vector.dim());
+
+        double[] result = new double[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            result[i] = op.apply(matrix[i], vector.vector[i % cols]);
+        }
+
+//        int p = 0;
+//        for (int i = 0; i < rows; i++) {
+//            for (int j = 0; j < cols; j++) {
+//                result[p] = op.apply(matrix[p++], vector.vector[j]);
+//            }
+//        }
+
+        return new Matrix(rows, cols, result);
+    }
+
     /**
      * @param other: matrix to be added
      * @return the sum of {@code this} and {@code other}
@@ -187,12 +251,20 @@ public class Matrix {
         return applyBinaryFunction(other, SUB);
     }
 
+    public Matrix subtractRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, SUB);
+    }
+
     /**
      * @param value: value to multiply each component of {@code this}
      * @return a matrix whose every component equals the multiplication of {@code this} by value
      */
     public Matrix scalarMultiply(double value) {
         return applyBinaryFunction(value, MUL);
+    }
+
+    public Matrix divideRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, DIV);
     }
 
     /**
@@ -251,6 +323,10 @@ public class Matrix {
             transpose[p] = matrix[i * cols + j];
         }
         return new Matrix(cols, rows, transpose);
+    }
+
+    public Matrix copy() {
+        return new Matrix(rows, cols, matrix.clone());
     }
 
     /**

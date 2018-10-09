@@ -1,11 +1,9 @@
 package io;
 
-import data.DataPoint;
+import data.IndexedDataset;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,8 +48,8 @@ public class DatabaseReader {
      * @param columns: list of data columns to read. Must be of numeric type.
      * @return Indexes dataset instance containing both the keys and the data read from the database
      */
-    public List<DataPoint> readTable(String table, String key, String[] columns){
-        List<DataPoint> points = new ArrayList<>();
+    public IndexedDataset readTable(String table, String key, String[] columns){
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
 
         // build SQL query
         String SQL = buildSQLString(table, key, columns, "");
@@ -75,7 +73,7 @@ public class DatabaseReader {
                     data[i] = rs.getDouble(i+2);
                 }
 
-                points.add(new DataPoint(id, data));
+                builder.add(id, data);
             }
 
         } catch (SQLException ex) {
@@ -83,7 +81,7 @@ public class DatabaseReader {
             throw new RuntimeException("Couldn't read data from database.");
         }
 
-        return points;
+        return builder.build();
     }
 
     /**
