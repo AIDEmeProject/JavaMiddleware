@@ -20,7 +20,7 @@ UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
 MODES = [
     'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
-    #'EVAL',      # run evaluation procedure over finished runs
+    'EVAL',      # run evaluation procedure over finished runs
     #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
@@ -31,7 +31,7 @@ NUM_RUNS = 1
 BUDGET = 25
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [7]
+RUNS = [4]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

@@ -22,6 +22,12 @@ abstract class AbstractKernelTest {
         assertEquals(expected, kernel.compute(x, y));
     }
 
+    void assertKernelVectorIsCorrect(double[] expected, double[][] arr1, double[] arr2) {
+        Matrix x = Matrix.FACTORY.make(arr1);
+        Vector y = Vector.FACTORY.make(arr2);
+        assertEquals(Vector.FACTORY.make(expected), kernel.compute(x, y));
+    }
+
     void assertKernelMatrixIsCorrectlyComputed(double[][] expected, double[][] toCompute) {
         assertEquals(Matrix.FACTORY.make(expected), kernel.compute(Matrix.FACTORY.make(toCompute)));
     }

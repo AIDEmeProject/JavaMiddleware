@@ -2,7 +2,6 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import data.IndexedDataset;
 import data.LabeledDataset;
-import data.LabeledPoint;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,9 +10,7 @@ import utils.linalg.Vector;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

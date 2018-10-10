@@ -1,17 +1,12 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
-import data.LabeledPoint;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

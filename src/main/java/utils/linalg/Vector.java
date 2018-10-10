@@ -101,6 +101,16 @@ public class Vector {
         return new Vector(result);
     }
 
+    private Vector applyBinaryFunctionInplace(double[] rhs, BiFunction<Double, Double, Double> op) {
+        Validator.assertEqualLengths(vector, rhs);
+
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = op.apply(vector[i], rhs[i]);
+        }
+
+        return this;
+    }
+
     private Vector applyBinaryFunction(double value, BiFunction<Double, Double, Double> op) {
         double[] result = new double[vector.length];
         for (int i = 0; i < result.length; i++) {
@@ -108,6 +118,13 @@ public class Vector {
         }
 
         return new Vector(result);
+    }
+
+    private Vector applyBinaryFunctionInplace(double value, BiFunction<Double, Double, Double> op) {
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = op.apply(vector[i], value);
+        }
+        return this;
     }
 
     /**
@@ -120,11 +137,28 @@ public class Vector {
     }
 
     /**
+     * @param other: vector to be added in-place to {@code this}
+     * @return {@code this}
+     * @throws IllegalArgumentException if vectors have incompatible dimensions
+     */
+    public Vector iAdd(Vector other) {
+        return applyBinaryFunctionInplace(other.vector, ADD);
+    }
+
+    /**
      * @param value: value to add each component of {@code this}
      * @return a vector whose every component equals the sum of {@code this} and {@code value}
      */
     public Vector scalarAdd(double value) {
         return applyBinaryFunction(value, ADD);
+    }
+
+    /**
+     * @param value: value to add each component of {@code this} in-place
+     * @return {@code this}
+     */
+    public Vector iScalarAdd(double value) {
+        return applyBinaryFunctionInplace(value, ADD);
     }
 
     /**
@@ -143,6 +177,15 @@ public class Vector {
     public Vector scalarMultiply(double value) {
         return applyBinaryFunction(value, MUL);
     }
+
+    /**
+     * @param value: multiply each component of {@code this} by value in-place.
+     * @return {@code this}
+     */
+    public Vector iScalarMultiply(double value) {
+        return applyBinaryFunctionInplace(value, MUL);
+    }
+
 
     /**
      * @param value: value to divide each component of {@code this}

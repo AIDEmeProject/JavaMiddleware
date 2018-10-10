@@ -3,8 +3,6 @@ package machinelearning.classifier;
 import data.LabeledDataset;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractLearnerTest {

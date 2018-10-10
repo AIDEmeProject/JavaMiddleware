@@ -9,7 +9,6 @@ import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 
 /**

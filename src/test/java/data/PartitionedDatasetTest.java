@@ -9,7 +9,6 @@ import org.mockito.stubbing.Answer;
 import utils.linalg.Vector;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

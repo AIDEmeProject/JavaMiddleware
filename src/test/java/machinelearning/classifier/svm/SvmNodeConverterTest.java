@@ -1,12 +1,9 @@
 package machinelearning.classifier.svm;
 
-import data.DataPoint;
 import libsvm.svm_node;
 import org.junit.jupiter.api.Test;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
