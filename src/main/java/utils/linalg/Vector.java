@@ -5,6 +5,7 @@ import utils.Validator;
 import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Ojalgo's
@@ -57,7 +58,7 @@ public class Vector {
      * @return the number of components of this vector (i.e. its dimension)
      */
     public int dim() {
-        return (int) vector.length;
+        return vector.length;
     }
 
     /**
@@ -119,6 +120,14 @@ public class Vector {
     }
 
     /**
+     * @param value: value to add each component of {@code this}
+     * @return a vector whose every component equals the sum of {@code this} and {@code value}
+     */
+    public Vector scalarAdd(double value) {
+        return applyBinaryFunction(value, ADD);
+    }
+
+    /**
      * @param other: vector to be subtracted from {@code this}
      * @return the result of the subtraction of {@code this} and {@code other}
      * @throws IllegalArgumentException if vectors have incompatible dimensions
@@ -141,6 +150,23 @@ public class Vector {
      */
     public Vector scalarDivide(double value) {
         return applyBinaryFunction(value, DIV);
+    }
+
+    public Vector applyMap(Function<Double, Double> op) {
+        double[] result = new double[vector.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = op.apply(vector[i]);
+        }
+
+        return new Vector(result);
+    }
+
+    public Vector iApplyMap(Function<Double, Double> op) {
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = op.apply(vector[i]);
+        }
+
+        return this;
     }
 
     /**

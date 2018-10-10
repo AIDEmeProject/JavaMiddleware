@@ -1,5 +1,7 @@
 package utils;
 
+import data.LabeledDataset;
+
 import java.util.Collection;
 
 /**
@@ -58,6 +60,17 @@ public class Validator {
     public static <T> void assertNotEmpty(T[] data){
         if (data.length == 0){
             throw new IllegalArgumentException("Array must contain at least one element.");
+        }
+    }
+
+    /**
+     * Raises an exception if collection is emtpy
+     * @param data: data vector
+     * @throws IllegalArgumentException if data vector is empty
+     */
+    public static void assertNotEmpty(LabeledDataset data){
+        if (data.isEmpty()){
+            throw new IllegalArgumentException("Labeled dataset cannot be empty.");
         }
     }
 

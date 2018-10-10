@@ -1,12 +1,10 @@
 package machinelearning.active.learning;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.active.ranker.MarginRanker;
 import machinelearning.classifier.svm.SvmLearner;
-
-import java.util.Collection;
 
 /**
  * Simple Margin is a Active Learning technique introduced in [1]. It approximates a version space cutting technique
@@ -31,7 +29,7 @@ public class SimpleMargin implements ActiveLearner {
     }
 
     @Override
-    public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+    public Ranker fit(LabeledDataset labeledPoints) {
         return new MarginRanker(svmLearner.fit(labeledPoints));
     }
 }

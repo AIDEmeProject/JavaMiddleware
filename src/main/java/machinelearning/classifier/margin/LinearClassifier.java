@@ -1,5 +1,6 @@
 package machinelearning.classifier.margin;
 
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 /**
@@ -60,6 +61,11 @@ public class LinearClassifier extends MarginClassifier {
     @Override
     public double margin(Vector x){
         return bias + x.dot(weights);
+    }
+
+    @Override
+    public Vector margin(Matrix xs) {
+        return xs.multiply(weights).scalarAdd(bias);
     }
 
     @Override

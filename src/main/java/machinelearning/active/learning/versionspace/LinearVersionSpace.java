@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
@@ -9,9 +9,7 @@ import utils.Validator;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
-import java.util.Collection;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * The Version Space for the {@link LinearClassifier}. Mathematically, it can be defined by a set of linear inequalities:
@@ -66,7 +64,7 @@ public class LinearVersionSpace implements VersionSpace {
      * @return sample of Linear Classifiers obtained through the Hit-and-Run algorithm.
      */
     @Override
-    public LinearClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
+    public LinearClassifier[] sample(LabeledDataset labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
         ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
@@ -76,14 +74,12 @@ public class LinearVersionSpace implements VersionSpace {
         return getLinearClassifiers(samples);
     }
 
-    private Collection<LabeledPoint> addIntercept(Collection<LabeledPoint> labeledPoints) {
+    private LabeledDataset addIntercept(LabeledDataset labeledPoints) {
         if (!addIntercept){
             return labeledPoints;
         }
 
-        return labeledPoints.stream()
-                .map(LabeledPoint::addBias)
-                .collect(Collectors.toList());
+        return labeledPoints.copyWithSameIndexesAndLabels(labeledPoints.getData().addBiasColumn());
     }
 
     private LinearClassifier[] getLinearClassifiers(Vector[] samples) {

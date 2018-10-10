@@ -1,11 +1,9 @@
 package machinelearning.classifier.margin;
 
-import data.DataPoint;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
-
-import java.util.Collection;
 
 /**
  * A Kernel classifier is defined as:
@@ -33,7 +31,7 @@ public class KernelClassifier extends MarginClassifier {
     /**
      * weight vectors used for computing the kernel matrix
      */
-    private final Collection<? extends DataPoint> supportVectors;
+    private final Matrix supportVectors;
 
     private final Kernel kernel;
 
@@ -44,7 +42,7 @@ public class KernelClassifier extends MarginClassifier {
      * @throws NullPointerException if kernel is null
      * @throws IllegalArgumentException if the number of weights and support vectors are different
      */
-    public KernelClassifier(double bias, Vector weights, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
+    public KernelClassifier(double bias, Vector weights, Matrix supportVectors, Kernel kernel) {
         this(new LinearClassifier(bias, weights), supportVectors, kernel);
     }
 
@@ -54,10 +52,10 @@ public class KernelClassifier extends MarginClassifier {
      * @throws NullPointerException if linearClassifier or kernel is null
      * @throws IllegalArgumentException if linearClassifier dimension is different from the number of support vectors
      */
-    public KernelClassifier(LinearClassifier linearClassifier, Collection<? extends DataPoint> supportVectors, Kernel kernel) {
+    public KernelClassifier(LinearClassifier linearClassifier, Matrix supportVectors, Kernel kernel) {
         Validator.assertNotNull(linearClassifier);
         Validator.assertNotNull(kernel);
-        Validator.assertEquals(linearClassifier.getDim(), supportVectors.size());
+        Validator.assertEquals(linearClassifier.getDim(), supportVectors.numRows());
 
         this.linearClassifier = linearClassifier;
         this.supportVectors = supportVectors;
@@ -66,7 +64,11 @@ public class KernelClassifier extends MarginClassifier {
 
     @Override
     public double margin(Vector x) {
-        double[] kernelVector = kernel.compute(supportVectors, x);
-        return linearClassifier.margin(Vector.FACTORY.make(kernelVector));
+        return linearClassifier.margin(kernel.compute(supportVectors, x));
+    }
+
+    @Override
+    public Vector margin(Matrix xs) {
+        return linearClassifier.margin(kernel.compute(xs, supportVectors));
     }
 }

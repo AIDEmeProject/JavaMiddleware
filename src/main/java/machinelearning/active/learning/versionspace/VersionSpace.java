@@ -1,9 +1,7 @@
 package machinelearning.active.learning.versionspace;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.classifier.Classifier;
-
-import java.util.Collection;
 
 /**
  * Mathematically, the Version Space corresponds as a collection of all classifiers in a particular hypothesis class which
@@ -19,5 +17,5 @@ public interface VersionSpace {
      * @return a random sample of numSamples hypothesis consistent with the labeledPoints.
      * @throws IllegalArgumentException if numSamples is not positive
      */
-    Classifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples);
+    Classifier[] sample(LabeledDataset labeledPoints, int numSamples);
 }

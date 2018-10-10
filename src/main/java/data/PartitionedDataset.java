@@ -1,5 +1,6 @@
 package data;
 
+import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedClassifierStub;
 import machinelearning.threesetmetric.ExtendedLabel;
@@ -93,12 +94,12 @@ public final class PartitionedDataset {
     /**
      * @return all the data points in the MOST INFORMATIVE partition
      */
-    public List<LabeledPoint> getLabeledPoints() {
-        List<LabeledPoint> labeledPoints = new ArrayList<>();
+    public LabeledDataset getLabeledPoints() {
+        Label[] labels = new Label[inferredStart];
         for (int i = 0; i < inferredStart; i++) {
-            labeledPoints.add(new LabeledPoint(points.get(i), labels[i].toLabel()));
+            labels[i] = this.labels[i].toLabel();
         }
-        return labeledPoints;
+        return new LabeledDataset(points.getRange(0, inferredStart), labels);
     }
 
     /**

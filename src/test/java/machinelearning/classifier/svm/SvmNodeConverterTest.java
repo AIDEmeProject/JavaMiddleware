@@ -3,6 +3,7 @@ package machinelearning.classifier.svm;
 import data.DataPoint;
 import libsvm.svm_node;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 import java.util.List;
@@ -25,7 +26,7 @@ class SvmNodeConverterTest {
 
     @Test
     void toDataPoint_emptyInputMatrix_returnsEmptyArray() {
-        assertTrue(SvmNodeConverter.toDataPoint(new svm_node[0][]).isEmpty());
+        assertTrue(SvmNodeConverter.toMatrix(new svm_node[0][], 0).isEmpty());
     }
 
     @Test
@@ -35,10 +36,8 @@ class SvmNodeConverterTest {
                 {createSvmNode(0, -10), createSvmNode(1, -20)}
         };
 
-        List<DataPoint> points = SvmNodeConverter.toDataPoint(nodes);
-        assertEquals(2, points.size());
-        assertEquals(new DataPoint(0, new double[] {10, 20}), points.get(0));
-        assertEquals(new DataPoint(1, new double[] {-10, -20}), points.get(1));
+        Matrix points = SvmNodeConverter.toMatrix(nodes, 2);
+        assertEquals(Matrix.FACTORY.make(2, 2, 10, 20, -10, -20), points);
     }
 
     private svm_node createSvmNode(int index, double value) {

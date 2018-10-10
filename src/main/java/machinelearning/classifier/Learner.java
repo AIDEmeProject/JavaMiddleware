@@ -1,8 +1,6 @@
 package machinelearning.classifier;
 
-import data.LabeledPoint;
-
-import java.util.Collection;
+import data.LabeledDataset;
 
 public interface Learner {
 
@@ -12,5 +10,5 @@ public interface Learner {
      * @throws IllegalArgumentException if labeledPoints is empty
      * @return a Classifier trained over the labeledPoints
      */
-    Classifier fit(Collection<LabeledPoint> labeledPoints);
+    Classifier fit(LabeledDataset labeledPoints);
 }

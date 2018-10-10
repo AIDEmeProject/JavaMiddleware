@@ -1,14 +1,12 @@
 package machinelearning.active.learning.versionspace;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.classifier.margin.KernelClassifier;
 import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import utils.linalg.Matrix;
 
 /**
  * This class defines the Version Space for the {@link KernelClassifier} classifier. It is defined by the set of
@@ -47,26 +45,19 @@ public class KernelVersionSpace implements VersionSpace {
         this.kernel = kernel;
     }
 
-    private Collection<LabeledPoint> computeKernelMatrix(Collection<LabeledPoint> labeledPoints){
+    private LabeledDataset computeKernelMatrix(LabeledDataset labeledPoints){
         // apply kernel function
-        double[][] kernelMatrix = kernel.compute(labeledPoints);
-
-        int i = 0;
-        Collection<LabeledPoint> kernelLabeledPoints = new ArrayList<>(labeledPoints.size());
-        for (LabeledPoint point : labeledPoints) {
-            kernelLabeledPoints.add(point.clone(kernelMatrix[i++]));
-        }
-
-        return kernelLabeledPoints;
+        Matrix kernelMatrix = kernel.compute(labeledPoints.getData());
+        return labeledPoints.copyWithSameIndexesAndLabels(kernelMatrix);
     }
 
     @Override
-    public KernelClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
+    public KernelClassifier[] sample(LabeledDataset labeledPoints, int numSamples) {
         LinearClassifier[] linearClassifiers = linearVersionSpace.sample(computeKernelMatrix(labeledPoints), numSamples);
 
         KernelClassifier[] kernelClassifiers = new KernelClassifier[numSamples];
         for (int i = 0; i < numSamples; i++) {
-            kernelClassifiers[i] = new KernelClassifier(linearClassifiers[i], labeledPoints, kernel);
+            kernelClassifiers[i] = new KernelClassifier(linearClassifiers[i], labeledPoints.getData(), kernel);
         }
 
         return kernelClassifiers;

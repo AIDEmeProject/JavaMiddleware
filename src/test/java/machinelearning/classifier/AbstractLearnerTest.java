@@ -1,5 +1,6 @@
 package machinelearning.classifier;
 
+import data.LabeledDataset;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -11,6 +12,6 @@ public abstract class AbstractLearnerTest {
 
     @Test
     void fit_EmptyLabeledPointsCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> learner.fit(new ArrayList<>()));
+        assertThrows(IllegalArgumentException.class, () -> learner.fit(LabeledDataset.EMPTY));
     }
 }

@@ -1,12 +1,9 @@
 package machinelearning.classifier;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,9 +42,9 @@ class MajorityVoteLearnerTest extends AbstractLearnerTest {
         learner = new MajorityVoteLearner(versionSpace, sampleSize);
 
         // fit and verify
-        Collection<LabeledPoint> points = new ArrayList<>();
-        points.add(mock(LabeledPoint.class));
-        learner.fit(points);
-        verify(versionSpace, times(1)).sample(points, sampleSize);
+        LabeledDataset labeledDataset = mock(LabeledDataset.class);
+        when(labeledDataset.isEmpty()).thenReturn(false);
+        learner.fit(labeledDataset);
+        verify(versionSpace, times(1)).sample(any(), eq(sampleSize));
     }
 }

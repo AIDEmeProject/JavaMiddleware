@@ -2,6 +2,7 @@ package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
 import utils.Validator;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 
@@ -17,6 +18,8 @@ public class GaussianKernel extends Kernel {
      * gamma parameter
      */
     private double gamma;
+
+    private static final DistanceKernel distanceKernel = new DistanceKernel();
 
     /**
      * @param gamma gamma parameter of gaussian kernel
@@ -34,10 +37,30 @@ public class GaussianKernel extends Kernel {
         this.gamma = 0;
     }
 
+    private double getGamma(int dim) {
+        return this.gamma > 0 ? this.gamma : (1.0 / dim);
+    }
+
+    private double gaussianMap(double distance, double gamma) {
+        return Math.exp(-gamma * distance);
+    }
+
     @Override
     public double compute(Vector x, Vector y) {
-        double gamma = this.gamma > 0 ? this.gamma : 1.0 / x.dim();
-        return Math.exp(-gamma * x.squaredDistanceTo(y));
+        final double gamma = getGamma(y.dim());
+        return gaussianMap(distanceKernel.compute(x, y), gamma);
+    }
+
+    @Override
+    public Vector compute(Matrix xs, Vector y) {
+        final double gamma = getGamma(y.dim());
+        return distanceKernel.compute(xs, y).iApplyMap(x -> gaussianMap(x, gamma));
+    }
+
+    @Override
+    public Matrix compute(Matrix xs, Matrix ys) {
+        final double gamma = getGamma(xs.numCols());
+        return distanceKernel.compute(xs, ys).iApplyMap(x -> gaussianMap(x, gamma));
     }
 
     @Override

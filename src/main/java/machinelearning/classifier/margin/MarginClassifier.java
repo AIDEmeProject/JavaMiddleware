@@ -1,8 +1,10 @@
 package machinelearning.classifier.margin;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 /**
@@ -22,6 +24,8 @@ public abstract class MarginClassifier implements Classifier {
      */
     public abstract double margin(Vector x);
 
+    public abstract Vector margin(Matrix xs);
+
     /**
      * @param point: a data point
      * @return the margin of this point
@@ -36,7 +40,16 @@ public abstract class MarginClassifier implements Classifier {
      */
     @Override
     public final double probability(DataPoint point) {
-        return 1.0 / (1.0 + Math.exp(-margin(point)));
+        return sigmoid(margin(point));
+    }
+
+    @Override
+    public final Vector probability(IndexedDataset points) {
+        return margin(points.getData()).iApplyMap(MarginClassifier::sigmoid);
+    }
+
+    private static double sigmoid(double value) {
+        return 1.0 / (1.0 + Math.exp(-value));
     }
 
     /**

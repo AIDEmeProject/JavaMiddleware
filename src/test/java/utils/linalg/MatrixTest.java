@@ -237,6 +237,18 @@ public class MatrixTest {
         assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
     }
 
+    @Test
+    void iAddRow_compatibleVector_returnsExpectedResult() {
+        matrix1.iAddRow(Vector.FACTORY.make(-2, 0, 3));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 2, 6, 2, 5, 9), matrix1);
+    }
+
+    @Test
+    void iAddColumn_compatibleVector_returnsExpectedResult() {
+        matrix1.iAddColumn(Vector.FACTORY.make(-2, 3));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 0, 1, 7, 8, 9), matrix1);
+    }
+
     /* *************************************
      *              SUBTRACTION
      * ************************************
@@ -337,27 +349,27 @@ public class MatrixTest {
      *            MULTIPLICATION
      * ************************************
      */
-//    @Test
-//    void iScalarMultiply_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iScalarMultiply(1));
-//    }
-//
-//    @Test
-//    void iScalarMultiply_multiplyByOne_resultIdenticalToInputMatrix() {
-//        matrix1.iScalarMultiply(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iScalarMultiply_multiplyByTwo_originalMatrixHasAllComponentsMultipliedByTwo() {
-//        matrix1.iScalarMultiply(2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 2, 4, 6, 8, 10, 12), matrix1);
-//    }
-//
-//    @Test
-//    void scalarMultiply_multiplyByOne_resultIdenticalToInputMatrix() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarMultiply(1));
-//    }
+    @Test
+    void iScalarMultiply_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iScalarMultiply(1));
+    }
+
+    @Test
+    void iScalarMultiply_multiplyByOne_resultIdenticalToInputMatrix() {
+        matrix1.iScalarMultiply(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iScalarMultiply_multiplyByTwo_originalMatrixHasAllComponentsMultipliedByTwo() {
+        matrix1.iScalarMultiply(2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 4, 6, 8, 10, 12), matrix1);
+    }
+
+    @Test
+    void scalarMultiply_multiplyByOne_resultIdenticalToInputMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarMultiply(1));
+    }
 
     @Test
     void scalarMultiply_multiplyByTwo_resultMatrixHasAllComponentsMultipliedByTwo() {
@@ -467,6 +479,16 @@ public class MatrixTest {
     void multiply_customInputMatrix_returnsCorrectMatrixMultiplication() {
         Matrix matrix = Matrix.FACTORY.make(3, 2, -1, 2, 0, 0, 4, -5);
         assertEquals(Matrix.FACTORY.make(2, 2, 11, -13, 20, -22), matrix1.multiply(matrix));
+    }
+
+    @Test
+    void multiplyTranspose_compatibleMatrices_returnsCorrectMatrixMultiplication() {
+        assertEquals(Matrix.FACTORY.make(2, 2, 140, 320, 320, 770), matrix1.multiplyTranspose(matrix2));
+    }
+
+    @Test
+    void getRowSquaredNorms_rectangularMatrix_returnsExpectedValues() {
+        assertEquals(Vector.FACTORY.make(14, 77), matrix1.getRowSquaredNorms());
     }
 
     /* ************************************

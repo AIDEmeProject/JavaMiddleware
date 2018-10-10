@@ -1,11 +1,8 @@
 package machinelearning.classifier.svm;
 
-import data.DataPoint;
 import libsvm.svm_node;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -33,32 +30,23 @@ class SvmNodeConverter {
     }
 
     /**
-     * Convert a double array into a svm_node array
-     * @param nodes: matrix to be converted
-     * @return converted matrix
-     */
-    private static DataPoint toDataPoint(int index, svm_node[] nodes){
-        double[] converted = new double[nodes.length];
-
-        for (int i = 0; i < nodes.length; i++) {
-            converted[i] = nodes[i].value;
-        }
-
-        return new DataPoint(index, converted);
-    }
-
-    /**
      * Convert a svm_node matrix into a list of DataPoints
      * @param nodes: matrix to be converted
      * @return converted matrix
      */
-    static List<DataPoint> toDataPoint(svm_node[][] nodes){
-        List<DataPoint> converted = new ArrayList<>(nodes.length);
-
-        for (int i = 0; i < nodes.length; i++) {
-            converted.add(toDataPoint(i, nodes[i]));
+    static Matrix toMatrix(svm_node[][] nodes, int dim){
+        if (nodes.length == 0) {
+            return Matrix.EMPTY;
         }
 
-        return converted;
+        double[][] converted = new double[nodes.length][dim];
+
+        for (int i = 0; i < nodes.length; i++) {
+            for (svm_node node : nodes[i]) {
+                converted[i][node.index] = node.value;
+            }
+        }
+
+        return Matrix.FACTORY.make(converted);
     }
 }

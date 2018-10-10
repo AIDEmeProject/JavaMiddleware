@@ -9,8 +9,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class IndexedDataset implements Iterable<DataPoint> {
-    private List<Long> indexes;
-    private Matrix data;
+    protected List<Long> indexes;
+    protected Matrix data;
+
+    public final static IndexedDataset EMPTY = new IndexedDataset(Collections.EMPTY_LIST, Matrix.EMPTY);
 
     public static class Builder {
         private List<Long> indexes;
@@ -56,6 +58,10 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
     public int length() {
         return indexes.size();
+    }
+
+    public int dim() {
+        return data.numCols();
     }
 
     public DataPoint get(int i) {

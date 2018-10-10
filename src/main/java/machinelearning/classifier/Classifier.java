@@ -2,8 +2,8 @@ package machinelearning.classifier;
 
 
 import data.DataPoint;
-
-import java.util.Collection;
+import data.IndexedDataset;
+import utils.linalg.Vector;
 
 /**
  * A classifier is any object capable of "learning from training data" and "make predictions for new data points".
@@ -24,15 +24,15 @@ public interface Classifier {
      * @param points: collection of data points
      * @return probability estimation array
      */
-    default double[] probability(Collection<DataPoint> points){
-        double[] probas = new double[points.size()];
+    default Vector probability(IndexedDataset points){
+        double[] probas = new double[points.length()];
 
         int i = 0;
         for (DataPoint point : points) {
             probas[i++] = probability(point);
         }
 
-        return probas;
+        return Vector.FACTORY.make(probas);
     }
 
     /**
@@ -49,8 +49,8 @@ public interface Classifier {
      * @param points: collection of data points
      * @return predicted class labels
      */
-    default Label[] predict(Collection<DataPoint> points){
-        Label[] labels = new Label[points.size()];
+    default Label[] predict(IndexedDataset points){
+        Label[] labels = new Label[points.length()];
 
         int i = 0;
         for (DataPoint point : points) {
@@ -58,16 +58,5 @@ public interface Classifier {
         }
 
         return labels;
-    }
-
-    /**
-     * Upper bound on "future probabilities".
-     *
-     * @param data: labeled data
-     * @param maxPositivePoints: maximum number of positive labeled points
-     * @return probability upper bound
-     */
-    default double computeProbabilityUpperBound(Collection<DataPoint> data, int maxPositivePoints){
-        return Double.POSITIVE_INFINITY;
     }
 }

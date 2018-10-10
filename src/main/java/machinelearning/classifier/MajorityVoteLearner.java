@@ -1,10 +1,8 @@
 package machinelearning.classifier;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import utils.Validator;
-
-import java.util.Collection;
 
 /**
  * This module builds a {@link MajorityVoteClassifier} by sampling from the {@link VersionSpace}.
@@ -38,7 +36,7 @@ public class MajorityVoteLearner implements Learner {
      * @return {@link MajorityVoteClassifier} constructed by sampling from the Version Space delimited by the labeledPoints.
      */
     @Override
-    public MajorityVoteClassifier fit(Collection<LabeledPoint> labeledPoints) {
+    public MajorityVoteClassifier fit(LabeledDataset labeledPoints) {
         Validator.assertNotEmpty(labeledPoints);
         return new MajorityVoteClassifier(versionSpace.sample(labeledPoints, sampleSize));
     }

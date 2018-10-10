@@ -1,6 +1,7 @@
 package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 /**
@@ -12,6 +13,16 @@ public class LinearKernel extends Kernel {
     @Override
     public double compute(Vector x, Vector y) {
         return x.dot(y);
+    }
+
+    @Override
+    public Vector compute(Matrix xs, Vector y) {
+        return xs.multiply(y);
+    }
+
+    @Override
+    public Matrix compute(Matrix xs, Matrix ys) {
+        return xs.multiplyTranspose(ys);
     }
 
     @Override

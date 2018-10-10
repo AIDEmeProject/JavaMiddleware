@@ -1,14 +1,11 @@
 package machinelearning.classifier.svm;
 
-import data.DataPoint;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 abstract class AbstractKernelTest {
     protected Kernel kernel;
@@ -16,16 +13,6 @@ abstract class AbstractKernelTest {
     @Test
     void compute_vectorsOfDifferentLengths_throwsException() {
         assertThrows(RuntimeException.class, () -> kernel.compute(Vector.FACTORY.zeros(1), Vector.FACTORY.zeros(2)));
-    }
-
-    @Test
-    void compute_emptyDataPointCollection_returnsEmptyArray() {
-        assertArrayEquals(new double[0], kernel.compute(Collections.EMPTY_LIST, new DataPoint(0, new double[1])));
-    }
-
-    @Test
-    void compute_emptyDataPointCollection_returnsEmptyMatrix() {
-        assertArrayEquals(new double[0][0], kernel.compute(Collections.EMPTY_LIST));
     }
 
     void assertKernelFunctionIsCorrect(double expected, double[] arr1, double[] arr2) {
@@ -36,12 +23,6 @@ abstract class AbstractKernelTest {
     }
 
     void assertKernelMatrixIsCorrectlyComputed(double[][] expected, double[][] toCompute) {
-        Collection<DataPoint> points = new ArrayList<>(toCompute.length);
-
-        for (double[] array : toCompute) {
-            points.add(new DataPoint(0, array));
-        }
-
-        assertArrayEquals(expected, kernel.compute(points));
+        assertEquals(Matrix.FACTORY.make(expected), kernel.compute(Matrix.FACTORY.make(toCompute)));
     }
 }

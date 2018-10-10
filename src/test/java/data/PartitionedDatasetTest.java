@@ -59,7 +59,7 @@ class PartitionedDatasetTest {
         DataPoint dataPoint = dataPoints.get(0);
         Label label = Label.NEGATIVE;
         dataset.update(new LabeledPoint(dataPoint, label));
-        assertEquals(Collections.singletonList(new LabeledPoint(dataPoint, label)), dataset.getLabeledPoints());
+        assertEquals(new LabeledPoint(dataPoint, label), dataset.getLabeledPoints().get(0));
     }
 
     @Test

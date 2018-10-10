@@ -1,5 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
+import data.LabeledDataset;
 import data.LabeledPoint;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
@@ -22,7 +23,7 @@ public class PolyhedralCone implements ConvexBody {
     /**
      * Collection of labeled points defining this polyhedral cone
      */
-    private final Collection<LabeledPoint> labeledPoints;
+    private final LabeledDataset labeledPoints;
 
     /**
      * Factory instance of LP solvers, used for finding an interior point
@@ -33,14 +34,18 @@ public class PolyhedralCone implements ConvexBody {
      * @param labeledPoints: set of labeled points to built polytope. \(w_i = y_i x_i\)
      * @param solverFactory: factory instance for LP solvers
      */
-    public PolyhedralCone(Collection<LabeledPoint> labeledPoints, LinearProgramSolver.FACTORY solverFactory) {
-        Validator.assertNotEmpty(labeledPoints);
+    public PolyhedralCone(LabeledDataset labeledPoints, LinearProgramSolver.FACTORY solverFactory) {
+        if (labeledPoints.isEmpty()) {
+            //TODO: accept empty set anyway?
+            throw new IllegalArgumentException("Cannot receive empty labeled points");
+        }
+
         this.labeledPoints = labeledPoints;
         this.solverFactory = solverFactory;
     }
 
     public int getDim() {
-        return labeledPoints.iterator().next().getDim();
+        return labeledPoints.dim();
     }
 
     @Override

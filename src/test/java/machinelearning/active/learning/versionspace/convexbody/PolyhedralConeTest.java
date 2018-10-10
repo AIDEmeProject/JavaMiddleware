@@ -1,15 +1,18 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
+import data.IndexedDataset;
+import data.LabeledDataset;
 import data.LabeledPoint;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -18,20 +21,19 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 class PolyhedralConeTest {
-    private Collection<LabeledPoint> points;
+    private LabeledDataset points;
     private PolyhedralCone cone;
 
     @BeforeEach
     void setUp() {
-        points = new ArrayList<>();
-        points.add(new LabeledPoint(0, new double[]{1, 0}, Label.POSITIVE));  // x >= 0
-        points.add(new LabeledPoint(1, new double[]{0, 1}, Label.NEGATIVE));  // y <= 0
+        Matrix data = Matrix.FACTORY.identity(2);
+        points = new LabeledDataset(new IndexedDataset(Arrays.asList(0L, 1L), data), new Label[]{Label.POSITIVE, Label.NEGATIVE});
         cone = new PolyhedralCone(points, mock(LinearProgramSolver.FACTORY.class));
     }
 
     @Test
     void constructor_emptyLabeledPoints_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new PolyhedralCone(Collections.EMPTY_LIST, mock(LinearProgramSolver.FACTORY.class)));
+        assertThrows(IllegalArgumentException.class, () -> new PolyhedralCone(LabeledDataset.EMPTY, mock(LinearProgramSolver.FACTORY.class)));
     }
 
     @Test

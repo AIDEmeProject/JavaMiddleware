@@ -1,10 +1,9 @@
 package machinelearning.classifier.svm;
 
-import data.DataPoint;
 import libsvm.svm_parameter;
+import utils.Validator;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
-
-import java.util.Collection;
 
 /**
  * A kernel is any function k(x,y) satisfying the Mercer conditions:
@@ -25,39 +24,39 @@ public abstract class Kernel {
      * @param y a data point
      * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
      */
-    public final double[] compute(Collection<? extends DataPoint> xs, Vector y){
-        double[] kernelVector = new double[xs.size()];
+    public Vector compute(Matrix xs, Vector y) {
+        Validator.assertEquals(xs.numCols(), y.dim());
 
-        int i = 0;
-        for (DataPoint x : xs) {
-            kernelVector[i++] = compute(x.getData(), y);
+        double[] result = new double[xs.numRows()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = compute(xs.getRow(i), y);
         }
-
-        return kernelVector;
+        return Vector.FACTORY.make(result);
     }
 
     /**
      * @param xs a collection of data points
-     * @param y a data point
-     * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
+     * @param ys a second collection of data points
+     * @return computes the matrix \([k(x_i, y_j)]\)
      */
-    public final double[] compute(Collection<? extends DataPoint> xs, DataPoint y){
-        return compute(xs, y.getData());
+    public Matrix compute(Matrix xs, Matrix ys) {
+        Validator.assertEquals(xs.numCols(), ys.numCols());
+
+        double[][] result = new double[xs.numRows()][ys.numRows()];
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < result[0].length; j++) {
+                result[i][j] = compute(xs.getRow(i), ys.getRow(j));
+            }
+        }
+        return Matrix.FACTORY.make(result);
     }
 
     /**
      * @param xs a collection of data points
      * @return the kernel matrix \(K_{ij} = k(x_i, x_j)\)
      */
-    public final double[][] compute(Collection<? extends DataPoint> xs){
-        double[][] kernelMatrix = new double[xs.size()][xs.size()];
-
-        int i = 0;
-        for (DataPoint x : xs) {
-            kernelMatrix[i++] = compute(xs, x);
-        }
-
-        return kernelMatrix;
+    public  Matrix compute(Matrix xs){
+        return compute(xs, xs);
     }
 
     /**
