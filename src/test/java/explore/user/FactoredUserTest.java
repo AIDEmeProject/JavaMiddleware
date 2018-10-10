@@ -4,6 +4,7 @@ import data.DataPoint;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.LabelGroup;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import java.util.*;
 
@@ -44,7 +45,7 @@ class FactoredUserTest {
     }
 
     private void assertLabelingIsCorrect(long id, Label[] expected, Long[]... lists) {
-        DataPoint dataPoint = new DataPoint(id, new double[]{0});
+        DataPoint dataPoint = new DataPoint(id, Vector.FACTORY.zeros(1));
         setFactoredUserFromArrays(lists);
         assertEquals(new LabelGroup(expected), factoredUser.getLabel(dataPoint));
     }

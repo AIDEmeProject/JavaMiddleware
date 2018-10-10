@@ -20,7 +20,7 @@ UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
 MODES = [
     'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
-    'EVAL',      # run evaluation procedure over finished runs
+    #'EVAL',      # run evaluation procedure over finished runs
     #'AVERAGE'    # average all evaluation file for a given metric
 ]
 

@@ -5,6 +5,7 @@ import data.IndexedDataset;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -14,7 +15,7 @@ class BudgetedUserTest {
     private BudgetedUser budgetedUser;
     private final User user = mock(User.class);
     private final int budget = 10;
-    private final DataPoint dataPoint = new DataPoint(0, new double[] {0,1,2});
+    private final DataPoint dataPoint = new DataPoint(0, Vector.FACTORY.make(0, 1, 2));
 
     @BeforeEach
     void setUp() {

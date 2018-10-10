@@ -159,7 +159,7 @@ class PartitionedDatasetTest {
 
     @Test
     void getLabel_dataPointsIndexNotInInitialCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getLabel(new DataPoint(-10, new double[]{1})));
+        assertThrows(IllegalArgumentException.class, () -> dataset.getLabel(new DataPoint(-10, Vector.FACTORY.make(1))));
     }
 
     @Test
@@ -192,6 +192,7 @@ class PartitionedDatasetTest {
 
     @Test
     void update_dataPointsIndexNotInInitialCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.update(new LabeledPoint(-10, new double[]{1}, Label.NEGATIVE)));
+        DataPoint dataPoint = new DataPoint(-10, Vector.FACTORY.make(1));
+        assertThrows(IllegalArgumentException.class, () -> dataset.update(new LabeledPoint(dataPoint, Label.NEGATIVE)));
     }
 }

@@ -41,13 +41,13 @@ class LinearClassifierTest {
 
     @Test
     void predict_incompatibleDimension_throwsException() {
-        DataPoint point = new DataPoint(0, new double[3]);
+        DataPoint point = new DataPoint(0, Vector.FACTORY.zeros(3));
         assertThrows(RuntimeException.class, () -> classifier.predict(point));
     }
 
     @Test
     void probability_incompatibleDimension_throwsException() {
-        DataPoint point = new DataPoint(0, new double[3]);
+        DataPoint point = new DataPoint(0, Vector.FACTORY.zeros(3));
         assertThrows(RuntimeException.class, () -> classifier.probability(point));
     }
 }

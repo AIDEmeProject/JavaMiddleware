@@ -18,39 +18,17 @@ public class LabeledPoint extends DataPoint {
     private UserLabel label;
 
     /**
-     * @param id: data point's identifier
-     * @param data: values array
-     * @param label: user provided label for this data point
-     * @throws IllegalArgumentException if data is empty or label is {@code null}
-     */
-    public LabeledPoint(long id, double[] data, UserLabel label) {
-        super(id, data);
-        this.label = Objects.requireNonNull(label);
-    }
-
-    public LabeledPoint(long id, Vector data, UserLabel label) {
-        super(id, data);
-        this.label = Objects.requireNonNull(label);
-    }
-
-    /**
      * @param point: a data point
      * @param label: label
      * @throws IllegalArgumentException if label is {@code null}
      */
     public LabeledPoint(DataPoint point, UserLabel label) {
-        this(point.id, point.data, label);
+        super(point.id, point.data);
+        this.label = Objects.requireNonNull(label);
     }
 
     public UserLabel getLabel() {
         return label;
-    }
-
-    /**
-     * @return a new Labeled Point with the value 1 appended to its left
-     */
-    public LabeledPoint addBias(){
-        return new LabeledPoint(id, data.addBias(), label);
     }
 
     /**
@@ -59,13 +37,5 @@ public class LabeledPoint extends DataPoint {
     @Override
     public String toString() {
         return "{\"id\": " + id  + ", \"data\": " + data + ", \"label\": " + label + "}";
-    }
-
-    /**
-     * @param newData: new data array
-     * @return a new LabeledPoint with newData as data, but the same id and label
-     */
-    public LabeledPoint clone(double[] newData){
-        return new LabeledPoint(id, newData, label);
     }
 }
