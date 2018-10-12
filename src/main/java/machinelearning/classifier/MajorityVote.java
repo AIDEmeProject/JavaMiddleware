@@ -3,6 +3,8 @@ package machinelearning.classifier;
 import utils.Validator;
 import utils.linalg.Vector;
 
+import java.util.Arrays;
+
 /**
  * This class represents a Majority Vote classifier. Given a set of classifiers {H_i}, the majority vote MV outputs:
  *
@@ -10,17 +12,17 @@ import utils.linalg.Vector;
  *
  * In other words, the probability of each class is simply the proportion of classifiers agreeing on this class.
  */
-public class MajorityVoteClassifier implements Classifier {
+public class MajorityVote<T extends Classifier> implements Classifier {
     /**
      * collection of classifiers to take the majority vote
      */
-    private final Classifier[] classifiers;
+    private final T[] classifiers;
 
     /**
      * @param classifiers: array of classifiers used in Majority Vote computation
      * @throws IllegalArgumentException if classifiers array is empty or contains null elements
      */
-    public MajorityVoteClassifier(Classifier[] classifiers) {
+    public MajorityVote(T[] classifiers) {
         Validator.assertNotEmpty(classifiers);
 
         for (Classifier classifier : classifiers){
@@ -30,6 +32,10 @@ public class MajorityVoteClassifier implements Classifier {
         }
 
         this.classifiers = classifiers;
+    }
+
+    public T[] getClassifiers() {
+        return classifiers;
     }
 
     /**
@@ -43,5 +49,13 @@ public class MajorityVoteClassifier implements Classifier {
             proba += clf.predict(vector).asBinary();
         }
         return proba / classifiers.length;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MajorityVote<?> that = (MajorityVote<?>) o;
+        return Arrays.equals(classifiers, that.classifiers);
     }
 }
