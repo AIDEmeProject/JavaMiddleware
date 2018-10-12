@@ -37,11 +37,6 @@ class LinearVersionSpaceTest {
     }
 
     @Test
-    void sample_emptyLabeledPointCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> versionSpace.sample(LabeledDataset.EMPTY, 10));
-    }
-
-    @Test
     void sample_negativeNumSamples_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> versionSpace.sample(trainingData, -1));
     }

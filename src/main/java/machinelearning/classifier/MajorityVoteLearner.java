@@ -37,7 +37,6 @@ public class MajorityVoteLearner implements Learner {
      */
     @Override
     public MajorityVoteClassifier fit(LabeledDataset labeledPoints) {
-        Validator.assertNotEmpty(labeledPoints);
         return new MajorityVoteClassifier(versionSpace.sample(labeledPoints, sampleSize));
     }
 }

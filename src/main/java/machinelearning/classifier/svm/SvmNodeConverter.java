@@ -36,7 +36,7 @@ class SvmNodeConverter {
      */
     static Matrix toMatrix(svm_node[][] nodes, int dim){
         if (nodes.length == 0) {
-            return Matrix.EMPTY;
+            throw new IllegalArgumentException("Cannot convert empty node collection.");
         }
 
         double[][] converted = new double[nodes.length][dim];

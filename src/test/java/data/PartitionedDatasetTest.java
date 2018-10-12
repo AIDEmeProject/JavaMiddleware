@@ -49,8 +49,8 @@ class PartitionedDatasetTest {
     }
 
     @Test
-    void getLabeledPoints_noUpdates_returnsEmptyList() {
-        assertTrue(dataset.getLabeledPoints().isEmpty());
+    void getLabeledPoints_noUpdates_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getLabeledPoints());
     }
 
     @Test
@@ -73,8 +73,8 @@ class PartitionedDatasetTest {
     }
 
     @Test
-    void getKnownPoints_noUpdates_returnsEmptyList() {
-        assertTrue(dataset.getKnownPoints().isEmpty());
+    void getKnownPoints_noUpdates_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getKnownPoints());
     }
 
     @Test

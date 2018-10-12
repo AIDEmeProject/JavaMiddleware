@@ -10,7 +10,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
-class MajorityVoteLearnerTest extends AbstractLearnerTest {
+class MajorityVoteLearnerTest {
+    private MajorityVoteLearner learner;
+
     @BeforeEach
     void setUp() {
         learner = new MajorityVoteLearner(mock(VersionSpace.class), 1);
@@ -43,7 +45,6 @@ class MajorityVoteLearnerTest extends AbstractLearnerTest {
 
         // fit and verify
         LabeledDataset labeledDataset = mock(LabeledDataset.class);
-        when(labeledDataset.isEmpty()).thenReturn(false);
         learner.fit(labeledDataset);
         verify(versionSpace, times(1)).sample(any(), eq(sampleSize));
     }

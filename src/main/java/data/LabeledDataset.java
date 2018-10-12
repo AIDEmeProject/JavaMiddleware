@@ -11,8 +11,6 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     private IndexedDataset dataset;
     private Label[] labels;
 
-    public final static LabeledDataset EMPTY = new LabeledDataset(IndexedDataset.EMPTY, new Label[0]);
-
     public LabeledDataset(List<Long> indexes, Matrix data, Label[] labels) {
         this(new IndexedDataset(indexes, data), labels);
     }
@@ -33,10 +31,6 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
 
     public int dim() {
         return dataset.dim();
-    }
-
-    public boolean isEmpty() {
-        return dataset.isEmpty();
     }
 
     public Matrix getData() {

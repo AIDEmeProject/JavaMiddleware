@@ -4,24 +4,19 @@ import utils.Validator;
 
 import java.util.Arrays;
 import java.util.StringJoiner;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
- * A Vector represents a mathematical real euclidean vector. Basically, this module is a wrapper of the Ojalgo's
+ * A Vector represents a mathematical real euclidean array. Basically, this module is a wrapper of the Ojalgo's
  * PrimitiveMatrix class. Note that all Vector instances are immutable, i.e. we do not allow modifying a Vector's inner
  * values directly. Consequently, all Vector operations create new Vector instances, leaving the operands untouched.
  */
-public class Vector {
-    /**
-     * A vector object from Apache Commons Math library
-     */
-    final double[] vector;
+public class Vector extends Tensor<Vector> {
 
     /**
      * This is a static factory for vector creation. It provides several utility methods for instantiating vectors.
      */
-    public static class FACTORY {
+    public static class FACTORY extends Tensor.FACTORY {
+
         /**
          * @param values: array of vector values. Input array will be copied by default.
          * @return a Vector built from the input array of values
@@ -51,14 +46,14 @@ public class Vector {
     }
 
     Vector(double[] vector) {
-        this.vector = vector;
+        super(vector, new Shape(vector.length));
     }
 
     /**
      * @return the number of components of this vector (i.e. its dimension)
      */
     public int dim() {
-        return vector.length;
+        return length();
     }
 
     /**
@@ -67,7 +62,12 @@ public class Vector {
      * @throws IllegalArgumentException if index is out of bounds (i.e. negative or larger than or equal to the dimension)
      */
     public double get(int index) {
-        return vector[index];
+        return super.get(index);
+    }
+
+    @Override
+    public Vector copy() {
+        return new Vector(array.clone());
     }
 
     /**
@@ -77,167 +77,13 @@ public class Vector {
      * @throws IllegalArgumentException if either "from" or "to" are out of bounds, or "from" is not smaller than "to"
      */
     public Vector slice(int from, int to) {
-        if (from < 0 || from == to || to > dim()) {
+        if (from < 0 || to > dim()) {
             throw new IllegalArgumentException();
         }
+
         double[] result = new double[to - from];
-        System.arraycopy(vector, from, result, 0, result.length);
+        System.arraycopy(array, from, result, 0, result.length);
         return new Vector(result);
-    }
-
-    private static BiFunction<Double, Double, Double> ADD = (x,y) -> x+y;
-    private static BiFunction<Double, Double, Double> SUB = (x,y) -> x-y;
-    private static BiFunction<Double, Double, Double> MUL = (x,y) -> x*y;
-    private static BiFunction<Double, Double, Double> DIV = (x,y) -> x/y;
-
-    private Vector applyBinaryFunction(double[] rhs, BiFunction<Double, Double, Double> op) {
-        Validator.assertEqualLengths(vector, rhs);
-
-        double[] result = new double[vector.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(vector[i], rhs[i]);
-        }
-
-        return new Vector(result);
-    }
-
-    private Vector applyBinaryFunctionInplace(double[] rhs, BiFunction<Double, Double, Double> op) {
-        Validator.assertEqualLengths(vector, rhs);
-
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = op.apply(vector[i], rhs[i]);
-        }
-
-        return this;
-    }
-
-    private Vector applyBinaryFunction(double value, BiFunction<Double, Double, Double> op) {
-        double[] result = new double[vector.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(vector[i], value);
-        }
-
-        return new Vector(result);
-    }
-
-    private Vector applyBinaryFunctionInplace(double value, BiFunction<Double, Double, Double> op) {
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = op.apply(vector[i], value);
-        }
-        return this;
-    }
-
-    /**
-     * @param other: vector to be added
-     * @return the sum of {@code this} and {@code other}
-     * @throws IllegalArgumentException if vectors have incompatible dimensions
-     */
-    public Vector add(Vector other) {
-        return applyBinaryFunction(other.vector, ADD);
-    }
-
-    /**
-     * @param other: vector to be added in-place to {@code this}
-     * @return {@code this}
-     * @throws IllegalArgumentException if vectors have incompatible dimensions
-     */
-    public Vector iAdd(Vector other) {
-        return applyBinaryFunctionInplace(other.vector, ADD);
-    }
-
-    /**
-     * @param value: value to add each component of {@code this}
-     * @return a vector whose every component equals the sum of {@code this} and {@code value}
-     */
-    public Vector scalarAdd(double value) {
-        return applyBinaryFunction(value, ADD);
-    }
-
-    /**
-     * @param value: value to add each component of {@code this} in-place
-     * @return {@code this}
-     */
-    public Vector iScalarAdd(double value) {
-        return applyBinaryFunctionInplace(value, ADD);
-    }
-
-    /**
-     * @param other: vector to be subtracted from {@code this}
-     * @return the result of the subtraction of {@code this} and {@code other}
-     * @throws IllegalArgumentException if vectors have incompatible dimensions
-     */
-    public Vector subtract(Vector other) {
-        return applyBinaryFunction(other.vector, SUB);
-    }
-
-    /**
-     * @param value: value to multiply each component of {@code this}
-     * @return a vector whose every component equals the multiplication of {@code this} by value
-     */
-    public Vector scalarMultiply(double value) {
-        return applyBinaryFunction(value, MUL);
-    }
-
-    /**
-     * @param value: multiply each component of {@code this} by value in-place.
-     * @return {@code this}
-     */
-    public Vector iScalarMultiply(double value) {
-        return applyBinaryFunctionInplace(value, MUL);
-    }
-
-
-    /**
-     * @param value: value to divide each component of {@code this}
-     * @return a vector whose every component equals the division of {@code this} by value
-     */
-    public Vector scalarDivide(double value) {
-        return applyBinaryFunction(value, DIV);
-    }
-
-    public Vector applyMap(Function<Double, Double> op) {
-        double[] result = new double[vector.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(vector[i]);
-        }
-
-        return new Vector(result);
-    }
-
-    public Vector iApplyMap(Function<Double, Double> op) {
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = op.apply(vector[i]);
-        }
-
-        return this;
-    }
-
-    /**
-     * @param other: another vector
-     * @return the scalar product of {@code this} and the input vector
-     * @throws IllegalArgumentException if vectors have incompatible dimensions
-     */
-    public double dot(Vector other) {
-        Validator.assertEquals(dim(), other.dim());
-        double sum = 0;
-        for (int i = 0; i < vector.length; i++) {
-            sum += vector[i] * other.get(i);
-        }
-        return sum;
-    }
-
-    /**
-     * @return the squared norm of this vector
-     */
-    public double squaredNorm() {
-        return dot(this);
-    }
-
-    /**
-     * @return the norm of this vector
-     */
-    public double norm() {
-        return Math.sqrt(squaredNorm());
     }
 
     /**
@@ -253,30 +99,7 @@ public class Vector {
             throw new IllegalStateException("Cannot normalize zero vector");
         }
 
-        return scalarMultiply(newNorm / norm);
-    }
-
-    /**
-     * @param other another vector
-     * @return the squared distance between {@code this} and the input vector
-     */
-    public double squaredDistanceTo(Vector other) {
-        Validator.assertEqualLengths(vector, other.vector);
-
-        double sqDistance = 0;
-        for (int i = 0; i < dim(); i++) {
-            double diff = vector[i] - other.get(i);
-            sqDistance += diff * diff;
-        }
-        return sqDistance;
-    }
-
-    /**
-     * @param other another vector
-     * @return the distance between {@code this} and the input vector
-     */
-    public double distanceTo(Vector other) {
-        return Math.sqrt(squaredDistanceTo(other));
+        return copy().iScalarMultiply(newNorm / norm);
     }
 
     /**
@@ -293,7 +116,7 @@ public class Vector {
         }
 
         double[] result = new double[newDim];
-        System.arraycopy(vector, 0, result, 0, Math.min(dim(), newDim));
+        System.arraycopy(array, 0, result, 0, Math.min(dim(), newDim));
         return new Vector(result);
     }
 
@@ -302,8 +125,8 @@ public class Vector {
      */
     public Vector addBias() {
         double[] result = new double[dim() + 1];
-        result[0] = 1.0;
-        System.arraycopy(vector, 0, result, 1, dim());
+        result[0] = 1;
+        System.arraycopy(array, 0, result, 1, array.length);
         return new Vector(result);
     }
 
@@ -318,7 +141,7 @@ public class Vector {
         int pos = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                matrix[pos++] = vector[i] * other.get(j);
+                matrix[pos++] = array[i] * other.array[j];
             }
         }
 
@@ -329,30 +152,7 @@ public class Vector {
      * @return an array copy of {@code this}'s content
      */
     public double[] toArray() {
-        return Arrays.copyOf(vector, dim());
-    }
-
-    /**
-     * @param other Vector to compare to {@code this}
-     * @param precision maximum difference allowed
-     * @return true if vectors have the same dimension and all components of their components are equal up to the given precision
-     */
-    public boolean equals(Vector other, double precision) {
-        if (dim() != other.dim()) return false;
-
-        for (int i = 0; i < dim(); i++) {
-            if (Math.abs(vector[i] - other.get(i)) > precision) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return this.equals((Vector) o, 1E-15);
+        return Arrays.copyOf(array, dim());
     }
 
     @Override

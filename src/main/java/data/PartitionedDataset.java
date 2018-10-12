@@ -194,12 +194,14 @@ public final class PartitionedDataset {
 
     private void updateInferredLabelsPartition() {
         int position = unknownStart;
-        for (ExtendedLabel prediction : classifier.predict(getUnknownPoints())) {
-            if (prediction != ExtendedLabel.UNKNOWN) {
-                labels[position] = prediction;
-                swap(position, unknownStart++);
+        if (hasUnknownPoints()) {
+            for (ExtendedLabel prediction : classifier.predict(getUnknownPoints())) {
+                if (prediction != ExtendedLabel.UNKNOWN) {
+                    labels[position] = prediction;
+                    swap(position, unknownStart++);
+                }
+                position++;
             }
-            position++;
         }
     }
 

@@ -29,11 +29,6 @@ class PolyhedralConeTest {
     }
 
     @Test
-    void constructor_emptyLabeledPoints_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new PolyhedralCone(LabeledDataset.EMPTY, mock(LinearProgramSolver.FACTORY.class)));
-    }
-
-    @Test
     void getDim_twoDimensionalLabeledPoints_returnsTwo() {
         assertEquals(2, cone.getDim());
     }

@@ -6,6 +6,7 @@ import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SvmNodeConverterTest {
@@ -22,12 +23,12 @@ class SvmNodeConverterTest {
     }
 
     @Test
-    void toDataPoint_emptyInputMatrix_returnsEmptyArray() {
-        assertTrue(SvmNodeConverter.toMatrix(new svm_node[0][], 0).isEmpty());
+    void toMatrix_emptyInputArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> SvmNodeConverter.toMatrix(new svm_node[0][], 0));
     }
 
     @Test
-    void toDataPoint_nonEmptyInputMatrix_correctConversion() {
+    void toMatrix_nonEmptyInputArray_correctConversion() {
         svm_node[][] nodes = new svm_node[][] {
                 {createSvmNode(0, 10), createSvmNode(1, 20)},
                 {createSvmNode(0, -10), createSvmNode(1, -20)}

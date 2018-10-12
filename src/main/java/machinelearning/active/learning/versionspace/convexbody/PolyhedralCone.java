@@ -34,11 +34,6 @@ public class PolyhedralCone implements ConvexBody {
      * @param solverFactory: factory instance for LP solvers
      */
     public PolyhedralCone(LabeledDataset labeledPoints, LinearProgramSolver.FACTORY solverFactory) {
-        if (labeledPoints.isEmpty()) {
-            //TODO: accept empty set anyway?
-            throw new IllegalArgumentException("Cannot receive empty labeled points");
-        }
-
         this.labeledPoints = labeledPoints;
         this.solverFactory = solverFactory;
     }

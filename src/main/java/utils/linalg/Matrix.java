@@ -5,28 +5,25 @@ import utils.Validator;
 
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
- * A Matrix represents a mathematical real matrix. Basically, this module is a wrapper of the Ojalgo's
+ * A Matrix represents a mathematical real array. Basically, this module is a wrapper of the Ojalgo's
  * PrimitiveMatrix class. Note that all Matrix instances are immutable, i.e. we do not allow modifying its inner
  * values directly. Consequently, all Matrix operations create new Matrix instances, leaving the operands untouched.
  */
-public class Matrix {
+public class Matrix extends Tensor<Matrix> {
     /**
-     * A matrix object from Apache Commons Math library
+     * A array object from Apache Commons Math library
      */
-    double[] matrix;
-    private int rows, cols;
-
-    public static final Matrix EMPTY = FACTORY.empty();
+    private final int rows;
+    private final int cols;
 
     /**
-     * This is a static factory for matrix creation. It provides several utility methods for instantiating matrices.
+     * This is a static factory for array creation. It provides several utility methods for instantiating matrices.
      */
-    public static class FACTORY {
+    public static class FACTORY extends Tensor.FACTORY {
         /**
-         * @param values: matrix of double values. Input array will be copied by default.
+         * @param values: array of double values. Input array will be copied by default.
          * @return a Matrix built from the input array of values
          * @throws IllegalArgumentException if input is empty or any two rows have different lengths
          */
@@ -34,19 +31,19 @@ public class Matrix {
             int rows = values.length;
             int cols = values[0].length;
 
-            Validator.assertPositive(rows);
-            Validator.assertPositive(cols);
+            Validator.assertNonNegative(rows);
+            Validator.assertNonNegative(cols);
 
-            double[] matrix = new double[rows * cols];
+            double[] array = new double[rows * cols];
 
             for (int i = 0; i < rows; i++) {
                 if (values[i].length != cols) {
                     throw new RuntimeException();
                 }
-                System.arraycopy(values[i], 0, matrix, i*cols, cols);
+                System.arraycopy(values[i], 0, array, i*cols, cols);
             }
 
-            return new Matrix(rows, cols, matrix);
+            return new Matrix(rows, cols, array);
         }
 
         /**
@@ -57,9 +54,6 @@ public class Matrix {
          * @throws IllegalArgumentException if either rows or cols are not positive, or values.length is different from rows * cols
          */
         public static Matrix make(int rows, int cols, double... values) {
-            Validator.assertPositive(rows);
-            Validator.assertPositive(cols);
-            Validator.assertEquals(rows * cols, values.length);
             return new Matrix(rows, cols, values);
         }
 
@@ -70,8 +64,6 @@ public class Matrix {
          * @throws IllegalArgumentException if either rows or cols are not positive
          */
         public static Matrix zeros(int rows, int cols) {
-            Validator.assertPositive(rows);
-            Validator.assertPositive(cols);
             return new Matrix(rows, cols, new double[rows * cols]);
         }
 
@@ -84,32 +76,29 @@ public class Matrix {
         }
 
         /**
-         * @param dim: dimension of identity matrix
-         * @return a dim x dim identity matrix
+         * @param dim: dimension of identity array
+         * @return a dim x dim identity array
          * @throws IllegalArgumentException if dim is not positive
          */
         public static Matrix identity(int dim) {
             Validator.assertPositive(dim);
-            double[] matrix = new double[dim * dim];
+            double[] array = new double[dim * dim];
             for (int i = 0; i < dim; i++) {
-                matrix[i * (dim+1)] = 1.0;
+                array[i * (dim+1)] = 1.0;
             }
-            return new Matrix(dim, dim, matrix);
-        }
-
-        private static Matrix empty() {
-            return new Matrix(0, 0, new double[0]);
+            return new Matrix(dim, dim, array);
         }
     }
 
-    Matrix(int rows, int cols, double[] matrix) {
-        this.matrix = matrix;
+    Matrix(int rows, int cols, double[] array) {
+        super(array, new Shape(rows, cols));
         this.rows = rows;
         this.cols = cols;
     }
 
-    public boolean isEmpty() {
-        return rows == 0;
+    @Override
+    public Matrix copy() {
+        return new Matrix(rows, cols, array.clone());
     }
 
     /**
@@ -133,9 +122,7 @@ public class Matrix {
      * @throws IllegalArgumentException if either i or j is out of bounds
      */
     public double get(int i, int j) {
-        Validator.assertIndexInBounds(i, 0, numRows());
-        Validator.assertIndexInBounds(j, 0, numCols());
-        return matrix[i * cols + j];
+        return super.get(i, j);
     }
 
     /**
@@ -146,26 +133,28 @@ public class Matrix {
     public Vector getRow(int i) {
         Validator.assertIndexInBounds(i, 0, numRows());
         double[] row = new double[cols];
-        System.arraycopy(matrix, i * cols, row, 0, cols);
+        System.arraycopy(array, i * cols, row, 0, cols);
         return new Vector(row);
     }
 
     public Matrix getRows(int... rows) {
+        Validator.assertNotEmpty(rows);
+
         double[] slice = new double[rows.length * cols];
         for (int i = 0; i < rows.length; i++) {
-            System.arraycopy(matrix, rows[i] * cols, slice, i * cols, cols);
+            System.arraycopy(array, rows[i] * cols, slice, i * cols, cols);
         }
         return new Matrix(rows.length, cols, slice);
     }
 
     public Matrix getRowSlice(int from, int to) {
-        if (from < 0 || from > to || to > rows) {
-            throw new IllegalArgumentException("Indexes " + from + ", " + to + " of bounds for matrix of " + rows + " rows");
+        if (from < 0 || from >= to || to > rows) {
+            throw new IllegalArgumentException("Indexes " + from + ", " + to + " of bounds for array of " + rows + " rows");
         }
 
         int size = to - from;
         double[] slice = new double[size * cols];
-        System.arraycopy(matrix, from * cols, slice, 0, slice.length);
+        System.arraycopy(array, from * cols, slice, 0, slice.length);
         return new Matrix(size, cols, slice);
     }
 
@@ -176,9 +165,9 @@ public class Matrix {
         if (i != j) {
             int offsetI = i * cols, offsetJ = j * cols;
             for (int k = 0; k < cols; k++) {
-                double tmp = matrix[offsetI];
-                matrix[offsetI++] = matrix[offsetJ];
-                matrix[offsetJ++] = tmp;
+                double tmp = array[offsetI];
+                array[offsetI++] = array[offsetJ];
+                array[offsetJ++] = tmp;
             }
         }
     }
@@ -187,65 +176,31 @@ public class Matrix {
         Statistics[] statistics = new Statistics[cols];
 
         for (int j = 0; j < cols; j++) {
-            statistics[j] = new Statistics("column_" + j, matrix[j]);
+            statistics[j] = new Statistics("column_" + j, array[j]);
         }
 
         int p = cols;
         for (int i = 1; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                statistics[j].update(matrix[p++]);
+                statistics[j].update(array[p++]);
             }
         }
 
         return statistics;
     }
 
-    private static BiFunction<Double, Double, Double> ADD = (x,y) -> x+y;
-    private static BiFunction<Double, Double, Double> SUB = (x,y) -> x-y;
-    private static BiFunction<Double, Double, Double> MUL = (x,y) -> x*y;
-    private static BiFunction<Double, Double, Double> DIV = (x,y) -> x/y;
-
-    private Matrix applyBinaryFunction(Matrix rhs, BiFunction<Double, Double, Double> op) {
-        Validator.assertEquals(rows, rhs.rows);
-        Validator.assertEquals(cols, rhs.cols);
-
-        double[] result = new double[matrix.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(matrix[i], rhs.matrix[i]);
-        }
-
-        return new Matrix(rows, cols, result);
-    }
-
-    private Matrix applyBinaryFunction(double value, BiFunction<Double, Double, Double> op) {
-        double[] result = new double[matrix.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(matrix[i], value);
-        }
-
-        return new Matrix(rows, cols, result);
-    }
-
-    private Matrix applyBinaryFunctionInplace(double value, BiFunction<Double, Double, Double> op) {
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = op.apply(matrix[i], value);
-        }
-
-        return this;
-    }
-
     private Matrix applyBinaryFunctionToRows(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(cols, vector.dim());
 
-        double[] result = new double[matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            result[i] = op.apply(matrix[i], vector.vector[i % cols]);
+        double[] result = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            result[i] = op.apply(array[i], vector.array[i % cols]);
         }
 
 //        int p = 0;
 //        for (int i = 0; i < rows; i++) {
 //            for (int j = 0; j < cols; j++) {
-//                result[p] = op.apply(matrix[p++], vector.vector[j]);
+//                result[p] = op.apply(array[p++], vector.vector[j]);
 //            }
 //        }
 
@@ -255,8 +210,8 @@ public class Matrix {
     private Matrix applyBinaryFunctionToRowsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(cols, vector.dim());
 
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = op.apply(matrix[i], vector.vector[i % cols]);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = op.apply(array[i], vector.array[i % cols]);
         }
 
         return this;
@@ -265,9 +220,9 @@ public class Matrix {
     private Matrix applyBinaryFunctionToColumns(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(rows, vector.dim());
 
-        double[] result = new double[matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            result[i] = op.apply(matrix[i], vector.vector[i / cols]);
+        double[] result = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            result[i] = op.apply(array[i], vector.array[i / cols]);
         }
 
         return new Matrix(rows, cols, result);
@@ -276,20 +231,11 @@ public class Matrix {
     private Matrix applyBinaryFunctionToColumnsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(rows, vector.dim());
 
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = op.apply(matrix[i], vector.vector[i / cols]);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = op.apply(array[i], vector.array[i / cols]);
         }
 
         return this;
-    }
-
-    /**
-     * @param other: matrix to be added
-     * @return the sum of {@code this} and {@code other}
-     * @throws IllegalArgumentException if matrices have incompatible dimensions
-     */
-    public Matrix add(Matrix other) {
-        return applyBinaryFunction(other, ADD);
     }
 
     public Matrix addColumn(Vector vector){
@@ -308,33 +254,12 @@ public class Matrix {
         return applyBinaryFunctionToRowsInplace(vector, ADD);
     }
 
-    /**
-     * @param other: matrix to be subtracted from {@code this}
-     * @return the result of the subtraction of {@code this} and {@code other}
-     * @throws IllegalArgumentException if matrices have incompatible dimensions
-     */
-    public Matrix subtract(Matrix other) {
-        return applyBinaryFunction(other, SUB);
-    }
-
-    public Matrix subtractColumn(Vector vector){
-        return applyBinaryFunctionToColumns(vector, SUB);
-    }
-
     public Matrix subtractRow(Vector vector){
         return applyBinaryFunctionToRows(vector, SUB);
     }
 
-    /**
-     * @param value: value to multiply each component of {@code this}
-     * @return a matrix whose every component equals the multiplication of {@code this} by value
-     */
-    public Matrix scalarMultiply(double value) {
-        return applyBinaryFunction(value, MUL);
-    }
-
-    public Matrix iScalarMultiply(double value) {
-        return applyBinaryFunctionInplace(value, MUL);
+    public Matrix subtractColumn(Vector vector){
+        return applyBinaryFunctionToColumns(vector, SUB);
     }
 
     public Matrix divideRow(Vector vector){
@@ -342,8 +267,8 @@ public class Matrix {
     }
 
     /**
-     * @param vector: vector to perform matrix-vector multiplication
-     * @return the matrix-vector multiplication of {@code this} and the input vector
+     * @param vector: vector to perform array-vector multiplication
+     * @return the array-vector multiplication of {@code this} and the input vector
      * @throws IllegalArgumentException if the number of columns {@code this} if different from the vector's dimension
      */
     public Vector multiply(Vector vector) {
@@ -356,7 +281,7 @@ public class Matrix {
         for (int i = 0; i < rows; i++) {
             double sum = 0;
             for (int j = 0; j < cols; j++) {
-                sum += matrix[offset + j] * vector.vector[j];
+                sum += array[offset + j] * vector.array[j];
             }
             offset += cols;
             result[i] = sum;
@@ -366,8 +291,8 @@ public class Matrix {
     }
 
     /**
-     * @param other: right-hand-size of matrix-matrix multiplication
-     * @return the result of the matrix-matrix multiplication between {@code this} and {@code other}
+     * @param other: right-hand-size of array-array multiplication
+     * @return the result of the array-array multiplication between {@code this} and {@code other}
      * @throws IllegalArgumentException if the number of columns of {@code this} and the number of rows of {@code other} are distinct
      */
     public Matrix multiply(Matrix other) {
@@ -380,7 +305,7 @@ public class Matrix {
         for (int p = 0; p < size; p++) {
             int i = (p / other.cols) * cols, j = p % other.cols;
             for (int k = 0; k < cols; k++) {
-                values[p] += matrix[i + k] * other.matrix[k * other.cols + j];
+                values[p] += array[i + k] * other.array[k * other.cols + j];
             }
         }
 
@@ -399,7 +324,7 @@ public class Matrix {
             int offsetOther = 0;
             for (int j = 0; j < other.rows; j++) {
                 for (int k = 0; k < cols; k++) {
-                    result[p] += matrix[offsetThis++] * other.matrix[offsetOther++];
+                    result[p] += array[offsetThis++] * other.array[offsetOther++];
                 }
                 offsetThis = start;
                 p++;
@@ -415,7 +340,7 @@ public class Matrix {
         int p = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                norms[i] += matrix[p] * matrix[p++];
+                norms[i] += array[p] * array[p++];
             }
         }
         return new Vector(norms);
@@ -428,13 +353,13 @@ public class Matrix {
         double[] transpose = new double[rows * cols];
         for (int p = 0; p < transpose.length; p++) {
             int i = p % rows, j = p / rows;
-            transpose[p] = matrix[i * cols + j];
+            transpose[p] = array[i * cols + j];
         }
         return new Matrix(cols, rows, transpose);
     }
 
     public Matrix addBiasColumn() {
-        double[] matrixWithBias = new double[matrix.length + rows];
+        double[] matrixWithBias = new double[array.length + rows];
         int newCols = cols + 1;
 
         for (int i = 0; i < matrixWithBias.length; i+=newCols) {
@@ -442,31 +367,10 @@ public class Matrix {
         }
 
         for (int i = 0; i < rows; i++) {
-            System.arraycopy(matrix, i * cols, matrixWithBias, i * newCols + 1, cols);
+            System.arraycopy(array, i * cols, matrixWithBias, i * newCols + 1, cols);
         }
 
         return new Matrix(rows, newCols, matrixWithBias);
-    }
-
-    public Matrix applyMap(Function<Double, Double> op) {
-        double[] result = new double[matrix.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = op.apply(matrix[i]);
-        }
-
-        return new Matrix(rows, cols, result);
-    }
-
-    public Matrix iApplyMap(Function<Double, Double> op) {
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = op.apply(matrix[i]);
-        }
-
-        return this;
-    }
-
-    public Matrix copy() {
-        return new Matrix(rows, cols, matrix.clone());
     }
 
     /**
@@ -480,24 +384,6 @@ public class Matrix {
             }
         }
         return array;
-    }
-
-    public boolean equals(Matrix other, double precision) {
-        if (numRows() != other.numRows() || numCols() != other.numCols()) return false;
-
-        for (int i = 0; i < matrix.length; i++) {
-            if (Math.abs(matrix[i] - other.matrix[i]) > precision) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return this.equals((Matrix) o, 1E-15);
     }
 
     @Override

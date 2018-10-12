@@ -12,8 +12,6 @@ public class IndexedDataset implements Iterable<DataPoint> {
     protected List<Long> indexes;
     protected Matrix data;
 
-    public final static IndexedDataset EMPTY = new IndexedDataset(Collections.EMPTY_LIST, Matrix.EMPTY);
-
     public static class Builder {
         private List<Long> indexes;
         private List<double[]> points;
@@ -50,10 +48,6 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
     public Matrix getData() {
         return data;
-    }
-
-    public boolean isEmpty() {
-        return indexes.isEmpty();
     }
 
     public int length() {

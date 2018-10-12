@@ -64,17 +64,6 @@ public class Validator {
     }
 
     /**
-     * Raises an exception if collection is emtpy
-     * @param data: data vector
-     * @throws IllegalArgumentException if data vector is empty
-     */
-    public static void assertNotEmpty(LabeledDataset data){
-        if (data.isEmpty()){
-            throw new IllegalArgumentException("Labeled dataset cannot be empty.");
-        }
-    }
-
-    /**
      * Throws exception is values are different.
      * @param val1: first value
      * @param val2: second value
@@ -83,6 +72,18 @@ public class Validator {
     public static void assertEquals(int val1, int val2){
         if(val1 != val2) {
             throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
+     * Throws exception is objects are different
+     * @param val1: first object
+     * @param val2: second object
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(Object val1, Object val2){
+        if(!val1.equals(val2)) {
+            throw new IllegalArgumentException("Objects " + val1 + " and " + val2 + " are not equal.");
         }
     }
 

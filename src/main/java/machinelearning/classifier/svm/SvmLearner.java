@@ -86,8 +86,6 @@ public class SvmLearner implements Learner {
     }
 
     private svm_problem buildSvmProblem(LabeledDataset labeledPoints){
-        Validator.assertNotEmpty(labeledPoints);
-
         svm_problem prob = new svm_problem();
 
         prob.l = labeledPoints.length();

@@ -2,7 +2,6 @@ package machinelearning.classifier.svm;
 
 import data.LabeledDataset;
 import data.LabeledPoint;
-import machinelearning.classifier.AbstractLearnerTest;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.margin.KernelClassifier;
@@ -15,7 +14,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SvmLearnerTest extends AbstractLearnerTest {
+class SvmLearnerTest {
+
+    private SvmLearner learner;
 
     @BeforeEach
     void setUp() {
