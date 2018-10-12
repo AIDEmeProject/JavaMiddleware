@@ -3,6 +3,7 @@ package machinelearning.classifier;
 
 import data.DataPoint;
 import data.IndexedDataset;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 /**
@@ -13,50 +14,72 @@ import utils.linalg.Vector;
 public interface Classifier {
 
     /**
-     * Return class probability estimation for a particular point in the dataset.
-     * @param point: data point
-     * @return probability of point being positive
+     * @param vector: a feature vector
+     * @return probability of vector belonging to the positive class
      */
-    double probability(DataPoint point);
+    double probability(Vector vector);
 
     /**
-     * Return class probability estimation for each point in the dataset.
-     * @param points: collection of data points
-     * @return probability estimation array
+     * @param matrix: a matrix whose every line corresponds to a feature vector
+     * @return class probability estimation for each row of the matrix
      */
-    default Vector probability(IndexedDataset points){
-        double[] probas = new double[points.length()];
-
-        int i = 0;
-        for (DataPoint point : points) {
-            probas[i++] = probability(point);
+    default Vector probability(Matrix matrix) {
+        double[] probas = new double[matrix.rows()];
+        for (int i = 0; i < probas.length; i++) {
+            probas[i] = probability(matrix.getRow(i));
         }
-
         return Vector.FACTORY.make(probas);
     }
 
     /**
-     * Return the predicted label for a particular point in the dataset.
-     * @param point: data point
-     * @return class label of given point
+     * @param point: a data point
+     * @return probability of data point belonging to the positive class
      */
-    default Label predict(DataPoint point){
-        return probability(point) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
+    default double probability(DataPoint point){
+        return probability(point.getData());
     }
 
     /**
-     * Return predicted class labels for each point in the dataset.
+     * @param points: a dataset
+     * @return class probability estimation for each point in the dataset.
+     */
+    default Vector probability(IndexedDataset points){
+        return probability(points.getData());
+    }
+
+    /**
+     * @param vector: a feature vector
+     * @return predicted label for the input vector
+     */
+    default Label predict(Vector vector){
+        return probability(vector) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
+    }
+
+    /**
+     * @param matrix:  a matrix whose every line corresponds to a feature vector
+     * @return predicted class labels for each row of the matrix
+     */
+    default Label[] predict(Matrix matrix) {
+        Label[] labels = new Label[matrix.rows()];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = predict(matrix.getRow(i));
+        }
+        return labels;
+    }
+
+    /**
+     * @param point: data point
+     * @return predicted label for the input data point.
+     */
+    default Label predict(DataPoint point){
+        return predict(point.getData());
+    }
+
+    /**
      * @param points: collection of data points
-     * @return predicted class labels
+     * @return predicted class labels for each point in the dataset.
      */
     default Label[] predict(IndexedDataset points){
-        Label[] labels = new Label[points.length()];
-
-        int i = 0;
-        for (DataPoint point : points) {
-            labels[i++] = predict(point);
-        }
-
-        return labels;
+        return predict(points.getData());
     }
 }

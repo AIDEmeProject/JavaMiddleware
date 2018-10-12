@@ -19,11 +19,15 @@ import utils.linalg.Vector;
  */
 public abstract class MarginClassifier implements Classifier {
     /**
-     * @param x: a data point
+     * @param x: a feature vector
      * @return the margin of this point
      */
     public abstract double margin(Vector x);
 
+    /**
+     * @param xs: a matrix of feature vectors (one per row)
+     * @return a Vector containing the margins of each feature vector
+     */
     public abstract Vector margin(Matrix xs);
 
     /**
@@ -34,18 +38,14 @@ public abstract class MarginClassifier implements Classifier {
         return margin(point.getData());
     }
 
-    /**
-     * @param point: a data point
-     * @return sigmoid( margin(point) )
-     */
     @Override
-    public final double probability(DataPoint point) {
-        return sigmoid(margin(point));
+    public double probability(Vector vector) {
+        return sigmoid(margin(vector));
     }
 
     @Override
-    public final Vector probability(IndexedDataset points) {
-        return margin(points.getData()).iApplyMap(MarginClassifier::sigmoid);
+    public Vector probability(Matrix matrix) {
+        return margin(matrix).iApplyMap(MarginClassifier::sigmoid);
     }
 
     private static double sigmoid(double value) {
@@ -57,7 +57,7 @@ public abstract class MarginClassifier implements Classifier {
      * @return sign( margin(x) )
      */
     @Override
-    public final Label predict(DataPoint point) {
-        return margin(point) > 0 ? Label.POSITIVE : Label.NEGATIVE;
+    public final Label predict(Vector point) {
+        return Label.fromSign(margin(point));
     }
 }

@@ -1,8 +1,8 @@
 package machinelearning.classifier;
 
-import data.DataPoint;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,10 +35,10 @@ class MajorityVoteClassifierTest {
 
     private void probability_PositiveAndNegativeClassifiers_ProbabilityCorrectlyComputed(int pos, int neg){
         Classifier positiveClassifier = Mockito.mock(Classifier.class);
-        Mockito.when(positiveClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(Label.POSITIVE);
+        Mockito.when(positiveClassifier.predict(Mockito.any(Vector.class))).thenReturn(Label.POSITIVE);
 
         Classifier negativeClassifier = Mockito.mock(Classifier.class);
-        Mockito.when(negativeClassifier.predict(Mockito.any(DataPoint.class))).thenReturn(Label.NEGATIVE);
+        Mockito.when(negativeClassifier.predict(Mockito.any(Vector.class))).thenReturn(Label.NEGATIVE);
 
         Classifier[] classifiers = new Classifier[pos+neg];
         for (int i = 0; i < classifiers.length; i++) {
@@ -46,7 +46,7 @@ class MajorityVoteClassifierTest {
         }
 
         MajorityVoteClassifier majorityVote = new MajorityVoteClassifier(classifiers);
-        DataPoint point = Mockito.mock(DataPoint.class);
+        Vector point = Mockito.mock(Vector.class);
         assertEquals((double) pos / classifiers.length, majorityVote.probability(point));
     }
 }

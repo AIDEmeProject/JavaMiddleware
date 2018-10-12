@@ -1,7 +1,7 @@
 package machinelearning.classifier;
 
-import data.DataPoint;
 import utils.Validator;
+import utils.linalg.Vector;
 
 /**
  * This class represents a Majority Vote classifier. Given a set of classifiers {H_i}, the majority vote MV outputs:
@@ -33,14 +33,14 @@ public class MajorityVoteClassifier implements Classifier {
     }
 
     /**
-     * @param point: data point
+     * @param vector: feature vector
      * @return proportion of classifiers predicting the given point as positive
      */
     @Override
-    public double probability(DataPoint point) {
+    public double probability(Vector vector) {
         double proba = 0;
         for (Classifier clf : classifiers) {
-            proba += clf.predict(point).asBinary();
+            proba += clf.predict(vector).asBinary();
         }
         return proba / classifiers.length;
     }
