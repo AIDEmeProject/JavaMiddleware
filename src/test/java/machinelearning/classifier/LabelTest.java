@@ -37,6 +37,17 @@ class LabelTest {
     }
 
     @Test
+    void fromSign_negativeAndPositiveValues_returnsNegativeAndPositiveLabelsRespectively() {
+        assertEquals(Label.NEGATIVE, Label.fromSign(-1));
+        assertEquals(Label.POSITIVE, Label.fromSign(1));
+    }
+
+    @Test
+    void fromSign_zeroValue_returnsNegative() {
+        assertEquals(Label.NEGATIVE, Label.fromSign(0));
+    }
+
+    @Test
     void toString_PositiveAndNegativeLabels_ReturnExpectedValue() {
         assertEquals("POSITIVE", Label.POSITIVE.toString());
         assertEquals("NEGATIVE", Label.NEGATIVE.toString());

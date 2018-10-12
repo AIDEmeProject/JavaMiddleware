@@ -39,6 +39,14 @@ public class Label implements UserLabel {
         return !isPositive;
     }
 
+    /**
+     * @param value a real number
+     * @return POSITIVE if {@code value} is positive, NEGATIVE otherwise
+     */
+    public static Label fromSign(double value) {
+        return value > 0 ? POSITIVE : NEGATIVE;
+    }
+
     @Override
     public Label[] getLabelsForEachSubspace() {
         return new Label[] {isPositive ? POSITIVE : NEGATIVE};
