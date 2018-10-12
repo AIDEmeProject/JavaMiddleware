@@ -38,7 +38,7 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     public IndexedDataset(List<Long> indexes, Matrix data) {
-        if (indexes.size() != data.numRows()) {
+        if (indexes.size() != data.rows()) {
             throw new IllegalArgumentException("Incompatible sizes of indexes and matrix data.");
         }
 
@@ -55,7 +55,7 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     public int dim() {
-        return data.numCols();
+        return data.cols();
     }
 
     public DataPoint get(int i) {

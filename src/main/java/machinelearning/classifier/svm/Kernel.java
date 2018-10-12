@@ -25,9 +25,9 @@ public abstract class Kernel {
      * @return computes the vector \([k(x_1, y), ..., k(x_n, y)]\)
      */
     public Vector compute(Matrix xs, Vector y) {
-        Validator.assertEquals(xs.numCols(), y.dim());
+        Validator.assertEquals(xs.cols(), y.dim());
 
-        double[] result = new double[xs.numRows()];
+        double[] result = new double[xs.rows()];
         for (int i = 0; i < result.length; i++) {
             result[i] = compute(xs.getRow(i), y);
         }
@@ -40,9 +40,9 @@ public abstract class Kernel {
      * @return computes the matrix \([k(x_i, y_j)]\)
      */
     public Matrix compute(Matrix xs, Matrix ys) {
-        Validator.assertEquals(xs.numCols(), ys.numCols());
+        Validator.assertEquals(xs.cols(), ys.cols());
 
-        double[][] result = new double[xs.numRows()][ys.numRows()];
+        double[][] result = new double[xs.rows()][ys.rows()];
         for (int i = 0; i < result.length; i++) {
             for (int j = 0; j < result[0].length; j++) {
                 result[i][j] = compute(xs.getRow(i), ys.getRow(j));

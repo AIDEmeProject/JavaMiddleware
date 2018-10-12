@@ -34,7 +34,7 @@ class EigenvalueDecompositionTest {
 
     @Test
     void getEigenvalue_indexEqualToMatrixDimension_throwsException() {
-        assertThrows(RuntimeException.class, () -> decomposition.getEigenvalue(matrix.numRows()));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvalue(matrix.rows()));
     }
 
     @Test
@@ -44,7 +44,7 @@ class EigenvalueDecompositionTest {
 
     @Test
     void getEigenvector_indexEqualToMatrixDimension_throwsException() {
-        assertThrows(RuntimeException.class, () -> decomposition.getEigenvector(matrix.numRows()));
+        assertThrows(RuntimeException.class, () -> decomposition.getEigenvector(matrix.rows()));
     }
 
     @Test
@@ -74,7 +74,7 @@ class EigenvalueDecompositionTest {
     }
 
     private void assertEigenvectorSatisfyCharacteristicEquation() {
-        for (int i = 0; i < matrix.numRows(); i++) {
+        for (int i = 0; i < matrix.rows(); i++) {
             Vector leftHandSide = matrix.multiply(decomposition.getEigenvector(i));
             Vector rightHandSide = decomposition.getEigenvector(i).scalarMultiply(decomposition.getEigenvalue(i));
             assertTrue(leftHandSide.equals(rightHandSide, 1e-10));

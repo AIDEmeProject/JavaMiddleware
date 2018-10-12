@@ -59,7 +59,7 @@ public class GaussianKernel extends Kernel {
 
     @Override
     public Matrix compute(Matrix xs, Matrix ys) {
-        final double gamma = getGamma(xs.numCols());
+        final double gamma = getGamma(xs.cols());
         return distanceKernel.compute(xs, ys).iApplyMap(x -> gaussianMap(x, gamma));
     }
 

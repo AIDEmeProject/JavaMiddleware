@@ -55,7 +55,7 @@ public class KernelClassifier extends MarginClassifier {
     public KernelClassifier(LinearClassifier linearClassifier, Matrix supportVectors, Kernel kernel) {
         Validator.assertNotNull(linearClassifier);
         Validator.assertNotNull(kernel);
-        Validator.assertEquals(linearClassifier.getDim(), supportVectors.numRows());
+        Validator.assertEquals(linearClassifier.getDim(), supportVectors.rows());
 
         this.linearClassifier = linearClassifier;
         this.supportVectors = supportVectors;

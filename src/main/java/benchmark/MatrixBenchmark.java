@@ -41,7 +41,7 @@ public class MatrixBenchmark extends AbstractBenchmark {
     @Warmup(iterations = 10, time = 5, timeUnit = TimeUnit.SECONDS)
     @Measurement(iterations = 10, time = 5, timeUnit = TimeUnit.SECONDS)
     public Matrix matrixMultiply() {
-        return a.multiply(b);
+        return a.matrixMultiply(b);
     }
 
     @Benchmark

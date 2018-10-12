@@ -86,12 +86,12 @@ public class MatrixTest {
 
     @Test
     void numRows_matrixWithTwoRows_returnsTwo() {
-        assertEquals(2, matrix1.numRows());
+        assertEquals(2, matrix1.rows());
     }
 
     @Test
     void numCols_matrixWithThreeColumns_returnsThree() {
-        assertEquals(3, matrix1.numCols());
+        assertEquals(3, matrix1.cols());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class MatrixTest {
 
     @Test
     void get_rowIndexEqualsNumRows_throwsException() {
-        assertThrows(RuntimeException.class, () -> matrix1.get(matrix1.numRows(), 0));
+        assertThrows(RuntimeException.class, () -> matrix1.get(matrix1.rows(), 0));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class MatrixTest {
 
     @Test
     void get_columnIndexEqualsNumCols_throwsException() {
-        assertThrows(RuntimeException.class, () -> matrix1.get(0, matrix1.numCols()));
+        assertThrows(RuntimeException.class, () -> matrix1.get(0, matrix1.cols()));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class MatrixTest {
 
     @Test
     void getRow_indexEqualsNumRows_throwsException() {
-        assertThrows(RuntimeException.class, () -> matrix1.getRow(matrix1.numRows()));
+        assertThrows(RuntimeException.class, () -> matrix1.getRow(matrix1.rows()));
     }
 
     @Test
@@ -144,79 +144,79 @@ public class MatrixTest {
      *              ADDITION
      * ************************************
      */
-//    @Test
-//    void iScalarAdd_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iScalarAdd(1));
-//    }
-//
-//
-//    @Test
-//    void iScalarAdd_addZero_resultIdenticalToInputMatrix() {
-//        matrix1.iScalarAdd(0);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iScalarAdd_addOne_originalMatrixHasAllComponentsAddedOne() {
-//        matrix1.iScalarAdd(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 2, 3, 4, 5, 6, 7), matrix1);
-//    }
-//
-//    @Test
-//    void scalarAdd_addZero_resultIdenticalToInputMatrix() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarAdd(0));
-//    }
-//
-//    @Test
-//    void scalarAdd_addOne_resultMatrixHasAllComponentsAddedOne() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 2, 3, 4, 5, 6, 7), matrix1.scalarAdd(1));
-//    }
-//
-//    @Test
-//    void scalarAdd_addOne_originalMatrixRemainsUnchanged() {
-//        matrix1.scalarAdd(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iAdd_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iAdd(matrix2));
-//    }
-//
-//    @Test
-//    void iAdd_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
-//    }
-//
-//    @Test
-//    void iAdd_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
-//    }
-//
-//    @Test
-//    void iAdd_addZeroMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeroslike(matrix1);
-//        matrix1.iAdd(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iAdd_addCompatibleMatrix_originalMatrixHasAllComponentsAdded() {
-//        matrix1.iAdd(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 11, 22, 33, 44, 55, 66), matrix1);
-//    }
+    @Test
+    void iScalarAdd_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iScalarAdd(1));
+    }
+
+
+    @Test
+    void iScalarAdd_addZero_resultIdenticalToInputMatrix() {
+        matrix1.iScalarAdd(0);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iScalarAdd_addOne_originalMatrixHasAllComponentsAddedOne() {
+        matrix1.iScalarAdd(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 3, 4, 5, 6, 7), matrix1);
+    }
+
+    @Test
+    void scalarAdd_addZero_resultIdenticalToInputMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarAdd(0));
+    }
+
+    @Test
+    void scalarAdd_addOne_resultMatrixHasAllComponentsAddedOne() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 3, 4, 5, 6, 7), matrix1.scalarAdd(1));
+    }
+
+    @Test
+    void scalarAdd_addOne_originalMatrixRemainsUnchanged() {
+        matrix1.scalarAdd(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iAdd_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iAdd(matrix2));
+    }
+
+    @Test
+    void iAdd_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
+    }
+
+    @Test
+    void iAdd_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.iAdd(matrix2));
+    }
+
+    @Test
+    void iAdd_addZeroMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.zeroslike(matrix1);
+        matrix1.iAdd(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iAdd_addCompatibleMatrix_originalMatrixHasAllComponentsAdded() {
+        matrix1.iAdd(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 11, 22, 33, 44, 55, 66), matrix1);
+    }
 
     @Test
     void add_incompatibleNumberOfRows_throwsException() {
-        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
         assertThrows(RuntimeException.class, () -> matrix1.add(matrix2));
     }
 
     @Test
     void add_incompatibleNumberOfColumns_throwsException() {
-        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
         assertThrows(RuntimeException.class, () -> matrix1.add(matrix2));
     }
 
@@ -253,78 +253,78 @@ public class MatrixTest {
      *              SUBTRACTION
      * ************************************
      */
-//    @Test
-//    void iScalarSubtract_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iScalarSubtract(1));
-//    }
-//
-//    @Test
-//    void iScalarSubtract_subtractZero_resultIdenticalToInputMatrix() {
-//        matrix1.iScalarSubtract(0);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iScalarSubtract_subtractOne_originalMatrixHasAllComponentsSubtractedOne() {
-//        matrix1.iScalarSubtract(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0, 1, 2, 3, 4, 5), matrix1);
-//    }
-//
-//    @Test
-//    void scalarSubtract_subtractZero_resultIdenticalToInputMatrix() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarSubtract(0));
-//    }
-//
-//    @Test
-//    void scalarSubtract_subtractOne_resultMatrixHasAllComponentsSubtractedOne() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0, 1, 2, 3, 4, 5), matrix1.scalarSubtract(1));
-//    }
-//
-//    @Test
-//    void scalarSubtract_subtractOne_originalMatrixRemainsUnchanged() {
-//        matrix1.scalarSubtract(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iSubtract_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iSubtract(matrix2));
-//    }
-//
-//    @Test
-//    void iSubtract_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
-//    }
-//
-//    @Test
-//    void iSubtract_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
-//    }
-//
-//    @Test
-//    void iSubtract_subtractZeroMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeroslike(matrix1);
-//        matrix1.iSubtract(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iSubtract_subtractCompatibleMatrix_originalMatrixHasAllComponentsSubtracted() {
-//        matrix1.iSubtract(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, -9, -18, -27, -36, -45, -54), matrix1);
-//    }
+    @Test
+    void iScalarSubtract_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iScalarSubtract(1));
+    }
+
+    @Test
+    void iScalarSubtract_subtractZero_resultIdenticalToInputMatrix() {
+        matrix1.iScalarSubtract(0);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iScalarSubtract_subtractOne_originalMatrixHasAllComponentsSubtractedOne() {
+        matrix1.iScalarSubtract(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 1, 2, 3, 4, 5), matrix1);
+    }
+
+    @Test
+    void scalarSubtract_subtractZero_resultIdenticalToInputMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarSubtract(0));
+    }
+
+    @Test
+    void scalarSubtract_subtractOne_resultMatrixHasAllComponentsSubtractedOne() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 1, 2, 3, 4, 5), matrix1.scalarSubtract(1));
+    }
+
+    @Test
+    void scalarSubtract_subtractOne_originalMatrixRemainsUnchanged() {
+        matrix1.scalarSubtract(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iSubtract_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iSubtract(matrix2));
+    }
+
+    @Test
+    void iSubtract_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
+    }
+
+    @Test
+    void iSubtract_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.iSubtract(matrix2));
+    }
+
+    @Test
+    void iSubtract_subtractZeroMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.zeroslike(matrix1);
+        matrix1.iSubtract(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iSubtract_subtractCompatibleMatrix_originalMatrixHasAllComponentsSubtracted() {
+        matrix1.iSubtract(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, -9, -18, -27, -36, -45, -54), matrix1);
+    }
 
     @Test
     void subtract_incompatibleNumberOfRows_throwsException() {
-        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
         assertThrows(RuntimeException.class, () -> matrix1.subtract(matrix2));
     }
 
     @Test
     void subtract_incompatibleNumberOfColumns_throwsException() {
-        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
         assertThrows(RuntimeException.class, () -> matrix1.subtract(matrix2));
     }
 
@@ -382,64 +382,64 @@ public class MatrixTest {
         assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
     }
 
-//    @Test
-//    void iMultiply_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void iMultiply_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void iMultiply_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void iMultiply_multiplyByOnesMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeros(2, 3, 1, 1, 1, 1, 1, 1);
-//        matrix1.iMultiply(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iMultiply_multiplyByNonOnesMatrix_originalMatrixHasAllComponentsMultiplied() {
-//        matrix1.iMultiply(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 10, 40, 90, 160, 250, 360), matrix1);
-//    }
+    @Test
+    void iMultiply_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iMultiply(matrix2));
+    }
 
-//    @Test
-//    void multiply_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.scalarMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void multiply_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.scalarMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void multiply_multiplyByOnesMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeros(2, 3, 1, 1, 1, 1, 1, 1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void multiply_multiplyByNonOnesMatrix_returnsExpectedResult() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 10, 40, 90, 160, 250, 360), matrix1.scalarMultiply(matrix2));
-//    }
-//
-//    @Test
-//    void multiply_multiplyByNonOnesMatrix_originalMatrixRemainsUnchanged() {
-//        matrix1.scalarMultiply(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
+    @Test
+    void iMultiply_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
+    }
+
+    @Test
+    void iMultiply_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.iMultiply(matrix2));
+    }
+
+    @Test
+    void iMultiply_multiplyByOnesMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.make(2, 3, 1, 1, 1, 1, 1, 1);
+        matrix1.iMultiply(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iMultiply_multiplyByNonOnesMatrix_originalMatrixHasAllComponentsMultiplied() {
+        matrix1.iMultiply(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 10, 40, 90, 160, 250, 360), matrix1);
+    }
+
+    @Test
+    void multiply_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.multiply(matrix2));
+    }
+
+    @Test
+    void multiply_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.multiply(matrix2));
+    }
+
+    @Test
+    void multiply_multiplyByOnesMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.make(2, 3, 1, 1, 1, 1, 1, 1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.multiply(matrix2));
+    }
+
+    @Test
+    void multiply_multiplyByNonOnesMatrix_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 10, 40, 90, 160, 250, 360), matrix1.multiply(matrix2));
+    }
+
+    @Test
+    void multiply_multiplyByNonOnesMatrix_originalMatrixRemainsUnchanged() {
+        matrix1.multiply(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
 
     @Test
     void multiply_vectorOfIncompatibleDimension_throwsException() {
@@ -448,8 +448,8 @@ public class MatrixTest {
 
     @Test
     void multiply_zerosVector_returnsZeroVector() {
-        Vector vector = Vector.FACTORY.zeros(matrix1.numCols());
-        assertEquals(Vector.FACTORY.zeros(matrix1.numRows()), matrix1.multiply(vector));
+        Vector vector = Vector.FACTORY.zeros(matrix1.cols());
+        assertEquals(Vector.FACTORY.zeros(matrix1.rows()), matrix1.multiply(vector));
     }
 
     @Test
@@ -459,26 +459,26 @@ public class MatrixTest {
     }
 
     @Test
-    void multiply_matrixOfIncompatibleDimensions_throwsException() {
-        assertThrows(RuntimeException.class, () -> matrix1.multiply(Matrix.FACTORY.zeros(1, 3)));
+    void multiplyMatrix_matrixOfIncompatibleDimensions_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.matrixMultiply(Matrix.FACTORY.zeros(1, 3)));
     }
 
     @Test
-    void multiply_zerosMatrix_returnsZeroMatrix() {
+    void multiplyMatrix_zerosMatrix_returnsZeroMatrix() {
         Matrix matrix = Matrix.FACTORY.zeros(3, 2);
-        assertEquals(Matrix.FACTORY.zeros(2, 2), matrix1.multiply(matrix));
+        assertEquals(Matrix.FACTORY.zeros(2, 2), matrix1.matrixMultiply(matrix));
     }
 
     @Test
-    void multiply_identityMatrix_returnsOriginalMatrix() {
+    void multiplyMatrix_identityMatrix_returnsOriginalMatrix() {
         Matrix matrix = Matrix.FACTORY.identity(3);
-        assertEquals(matrix1, matrix1.multiply(matrix));
+        assertEquals(matrix1, matrix1.matrixMultiply(matrix));
     }
 
     @Test
-    void multiply_customInputMatrix_returnsCorrectMatrixMultiplication() {
+    void multiplyMatrix_customInputMatrix_returnsCorrectMatrixMultiplication() {
         Matrix matrix = Matrix.FACTORY.make(3, 2, -1, 2, 0, 0, 4, -5);
-        assertEquals(Matrix.FACTORY.make(2, 2, 11, -13, 20, -22), matrix1.multiply(matrix));
+        assertEquals(Matrix.FACTORY.make(2, 2, 11, -13, 20, -22), matrix1.matrixMultiply(matrix));
     }
 
     @Test
@@ -495,97 +495,97 @@ public class MatrixTest {
      *              DIVISION
      * ************************************
      */
-//    @Test
-//    void iScalarDivide_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iScalarDivide(1));
-//    }
-//
-//    @Test
-//    void iScalarDivide_divideByOne_resultIdenticalToInputMatrix() {
-//        matrix1.iScalarDivide(1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iScalarDivide_divideByTwo_originalMatrixHasAllComponentsDividedByTwo() {
-//        matrix1.iScalarDivide(2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0.5, 1, 1.5, 2, 2.5, 3), matrix1);
-//    }
-//
-//    @Test
-//    void scalarDivide_divideByOne_resultIdenticalToInputMatrix() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarDivide(1));
-//    }
-//
-//    @Test
-//    void scalarDivide_divideByTwo_resultMatrixHasAllComponentsDividedByTwo() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0.5, 1, 1.5, 2, 2.5, 3), matrix1.scalarDivide(2));
-//    }
-//
-//    @Test
-//    void scalarDivide_divideByTwo_originalMatrixRemainsUnchanged() {
-//        matrix1.scalarDivide(2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iDivide_AnyValue_outputIsTheSameObjectAsThis() {
-//        assertSame(matrix1, matrix1.iDivide(matrix2));
-//    }
-//
-//    @Test
-//    void iDivide_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
-//    }
-//
-//    @Test
-//    void iDivide_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
-//    }
-//
-//    @Test
-//    void iDivide_divideByOnesMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeros(2, 3, 1, 1, 1, 1, 1, 1);
-//        matrix1.iDivide(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
-//
-//    @Test
-//    void iDivide_divideByNonOnesMatrix_originalMatrixHasAllComponentsDivided() {
-//        matrix1.iDivide(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), matrix1);
-//    }
-//
-//    @Test
-//    void divide_incompatibleNumberOfRows_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows() - 1, matrix1.numCols());
-//        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
-//    }
-//
-//    @Test
-//    void divide_incompatibleNumberOfColumns_throwsException() {
-//        matrix2 = Matrix.FACTORY.zeros(matrix1.numRows(), matrix1.numCols()-1);
-//        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
-//    }
-//
-//    @Test
-//    void divide_divideByOnesMatrix_resultIdenticalToInputMatrix() {
-//        matrix2 = Matrix.FACTORY.zeros(2, 3, 1, 1, 1, 1, 1, 1);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1.divide(matrix2));
-//    }
-//
-//    @Test
-//    void divide_divideByNonOnesMatrix_returnsExpectedResult() {
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), matrix1.divide(matrix2));
-//    }
-//
-//    @Test
-//    void divide_divideByNonOnesMatrix_originalMatrixRemainsUnchanged() {
-//        matrix1.divide(matrix2);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
+    @Test
+    void iScalarDivide_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iScalarDivide(1));
+    }
+
+    @Test
+    void iScalarDivide_divideByOne_resultIdenticalToInputMatrix() {
+        matrix1.iScalarDivide(1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iScalarDivide_divideByTwo_originalMatrixHasAllComponentsDividedByTwo() {
+        matrix1.iScalarDivide(2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 0.5, 1, 1.5, 2, 2.5, 3), matrix1);
+    }
+
+    @Test
+    void scalarDivide_divideByOne_resultIdenticalToInputMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.scalarDivide(1));
+    }
+
+    @Test
+    void scalarDivide_divideByTwo_resultMatrixHasAllComponentsDividedByTwo() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 0.5, 1, 1.5, 2, 2.5, 3), matrix1.scalarDivide(2));
+    }
+
+    @Test
+    void scalarDivide_divideByTwo_originalMatrixRemainsUnchanged() {
+        matrix1.scalarDivide(2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iDivide_AnyValue_outputIsTheSameObjectAsThis() {
+        assertSame(matrix1, matrix1.iDivide(matrix2));
+    }
+
+    @Test
+    void iDivide_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
+    }
+
+    @Test
+    void iDivide_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.iDivide(matrix2));
+    }
+
+    @Test
+    void iDivide_divideByOnesMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.make(2, 3, 1, 1, 1, 1, 1, 1);
+        matrix1.iDivide(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iDivide_divideByNonOnesMatrix_originalMatrixHasAllComponentsDivided() {
+        matrix1.iDivide(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), matrix1);
+    }
+
+    @Test
+    void divide_incompatibleNumberOfRows_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows() - 1, matrix1.cols());
+        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
+    }
+
+    @Test
+    void divide_incompatibleNumberOfColumns_throwsException() {
+        matrix2 = Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()-1);
+        assertThrows(RuntimeException.class, () -> matrix1.divide(matrix2));
+    }
+
+    @Test
+    void divide_divideByOnesMatrix_resultIdenticalToInputMatrix() {
+        matrix2 = Matrix.FACTORY.make(2, 3, 1, 1, 1, 1, 1, 1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1.divide(matrix2));
+    }
+
+    @Test
+    void divide_divideByNonOnesMatrix_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), matrix1.divide(matrix2));
+    }
+
+    @Test
+    void divide_divideByNonOnesMatrix_originalMatrixRemainsUnchanged() {
+        matrix1.divide(matrix2);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
 
     /* *************************************
      *           UTILITY METHODS
@@ -599,7 +599,7 @@ public class MatrixTest {
     @Test
     void toArray_anyMatrix_returnsArrayOfMatrixEntries() {
         double[][] array = matrix1.toArray();
-        assertEquals(matrix1.numRows(), array.length);
+        assertEquals(matrix1.rows(), array.length);
         assertArrayEquals(new double[] {1, 2, 3}, array[0]);
         assertArrayEquals(new double[] {4, 5, 6}, array[1]);
     }
@@ -611,15 +611,15 @@ public class MatrixTest {
         assertEquals(1, matrix1.get(0, 0));
     }
 
-//    @Test
-//    void clone_anyMatrix_returnsIdenticalMatrix() {
-//        assertEquals(matrix1, matrix1.clone());
-//    }
-//
-//    @Test
-//    void clone_anyMatrix_changingCloneDoesNotModifyOriginalMatrix() {
-//        Matrix clone = matrix1.clone();
-//        clone.iScalarAdd(10);
-//        assertEquals(Matrix.FACTORY.zeros(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
-//    }
+    @Test
+    void copy_anyMatrix_returnsIdenticalMatrix() {
+        assertEquals(matrix1, matrix1.copy());
+    }
+
+    @Test
+    void copy_anyMatrix_changingCloneDoesNotModifyOriginalMatrix() {
+        Matrix clone = matrix1.copy();
+        clone.iScalarAdd(10);
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
 }

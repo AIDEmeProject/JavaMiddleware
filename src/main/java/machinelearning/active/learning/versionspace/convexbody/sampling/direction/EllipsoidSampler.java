@@ -28,7 +28,7 @@ class EllipsoidSampler implements DirectionSampler {
      */
     EllipsoidSampler(Matrix matrix) {
         this.matrix = new CholeskyDecomposition(matrix).getL();
-        this.randomDirectionSampler = new RandomDirectionSampler(matrix.numCols());
+        this.randomDirectionSampler = new RandomDirectionSampler(matrix.cols());
     }
 
     /**
