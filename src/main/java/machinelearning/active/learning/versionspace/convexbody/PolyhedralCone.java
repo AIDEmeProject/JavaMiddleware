@@ -2,6 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledDataset;
 import data.LabeledPoint;
+import machinelearning.classifier.margin.LinearClassifier;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
 import utils.linalg.Vector;
@@ -158,16 +159,17 @@ public class PolyhedralCone implements ConvexBody {
      * @return the separating hyperplane vector (if it exists)
      */
     @Override
-    public Optional<Vector> getSeparatingHyperplane(Vector x) {
+    public Optional<LinearClassifier> getSeparatingHyperplane(Vector x) {
         Validator.assertEquals(x.dim(), getDim());
 
         if (x.squaredNorm() > 1) {
-            return Optional.of(x);
+            return Optional.of(new LinearClassifier(-x.squaredNorm(), x));  // return -1 for bias?
         }
 
         for (LabeledPoint point : labeledPoints) {
             if (point.getLabel().asSign() * point.getData().dot(x) < 0){
-                return Optional.of(point.getData().scalarMultiply(-point.getLabel().asSign()));
+                Vector weights = point.getData().scalarMultiply(-point.getLabel().asSign());
+                return Optional.of(new LinearClassifier(0, weights));
             }
         }
 

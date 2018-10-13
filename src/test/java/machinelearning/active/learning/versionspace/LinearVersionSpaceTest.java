@@ -2,14 +2,14 @@ package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.classifier.MajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -59,7 +59,7 @@ class LinearVersionSpaceTest {
             expected[i] = new LinearClassifier(hitAndRunSamples[i], false);
         }
 
-        assertArrayEquals(expected, versionSpace.sample(trainingData, hitAndRunSamples.length));
+        assertEquals(new MajorityVote<>(expected), versionSpace.sample(trainingData, hitAndRunSamples.length));
     }
 
     //TODO: write better tests

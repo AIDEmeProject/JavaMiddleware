@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
+import machinelearning.classifier.margin.LinearClassifier;
 import utils.linalg.EigenvalueDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -67,13 +68,13 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         initialize(body);
 
         boolean converged = false;
-
+        int count = 0;
         while (!converged) {
             converged = true;
 
             AxisIterator iterator = new AxisIterator();
             while (converged && iterator.hasNext()) {
-                Optional<Vector> separatingHyperplane = body.getSeparatingHyperplane(iterator.next());
+                Optional<LinearClassifier> separatingHyperplane = body.getSeparatingHyperplane(iterator.next());
 
                 // if a separating hyperplane exists, it means E_k / (n+1) is not contained in K, and E_k must be updated
                 if (separatingHyperplane.isPresent()) {
@@ -81,7 +82,9 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
                     ellipsoidMethodUpdate(separatingHyperplane.get());
                 }
             }
+            count++;
         }
+        System.out.println(count);
     }
 
     /**
@@ -92,19 +95,35 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         matrix = Matrix.FACTORY.identity(body.getDim());
     }
 
+    private double tau(double alpha, int dim) {
+        return (1 + dim * alpha) / (dim + 1);
+    }
+
+    private double delta(double alpha, int dim) {
+        int dimSq = dim * dim;
+        return dimSq * (1 - alpha * alpha) / (dimSq - 1);
+    }
+
+    private double sigma(double alpha, int dim) {
+        return 2 * (1 + dim * alpha) / ((dim + 1) * (1 + alpha));
+    }
+
     /**
      * Let E_k be the current ellipsoid, and let H be a hyperplane cutting E_k. This method will update E_k to be the
      * smallest volume ellipsoid containing E_k intersection with the negative half space of H.
      *
      * For more details, check lemma 2.2.1 from [1].
      */
-    private void ellipsoidMethodUpdate(Vector g) {
+    private void ellipsoidMethodUpdate(LinearClassifier hyperplane) {
+        Vector g = hyperplane.getWeights();
         Vector Pg = matrix.multiply(g);
-        Pg = Pg.scalarDivide(Math.sqrt(Pg.dot(g)));
+        double norm = Math.sqrt(Pg.dot(g));
+        Pg.iScalarDivide(norm);
 
         int n = center.dim();
-        center = center.subtract(Pg.scalarDivide(n + 1.));
-        matrix = matrix.subtract(Pg.outerProduct(Pg).scalarMultiply(2./(n + 1))).scalarMultiply(n*n/(n*n - 1.));
+        double alpha = hyperplane.margin(center) / norm;
+        center.iSubtract(Pg.scalarMultiply(tau(alpha, n)));
+        matrix.iSubtract(Pg.outerProduct(Pg).iScalarMultiply(sigma(alpha, n))).iScalarMultiply(delta(alpha, n));
     }
 
     /**

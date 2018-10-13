@@ -55,6 +55,14 @@ public class LinearClassifier extends MarginClassifier {
      */
     public int getDim() { return weights.dim(); }
 
+    public double getBias() {
+        return bias;
+    }
+
+    public Vector getWeights() {
+        return weights;
+    }
+
     /**
      * Compute bias + weight^T x
      */

@@ -1,5 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
+import machinelearning.classifier.margin.LinearClassifier;
 import utils.linalg.Vector;
 
 import java.util.Optional;
@@ -42,12 +43,14 @@ public interface ConvexBody {
     LineSegment computeLineIntersection(Line line);
 
     /**
-     * Given a closed convex body K and a point x not in K, we define its "separating hyperplane" by a vector C satisfying:
+     * Given a closed convex body K and a point x0 not in K, we define its "separating hyperplane" by its weight vector W
+     * and bias B satisfying:
      *
-     *                  \( \forall w \in K, c^T w \leq c^T x  \)
+     *                  \( \forall x \in K, W^T x + B \leq 0  \)
+     *                  \(  W^T x0 + B \geq 0  \)
      *
-     * In other words, if H is the hyperplane passing through x and orthogonal to c, then K is contained in its negative
-     * half-space.
+     * In other words, K is entirely contained in the "negative" half-space delimited by the hyperplane, and x0 belongs
+     * to its positive half-space.
      *
      * Computing this hyperplane is necessary for using "rounding" optimization of the Hit-and-Run Sampler.
      *
@@ -57,7 +60,7 @@ public interface ConvexBody {
      * @param x: a data point
      * @return a LinearClassifier instance which separates the point x from the convex body. If x is on the interior of
      * the convex body, Optional.empty() is returned instead.
-     * @throws IllegalArgumentException if x.length and getDim() are different
+     * @throws IllegalArgumentException if x.dim() and getDim() are different
      */
-    Optional<Vector> getSeparatingHyperplane(Vector x);
+    Optional<LinearClassifier> getSeparatingHyperplane(Vector x);
 }
