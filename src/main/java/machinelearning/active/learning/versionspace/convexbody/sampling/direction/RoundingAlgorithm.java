@@ -68,7 +68,6 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         initialize(body);
 
         boolean converged = false;
-        int count = 0;
         while (!converged) {
             converged = true;
 
@@ -82,9 +81,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
                     ellipsoidMethodUpdate(separatingHyperplane.get());
                 }
             }
-            count++;
         }
-        System.out.println(count);
     }
 
     /**
@@ -122,6 +119,15 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
         int n = center.dim();
         double alpha = hyperplane.margin(center) / norm;
+
+        if (alpha >= 1) {
+            throw new RuntimeException("Invalid hyperplane: ellipsoid is contained in its positive semi-space (expected the negative one)");
+        }
+        else if (alpha <= -1.0 / n) {
+            System.out.println("Sub-optimal cut: ellipsoid remains unchanged.");
+            return;
+        }
+
         center.iSubtract(Pg.scalarMultiply(tau(alpha, n)));
         matrix.iSubtract(Pg.outerProduct(Pg).iScalarMultiply(sigma(alpha, n))).iScalarMultiply(delta(alpha, n));
     }

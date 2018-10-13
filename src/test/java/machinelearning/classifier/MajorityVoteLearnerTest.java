@@ -14,30 +14,34 @@ class MajorityVoteLearnerTest {
     private MajorityVoteLearner learner;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         learner = new MajorityVoteLearner(mock(VersionSpace.class), 1);
     }
 
     @Test
     void constructor_NullInputVersionSpace_throwsException() {
-        assertThrows(NullPointerException.class, () -> new MajorityVoteLearner(null, 1));
+        assertThrows(NullPointerException.class, () -> new MajorityVoteLearner<>(null, 1));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void constructor_NegativeSampleSize_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> new MajorityVoteLearner(mock(VersionSpace.class), -1));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void constructor_ZeroSampleSize_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> new MajorityVoteLearner(mock(VersionSpace.class), 0));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void fit_mockedVersionSpace_versionSpaceIsSampledOnceWithCorrectArguments() {
         // version space mock
         VersionSpace versionSpace = mock(VersionSpace.class);
-        when(versionSpace.sample(any(), anyInt())).thenReturn(new Classifier[] { mock(Classifier.class) });
+        when(versionSpace.sample(any(), anyInt())).thenReturn(mock(MajorityVote.class));
 
         // majority vote learner
         int sampleSize = 5;

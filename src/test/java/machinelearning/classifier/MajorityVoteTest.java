@@ -7,15 +7,15 @@ import utils.linalg.Vector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class MajorityVoteClassifierTest {
+class MajorityVoteTest {
     @Test
     void constructor_emptyClassifierArrayInput_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new MajorityVoteClassifier(new Classifier[0]));
+        assertThrows(IllegalArgumentException.class, () -> new MajorityVote<>(new Classifier[0]));
     }
 
     @Test
     void constructor_NullInClassifierInputArray_throwsException() {
-        assertThrows(NullPointerException.class, () -> new MajorityVoteClassifier(new Classifier[]{null}));
+        assertThrows(NullPointerException.class, () -> new MajorityVote<>(new Classifier[]{null}));
     }
 
     @Test
@@ -45,7 +45,7 @@ class MajorityVoteClassifierTest {
             classifiers[i] = i < pos ? positiveClassifier : negativeClassifier;
         }
 
-        MajorityVoteClassifier majorityVote = new MajorityVoteClassifier(classifiers);
+        MajorityVote majorityVote = new MajorityVote<>(classifiers);
         Vector point = Mockito.mock(Vector.class);
         assertEquals((double) pos / classifiers.length, majorityVote.probability(point));
     }
