@@ -141,7 +141,7 @@ public class Matrix extends Tensor<Matrix> {
 
     public Matrix getRowSlice(int from, int to) {
         if (from < 0 || from >= to || to > rows()) {
-            throw new IllegalArgumentException("Indexes " + from + ", " + to + " of bounds for array of " + rows() + " rows()");
+            throw new IllegalArgumentException("Invalid indexes " + from + " and " + to + " for matrix of " + rows() + " rows");
         }
 
         int size = to - from;
@@ -163,6 +163,139 @@ public class Matrix extends Tensor<Matrix> {
             }
         }
     }
+    
+    /* ROW-WISE OPERATIONS */
+    
+    /**
+     * @param vector: vector to add to each row of {@code this}
+     * @return a new matrix containing the result of the addition of {@code vector} to each row of {@code this}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix addRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, ADD);
+    }
+
+    /**
+     * @param vector: vector to subtract from each row of {@code this}
+     * @return a new matrix containing the result of the subtracting {@code vector} from each row of {@code this}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix subtractRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, SUB);
+    }
+
+    /**
+     * @param vector: vector to element-wise multiply each row of {@code this} with
+     * @return a new matrix containing the result of the element-wise multiplication of {@code vector} with each row of matrix
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix multiplyRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, MUL);
+    }
+
+    /**
+     * @param vector: vector to divide each row of {@code this} by
+     * @return a new matrix containing the result of the division of each row of {@code this} by {@code vector}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix divideRow(Vector vector){
+        return applyBinaryFunctionToRows(vector, DIV);
+    }
+
+    private Matrix applyBinaryFunctionToRows(Vector vector, BiFunction<Double, Double, Double> op) {
+        return copy().applyBinaryFunctionToRowsInplace(vector, op);
+    }
+
+    /* INPLACE ROW-WISE OPERATIONS */
+    /**
+     * @param vector: vector to add to each row of {@code this} inplace
+     * @return {@code this}, after addition
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iAddRow(Vector vector){
+        return applyBinaryFunctionToRowsInplace(vector, ADD);
+    }
+
+    /**
+     * @param vector: vector to subtract from each row of {@code this} inplace
+     * @return {@code this}, after subtraction
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iSubtractRow(Vector vector){
+        return applyBinaryFunctionToRowsInplace(vector, SUB);
+    }
+
+    /**
+     * @param vector: vector to element-wise multiply each row of {@code this} inplace
+     * @return {@code this}, after multiplication
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iMultiplyRow(Vector vector){
+        return applyBinaryFunctionToRowsInplace(vector, MUL);
+    }
+
+    /**
+     * @param vector: vector to element-wise divide each row of {@code this} inplace
+     * @return {@code this}, after division
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iDivideRow(Vector vector){
+        return applyBinaryFunctionToRowsInplace(vector, DIV);
+    }
+
+    private Matrix applyBinaryFunctionToRowsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
+        Validator.assertEquals(cols(), vector.dim());
+
+        int p = 0;
+        for (int i = 0; i < rows(); i++) {
+            for (int j = 0; j < cols(); j++) {
+                array[p] = op.apply(array[p++], vector.array[j]);
+            }
+        }
+        return this;
+    }
+
+    /* COLUMN-WISE OPERATIONS */
+
+    /**
+     * @param vector: vector to add to each column of {@code this}
+     * @return a new matrix containing the result of the addition of {@code vector} to each column of {@code this}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix addColumn(Vector vector){
+        return applyBinaryFunctionToColumns(vector, ADD);
+    }
+
+    /**
+     * @param vector: vector to subtract from each column of {@code this}
+     * @return a new matrix containing the result of the subtracting {@code vector} from each column of {@code this}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix subtractColumn(Vector vector){
+        return applyBinaryFunctionToColumns(vector, SUB);
+    }
+
+    /**
+     * @param vector: vector to element-wise multiply each column of {@code this} with
+     * @return a new matrix containing the result of the element-wise multiplication of {@code vector} with each column of matrix
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix multiplyColumn(Vector vector){
+        return applyBinaryFunctionToColumns(vector, MUL);
+    }
+
+    /**
+     * @param vector: vector to divide each column of {@code this} by
+     * @return a new matrix containing the result of the division of each column of {@code this} by {@code vector}
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix divideColumn(Vector vector){
+        return applyBinaryFunctionToColumns(vector, DIV);
+    }
+
+    private Matrix applyBinaryFunctionToColumns(Vector vector, BiFunction<Double, Double, Double> op) {
+        return copy().applyBinaryFunctionToColumnsInplace(vector, op);
+    }
 
     public Statistics[] columnStatistics() {
         Statistics[] statistics = new Statistics[cols()];
@@ -181,63 +314,59 @@ public class Matrix extends Tensor<Matrix> {
         return statistics;
     }
 
-    private Matrix applyBinaryFunctionToRows(Vector vector, BiFunction<Double, Double, Double> op) {
-        return copy().applyBinaryFunctionToRowsInplace(vector, op);
-    }
+    /* INPLACE COLUMN-WISE OPERATIONS */
 
-    private Matrix applyBinaryFunctionToRowsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
-        Validator.assertEquals(cols(), vector.dim());
-        for (int i = 0; i < array.length; i++) {
-            array[i] = op.apply(array[i], vector.array[i % cols()]);
-        }
-        //        int p = 0;
-//        for (int i = 0; i < rows(); i++) {
-//            for (int j = 0; j < cols(); j++) {
-//                result[p] = op.apply(array[p++], vector.vector[j]);
-//            }
-//        }
-        return this;
-    }
-
-    private Matrix applyBinaryFunctionToColumns(Vector vector, BiFunction<Double, Double, Double> op) {
-        return copy().applyBinaryFunctionToColumnsInplace(vector, op);
-    }
-
-    private Matrix applyBinaryFunctionToColumnsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
-        Validator.assertEquals(rows(), vector.dim());
-        for (int i = 0; i < array.length; i++) {
-            array[i] = op.apply(array[i], vector.array[i / cols()]);
-        }
-        return this;
-    }
-
-    public Matrix addColumn(Vector vector){
-        return applyBinaryFunctionToColumns(vector, ADD);
-    }
-
-    public Matrix addRow(Vector vector){
-        return applyBinaryFunctionToRows(vector, ADD);
-    }
-
+    /**
+     * @param vector: vector to add to each column of {@code this} inplace
+     * @return {@code this}, after addition
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
     public Matrix iAddColumn(Vector vector){
         return applyBinaryFunctionToColumnsInplace(vector, ADD);
     }
 
-    public Matrix iAddRow(Vector vector){
-        return applyBinaryFunctionToRowsInplace(vector, ADD);
+    /**
+     * @param vector: vector to subtract from each column of {@code this} inplace
+     * @return {@code this}, after subtraction
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iSubtractColumn(Vector vector){
+        return applyBinaryFunctionToColumnsInplace(vector, SUB);
     }
 
-    public Matrix subtractRow(Vector vector){
-        return applyBinaryFunctionToRows(vector, SUB);
+    /**
+     * @param vector: vector to element-wise multiply each column of {@code this} inplace
+     * @return {@code this}, after multiplication
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iMultiplyColumn(Vector vector){
+        return applyBinaryFunctionToColumnsInplace(vector, MUL);
     }
 
-    public Matrix subtractColumn(Vector vector){
-        return applyBinaryFunctionToColumns(vector, SUB);
+    /**
+     * @param vector: vector to element-wise divide each column of {@code this} inplace
+     * @return {@code this}, after division
+     * @throws IllegalArgumentException if vector.dim() is different from matrix.columns()
+     */
+    public Matrix iDivideColumn(Vector vector){
+        return applyBinaryFunctionToColumnsInplace(vector, DIV);
     }
 
-    public Matrix divideRow(Vector vector){
-        return applyBinaryFunctionToRows(vector, DIV);
+    private Matrix applyBinaryFunctionToColumnsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
+        Validator.assertEquals(rows(), vector.dim());
+
+        int p = 0, k = 0;
+        for (int i = 0; i < rows(); i++) {
+            double value = vector.array[k];
+            for (int j = 0; j < cols(); j++) {
+                array[p] = op.apply(array[p++], value);
+            }
+            k++;
+        }
+        return this;
     }
+    
+    /* MATRIX-VECTOR AND MATRIX-MATRIX OPERATIONS */
 
     /**
      * @param vector: vector to perform array-vector multiplication
@@ -306,6 +435,8 @@ public class Matrix extends Tensor<Matrix> {
 
         return new Matrix(rows(), other.rows(), result);
     }
+    
+    /* UTILITY FUNCTIONS */
 
     public Vector getRowSquaredNorms() {
         double[] norms = new double[rows()];

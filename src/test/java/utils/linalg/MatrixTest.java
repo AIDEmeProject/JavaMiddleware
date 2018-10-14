@@ -238,15 +238,67 @@ public class MatrixTest {
     }
 
     @Test
-    void iAddRow_compatibleVector_returnsExpectedResult() {
-        matrix1.iAddRow(Vector.FACTORY.make(-2, 0, 3));
-        assertEquals(Matrix.FACTORY.make(2, 3, -1, 2, 6, 2, 5, 9), matrix1);
+    void addRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.addRow(Vector.FACTORY.zeros(10)));
     }
 
     @Test
-    void iAddColumn_compatibleVector_returnsExpectedResult() {
-        matrix1.iAddColumn(Vector.FACTORY.make(-2, 3));
-        assertEquals(Matrix.FACTORY.make(2, 3, -1, 0, 1, 7, 8, 9), matrix1);
+    void addRow_nonZeroCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 4, 7, 3, 7, 10), matrix1.addRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void addRow_nonZeroCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.addRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iAddRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iAddRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iAddRow_nonZeroCompatibleVector_originalMatrixModified() {
+        matrix1.iAddRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 4, 7, 3, 7, 10), matrix1);
+    }
+
+    @Test
+    void iAddRow_nonZeroCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iAddRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void addColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.addColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void addColumn_nonZeroCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 1, 2, 6, 7, 8), matrix1.addColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
+    @Test
+    void addColumn_nonZeroCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.addColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iAddColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iAddColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iAddColumn_nonZeroCompatibleVector_originalMatrixModified() {
+        matrix1.iAddColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 0, 1, 2, 6, 7, 8), matrix1);
+    }
+
+    @Test
+    void iAddColumn_nonZeroCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iAddColumn(Vector.FACTORY.make(-1, 2)));
     }
 
     /* *************************************
@@ -343,6 +395,70 @@ public class MatrixTest {
     void subtract_subtractNonZeroMatrix_originalMatrixRemainsUnchanged() {
         matrix1.subtract(matrix2);
         assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void subtractRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.subtractRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void subtractRow_nonZeroCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 0, -1, 5, 3, 2), matrix1.subtractRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void subtractRow_nonZeroCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.subtractRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iSubtractRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iSubtractRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iSubtractRow_nonZeroCompatibleVector_originalMatrixModified() {
+        matrix1.iSubtractRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 0, -1, 5, 3, 2), matrix1);
+    }
+
+    @Test
+    void iSubtractRow_nonZeroCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iSubtractRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void subtractColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.subtractColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void subtractColumn_nonZeroCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 3, 4, 2, 3, 4), matrix1.subtractColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
+    @Test
+    void subtractColumn_nonZeroCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.subtractColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iSubtractColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iSubtractColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iSubtractColumn_nonZeroCompatibleVector_originalMatrixModified() {
+        matrix1.iSubtractColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 2, 3, 4, 2, 3, 4), matrix1);
+    }
+
+    @Test
+    void iSubtractColumn_nonZeroCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iSubtractColumn(Vector.FACTORY.make(-1, 2)));
     }
 
     /* *************************************
@@ -442,6 +558,70 @@ public class MatrixTest {
     }
 
     @Test
+    void multiplyRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.multiplyRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void multiplyRow_nonOnesCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 4, 12, -4, 10, 24), matrix1.multiplyRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void multiplyRow_nonOnesCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.multiplyRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iMultiplyRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iMultiplyRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iMultiplyRow_nonOnesCompatibleVector_originalMatrixModified() {
+        matrix1.iMultiplyRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 4, 12, -4, 10, 24), matrix1);
+    }
+
+    @Test
+    void iMultiplyRow_nonOnesCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iMultiplyRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void multiplyColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.multiplyColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void multiplyColumn_nonOnesCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, -2, -3, 8, 10, 12), matrix1.multiplyColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
+    @Test
+    void multiplyColumn_nonOnesCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.multiplyColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iMultiplyColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iMultiplyColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iMultiplyColumn_nonOnesCompatibleVector_originalMatrixModified() {
+        matrix1.iMultiplyColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, -2, -3, 8, 10, 12), matrix1);
+    }
+
+    @Test
+    void iMultiplyColumn_nonOnesCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iMultiplyColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
+    @Test
     void multiply_vectorOfIncompatibleDimension_throwsException() {
         assertThrows(RuntimeException.class, () -> matrix1.multiply(Vector.FACTORY.make(1.0)));
     }
@@ -484,11 +664,6 @@ public class MatrixTest {
     @Test
     void multiplyTranspose_compatibleMatrices_returnsCorrectMatrixMultiplication() {
         assertEquals(Matrix.FACTORY.make(2, 2, 140, 320, 320, 770), matrix1.multiplyTranspose(matrix2));
-    }
-
-    @Test
-    void getRowSquaredNorms_rectangularMatrix_returnsExpectedValues() {
-        assertEquals(Vector.FACTORY.make(14, 77), matrix1.getRowSquaredNorms());
     }
 
     /* ************************************
@@ -587,13 +762,87 @@ public class MatrixTest {
         assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
     }
 
+    @Test
+    void divideRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.divideRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void divideRow_nonOnesCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 1, 0.75, -4, 2.5, 1.5), matrix1.divideRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void divideRow_nonOnesCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.divideRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iDivideRow_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iDivideRow(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iDivideRow_nonOnesCompatibleVector_originalMatrixModified() {
+        matrix1.iDivideRow(Vector.FACTORY.make(-1, 2, 4));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 1, 0.75, -4, 2.5, 1.5), matrix1);
+    }
+
+    @Test
+    void iDivideRow_nonOnesCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iDivideRow(Vector.FACTORY.make(-1, 2, 4)));
+    }
+
+    @Test
+    void divideColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.divideColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void divideColumn_nonOnesCompatibleVector_returnsExpectedResult() {
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, -2, -3, 2, 2.5, 3), matrix1.divideColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
+    @Test
+    void divideColumn_nonOnesCompatibleVector_originalMatrixRemainsUnchanged() {
+        matrix1.divideColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, 1, 2, 3, 4, 5, 6), matrix1);
+    }
+
+    @Test
+    void iDivideColumn_incompatibleNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.iDivideColumn(Vector.FACTORY.zeros(10)));
+    }
+
+    @Test
+    void iDivideColumn_nonOnesCompatibleVector_originalMatrixModified() {
+        matrix1.iDivideColumn(Vector.FACTORY.make(-1, 2));
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, -2, -3, 2, 2.5, 3), matrix1);
+    }
+
+    @Test
+    void iDivideColumn_nonOnesCompatibleVector_returnsSameObject() {
+        assertSame(matrix1, matrix1.iDivideColumn(Vector.FACTORY.make(-1, 2)));
+    }
+
     /* *************************************
      *           UTILITY METHODS
      * *************************************
      */
     @Test
+    void getRowSquaredNorms_rectangularMatrix_returnsExpectedValues() {
+        assertEquals(Vector.FACTORY.make(14, 77), matrix1.getRowSquaredNorms());
+    }
+
+    @Test
     void transpose_nonSquareMatrix_returnsCorrectTranspose() {
         assertEquals(Matrix.FACTORY.make(3, 2, 1, 4, 2, 5, 3, 6), matrix1.transpose());
+    }
+
+    @Test
+    void addBiasColumn_rectangularMatrix_onesColumnCorrectlyAppended() {
+        assertEquals(Matrix.FACTORY.make(2, 4, 1, 1, 2, 3, 1, 4, 5, 6), matrix1.addBiasColumn());
     }
 
     @Test
