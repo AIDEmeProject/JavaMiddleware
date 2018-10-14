@@ -34,10 +34,6 @@ public class Shape {
         return capacities;
     }
 
-    public boolean isEmpty() {
-        return getCapacity() == 0;
-    }
-
     public int getCapacity() {
         return capacities[0];
     }
