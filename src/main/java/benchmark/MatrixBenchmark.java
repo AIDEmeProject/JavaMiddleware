@@ -65,4 +65,23 @@ public class MatrixBenchmark extends AbstractBenchmark {
         return new CholeskyDecomposition(spd).getL();
     }
 
+    @Benchmark
+    public Matrix addRow() {
+        return a.addRow(c);
+    }
+
+    @Benchmark
+    public Matrix iAddRow() {
+        return a.iAddRow(c);
+    }
+
+    @Benchmark
+    public Matrix addColumn() {
+        return a.addColumn(c);
+    }
+
+    @Benchmark
+    public Matrix iAddColumn() {
+        return a.iAddColumn(c);
+    }
 }

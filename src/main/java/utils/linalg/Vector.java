@@ -140,8 +140,9 @@ public class Vector extends Tensor<Vector> {
 
         int pos = 0;
         for (int i = 0; i < rows; i++) {
+            double value = array[i];
             for (int j = 0; j < cols; j++) {
-                matrix[pos++] = array[i] * other.array[j];
+                matrix[pos++] = value * other.array[j];
             }
         }
 
