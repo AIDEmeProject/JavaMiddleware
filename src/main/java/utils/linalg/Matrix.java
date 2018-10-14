@@ -182,51 +182,32 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     private Matrix applyBinaryFunctionToRows(Vector vector, BiFunction<Double, Double, Double> op) {
+        return copy().applyBinaryFunctionToRowsInplace(vector, op);
+    }
+
+    private Matrix applyBinaryFunctionToRowsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(cols(), vector.dim());
-
-        double[] result = new double[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = op.apply(array[i], vector.array[i % cols()]);
+            array[i] = op.apply(array[i], vector.array[i % cols()]);
         }
-
-//        int p = 0;
+        //        int p = 0;
 //        for (int i = 0; i < rows(); i++) {
 //            for (int j = 0; j < cols(); j++) {
 //                result[p] = op.apply(array[p++], vector.vector[j]);
 //            }
 //        }
-
-        return new Matrix(rows(), cols(), result);
-    }
-
-    private Matrix applyBinaryFunctionToRowsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
-        Validator.assertEquals(cols(), vector.dim());
-
-        for (int i = 0; i < array.length; i++) {
-            array[i] = op.apply(array[i], vector.array[i % cols()]);
-        }
-
         return this;
     }
 
     private Matrix applyBinaryFunctionToColumns(Vector vector, BiFunction<Double, Double, Double> op) {
-        Validator.assertEquals(rows(), vector.dim());
-
-        double[] result = new double[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[i] = op.apply(array[i], vector.array[i / cols()]);
-        }
-
-        return new Matrix(rows(), cols(), result);
+        return copy().applyBinaryFunctionToColumnsInplace(vector, op);
     }
 
     private Matrix applyBinaryFunctionToColumnsInplace(Vector vector, BiFunction<Double, Double, Double> op) {
         Validator.assertEquals(rows(), vector.dim());
-
         for (int i = 0; i < array.length; i++) {
             array[i] = op.apply(array[i], vector.array[i / cols()]);
         }
-
         return this;
     }
 

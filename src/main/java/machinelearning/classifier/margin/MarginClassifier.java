@@ -1,7 +1,6 @@
 package machinelearning.classifier.margin;
 
 import data.DataPoint;
-import data.IndexedDataset;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import utils.linalg.Matrix;

@@ -2,7 +2,6 @@ package data;
 
 import explore.user.UserLabel;
 import machinelearning.classifier.Label;
-import utils.linalg.Vector;
 
 import java.util.Objects;
 
