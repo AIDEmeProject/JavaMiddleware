@@ -378,18 +378,54 @@ public class Matrix extends Tensor<Matrix> {
             throw new IllegalArgumentException();
         }
 
-        int offset = 0;
         double[] result = new double[rows()];
+
+        int start = 0;
         for (int i = 0; i < rows(); i++) {
+            int offset = start;
             double sum = 0;
+
             for (int j = 0; j < cols(); j++) {
-                sum += array[offset + j] * vector.array[j];
+                sum += array[offset++] * vector.array[j];
             }
-            offset += cols();
+
+            start += cols();
             result[i] = sum;
         }
 
         return new Vector(result);
+    }
+
+    /**
+     * @param other: matrix to be transpose-multiplied
+     * @return {@code this} * {@code other}^T
+     * @throws IllegalArgumentException if matrices have different number of columns
+     */
+    public Matrix multiplyTranspose(Matrix other) {
+        Validator.assertEquals(cols(), other.cols());
+
+        double[] result = new double[rows() * other.rows()];
+
+        int offsetResult = 0, startThis = 0;
+        for (int i = 0; i < rows(); i++) {
+            int offsetOther = 0;
+
+            for (int j = 0; j < other.rows(); j++) {
+                int offsetThis = startThis;
+                double sum = 0;
+
+                for (int k = 0; k < cols(); k++) {
+                    sum += array[offsetThis++] * other.array[offsetOther++];
+                }
+
+                result[offsetResult] = sum;
+                offsetResult++;
+            }
+
+            startThis += cols();
+        }
+
+        return new Matrix(rows(), other.rows(), result);
     }
 
     /**
@@ -398,44 +434,33 @@ public class Matrix extends Tensor<Matrix> {
      * @throws IllegalArgumentException if the number of columns of {@code this} and the number of rows()() of {@code other} are distinct
      */
     public Matrix matrixMultiply(Matrix other) {
-        if (cols() != other.rows()) {
-            throw new IllegalArgumentException();
-        }
-        int size = rows() * other.cols();
-        double[] values = new double[size];
+        Validator.assertEquals(cols(), other.rows());
 
-        for (int p = 0; p < size; p++) {
-            int i = (p / other.cols()) * cols(), j = p % other.cols();
-            for (int k = 0; k < cols(); k++) {
-                values[p] += array[i + k] * other.array[k * other.cols() + j];
+        double[] values = new double[rows() * other.cols()];
+
+        int startThis = 0, startThat = 0;
+        for (int i = 0; i < rows(); i++) {
+            int offsetThat = 0;
+            int offsetThis = startThis;
+
+            for (int j = 0; j < other.rows(); j++) {
+                int offsetResult = startThat;
+                double value = array[offsetThis];
+
+                for (int k = 0; k < other.cols(); k++) {
+                    values[offsetResult++] += value * other.array[offsetThat++];
+                }
+
+                offsetThis++;
             }
+
+            startThis += cols();
+            startThat += other.cols();
         }
 
         return new Matrix(rows(), other.cols(), values);
     }
 
-    public Matrix multiplyTranspose(Matrix other) {
-        Validator.assertEquals(cols(), other.cols());
-
-        double[] result = new double[rows() * other.rows()];
-
-        int p = 0;
-        for (int i = 0; i < rows(); i++) {
-            int start = i * cols();
-            int offsetThis = start;
-            int offsetOther = 0;
-            for (int j = 0; j < other.rows(); j++) {
-                for (int k = 0; k < cols(); k++) {
-                    result[p] += array[offsetThis++] * other.array[offsetOther++];
-                }
-                offsetThis = start;
-                p++;
-            }
-        }
-
-        return new Matrix(rows(), other.rows(), result);
-    }
-    
     /* UTILITY FUNCTIONS */
 
     public Vector getRowSquaredNorms() {

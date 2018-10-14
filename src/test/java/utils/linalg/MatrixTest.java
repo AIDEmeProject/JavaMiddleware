@@ -638,6 +638,10 @@ public class MatrixTest {
         assertEquals(Vector.FACTORY.make(3, 6), matrix1.multiply(vector));
     }
 
+    /* ************************************
+     *    MATRIX-MATRIX MULTIPLICATION
+     * ************************************
+     */
     @Test
     void multiplyMatrix_matrixOfIncompatibleDimensions_throwsException() {
         assertThrows(RuntimeException.class, () -> matrix1.matrixMultiply(Matrix.FACTORY.zeros(1, 3)));
@@ -659,6 +663,11 @@ public class MatrixTest {
     void multiplyMatrix_customInputMatrix_returnsCorrectMatrixMultiplication() {
         Matrix matrix = Matrix.FACTORY.make(3, 2, -1, 2, 0, 0, 4, -5);
         assertEquals(Matrix.FACTORY.make(2, 2, 11, -13, 20, -22), matrix1.matrixMultiply(matrix));
+    }
+
+    @Test
+    void multiplyTranspose_differentNumberOfColumns_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.multiplyTranspose(Matrix.FACTORY.zeros(matrix1.rows(), matrix1.cols()+1)));
     }
 
     @Test
