@@ -129,6 +129,11 @@ public class Matrix extends Tensor<Matrix> {
         return new Vector(row);
     }
 
+    /**
+     * @param rows: row indexes to extract from {@code this} matrix
+     * @return a new matrix containing the input rows in the provided order
+     * @throws ArrayIndexOutOfBoundsException if any row index is out-of-bounds
+     */
     public Matrix getRows(int... rows) {
         Validator.assertNotEmpty(rows);
 
@@ -139,6 +144,12 @@ public class Matrix extends Tensor<Matrix> {
         return new Matrix(rows.length, cols(), slice);
     }
 
+    /**
+     * @param from: start index (inclusive)
+     * @param to: end index (exclusive)
+     * @return a copy of a slice of rows from the original matrix
+     * @throws IllegalArgumentException if indexes are out-of-bounds, or {@code from} is not smaller than {@code to}
+     */
     public Matrix getRowSlice(int from, int to) {
         if (from < 0 || from >= to || to > rows()) {
             throw new IllegalArgumentException("Invalid indexes " + from + " and " + to + " for matrix of " + rows() + " rows");
@@ -150,6 +161,12 @@ public class Matrix extends Tensor<Matrix> {
         return new Matrix(size, cols(), slice);
     }
 
+    /**
+     * Swap two rows in-place
+     * @param i: index of one row to swapped
+     * @param j: index of another row to be swapped
+     * @throws IllegalArgumentException if indexes are out-of-bounds
+     */
     public void swapRows(int i, int j) {
         Validator.assertIndexInBounds(i, 0, rows());
         Validator.assertIndexInBounds(j, 0, rows());
@@ -297,6 +314,9 @@ public class Matrix extends Tensor<Matrix> {
         return copy().applyBinaryFunctionToColumnsInplace(vector, op);
     }
 
+    /**
+     * @return the statistics (mean, std, ...) of each column in {@code this} matrix.
+     */
     public Statistics[] columnStatistics() {
         Statistics[] statistics = new Statistics[cols()];
 
@@ -463,6 +483,9 @@ public class Matrix extends Tensor<Matrix> {
 
     /* UTILITY FUNCTIONS */
 
+    /**
+     * @return a Vector containing the squared norm of each row in the matrix
+     */
     public Vector getRowSquaredNorms() {
         double[] norms = new double[rows()];
 

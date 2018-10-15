@@ -1,7 +1,10 @@
 package utils.linalg;
 
+import explore.statistics.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Array;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -138,6 +141,67 @@ public class MatrixTest {
     void getRow_runOverAllValidIndexes_correctVectorsReturned() {
         assertEquals(Vector.FACTORY.make(1, 2, 3), matrix1.getRow(0));
         assertEquals(Vector.FACTORY.make(4, 5, 6), matrix1.getRow(1));
+    }
+
+    @Test
+    void getRows_emtpyArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRows());
+    }
+
+    @Test
+    void getRows_outOfBoundsIndex_throwsException() {
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> matrix1.getRows(0, -1));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> matrix1.getRows(0, matrix1.rows()));
+    }
+
+    @Test
+    void getRows_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 3, 4, 5, 6, 1, 2, 3), matrix1.getRows(1, 0));
+    }
+
+    @Test
+    void getRowSlice_negativeFromIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRowSlice(-1, 0));
+    }
+
+    @Test
+    void getRowSlice_ToIndexLargerThanNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRowSlice(0, matrix1.rows()+1));
+    }
+
+    @Test
+    void getRowSlice_FromIndexEqualsToIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getRowSlice(0, 0));
+    }
+
+    @Test
+    void getRowSlice_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(1, 3, 4, 5, 6), matrix1.getRowSlice(1, 2));
+    }
+
+    @Test
+    void swapRows_negativeIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.swapRows(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.swapRows(0, -1));
+    }
+
+    @Test
+    void swapRows_indexEqualsToNumberOfRows_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.swapRows(matrix1.rows(), 0));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.swapRows(0, matrix1.rows()));
+    }
+
+    @Test
+    void swapRows_sameRowIndexes_matrixRemainsUnchanged() {
+        Matrix copy = matrix1.copy();
+        matrix1.swapRows(0, 0);
+        assertEquals(copy, matrix1);
+    }
+
+    @Test
+    void swapRows_differentRowIndexes_originalMatrixModifiedAsExpected() {
+        matrix1.swapRows(0, 1);
+        assertEquals(Matrix.FACTORY.make(2, 3, 4, 5, 6, 1, 2, 3), matrix1);
     }
 
     /* *************************************
@@ -839,6 +903,16 @@ public class MatrixTest {
      *           UTILITY METHODS
      * *************************************
      */
+
+    @Test
+    void columnStatistics_rectangularMatrix_returnsExpectedValues() {
+        Statistics[] expected = new Statistics[matrix1.cols()];
+        expected[0] = new Statistics("column_0", 2.5, 4.5, 2);
+        expected[1] = new Statistics("column_1", 3.5, 4.5, 2);
+        expected[2] = new Statistics("column_2", 4.5, 4.5, 2);
+        assertArrayEquals(expected, matrix1.columnStatistics());
+    }
+
     @Test
     void getRowSquaredNorms_rectangularMatrix_returnsExpectedValues() {
         assertEquals(Vector.FACTORY.make(14, 77), matrix1.getRowSquaredNorms());

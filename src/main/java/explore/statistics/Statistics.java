@@ -1,5 +1,7 @@
 package explore.statistics;
 
+import java.util.Objects;
+
 /**
  * This class holds statistical information from a particular metric, such as its mean, variance, and number of samples.
  * As new values for the same metric are observed, its internal statistics can be updated as well.
@@ -31,10 +33,14 @@ public class Statistics {
      * @param value: metric's initial value
      */
     public Statistics(String name, double value) {
+        this(name, value, 0D, 1);
+    }
+
+    public Statistics(String name, double mean, double variance, int sampleSize) {
         this.name = name;
-        this.mean = value;
-        this.variance = 0D;
-        this.sampleSize = 1;
+        this.mean = mean;
+        this.variance = variance;
+        this.sampleSize = sampleSize;
     }
 
     public String getName() {
@@ -71,6 +77,17 @@ public class Statistics {
         sampleSize++;
         mean += diff / sampleSize;
         variance += diff * (value - mean);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Statistics that = (Statistics) o;
+        return Double.compare(that.mean, mean) == 0 &&
+                Double.compare(that.variance, variance) == 0 &&
+                sampleSize == that.sampleSize &&
+                Objects.equals(name, that.name);
     }
 
     /**
