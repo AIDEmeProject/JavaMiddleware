@@ -11,11 +11,18 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <scala.version>2.12.7</scala.version>
+        <scala.version>2.12.4</scala.version>
         <scala.maven.plugin.version>3.3.2</scala.maven.plugin.version>
         <maven.shade.plugin.version>2.2</maven.shade.plugin.version>
         <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>mvnrepository</id>
+            <url>https://dl.bintray.com/cibotech/public/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -194,6 +201,12 @@
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>1.21</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.cibo/scalastan -->
+        <dependency>
+            <groupId>com.cibo</groupId>
+            <artifactId>scalastan_2.12</artifactId>
+            <version>0.7.4</version>
         </dependency>
     </dependencies>
 </project>
