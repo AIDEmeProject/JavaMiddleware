@@ -142,7 +142,7 @@ public final class PartitionedDataset {
      * @return the current label associated to this data point
      */
     public ExtendedLabel getLabel(DataPoint point) {
-        return labels[findPosition(point)];
+        return labels[findPosition(point.getId())];
     }
 
     /**
@@ -180,7 +180,7 @@ public final class PartitionedDataset {
     }
 
     private void updateMostInformativePointsPartition(LabeledPoint labeledPoint) {
-        int pos = findPosition(labeledPoint);
+        int pos = findPosition(labeledPoint.getId());
         labels[pos] = ExtendedLabel.fromLabel(labeledPoint.getLabel());
 
         if(pos >= unknownStart) {
@@ -223,10 +223,10 @@ public final class PartitionedDataset {
         array[j] = temp;
     }
 
-    private int findPosition(DataPoint point) {
-        Integer position = indexToPosition.get(point.getId());
+    private int findPosition(long id) {
+        Integer position = indexToPosition.get(id);
         if (position == null) {
-            throw new IllegalArgumentException("Point " + point + " not found.");
+            throw new IllegalArgumentException("ID " + id + " not found.");
         }
         return position;
     }

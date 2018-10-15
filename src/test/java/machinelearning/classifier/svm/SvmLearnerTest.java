@@ -31,7 +31,7 @@ class SvmLearnerTest {
         Classifier classifier = learner.fit(labeledPoints);
 
         for (LabeledPoint point : labeledPoints) {
-            assertEquals(point.getLabel(), classifier.predict(point));
+            assertEquals(point.getLabel(), classifier.predict(point.getData()));
         }
     }
 

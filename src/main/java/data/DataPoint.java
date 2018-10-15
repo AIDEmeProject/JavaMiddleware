@@ -13,12 +13,12 @@ public class DataPoint {
     /**
      * data point's unique id
      */
-    protected long id;
+    private long id;
 
     /**
      * data point's values
      */
-    protected Vector data;
+    private Vector data;
 
 
     /**
