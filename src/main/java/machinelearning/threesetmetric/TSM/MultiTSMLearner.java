@@ -79,6 +79,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
         tsmSet = new ArrayList<>();
         testStates = new ArrayList<>();
         backupTsmSet = new ArrayList<>();
+        System.out.println(Arrays.deepToString(tsmFlags.toArray()));
 
 
         // the following three int arrays are used to record conflicting points for TSM and initialized to be zero array.
@@ -107,7 +108,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     @Override
     public void update(Collection<LabeledPoint> labeledSamples) {
-        for(int i=0;i < tsmSet.size();i++){
+        for(int i=0;i < feaGroups.size();i++){
             if(tsmFlags.get(i)[1]){
                 // if the second element of flags array is true, the corresponding attribute is a categorical attribute
                 if(tsmSet.get(i)!=null){
@@ -136,7 +137,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
                         System.out.println(e.toString());
                     }
                 }
-                if(errTSM[i] >= threshold){
+                if(tsmSet.get(i) != null && errTSM[i] >= threshold){
                     tsmSet.set(i, null);
                 }
 
@@ -151,7 +152,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
                         System.out.println(e.toString());
                     }
                 }
-                if(errBackTSM[i] >= threshold){
+                if(backupTsmSet.get(i) != null && errBackTSM[i] >= threshold){
                     backupTsmSet.set(i, null);
                 }
 
@@ -160,7 +161,9 @@ public class MultiTSMLearner implements ExtendedClassifier {
                     testStates.set(i, 1);
                 }else if(tsmSet.get(i)==null && backupTsmSet.get(i)!=null){
                     tsmFlags.get(i)[0]=false;
+                    System.out.println("true to false");
                 }else if(tsmSet.get(i)!=null && backupTsmSet.get(i)==null){
+                    System.out.println("false to true");
                     tsmFlags.get(i)[0]=true;
                 }else {
                     tsmFlags.get(i)[0] = errTSM[i] <= errBackTSM[i];
@@ -181,9 +184,9 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     @Override
     public ExtendedLabel predict(DataPoint point) {
-        if(isInConvexRegion(point)){
+        if(isInPosRegion(point)){
             return ExtendedLabel.POSITIVE;
-        }else if(isInConcaveRegion(point)){
+        }else if(isInNegRegion(point)){
             return ExtendedLabel.NEGATIVE;
         }else {
             return ExtendedLabel.UNKNOWN;
@@ -195,7 +198,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
      * @param sample an example to be checked
      * @return true if the example is in the positive region, false otherwise
      */
-    public boolean isInConvexRegion (DataPoint sample) {
+    public boolean isInPosRegion (DataPoint sample) {
         ArrayList<Boolean> catTruth = new ArrayList<> ();
         for(int i=0; i < tsmSet.size(); i++){
             // for categorical variables, if the example is not on the truth lines, return false
@@ -209,11 +212,14 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 // for numerical variables
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
+                //System.out.println("tsmFlag is: " + flag);
                 if(flag){
+                    //System.out.println("TSM is used for prediction" + flag);
                     if(tsmSet.get(i) == null || !tsmSet.get(i).isInConvexRegion(newSample, true)){
                         return false;
                     }
                 }else {
+                    //System.out.println("backupTSM is used for prediction" + flag);
                     if(backupTsmSet.get(i)==null || !backupTsmSet.get(i).isInConvexRegion(newSample, false)){
                         return false;
                     }
@@ -229,7 +235,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
      * @param sample an example to be checked
      * @return true if the example is in the negative region, false otherwise
      */
-    public boolean isInConcaveRegion (DataPoint sample) {
+    public boolean isInNegRegion (DataPoint sample) {
         for(int i=0; i < tsmSet.size(); i++){
             if(tsmFlags.get(i)[1]){
                 if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample)){
@@ -238,11 +244,14 @@ public class MultiTSMLearner implements ExtendedClassifier {
             }else {
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
+                //System.out.println("tsmFlag is: " + flag);
                 if(flag){
+                    //System.out.println("TSM is used for prediction" + flag);
                     if(tsmSet.get(i)!= null && tsmSet.get(i).isInConcaveRegion(newSample, true)) {
                         return true;
                     }
                 } else {
+                    //System.out.println("backupTSM is used for prediction" + flag);
                     //todo: remove tsmFlags from threeset metric
                     if(backupTsmSet.get(i)!= null && backupTsmSet.get(i).isInConcaveRegion(newSample, false)) {
                         return true;
@@ -264,8 +273,8 @@ public class MultiTSMLearner implements ExtendedClassifier {
     private static Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, int index) {
         Collection<LabeledPoint> dataPointsCopy = new ArrayList<>();
         for(LabeledPoint dataPoint : labeledSamples){
-            System.out.println("the size of label list: " + dataPoint.getLabel().getLabelsForEachSubspace().length);
-            System.out.println("the type of labels: " + dataPoint.getLabel().getClass());
+//            System.out.println("the size of label list: " + dataPoint.getLabel().getLabelsForEachSubspace().length);
+//            System.out.println("the type of labels: " + dataPoint.getLabel().getClass());
             UserLabel label = dataPoint.getLabel().getLabelsForEachSubspace()[index];
             LabeledPoint partialPoint = new LabeledPoint(dataPoint.getSelectedAttributes(select_set), label);
             dataPointsCopy.add(partialPoint);
