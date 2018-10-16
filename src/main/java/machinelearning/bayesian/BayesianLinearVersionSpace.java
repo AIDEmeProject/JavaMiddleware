@@ -11,10 +11,35 @@ import utils.linalg.Vector;
 
 import java.util.Arrays;
 
+
+/**
+ * A Bayesian Version Space maintains a probability distribution over the parameters of a classifier (for example, the weights
+ * of a Linear Classifier) instead of maintaining cuts. Such distribution is defined by means of the Bayes rule, and it is
+ * fitted over labeled data. An advantage of this method is it supports noisy labeling, in contrast with usual Version
+ * Space algorithms.
+ *
+ * In the particular case of this class, we sample Linear Classifiers through this Bayesian approach.
+ *
+ * @see StanLogisticRegressionSampler
+ */
 public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier> {
+    /**
+     * Whether to fit the intercept
+     */
     private final boolean addIntercept;
+
+    /**
+     * Stan sampler
+     */
     private final StanLogisticRegressionSampler sampler;
 
+    /**
+     * @param warmup: number of initial samples to skip
+     * @param thin: only keep every "thin" sample after warm-up phase
+     * @param sigma: standard deviation of gaussian prior
+     * @param addIntercept: whether to fit intercept
+     * @throws IllegalArgumentException if warmup, thin, or sigma are negative
+     */
     public BayesianLinearVersionSpace(int warmup, int thin, double sigma, boolean addIntercept) {
         Validator.assertPositive(warmup);
         Validator.assertPositive(thin);
@@ -26,6 +51,8 @@ public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier
 
     @Override
     public MajorityVote<LinearClassifier> sample(LabeledDataset labeledPoints, int numSamples) {
+        Validator.assertPositive(numSamples);
+
         Matrix data = labeledPoints.getData();
         if (addIntercept) {
             data = data.addBiasColumn();
