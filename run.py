@@ -31,7 +31,7 @@ NUM_RUNS = 1
 BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [5]
+RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
@@ -44,11 +44,18 @@ METRICS = [
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
-ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
+# ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
+#     num_samples=8,
+#     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
+#     kernel='gaussian', gamma=0,  # kernel
+#     add_intercept=True, solver="ojalgo")  # extra
+# )
+
+ACTIVE_LEARNER = UncertaintySampler(BayesianMajorityVote(
     num_samples=8,
-    warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
+    warmup=100, thin=10, sigma=1e5,  # sampling
     kernel='gaussian', gamma=0,  # kernel
-    add_intercept=True, solver="ojalgo")  # extra
+    add_intercept=True)  # extra
 )
 
 

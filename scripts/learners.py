@@ -70,6 +70,18 @@ class HitAndRun(Printable):
         self.selector = selector
 
 
+class BayesianSampler(Printable):
+    def __init__(self, warmup, thin, sigma):
+        super().__init__(add_name=False)
+        assert_positive("warmup", warmup)
+        assert_positive("thin", thin)
+        assert_positive("sigma", sigma)
+
+        self.warmup = warmup
+        self.thin = thin
+        self.sigma = sigma
+
+
 class VersionSpace(Printable):
     def __init__(self, hit_and_run,
                  kernel='linear', gamma=0,
@@ -82,6 +94,15 @@ class VersionSpace(Printable):
         self.solver = solver
         self.kernel = Kernel(kernel, gamma)
         self.hitAndRunSampler = hit_and_run
+
+
+class BayesianVersionSpace(Printable):
+    def __init__(self, warmup, thin, sigma, kernel='linear', gamma=0, add_intercept=True):
+        super().__init__(add_name=False)
+
+        self.addIntercept = add_intercept
+        self.kernel = Kernel(kernel, gamma)
+        self.bayesianSampler = BayesianSampler(warmup, thin, sigma)
 
 
 class MajorityVote(Learner):
@@ -102,3 +123,23 @@ class MajorityVote(Learner):
             kernel=kernel, gamma=gamma,
             add_intercept=add_intercept, solver=solver
         )
+
+
+class BayesianMajorityVote(Learner):
+    def __init__(self, num_samples=8,
+                 warmup=100, thin=10, sigma=1.0,
+                 kernel='linear', gamma=0,
+                 add_intercept=True):
+        super().__init__(name="MajorityVote")
+
+        self.sampleSize = num_samples
+        self.versionSpace = BayesianVersionSpace(
+            warmup=warmup, thin=thin, sigma=sigma,
+            kernel=kernel, gamma=gamma,
+            add_intercept=add_intercept
+        )
+
+
+
+
+

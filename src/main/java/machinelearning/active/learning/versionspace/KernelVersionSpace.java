@@ -28,7 +28,7 @@ public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
     /**
      * {@link LinearVersionSpace} instance used for sampling
      */
-    private final LinearVersionSpace linearVersionSpace;
+    private final VersionSpace<LinearClassifier> linearVersionSpace;
 
     /**
      * {@link Kernel} function
@@ -40,7 +40,7 @@ public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
      * @param kernel: the kernel function
      * @throws NullPointerException if sampler or kernel is null
      */
-    public KernelVersionSpace(LinearVersionSpace linearVersionSpace, Kernel kernel) {
+    public KernelVersionSpace(VersionSpace<LinearClassifier> linearVersionSpace, Kernel kernel) {
         Validator.assertNotNull(linearVersionSpace);
         Validator.assertNotNull(kernel);
         this.linearVersionSpace = linearVersionSpace;
