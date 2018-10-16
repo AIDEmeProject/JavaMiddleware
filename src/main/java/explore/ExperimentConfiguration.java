@@ -101,8 +101,13 @@ public final class ExperimentConfiguration {
                     .collect(Collectors.toList());
             System.out.println(featureGroups.size());
             System.out.println(Arrays.toString(featureGroupIndexes.get(0)));
-            return Optional.of(new MultiTSMLearner(featureGroupIndexes, flags));
+            return Optional.of(new MultiTSMLearner(featureGroupIndexes, getFlagsCopy()));
         }
+
+        private List<boolean[]> getFlagsCopy() {
+            return flags.stream().map(boolean[]::clone).collect(Collectors.toList());
+        }
+
 
         private int[] getColumnIndex(String[] attributes) {
             return Arrays.stream(attributes).mapToInt(this::getColumnIndex).toArray();
