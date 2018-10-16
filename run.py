@@ -28,7 +28,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 25
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1]
@@ -53,7 +53,7 @@ METRICS = [
 
 ACTIVE_LEARNER = UncertaintySampler(BayesianMajorityVote(
     num_samples=8,
-    warmup=100, thin=10, sigma=1e5,  # sampling
+    warmup=100, thin=1, sigma=1e5,  # sampling
     kernel='gaussian', gamma=0,  # kernel
     add_intercept=True)  # extra
 )

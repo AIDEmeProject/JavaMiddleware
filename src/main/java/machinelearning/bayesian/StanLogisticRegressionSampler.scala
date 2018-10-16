@@ -30,19 +30,20 @@ class StanLogisticRegressionSampler(warmup: Int, thin: Int, sigma: Double) {
     * @return a collection of samples obtained from the posterior distribution fitted over (xs, ys)
     */
   def run(numSamples: Int, xs: Array[Array[Double]], ys: Array[Int]): Array[Array[Double]] = {
-    val iters = warmup + thin * numSamples
+    val iters = thin * numSamples
     val results = StanLogisticRegressionSampler.model
+        .withData(StanLogisticRegressionSampler.N, xs.length)
+        .withData(StanLogisticRegressionSampler.D, xs(0).length)
         .withData(StanLogisticRegressionSampler.x, xs.toSeq.map(t => t.toSeq))
         .withData(StanLogisticRegressionSampler.y, ys.toSeq)
         .withData(StanLogisticRegressionSampler.sigma, sigma)
-        .run(chains = 1, method = RunMethod.Sample(samples = iters))
+        .run(chains = 1, method = RunMethod.Sample(samples = iters, warmup=warmup, thin=thin))
 
-    val sample = results.samples(StanLogisticRegressionSampler.beta)
-      .head  // there is only a single chain
-      .drop(warmup)  // skip initial "warmup" samples
-      .zipWithIndex.collect {case (e,i) if ((i+1) % thin) == 0 => e}  // get every "thin" sample
-
-    sample.map(t => t.toArray).toArray
+    results
+      .samples(StanLogisticRegressionSampler.beta)  // get beta samples
+      .head  // there is only one chain
+      .map(t => t.toArray)  // convert each sample to array
+      .toArray  // return an array
   }
 }
 
