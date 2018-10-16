@@ -98,13 +98,13 @@ public class TsmLearner extends CatTSM {
                 if (t.getLabel().isPositive()) {
                     // check whether a positive point(including the boundary) is inside the concave region or not
                     if(isInConcaveRegion(point)){
-                        throw new IllegalArgumentException("a positive point cannot be inside the concave(negative) region: " + Arrays.toString(point));
+                        throw new IllegalArgumentException("Pos in concave : " + Arrays.toString(point));
                     }
                     updateConvexRegion(point);
                 } else {
                     // check whether a negative point (including the boundary) is inside the convex region or not
-                    if(convexRegion!=null && convexRegion.containsPoint(point)){
-                        throw new IllegalArgumentException("a negative point cannot be inside the convex(positive) region: " + Arrays.toString(point));
+                    if(isInConvexRegion(point)){
+                        throw new IllegalArgumentException("Neg in convex : " + Arrays.toString(point));
                     }
                     updateConcaveRegion(point);
                 }
@@ -130,13 +130,13 @@ public class TsmLearner extends CatTSM {
                 if (t.getLabel().isNegative()) {
                     // check whether a negative point(including the boundary) is inside the concave region or not
                     if(isInConcaveRegion(point)){
-                        throw new IllegalArgumentException("a negative point cannot be inside the concave(negative) region: " + Arrays.toString(point));
+                        throw new IllegalArgumentException("Neg in concave : " + Arrays.toString(point));
                     }
                     updateConvexRegion(point);
                 } else {
                     // check whether a positive point( including the boundary) is inside the convex region or not
-                    if(convexRegion!=null && convexRegion.containsPoint(point)){
-                        throw new IllegalArgumentException("a positive point cannot be inside the convex(negative) region: " + Arrays.toString(point));
+                    if(isInConvexRegion(point)){
+                        throw new IllegalArgumentException("Pos in convex : " + Arrays.toString(point));
                     }
 
                     updateConcaveRegion(point);

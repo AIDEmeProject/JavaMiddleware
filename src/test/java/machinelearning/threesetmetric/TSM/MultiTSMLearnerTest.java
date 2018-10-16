@@ -113,17 +113,17 @@ class MultiTSMLearnerTest {
 
     @Test
     void isInConvexRegion_t() {
-        assertTrue(multiTSMLearner.isInConvexRegion(new DataPoint(0, new double[]{6, 1.7, 2.25, 2016, 69390, 0, 0, 1, 0})));
+        assertTrue(multiTSMLearner.isInPosRegion(new DataPoint(0, new double[]{6, 1.7, 2.25, 2016, 69390, 0, 0, 1, 0})));
     }
 
     @Test
     void isInConvexRegion_f() {
-        assertEquals(false, multiTSMLearner.isInConvexRegion(new DataPoint(0, new double[]{9,1.7,2.5,2016,69390,0,0,1,0})));
+        assertEquals(false, multiTSMLearner.isInNegRegion(new DataPoint(0, new double[]{9,1.7,2.5,2016,69390,0,0,1,0})));
     }
 
     @Test
     void isInConcaveRegion_t() {
-        assertEquals(true, multiTSMLearner.isInConcaveRegion(new DataPoint(0, new double[]{5.2451,1.49098,1.89992,2015,69390,0,0,1,0})));
+        assertEquals(true, multiTSMLearner.isInPosRegion(new DataPoint(0, new double[]{5.2451,1.49098,1.89992,2015,69390,0,0,1,0})));
     }
 
 //    @Test

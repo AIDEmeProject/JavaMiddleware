@@ -7,8 +7,8 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-#TASK = "sdss_Q1_0.1%"
-TASK = "sdss_Q2_circle_1%_Q3_rect_1%"
+TASK = "sdss_Q4_0.1%"
+#TASK = "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%"
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 5000
@@ -18,16 +18,17 @@ MODES = [
     'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    #'AVERAGE'    # average all evaluation file for a given metric
+    # 'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 300
+BUDGET = 100
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
+#RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
@@ -60,7 +61,7 @@ mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UN
 
 # Active Learning algorithm to run. Necessary for RUN and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0.5)
+ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
 # ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
 #     num_samples=8,
