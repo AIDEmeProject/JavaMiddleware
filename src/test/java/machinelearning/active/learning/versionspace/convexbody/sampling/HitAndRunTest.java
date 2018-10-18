@@ -9,8 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 import utils.linalg.Vector;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -29,17 +27,12 @@ class HitAndRunTest {
 
     @Test
     void constructor_nullConvexBody_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRun(null, directionSampler, new Random()));
+        assertThrows(NullPointerException.class, () -> new HitAndRun(null, directionSampler));
     }
 
     @Test
     void constructor_nullDirectionSampler_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRun(convexBody, null, new Random()));
-    }
-
-    @Test
-    void constructor_nullRandomNumberGenerator_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRun(convexBody, directionSampler, null));
+        assertThrows(NullPointerException.class, () -> new HitAndRun(convexBody, null));
     }
 
     @Test

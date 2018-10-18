@@ -7,6 +7,7 @@ import explore.metrics.MetricCalculator;
 import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
+import utils.RandomState;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,7 +36,6 @@ public final class Evaluate {
         Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
         try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-
             long iter = 0;
             long numberOfPreviousIters = countLinesOfFile(evalFile);
 
@@ -46,6 +46,8 @@ public final class Evaluate {
                     continue;
                 }
 
+                setRandomSeed(id, partitionedDataset);
+
                 Map<String, Double> metrics = metricCalculator.compute(partitionedDataset, user).getMetrics();
 
                 writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
@@ -53,6 +55,10 @@ public final class Evaluate {
         } catch (IOException ex) {
             throw new RuntimeException("evaluation failed.", ex);
         }
+    }
+
+    private void setRandomSeed(int id, PartitionedDataset partitionedDataset) {
+        RandomState.setSeed(10000L * id + partitionedDataset.numberOfLabeledPoints());
     }
 
     private static long countLinesOfFile(Path file) {

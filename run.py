@@ -18,9 +18,9 @@ UNKNOWN_SET_SAMPLE_PROBABILITY = 0.5
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    'NEW',       # run new exploration
-    #'RESUME',    # resume a previous exploration
-    'EVAL',      # run evaluation procedure over finished runs
+    #'NEW',       # run new exploration
+    'RESUME',    # resume a previous exploration
+    #'EVAL',      # run evaluation procedure over finished runs
     #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
@@ -28,7 +28,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 25
+BUDGET = 2
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1]
@@ -44,19 +44,19 @@ METRICS = [
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
-# ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
-#     num_samples=8,
-#     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
-#     kernel='gaussian', gamma=0,  # kernel
-#     add_intercept=True, solver="ojalgo")  # extra
-# )
-
-ACTIVE_LEARNER = UncertaintySampler(BayesianMajorityVote(
+ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
     num_samples=8,
-    warmup=100, thin=1, sigma=1e5,  # sampling
+    warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0,  # kernel
-    add_intercept=True)  # extra
+    add_intercept=True, solver="ojalgo")  # extra
 )
+
+# ACTIVE_LEARNER = UncertaintySampler(BayesianMajorityVote(
+#     num_samples=8,
+#     warmup=100, thin=1, sigma=1e5,  # sampling
+#     kernel='gaussian', gamma=0,  # kernel
+#     add_intercept=True)  # extra
+# )
 
 
 #############################

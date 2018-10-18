@@ -4,6 +4,7 @@ import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
 import machinelearning.active.learning.versionspace.convexbody.LineSegment;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
+import utils.RandomState;
 import utils.Validator;
 import utils.linalg.Vector;
 
@@ -36,34 +37,21 @@ public final class HitAndRun {
     private DirectionSampler directionSampler;
 
     /**
-     * Random number generator
-     */
-    private final Random rand;
-
-    /**
      * Hit-and-Run chain starting point
      */
     private final Vector initialSample;
 
     /**
-     * Initialize random state to new Random().
-     */
-    public HitAndRun(ConvexBody body, DirectionSampler directionSampler){
-        this(body, directionSampler, new Random());
-    }
-
-    /**
      * @throws NullPointerException if any of the input parameters are null
      */
-    public HitAndRun(ConvexBody body, DirectionSampler directionSampler, Random rand) {
+    public HitAndRun(ConvexBody body, DirectionSampler directionSampler) {
         this.body = Objects.requireNonNull(body);
         this.directionSampler = Objects.requireNonNull(directionSampler);
-        this.rand = Objects.requireNonNull(rand);
         this.initialSample = body.getInteriorPoint();
     }
 
     /**
-     * @return a new Hit-and-Run chain. All chains will share the same random state  TODO: can we avoid this?
+     * @return a new Hit-and-Run chain. All chains have their own, independent random state
      */
     public final Chain newChain() {
         return new Chain(initialSample);
@@ -79,17 +67,23 @@ public final class HitAndRun {
          */
         private Vector currentSample;
 
+        /**
+         * Random number generator
+         */
+        private final Random random;
+
         private Chain(Vector currentSample) {
             this.currentSample = currentSample;
+            this.random = RandomState.newInstance();
         }
 
         /**
          * @return the next sample of this Markov Chain. It corresponds to the lines 3 to 5 in the pseudo-code above.
          */
         public Vector advance() {
-            Line line = new Line(currentSample, directionSampler.sampleDirection(rand));
+            Line line = new Line(currentSample, directionSampler.sampleDirection(random));
             LineSegment segment = body.computeLineIntersection(line);
-            currentSample = segment.getPoint(rand.nextDouble());
+            currentSample = segment.getPoint(random.nextDouble());
             return currentSample;
         }
 

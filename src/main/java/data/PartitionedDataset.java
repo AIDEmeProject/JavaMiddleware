@@ -109,6 +109,10 @@ public final class PartitionedDataset {
         return inferredStart > 0;
     }
 
+    public int numberOfLabeledPoints() {
+        return inferredStart;
+    }
+
     /**
      * @return a list of data points outside of the MOST INFORMATIVE partition (i.e. INFERRED LABELS + UNKNOWN partitions)
      */

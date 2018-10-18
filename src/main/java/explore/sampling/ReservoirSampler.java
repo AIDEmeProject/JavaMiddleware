@@ -1,5 +1,6 @@
 package explore.sampling;
 
+import utils.RandomState;
 import utils.Validator;
 
 import java.util.ArrayList;
@@ -15,16 +16,6 @@ import java.util.function.Predicate;
  * @author luciano
  */
 public class ReservoirSampler {
-
-    private static final Random random = new Random();
-
-    /**
-     * Set the seed for the internal random generator. Used when one wants reproducibility.
-     * @param seed: new seed
-     */
-    public static void setSeed(long seed){
-        random.setSeed(seed);
-    }
 
     /**
      * Extracts a random sample from a collection. We can also specify a filter function for ignoring certain elements.
@@ -44,6 +35,7 @@ public class ReservoirSampler {
             return collection;
         }
 
+        Random random = RandomState.newInstance();
         int index = 0;
         ArrayList<T> result = new ArrayList<>(sampleSize);
 

@@ -57,11 +57,6 @@ class HitAndRunSamplerTest {
     }
 
     @Test
-    void builder_nullRandom_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunSampler.Builder(directionSamplingAlgorithm, selector).random(null));
-    }
-
-    @Test
     void sample_mockDirectionSamplingAlgorithm_fitCalledOnce() {
         ConvexBody body = mock(ConvexBody.class);
 

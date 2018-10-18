@@ -5,10 +5,10 @@ import data.IndexedDataset;
 import data.PartitionedDataset;
 import explore.user.User;
 import machinelearning.active.Ranker;
+import utils.RandomState;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * This module encodes a typical iteration of the Active Learning exploration phase, after the Initial Sampling phase.
@@ -42,7 +42,7 @@ class ExploreIteration extends Iteration {
 
     @Override
     List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
-        IndexedDataset unlabeledData = new Random().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
+        IndexedDataset unlabeledData = RandomState.newInstance().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
         IndexedDataset sample = unlabeledData.sample(subsampleSize);
         return Collections.singletonList(ranker.top(sample));
     }

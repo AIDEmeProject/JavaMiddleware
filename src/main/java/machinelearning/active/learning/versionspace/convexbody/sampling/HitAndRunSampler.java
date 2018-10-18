@@ -9,7 +9,6 @@ import utils.Validator;
 import utils.linalg.Vector;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * This class is responsible for configuring a sampling strategy for the Hit-and-Run algorithm. We can configure 4 sampling
@@ -24,7 +23,6 @@ public class HitAndRunSampler {
     private final DirectionSamplingAlgorithm directionSamplingAlgorithm;
     private final SampleSelector sampleSelector;
     private final SampleCache sampleCache;
-    private final Random random;
 
     /**
      * Builder instance of HitAndRunSampler objects. All sampling configurations can be set through here.
@@ -45,11 +43,6 @@ public class HitAndRunSampler {
          */
         private SampleCache cache = new SampleCacheStub();
 
-        /**
-         * Random number generator. By default, a Random() instance is used.
-         */
-        private Random random = new Random();
-
         public Builder(DirectionSamplingAlgorithm directionSamplingAlgorithm, SampleSelector selector) {
             this.directionSamplingAlgorithm = Objects.requireNonNull(directionSamplingAlgorithm);
             this.selector = Objects.requireNonNull(selector);
@@ -63,11 +56,6 @@ public class HitAndRunSampler {
             return this;
         }
 
-        public Builder random(Random random) {
-            this.random = Objects.requireNonNull(random);
-            return this;
-        }
-
         public HitAndRunSampler build() {
             return new HitAndRunSampler(this);
         }
@@ -77,7 +65,6 @@ public class HitAndRunSampler {
         this.directionSamplingAlgorithm = builder.directionSamplingAlgorithm;
         this.sampleSelector = builder.selector;
         this.sampleCache = builder.cache;
-        this.random = builder.random;
     }
 
     /**
@@ -90,7 +77,7 @@ public class HitAndRunSampler {
 
         body = sampleCache.attemptToSetDefaultInteriorPoint(body);
 
-        HitAndRun chain = new HitAndRun(body, directionSamplingAlgorithm.fit(body), random);
+        HitAndRun chain = new HitAndRun(body, directionSamplingAlgorithm.fit(body));
         Vector[] samples = sampleSelector.select(chain, numSamples);
 
         sampleCache.updateCache(samples);

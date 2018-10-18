@@ -10,6 +10,7 @@ import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
 import machinelearning.active.Ranker;
+import utils.RandomState;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,6 +66,7 @@ public final class Explore {
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
             Ranker ranker = null;
+            setRandomSeed(id, partitionedDataset);
             if (partitionedDataset.hasLabeledPoints()) {
                 ranker = configuration.getActiveLearner().fit(partitionedDataset.getLabeledPoints());
             }
@@ -81,6 +83,8 @@ public final class Explore {
                 StatisticsCollection timeMeasurements = new StatisticsCollection();
 
                 int num = budgetedUser.getNumberOfLabeledPoints();
+                setRandomSeed(id, partitionedDataset);
+
                 while(budgetedUser.getNumberOfLabeledPoints() == num && partitionedDataset.hasUnknownPoints()) {
                     Iteration.Result result = iteration.run(partitionedDataset, budgetedUser, ranker);
                     ranker = result.getRanker();
@@ -96,6 +100,10 @@ public final class Explore {
             //TODO: log error
             throw new RuntimeException("Exploration failed.", ex);
         }
+    }
+
+    private void setRandomSeed(int id, PartitionedDataset partitionedDataset) {
+        RandomState.setSeed(10000L * id + partitionedDataset.numberOfLabeledPoints());
     }
 
     private static Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {

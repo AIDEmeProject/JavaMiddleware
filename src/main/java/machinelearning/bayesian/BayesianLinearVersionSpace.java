@@ -5,6 +5,7 @@ import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.MajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
+import utils.RandomState;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -62,7 +63,7 @@ public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier
                 .mapToInt(Label::asBinary)
                 .toArray();
 
-        double[][] samples = sampler.run(numSamples, data.toArray(), ys);
+        double[][] samples = sampler.run(numSamples, data.toArray(), ys, RandomState.newInstance().nextInt());
 
         return new MajorityVote<>(Arrays.stream(samples)
                 .map(Vector.FACTORY::make)
