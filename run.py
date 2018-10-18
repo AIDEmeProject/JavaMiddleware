@@ -7,7 +7,7 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-TASK = "sdss_Q1_0.1%"
+TASKS = ["sdss_Q1_0.1%", "sdss_Q3_0.1%"]
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 50000
@@ -28,7 +28,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 15
+BUDGET = 10
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1]
@@ -70,29 +70,33 @@ assert_positive("BUDGET", BUDGET)
 assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
 # BUILD EXPERIMENT
-experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
-experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER,
-                        sample_from_unknown_region_probability=UNKNOWN_SET_SAMPLE_PROBABILITY)
-experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
+for TASK in TASKS:
+    experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
+    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER,
+                            sample_from_unknown_region_probability=UNKNOWN_SET_SAMPLE_PROBABILITY)
+    experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
-# BUILD COMMAND LINE ARGUMENTS
-command_line = [
-    "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
-    "--experiment_dir", experiment_dir,
-    "--mode", ' '.join(MODES),
-    "--num_runs", str(NUM_RUNS),
-    "--budget", str(BUDGET),
-]
+    # BUILD COMMAND LINE ARGUMENTS
+    command_line = [
+        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
+        "--experiment_dir", experiment_dir,
+        "--mode", ' '.join(MODES),
+        "--num_runs", str(NUM_RUNS),
+        "--budget", str(BUDGET),
+    ]
 
-if RUNS:
-    command_line.append("--runs")
-    command_line.append(' '.join(map(str, RUNS)))
+    if RUNS:
+        command_line.append("--runs")
+        command_line.append(' '.join(map(str, RUNS)))
 
-if METRICS and ('EVAL' in MODES or 'AVERAGE' in MODES):
-    command_line.append("--metrics")
-    for m in METRICS:
-        assert_is_instance(m, Metric)
-        command_line.append(str(m))
-        m.dump_to_config_file(experiment_dir, add_name=True)
+    if METRICS and ('EVAL' in MODES or 'AVERAGE' in MODES):
+        command_line.append("--metrics")
+        for m in METRICS:
+            assert_is_instance(m, Metric)
+            command_line.append(str(m))
+            m.dump_to_config_file(experiment_dir, add_name=True)
 
-subprocess.run(' '.join(command_line), shell=True)
+    try:
+        subprocess.run(' '.join(command_line), shell=True)
+    except:
+        print("Task " + TASK + " failed")
