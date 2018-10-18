@@ -59,6 +59,8 @@ public final class Explore {
     }
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
+        setRandomSeed(id);
+
         PartitionedDataset partitionedDataset = getPartitionedDataset(id);
         BudgetedUser budgetedUser = new BudgetedUser(user, budget);
 
@@ -66,7 +68,6 @@ public final class Explore {
              BufferedWriter metricsWriter = Files.newBufferedWriter(folder.getEvalFile("Timing", id), openOption)) {
 
             Ranker ranker = null;
-            setRandomSeed(id, partitionedDataset);
             if (partitionedDataset.hasLabeledPoints()) {
                 ranker = configuration.getActiveLearner().fit(partitionedDataset.getLabeledPoints());
             }
@@ -83,7 +84,6 @@ public final class Explore {
                 StatisticsCollection timeMeasurements = new StatisticsCollection();
 
                 int num = budgetedUser.getNumberOfLabeledPoints();
-                setRandomSeed(id, partitionedDataset);
 
                 while(budgetedUser.getNumberOfLabeledPoints() == num && partitionedDataset.hasUnknownPoints()) {
                     Iteration.Result result = iteration.run(partitionedDataset, budgetedUser, ranker);
@@ -102,8 +102,8 @@ public final class Explore {
         }
     }
 
-    private void setRandomSeed(int id, PartitionedDataset partitionedDataset) {
-        RandomState.setSeed(10000L * id + partitionedDataset.numberOfLabeledPoints());
+    private void setRandomSeed(int id) {
+        RandomState.setSeed(1000L * id);
     }
 
     private static Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {

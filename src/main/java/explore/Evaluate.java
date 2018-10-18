@@ -29,11 +29,13 @@ public final class Evaluate {
     }
 
     public void evaluate(int id, String calculatorIdentifier) {
+        Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
+
         MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
 
         PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
 
-        Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
+        setRandomSeed(id);
 
         try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             long iter = 0;
@@ -46,8 +48,6 @@ public final class Evaluate {
                     continue;
                 }
 
-                setRandomSeed(id, partitionedDataset);
-
                 Map<String, Double> metrics = metricCalculator.compute(partitionedDataset, user).getMetrics();
 
                 writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
@@ -57,8 +57,8 @@ public final class Evaluate {
         }
     }
 
-    private void setRandomSeed(int id, PartitionedDataset partitionedDataset) {
-        RandomState.setSeed(10000L * id + partitionedDataset.numberOfLabeledPoints());
+    private void setRandomSeed(int id) {
+        RandomState.setSeed(1000L * id);
     }
 
     private static long countLinesOfFile(Path file) {
