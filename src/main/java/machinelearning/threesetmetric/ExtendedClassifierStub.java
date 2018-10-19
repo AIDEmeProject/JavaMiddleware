@@ -53,4 +53,21 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
         return ExtendedLabel.UNKNOWN;
     }
 
+    /**
+     * @return true --> tsm is still running
+     */
+
+    @Override
+    public boolean getState(){
+        return true;
+    }
+
+
+    /**
+     * @return false --> no relabeling is required
+     */
+    public boolean thriggerRelabeling(){
+        return false;
+    }
+
 }

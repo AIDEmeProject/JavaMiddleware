@@ -30,6 +30,7 @@ public interface ExtendedClassifier {
     //
     void update(Collection<LabeledPoint> labeledPoint);
 
+
     /**
      * @param dataPoint: a data point
      * @return the predicted label for input point
@@ -45,4 +46,16 @@ public interface ExtendedClassifier {
                 .map(this::predict)
                 .toArray(ExtendedLabel[]::new);
     }
+
+
+    /**
+     * @return true if at least one partition of tsm is still running, false otherwise
+     */
+    boolean getState();
+
+
+    /**
+     * @return true if any partition of tsm has failed and relabeling is required, false otherwise
+     */
+    boolean thriggerRelabeling();
 }

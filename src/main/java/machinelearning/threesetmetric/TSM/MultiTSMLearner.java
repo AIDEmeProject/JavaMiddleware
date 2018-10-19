@@ -37,12 +37,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
     private final List<boolean[]> tsmFlags;
 
     /**
-     * Test the correctness of TSMs construction. For each element:
-     * 0: untested; 1: TSM is invalid and assigned to be null, release memory
-     */
-    private List<Integer> testStates;
-
-    /**
      * The opposite way to create TSM -- build convex polytope for negative regions
      */
     private final List<TsmLearner> backupTsmSet;
@@ -69,6 +63,13 @@ public class MultiTSMLearner implements ExtendedClassifier {
     private static int threshold = 1;
 
     /**
+     * Test the correctness of TSMs construction. For each element:
+     * 0: untested; 1: TSM is invalid and assigned to be null, release memory
+     */
+    private List<Integer> testStates;
+
+
+    /**
      * @param feaGroups partition of attributes represented by indices
      * @param tsmFlags a list of indicators that correspond to attributes partition
      */
@@ -79,8 +80,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
         tsmSet = new ArrayList<>();
         testStates = new ArrayList<>();
         backupTsmSet = new ArrayList<>();
-        System.out.println(Arrays.deepToString(tsmFlags.toArray()));
-
 
         // the following three int arrays are used to record conflicting points for TSM and initialized to be zero array.
         errTSM = new int[feaGroups.size()];
@@ -136,10 +135,12 @@ public class MultiTSMLearner implements ExtendedClassifier {
                         System.out.println("-2-");
                         System.out.println(e.toString());
                     }
+
+                    if(errTSM[i] >= threshold){
+                        tsmSet.set(i, null);
+                    }
                 }
-                if(tsmSet.get(i) != null && errTSM[i] >= threshold){
-                    tsmSet.set(i, null);
-                }
+
 
                 if(backupTsmSet.get(i)!=null){
                     try{
@@ -151,27 +152,30 @@ public class MultiTSMLearner implements ExtendedClassifier {
                         System.out.println("-4-");
                         System.out.println(e.toString());
                     }
-                }
-                if(backupTsmSet.get(i) != null && errBackTSM[i] >= threshold){
-                    backupTsmSet.set(i, null);
+                    if(errBackTSM[i] >= threshold){
+                        backupTsmSet.set(i, null);
+                    }
                 }
 
+
+                //todo: add automatic conflicting points check and run test experiments
                 boolean oldFlag = tsmFlags.get(i)[0];
-                if(tsmSet.get(i)==null && backupTsmSet.get(i) == null){
+                if(tsmSet.get(i) == null && backupTsmSet.get(i) == null){
                     testStates.set(i, 1);
-                }else if(tsmSet.get(i)==null && backupTsmSet.get(i)!=null){
-                    tsmFlags.get(i)[0]=false;
-                    System.out.println("true to false");
-                }else if(tsmSet.get(i)!=null && backupTsmSet.get(i)==null){
-                    System.out.println("false to true");
-                    tsmFlags.get(i)[0]=true;
+                }else if(tsmSet.get(i) == null && backupTsmSet.get(i) != null){
+                    if(oldFlag){
+                        tsmFlags.get(i)[0] = false;
+                        isFlagChanged[i] = 1;
+                        System.out.println("true to false");
+                    }
+                }else if(tsmSet.get(i) != null && backupTsmSet.get(i) == null){
+                    if(!oldFlag){
+                        tsmFlags.get(i)[0] = true;
+                        isFlagChanged[i] = 1;
+                        System.out.println("false to true");
+                    }
                 }else {
                     tsmFlags.get(i)[0] = errTSM[i] <= errBackTSM[i];
-                }
-                if(tsmFlags.get(i)[0]==oldFlag){
-                    isFlagChanged[i] = 0;
-                }else {
-                    isFlagChanged[i] = 1;
                 }
             }
         }
@@ -193,6 +197,22 @@ public class MultiTSMLearner implements ExtendedClassifier {
         }
     }
 
+
+    /**
+     * @return true if at least one partition of tsm is still running, false otherwise
+     */
+    public boolean getState(){
+        return !isTSMsetNull();
+    }
+
+
+    /**
+     * @return true if any partition of tsm has failed and relabeling is required, false otherwise
+     */
+    public boolean thriggerRelabeling(){
+        return Arrays.stream(isFlagChanged).anyMatch(x -> x == 1);
+    }
+
     /**
      * Verify if an example is positive
      * @param sample an example to be checked
@@ -212,14 +232,11 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 // for numerical variables
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
-                //System.out.println("tsmFlag is: " + flag);
                 if(flag){
-                    //System.out.println("TSM is used for prediction" + flag);
                     if(tsmSet.get(i) == null || !tsmSet.get(i).isInConvexRegion(newSample, true)){
                         return false;
                     }
                 }else {
-                    //System.out.println("backupTSM is used for prediction" + flag);
                     if(backupTsmSet.get(i)==null || !backupTsmSet.get(i).isInConvexRegion(newSample, false)){
                         return false;
                     }
@@ -244,14 +261,11 @@ public class MultiTSMLearner implements ExtendedClassifier {
             }else {
                 DataPoint newSample = factorizeFeatures(sample, feaGroups.get(i));
                 boolean flag = tsmFlags.get(i)[0];
-                //System.out.println("tsmFlag is: " + flag);
                 if(flag){
-                    //System.out.println("TSM is used for prediction" + flag);
                     if(tsmSet.get(i)!= null && tsmSet.get(i).isInConcaveRegion(newSample, true)) {
                         return true;
                     }
                 } else {
-                    //System.out.println("backupTSM is used for prediction" + flag);
                     //todo: remove tsmFlags from threeset metric
                     if(backupTsmSet.get(i)!= null && backupTsmSet.get(i).isInConcaveRegion(newSample, false)) {
                         return true;
@@ -264,6 +278,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
 
     /**
      * Test whether all partitions have been null or not
+     * @return true if all tsm stops running, false otherwise
      */
     public boolean isTSMsetNull(){
         return (!testStates.contains(0));

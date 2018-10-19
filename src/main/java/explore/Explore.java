@@ -3,6 +3,7 @@ package explore;
 import data.DataPoint;
 import data.LabeledPoint;
 import data.PartitionedDataset;
+import explore.metrics.ThreeSetMetric;
 import explore.statistics.Statistics;
 import explore.statistics.StatisticsCollection;
 import explore.user.BudgetedUser;
