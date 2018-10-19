@@ -165,12 +165,41 @@ public final class PartitionedDataset {
      * @param labeledPoint: a new labeled point provided by an Active Learning exploration routine
      */
     public void update(LabeledPoint labeledPoint) {
+        ExtendedLabel previousLabel = getLabel(labeledPoint);
+
         updateMostInformativePointsPartition(labeledPoint);
-        if (classifier.predict(labeledPoint).isUnknown()) {
+
+        // if our data model is still working and the update point is UNKNOWN, update model and INFERRED + UNKNOWN partitions
+        if (classifier.isRunning() && previousLabel.isUnknown()) {
             classifier.update(labeledPoint);
-            updateInferredLabelsPartition();
+
+            // when our data model has a change of internal state, it may require a relabeling of points in the INFERRED partition
+            if (classifier.triggerRelabeling()) {
+                relabelInferredPartition();
+            }
+
+            attemptToLabelUnknownPoints();
         }
     }
+
+    private void relabelInferredPartition() {
+        for (int pos = inferredStart; pos < unknownStart; pos++) {
+            ExtendedLabel prediction = classifier.predict(points.get(pos));
+
+            // label has changed
+            if (prediction != labels[pos]) {
+                // update label
+                labels[pos] = prediction;
+
+                // if new prediction is UNKNOWN, put point on UNKNOWN partition
+                if (prediction.isUnknown()) {
+                    unknownStart--;
+                    swap(pos, unknownStart);
+                }
+            }
+        }
+    }
+
 
     /**
      * Perform a sequence of update operations, in the order of the labeledPoints input
@@ -193,21 +222,22 @@ public final class PartitionedDataset {
         }
     }
 
-    private void updateInferredLabelsPartition() {
-        int position = unknownStart;
-        for (ExtendedLabel prediction : classifier.predict(getUnknownPoints())) {
-            if (prediction != ExtendedLabel.UNKNOWN) {
+    private void attemptToLabelUnknownPoints() {
+        for (int position = unknownStart; position < labels.length; position++) {
+            ExtendedLabel prediction = classifier.predict(points.get(position));
+            if (!prediction.isUnknown()) {
                 labels[position] = prediction;
                 swap(position, unknownStart++);
             }
-            position++;
         }
     }
 
     private void swap(int i, int j) {
-        swapMapKeys(indexToPosition, points.get(i).getId(), points.get(j).getId());
-        swapArrayElements(labels, i, j);
-        Collections.swap(points, i, j);
+        if (i != j) {
+            swapMapKeys(indexToPosition, points.get(i).getId(), points.get(j).getId());
+            swapArrayElements(labels, i, j);
+            Collections.swap(points, i, j);
+        }
     }
 
     private static <K, V> void swapMapKeys(Map<K, V> map, K key1, K key2) {

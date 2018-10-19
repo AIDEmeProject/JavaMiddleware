@@ -27,7 +27,6 @@ public interface ExtendedClassifier {
      * Update the current data model with new labeled data.
      * @param labeledPoint a {@link LabeledPoint} instance
      */
-    //
     void update(Collection<LabeledPoint> labeledPoint);
 
 
@@ -49,13 +48,13 @@ public interface ExtendedClassifier {
 
 
     /**
-     * @return true if at least one partition of tsm is still running, false otherwise
+     * @return true if the data model is still running
      */
-    boolean getState();
+    boolean isRunning();
 
 
     /**
-     * @return true if any partition of tsm has failed and relabeling is required, false otherwise
+     * @return true if a relabeling of the INFERRED partition is needed
      */
-    boolean thriggerRelabeling();
+    boolean triggerRelabeling();
 }

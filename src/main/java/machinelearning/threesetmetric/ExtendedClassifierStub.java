@@ -11,21 +11,6 @@ import java.util.Collection;
  * A stub for a {@link ExtendedClassifier}.
  */
 public final class ExtendedClassifierStub implements ExtendedClassifier {
-//    /**
-//     * Nothing is done
-//     */
-//    @Override
-//    public void update(Vector point, UserLabel label) {
-//        // do nothing
-//    }
-//
-//    /**
-//     * @return {@link ExtendedLabel#UNKNOWN}
-//     */
-//    @Override
-//    public ExtendedLabel predict(Vector point) {
-//        return ExtendedLabel.UNKNOWN;
-//    }
 
     /**
      * @return an empty array
@@ -34,8 +19,6 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
     public ExtendedLabel[] predict(Collection<DataPoint> points) {
         return new ExtendedLabel[0];
     }
-
-
 
     /**
      * Nothing is done
@@ -54,19 +37,19 @@ public final class ExtendedClassifierStub implements ExtendedClassifier {
     }
 
     /**
-     * @return true --> tsm is still running
+     * @return false, since no data model is ever built
      */
 
     @Override
-    public boolean getState(){
-        return true;
+    public boolean isRunning(){
+        return false;
     }
 
 
     /**
-     * @return false --> no relabeling is required
+     * @return false, since no labeling is ever done
      */
-    public boolean thriggerRelabeling(){
+    public boolean triggerRelabeling(){
         return false;
     }
 

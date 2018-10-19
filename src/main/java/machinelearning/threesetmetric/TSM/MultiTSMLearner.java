@@ -201,15 +201,14 @@ public class MultiTSMLearner implements ExtendedClassifier {
     /**
      * @return true if at least one partition of tsm is still running, false otherwise
      */
-    public boolean getState(){
-        return !isTSMsetNull();
+    public boolean isRunning(){
+        return testStates.contains(0);
     }
-
 
     /**
      * @return true if any partition of tsm has failed and relabeling is required, false otherwise
      */
-    public boolean thriggerRelabeling(){
+    public boolean triggerRelabeling(){
         return Arrays.stream(isFlagChanged).anyMatch(x -> x == 1);
     }
 
@@ -275,15 +274,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
         }
         return false;
     }
-
-    /**
-     * Test whether all partitions have been null or not
-     * @return true if all tsm stops running, false otherwise
-     */
-    public boolean isTSMsetNull(){
-        return (!testStates.contains(0));
-    }
-
 
     private static Collection<LabeledPoint> factorizeFeatures(Collection<LabeledPoint> labeledSamples, int[] select_set, int index) {
         Collection<LabeledPoint> dataPointsCopy = new ArrayList<>();

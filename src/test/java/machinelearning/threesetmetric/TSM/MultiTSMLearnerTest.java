@@ -132,8 +132,8 @@ class MultiTSMLearnerTest {
 //    }
 
     @Test
-    void isTSMsetNull() {
-        assertEquals(false, multiTSMLearner.isTSMsetNull());
+    void isRunning() {
+        assertEquals(true, multiTSMLearner.isRunning());
     }
 
     @Test
