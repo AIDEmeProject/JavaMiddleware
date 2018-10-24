@@ -1,8 +1,9 @@
 package explore;
 
-import data.IndexedDataset;
+import data.DataPoint;
 import data.LabeledPoint;
 import data.PartitionedDataset;
+import explore.metrics.ThreeSetMetric;
 import explore.statistics.Statistics;
 import explore.statistics.StatisticsCollection;
 import explore.user.BudgetedUser;
@@ -10,21 +11,19 @@ import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
 import machinelearning.active.Ranker;
-import utils.RandomState;
+import machinelearning.threesetmetric.ExtendedClassifier;
+import machinelearning.threesetmetric.TSM.MultiTSMLearner;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public final class Explore {
     private final FolderManager folder;
-    private final IndexedDataset dataPoints;
+    private final List<DataPoint> dataPoints;
     private final User user;
     private final ExperimentConfiguration configuration;
 
@@ -33,7 +32,7 @@ public final class Explore {
      * @param dataPoints: unlabeled pool of points
      * @param user: the user for labeling points
      */
-    public Explore(FolderManager folder, IndexedDataset dataPoints, User user) {
+    public Explore(FolderManager folder, List<DataPoint> dataPoints, User user) {
         this.folder = folder;
         this.dataPoints = dataPoints;
         this.user = user;
@@ -59,8 +58,6 @@ public final class Explore {
     }
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
-        setRandomSeed(id);
-
         PartitionedDataset partitionedDataset = getPartitionedDataset(id);
         BudgetedUser budgetedUser = new BudgetedUser(user, budget);
 
@@ -84,7 +81,6 @@ public final class Explore {
                 StatisticsCollection timeMeasurements = new StatisticsCollection();
 
                 int num = budgetedUser.getNumberOfLabeledPoints();
-
                 while(budgetedUser.getNumberOfLabeledPoints() == num && partitionedDataset.hasUnknownPoints()) {
                     Iteration.Result result = iteration.run(partitionedDataset, budgetedUser, ranker);
                     ranker = result.getRanker();
@@ -102,10 +98,6 @@ public final class Explore {
         }
     }
 
-    private void setRandomSeed(int id) {
-        RandomState.setSeed(1000L * id);
-    }
-
     private static Map<String, Double> computeTotalTimeMeasurements(StatisticsCollection metrics) {
         Map<String, Double> sum = new HashMap<>();
         for (Statistics statistics : metrics) {
@@ -115,7 +107,13 @@ public final class Explore {
     }
 
     private PartitionedDataset getPartitionedDataset(int id) {
-        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
+        PartitionedDataset partitionedDataset = configuration
+                .getTsmConfiguration()
+                .getMultiTsmModel()
+                .map(x -> new PartitionedDataset(dataPoints, x))
+                .orElseGet(() -> new PartitionedDataset(dataPoints));
+        //System.out.println(configuration.getTsmConfiguration().getMultiTsmModel().isPresent() ? "with TSM" : "no TSM");
+        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().size());
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

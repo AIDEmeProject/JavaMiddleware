@@ -49,7 +49,7 @@ public class IniConfigurationParser {
             }
 
             for (String optionKey: sec.keySet()) {
-                map.put(optionKey, sec.get(optionKey));
+                map.put(optionKey, sec.get(optionKey).trim());
             }
         }
         catch (IOException ex){

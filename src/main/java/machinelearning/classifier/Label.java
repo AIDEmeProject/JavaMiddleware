@@ -5,25 +5,17 @@ import explore.user.UserLabel;
 /**
  * Binary labels, used for classification. There are only two instances of this class: POSITIVE and NEGATIVE.
  */
-public class Label implements UserLabel {
+public enum Label implements UserLabel {
+    POSITIVE(true), NEGATIVE(false);
+
     /**
      * Whether this label is the POSITIVE or the NEGATIVE one
      */
     private boolean isPositive;
 
-    private Label(boolean isPositive) {
+    Label(boolean isPositive) {
         this.isPositive = isPositive;
     }
-
-    /**
-     * POSITIVE label
-     */
-    public final static Label POSITIVE = new Label(true);
-
-    /**
-     * NEGATIVE label
-     */
-    public final static Label NEGATIVE = new Label(false);
 
     /**
      * @return whether the label is POSITIVE

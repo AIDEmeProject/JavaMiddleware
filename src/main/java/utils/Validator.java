@@ -6,6 +6,13 @@ import java.util.Collection;
  * This utility class encloses several data validation checks used throughout our modules.
  */
 public class Validator {
+    public static String assertNotEmpty(String s) {
+        if (s.isEmpty()) {
+            throw new IllegalArgumentException("String cannot be empty.");
+        }
+        return s;
+    }
+
     /**
      * Raises an exception if object is null
      * @param object: any object

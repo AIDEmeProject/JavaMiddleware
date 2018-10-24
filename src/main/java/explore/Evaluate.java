@@ -33,7 +33,11 @@ public final class Evaluate {
 
         MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
 
-        PartitionedDataset partitionedDataset = new PartitionedDataset(dataPoints);
+        PartitionedDataset partitionedDataset = folder.getExperimentConfig()
+                .getTsmConfiguration()
+                .getMultiTsmModel()
+                .map(x -> new PartitionedDataset(dataPoints, x))
+                .orElseGet(() -> new PartitionedDataset(dataPoints));
 
         setRandomSeed(id);
 

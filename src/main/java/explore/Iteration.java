@@ -109,7 +109,7 @@ public abstract class Iteration {
         List<LabeledPoint> labeledPoints = new ArrayList<>();
         for (DataPoint dataPoint : mostInformativePoints) {
             ExtendedLabel extendedLabel = partitionedDataset.getLabel(dataPoint);
-            UserLabel label = extendedLabel == ExtendedLabel.UNKNOWN ? user.getLabel(dataPoint) : extendedLabel.toLabel();
+            UserLabel label = extendedLabel.isUnknown() ? user.getLabel(dataPoint) : extendedLabel.toLabel();
             labeledPoints.add(new LabeledPoint(dataPoint, label));
         }
         return labeledPoints;

@@ -1,6 +1,5 @@
 package data;
 
-import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedClassifierStub;
 import machinelearning.threesetmetric.ExtendedLabel;
@@ -23,7 +22,7 @@ public final class PartitionedDataset {
     /**
      * List of all data points
      */
-    private final IndexedDataset points;
+    private final List<DataPoint> points;
 
     /**
      * A extended classifier for inferring labels
@@ -55,17 +54,17 @@ public final class PartitionedDataset {
      * @param points: data points to build partitions. A copy will be stored internally to avoid unintended changes to input list.
      * @param classifier: {@link ExtendedClassifier} used to build the inferred labels partition
      */
-    public PartitionedDataset(IndexedDataset points, ExtendedClassifier classifier) {
-        this.points = points.copy();
+    public PartitionedDataset(List<DataPoint> points, ExtendedClassifier classifier) {
+        this.points = new ArrayList<>(points);
         this.classifier = Objects.requireNonNull(classifier);
 
         this.inferredStart = 0;
         this.unknownStart = 0;
 
-        this.labels = new ExtendedLabel[this.points.length()];
+        this.labels = new ExtendedLabel[this.points.size()];
         Arrays.fill(this.labels, ExtendedLabel.UNKNOWN);
 
-        this.indexToPosition = new HashMap<>(this.points.length());
+        this.indexToPosition = new HashMap<>(this.points.size());
         initializeIndexes();
     }
 
@@ -73,7 +72,7 @@ public final class PartitionedDataset {
      * Through this constructor, no label inference will be done (i.e. the INFERRED LABELS partition is always empty)
      * @param points: data points to build partitions. A copy will be stored internally to avoid unintended changes to input list.
      */
-    public PartitionedDataset(IndexedDataset points) {
+    public PartitionedDataset(List<DataPoint> points) {
         this(points, new ExtendedClassifierStub());
     }
 
@@ -87,19 +86,19 @@ public final class PartitionedDataset {
     /**
      * @return the entire list of data points. The order of data points MAY CHANGE after every update() call.
      */
-    public IndexedDataset getAllPoints() {
+    public List<DataPoint> getAllPoints() {
         return points;
     }
 
     /**
      * @return all the data points in the MOST INFORMATIVE partition
      */
-    public LabeledDataset getLabeledPoints() {
-        Label[] labels = new Label[inferredStart];
+    public List<LabeledPoint> getLabeledPoints() {
+        List<LabeledPoint> labeledPoints = new ArrayList<>();
         for (int i = 0; i < inferredStart; i++) {
-            labels[i] = this.labels[i].toLabel();
+            labeledPoints.add(new LabeledPoint(points.get(i), labels[i].toLabel()));
         }
-        return new LabeledDataset(points.getRange(0, inferredStart), labels);
+        return labeledPoints;
     }
 
     /**
@@ -109,36 +108,32 @@ public final class PartitionedDataset {
         return inferredStart > 0;
     }
 
-    public int numberOfLabeledPoints() {
-        return inferredStart;
-    }
-
     /**
      * @return a list of data points outside of the MOST INFORMATIVE partition (i.e. INFERRED LABELS + UNKNOWN partitions)
      */
-    public IndexedDataset getUnlabeledPoints() {
-        return points.getRange(inferredStart, points.length());
+    public List<DataPoint> getUnlabeledPoints() {
+        return points.subList(inferredStart, points.size());
     }
 
     /**
      * @return a list of all points in the UNKNOWN partition
      */
-    public IndexedDataset getUnknownPoints() {
-        return points.getRange(unknownStart, points.length());
+    public List<DataPoint> getUnknownPoints() {
+        return points.subList(unknownStart, points.size());
     }
 
     /**
      * @return whether the UNKNOWN partition is not empty
      */
     public boolean hasUnknownPoints() {
-        return unknownStart < points.length();
+        return unknownStart < points.size();
     }
 
     /**
      * @return a list of all data points whose labels are known (i.e. MOST INFORMATIVE + INFERRED LABELS)
      */
-    public IndexedDataset getKnownPoints() {
-        return points.getRange(0, unknownStart);
+    public List<DataPoint> getKnownPoints() {
+        return points.subList(0, unknownStart);
     }
 
     /**
@@ -146,14 +141,14 @@ public final class PartitionedDataset {
      * @return the current label associated to this data point
      */
     public ExtendedLabel getLabel(DataPoint point) {
-        return labels[findPosition(point.getId())];
+        return labels[findPosition(point)];
     }
 
     /**
      * @param points: a collection of data points
      * @return the current label associated to each data point in the collection
      */
-    public ExtendedLabel[] getLabel(IndexedDataset points) {
+    public ExtendedLabel[] getLabel(Collection<DataPoint> points) {
         return points.stream()
                 .map(this::getLabel)
                 .toArray(ExtendedLabel[]::new);
@@ -170,10 +165,41 @@ public final class PartitionedDataset {
      * @param labeledPoint: a new labeled point provided by an Active Learning exploration routine
      */
     public void update(LabeledPoint labeledPoint) {
+        ExtendedLabel previousLabel = getLabel(labeledPoint);
+
         updateMostInformativePointsPartition(labeledPoint);
-        classifier.update(labeledPoint);
-        updateInferredLabelsPartition();
+
+        // if our data model is still working and the update point is UNKNOWN, update model and INFERRED + UNKNOWN partitions
+        if (classifier.isRunning() && previousLabel.isUnknown()) {
+            classifier.update(labeledPoint);
+
+            // when our data model has a change of internal state, it may require a relabeling of points in the INFERRED partition
+            if (classifier.triggerRelabeling()) {
+                relabelInferredPartition();
+            }
+
+            attemptToLabelUnknownPoints();
+        }
     }
+
+    private void relabelInferredPartition() {
+        for (int pos = inferredStart; pos < unknownStart; pos++) {
+            ExtendedLabel prediction = classifier.predict(points.get(pos));
+
+            // label has changed
+            if (prediction != labels[pos]) {
+                // update label
+                labels[pos] = prediction;
+
+                // if new prediction is UNKNOWN, put point on UNKNOWN partition
+                if (prediction.isUnknown()) {
+                    unknownStart--;
+                    swap(pos, unknownStart);
+                }
+            }
+        }
+    }
+
 
     /**
      * Perform a sequence of update operations, in the order of the labeledPoints input
@@ -184,7 +210,7 @@ public final class PartitionedDataset {
     }
 
     private void updateMostInformativePointsPartition(LabeledPoint labeledPoint) {
-        int pos = findPosition(labeledPoint.getId());
+        int pos = findPosition(labeledPoint);
         labels[pos] = ExtendedLabel.fromLabel(labeledPoint.getLabel());
 
         if(pos >= unknownStart) {
@@ -196,23 +222,22 @@ public final class PartitionedDataset {
         }
     }
 
-    private void updateInferredLabelsPartition() {
-        int position = unknownStart;
-        if (hasUnknownPoints()) {
-            for (ExtendedLabel prediction : classifier.predict(getUnknownPoints())) {
-                if (prediction != ExtendedLabel.UNKNOWN) {
-                    labels[position] = prediction;
-                    swap(position, unknownStart++);
-                }
-                position++;
+    private void attemptToLabelUnknownPoints() {
+        for (int position = unknownStart; position < labels.length; position++) {
+            ExtendedLabel prediction = classifier.predict(points.get(position));
+            if (!prediction.isUnknown()) {
+                labels[position] = prediction;
+                swap(position, unknownStart++);
             }
         }
     }
 
     private void swap(int i, int j) {
-        swapMapKeys(indexToPosition, points.get(i).getId(), points.get(j).getId());
-        swapArrayElements(labels, i, j);
-        points.swap(i, j);
+        if (i != j) {
+            swapMapKeys(indexToPosition, points.get(i).getId(), points.get(j).getId());
+            swapArrayElements(labels, i, j);
+            Collections.swap(points, i, j);
+        }
     }
 
     private static <K, V> void swapMapKeys(Map<K, V> map, K key1, K key2) {
@@ -227,10 +252,10 @@ public final class PartitionedDataset {
         array[j] = temp;
     }
 
-    private int findPosition(long id) {
-        Integer position = indexToPosition.get(id);
+    private int findPosition(DataPoint point) {
+        Integer position = indexToPosition.get(point.getId());
         if (position == null) {
-            throw new IllegalArgumentException("ID " + id + " not found.");
+            throw new IllegalArgumentException("Point " + point + " not found.");
         }
         return position;
     }

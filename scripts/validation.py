@@ -17,3 +17,12 @@ def assert_in_list(value, list):
 def assert_is_instance(obj, cls):
     if not issubclass(type(obj), cls):
         raise ValueError("{0} is not an instance of {1}".format(obj, cls))
+
+
+def assert_same_lengths(*args):
+    l = -1
+    for arg in args:
+        if l < 0:
+            l = len(arg)
+        if len(arg) != l:
+            raise ValueError("Lists have different lengths.")

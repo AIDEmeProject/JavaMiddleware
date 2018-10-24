@@ -37,7 +37,7 @@ class ExploreIteration extends Iteration {
     public ExploreIteration(ExperimentConfiguration configuration) {
         super(configuration);
         this.subsampleSize = configuration.getSubsampleSize();
-        this.searchUnknownRegionProbability = configuration.getSearchUncertainRegionProbability();
+        this.searchUnknownRegionProbability = configuration.getTsmConfiguration().getSearchUnknownRegionProbability();
     }
 
     @Override

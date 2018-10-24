@@ -1,10 +1,10 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
-import data.IndexedDataset;
 import data.LabeledPoint;
-import explore.user.UserLabel;
-import utils.linalg.Vector;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A ExtendedClassifier is responsible for building an accurate model of the user interest and disinterest regions. This model
@@ -14,42 +14,47 @@ import utils.linalg.Vector;
  * POSITIVE, NEGATIVE, or UNKNOWN. See {@link ExtendedLabel} for more details.
  */
 public interface ExtendedClassifier {
-    /**
-     * Update the current data model with new labeled data.
-     * @param point: a data array
-     * @param label: the data's label
-     */
-    void update(Vector point, UserLabel label);
 
     /**
      * Update the current data model with new labeled data.
      * @param labeledPoint a {@link LabeledPoint} instance
      */
     default void update(LabeledPoint labeledPoint) {
-        update(labeledPoint.getData(), labeledPoint.getLabel());
+        update(Collections.singleton(labeledPoint));
     }
 
     /**
-     * @param point: a data point
-     * @return the predicted label for input point
+     * Update the current data model with new labeled data.
+     * @param labeledPoint a {@link LabeledPoint} instance
      */
-    ExtendedLabel predict(Vector point);
+    void update(Collection<LabeledPoint> labeledPoint);
+
 
     /**
      * @param dataPoint: a data point
      * @return the predicted label for input point
      */
-    default ExtendedLabel predict(DataPoint dataPoint) {
-        return predict(dataPoint.getData());
-    }
+    ExtendedLabel predict(DataPoint dataPoint);
 
     /**
      * @param points: a collection of data point
      * @return the predicted labels for each point in the input collection
      */
-    default ExtendedLabel[] predict(IndexedDataset points) {
+    default ExtendedLabel[] predict(Collection<DataPoint> points) {
         return points.stream()
                 .map(this::predict)
                 .toArray(ExtendedLabel[]::new);
     }
+
+
+    /**
+     * @return true if the data model is still running
+     */
+    boolean isRunning();
+
+
+    /**
+     * @return true if a relabeling of the INFERRED partition is needed
+     */
+    boolean triggerRelabeling();
 }

@@ -20,7 +20,6 @@ public class DataPoint {
      */
     private Vector data;
 
-
     /**
      * @param id: data point's unique ID
      * @param data: the features array
@@ -39,6 +38,17 @@ public class DataPoint {
         return data;
     }
 
+    public double get(int i){
+        return data.get(i);
+    }
+
+    /**
+     * @return data point's dimension (i.e. number of features)
+     */
+    public int getDim(){
+        return data.dim();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -46,6 +56,15 @@ public class DataPoint {
 
         DataPoint dataPoint = (DataPoint) o;
         return id == dataPoint.id && data.equals(dataPoint.data);
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public DataPoint getSelectedAttributes(int[] indices) {
+        Arrays.sort(indices);
+        return new DataPoint(id, data.slice(indices));
     }
 
     @Override

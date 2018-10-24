@@ -1,5 +1,0 @@
-[task_name]
-dataset: my_dataset  # dataset name, as defined on datasets.ini
-columns: col1,col2,col3  # comma-separated list of columns to use
-predicate: "col1 > 1 AND col2 < 3 AND col1*col3 <= 10"  # true predicate defining the positive class
-preprocessing: onehot,standardize  # comma-separated list of preprocessing steps to make
