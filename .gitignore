@@ -2,5 +2,6 @@
 target/
 out/
 experiment/
+results/
 javadoc/
 *.ini
