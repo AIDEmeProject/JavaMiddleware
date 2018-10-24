@@ -1,14 +1,12 @@
 package utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.commons.math3.FieldElement;
 import org.apache.commons.math3.linear.FieldLUDecomposition;
 import org.apache.commons.math3.linear.FieldMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.util.BigReal;
-import org.apache.commons.math3.util.MathUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * This class provides several common methods in Linear Algebra

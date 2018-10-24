@@ -2,7 +2,6 @@ package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
 import data.LabeledPoint;
-import javafx.scene.control.Labeled;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CatTSMTest {
     private Collection<LabeledPoint> labeledPoints;

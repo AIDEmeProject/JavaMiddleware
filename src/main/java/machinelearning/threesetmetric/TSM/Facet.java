@@ -1,11 +1,12 @@
 package machinelearning.threesetmetric.TSM;
 
-import java.util.Arrays;
-import utils.LinearAlgebra;
-
-import static org.apache.commons.math3.util.MathArrays.linearCombination;
 import org.apache.commons.math3.util.Pair;
 import org.apache.commons.math3.util.Precision;
+import utils.LinearAlgebra;
+
+import java.util.Arrays;
+
+import static org.apache.commons.math3.util.MathArrays.linearCombination;
 
 /**
  * This class create a facet (or (n-1)-face) based on a list of vertices

@@ -2,7 +2,7 @@ package machinelearning.threesetmetric.TSM;
 
 import data.DataPoint;
 import data.LabeledPoint;
-import explore.user.UserLabel;
+import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedLabel;
 
@@ -280,8 +280,8 @@ public class MultiTSMLearner implements ExtendedClassifier {
         for(LabeledPoint dataPoint : labeledSamples){
 //            System.out.println("the size of label list: " + dataPoint.getLabel().getLabelsForEachSubspace().length);
 //            System.out.println("the type of labels: " + dataPoint.getLabel().getClass());
-            UserLabel label = dataPoint.getLabel().getLabelsForEachSubspace()[index];
-            LabeledPoint partialPoint = new LabeledPoint(dataPoint.getSelectedAttributes(select_set), label);
+            Label label = dataPoint.getLabel().getLabelsForEachSubspace()[index];
+            LabeledPoint partialPoint = dataPoint.getSelectedAttributes(select_set, label);
             dataPointsCopy.add(partialPoint);
         }
         return dataPointsCopy;

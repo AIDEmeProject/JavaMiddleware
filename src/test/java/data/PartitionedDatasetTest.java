@@ -5,26 +5,33 @@ import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedLabel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
+import utils.linalg.Vector;
 
 import java.util.*;
 
 import static machinelearning.classifier.Label.NEGATIVE;
 import static machinelearning.classifier.Label.POSITIVE;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 
 class PartitionedDatasetTest {
-    private List<DataPoint> dataPoints;
+    private IndexedDataset dataPoints;
     private PartitionedDataset dataset;
     private MockClassifier classifier;
 
     @BeforeEach
     void setUp() {
-        dataPoints = new ArrayList<>();
-        dataPoints.add(new DataPoint(0, new double[]{0}));
-        dataPoints.add(new DataPoint(10, new double[]{1}));
-        dataPoints.add(new DataPoint(20, new double[]{2}));
-        dataPoints.add(new DataPoint(30, new double[]{3}));
-        dataPoints.add(new DataPoint(40, new double[]{4}));
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+        builder.add(0, new double[]{0});
+        builder.add(10, new double[]{1});
+        builder.add(20, new double[]{2});
+        builder.add(30, new double[]{3});
+        builder.add(40, new double[]{4});
+
+        dataPoints = builder.build();
 
         classifier = new MockClassifier(Arrays.asList(0L, 10L, 20L, 30L, 40L));
         dataset = new PartitionedDataset(dataPoints, classifier);
@@ -43,21 +50,21 @@ class PartitionedDatasetTest {
 
     @Test
     void getAllPoints_singleUpdate_outputContainsTheSameElementsAsInputButNotInOriginalOrder() {
-        dataset.update(new LabeledPoint(dataPoints.get(2), NEGATIVE));
-        assertNotEquals(dataPoints, dataset.getAllPoints());
-        assertTrue(dataset.getAllPoints().containsAll(dataPoints));
+        dataset.update(new LabeledPoint(dataPoints.get(2), Label.NEGATIVE));
+        assertEquals(dataPoints.getRows(2, 1, 0, 3, 4), dataset.getAllPoints());
     }
 
     @Test
-    void getLabeledPoints_noUpdates_returnsEmptyList() {
-        assertTrue(dataset.getLabeledPoints().isEmpty());
+    void getLabeledPoints_noUpdates_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getLabeledPoints());
     }
 
     @Test
     void getLabeledPoints_singleUpdate_returnsListContainingALabeledPointWrappingTheUpdatedPoint() {
-        LabeledPoint labeledPoint = new LabeledPoint(dataPoints.get(0), NEGATIVE);
-        dataset.update(labeledPoint);
-        assertEquals(Collections.singletonList(labeledPoint), dataset.getLabeledPoints());
+        DataPoint dataPoint = dataPoints.get(0);
+        Label label = Label.NEGATIVE;
+        dataset.update(new LabeledPoint(dataPoint, label));
+        assertEquals(new LabeledPoint(dataPoint, label), dataset.getLabeledPoints().get(0));
     }
 
     @Test
@@ -73,14 +80,14 @@ class PartitionedDatasetTest {
 
     @Test
     void getKnownPoints_noUpdates_returnsEmptyList() {
-        assertTrue(dataset.getKnownPoints().isEmpty());
+        assertThrows(IllegalArgumentException.class, () -> dataset.getKnownPoints());
     }
 
     @Test
     void getKnownPoints_singleUpdateAndNoClassificationModel_returnsListContainingTheUpdatedPoint() {
         DataPoint dataPoint = dataPoints.get(1);
-        dataset.update(new LabeledPoint(dataPoint, NEGATIVE));
-        assertEquals(Collections.singletonList(dataPoint), dataset.getKnownPoints());
+        dataset.update(new LabeledPoint(dataPoint, Label.NEGATIVE));
+        assertEquals(dataPoints.getRows(1), dataset.getKnownPoints());
     }
 
     @Test
@@ -89,12 +96,18 @@ class PartitionedDatasetTest {
 
         dataset.update(new LabeledPoint(dataPoints.get(4), NEGATIVE));
 
-        assertListsHaveTheSameElements(dataset.getKnownPoints(), Arrays.asList(dataPoints.get(4), dataPoints.get(2)));
+        assertEquals(dataset.getKnownPoints(), dataPoints.getRows(4, 2));
     }
 
-    private <T> void assertListsHaveTheSameElements(List<T> list1, List<T> list2) {
-        assertEquals(list1.size(), list2.size());
-        assertTrue(list1.containsAll(list2));
+    private ExtendedClassifier getExtendedClassifierStub(long index) {
+        ExtendedClassifier classifier = mock(ExtendedClassifier.class);
+        doNothing().when(classifier).update(isA(LabeledPoint.class));
+        when(classifier.predict((DataPoint) any())).thenAnswer((Answer<ExtendedLabel>) invocationOnMock -> {
+            DataPoint dataPoint1 = invocationOnMock.getArgument(0);
+            return dataPoint1.getId() == index ? ExtendedLabel.POSITIVE : ExtendedLabel.UNKNOWN;
+        });
+        when(classifier.predict((IndexedDataset) any())).thenCallRealMethod();
+        return classifier;
     }
 
     @Test
@@ -117,9 +130,8 @@ class PartitionedDatasetTest {
 
     @Test
     void getUnlabeledPoints_singleUpdate_returnsListContainingAllDataPointsExceptTheUpdatedOne() {
-        dataset.update(new LabeledPoint(dataPoints.remove(2), NEGATIVE));
-        assertEquals(dataPoints.size(), dataset.getUnlabeledPoints().size());
-        assertTrue(dataset.getUnlabeledPoints().containsAll(dataPoints));
+        dataset.update(new LabeledPoint(dataPoints.get(2), Label.NEGATIVE));
+        assertEquals(dataPoints.getRows(1, 0, 3, 4), dataset.getUnlabeledPoints());
     }
 
     @Test
@@ -129,9 +141,8 @@ class PartitionedDatasetTest {
 
     @Test
     void getUnknownPoints_singleUpdateAndNoClassificationModel_returnsListContainingAllDataPointsExceptTheUpdatedOne() {
-        dataset.update(new LabeledPoint(dataPoints.remove(2), NEGATIVE));
-        assertEquals(dataPoints.size(), dataset.getUnknownPoints().size());
-        assertTrue(dataset.getUnknownPoints().containsAll(dataPoints));
+        dataset.update(new LabeledPoint(dataPoints.get(2), Label.NEGATIVE));
+        assertEquals(dataPoints.getRows(1, 0, 3, 4), dataset.getUnknownPoints());
     }
 
     @Test
@@ -140,37 +151,32 @@ class PartitionedDatasetTest {
 
         dataset.update(new LabeledPoint(dataPoints.get(4), NEGATIVE));
 
-        assertListsHaveTheSameElements(dataset.getUnknownPoints(), Arrays.asList(dataPoints.get(0), dataPoints.get(1), dataPoints.get(3)));
-    }
-
-    @Test
-    void getLabel_emptyInputCollection_returnsEmptyArray() {
-        assertEquals(0, dataset.getLabel(Collections.EMPTY_LIST).length);
+        assertEquals(dataPoints.getRows(1, 3, 0), dataset.getUnknownPoints());
     }
 
     @Test
     void getLabel_noUpdates_returnsUnknownForAllPoints() {
-        ExtendedLabel[] labels = new ExtendedLabel[dataPoints.size()];
+        ExtendedLabel[] labels = new ExtendedLabel[dataPoints.length()];
         Arrays.fill(labels, ExtendedLabel.UNKNOWN);
         assertArrayEquals(labels, dataset.getLabel(dataPoints));
     }
 
     @Test
     void getLabel_dataPointsIndexNotInInitialCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getLabel(new DataPoint(-10, new double[]{1})));
+        assertThrows(IllegalArgumentException.class, () -> dataset.getLabel(new DataPoint(-10, Vector.FACTORY.make(1))));
     }
 
     @Test
     void getLabel_singleUpdateAndNoClassificationModel_returnExpectedLabelForUpdatedPointAndUnknownForTheRest() {
-        DataPoint dataPoint = dataPoints.remove(2);
-        Label label = NEGATIVE;
+        DataPoint dataPoint = dataPoints.get(2);
+        Label label = Label.NEGATIVE;
         dataset.update(new LabeledPoint(dataPoint, label));
 
         assertEquals(label, dataset.getLabel(dataPoint).toLabel());
 
-        ExtendedLabel[] labels = new ExtendedLabel[dataPoints.size()];
+        ExtendedLabel[] labels = new ExtendedLabel[dataPoints.length()-1];
         Arrays.fill(labels, ExtendedLabel.UNKNOWN);
-        assertArrayEquals(labels, dataset.getLabel(dataPoints));
+        assertArrayEquals(labels, dataset.getLabel(dataPoints.getRows(1, 0, 3, 4)));
     }
 
     @Test
@@ -178,7 +184,7 @@ class PartitionedDatasetTest {
         classifier.setLabel(20L, ExtendedLabel.POSITIVE);
         dataset.update(new LabeledPoint(dataPoints.get(4), NEGATIVE));
 
-        ExtendedLabel[] expected = new ExtendedLabel[dataPoints.size()];
+        ExtendedLabel[] expected = new ExtendedLabel[dataPoints.length()];
         Arrays.fill(expected, ExtendedLabel.UNKNOWN);
         expected[2] = ExtendedLabel.POSITIVE;
         expected[4] = ExtendedLabel.NEGATIVE;
@@ -188,7 +194,8 @@ class PartitionedDatasetTest {
 
     @Test
     void update_dataPointsIndexNotInInitialCollection_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.update(new LabeledPoint(-10, new double[]{1}, NEGATIVE)));
+        DataPoint dataPoint = new DataPoint(-10, Vector.FACTORY.make(1));
+        assertThrows(IllegalArgumentException.class, () -> dataset.update(new LabeledPoint(dataPoint, Label.NEGATIVE)));
     }
 
     @Test

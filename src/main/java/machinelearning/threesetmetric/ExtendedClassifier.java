@@ -1,6 +1,7 @@
 package machinelearning.threesetmetric;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import data.LabeledPoint;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public interface ExtendedClassifier {
      * @param points: a collection of data point
      * @return the predicted labels for each point in the input collection
      */
-    default ExtendedLabel[] predict(Collection<DataPoint> points) {
+    default ExtendedLabel[] predict(IndexedDataset points) {
         return points.stream()
                 .map(this::predict)
                 .toArray(ExtendedLabel[]::new);

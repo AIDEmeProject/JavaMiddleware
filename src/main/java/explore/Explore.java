@@ -1,9 +1,8 @@
 package explore;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
-import explore.metrics.ThreeSetMetric;
 import explore.statistics.Statistics;
 import explore.statistics.StatisticsCollection;
 import explore.user.BudgetedUser;
@@ -11,19 +10,20 @@ import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
 import machinelearning.active.Ranker;
-import machinelearning.threesetmetric.ExtendedClassifier;
-import machinelearning.threesetmetric.TSM.MultiTSMLearner;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public final class Explore {
     private final FolderManager folder;
-    private final List<DataPoint> dataPoints;
+    private final IndexedDataset dataPoints;
     private final User user;
     private final ExperimentConfiguration configuration;
 
@@ -32,7 +32,7 @@ public final class Explore {
      * @param dataPoints: unlabeled pool of points
      * @param user: the user for labeling points
      */
-    public Explore(FolderManager folder, List<DataPoint> dataPoints, User user) {
+    public Explore(FolderManager folder, IndexedDataset dataPoints, User user) {
         this.folder = folder;
         this.dataPoints = dataPoints;
         this.user = user;
@@ -112,8 +112,8 @@ public final class Explore {
                 .getMultiTsmModel()
                 .map(x -> new PartitionedDataset(dataPoints, x))
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
-        //System.out.println(configuration.getTsmConfiguration().getMultiTsmModel().isPresent() ? "with TSM" : "no TSM");
-        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().size());
+
+        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().length());
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

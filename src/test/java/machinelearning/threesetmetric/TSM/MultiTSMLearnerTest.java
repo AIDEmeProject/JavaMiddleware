@@ -3,7 +3,6 @@ package machinelearning.threesetmetric.TSM;
 import data.DataPoint;
 import data.LabeledPoint;
 import machinelearning.classifier.Label;
-import machinelearning.threesetmetric.ExtendedLabel;
 import machinelearning.threesetmetric.LabelGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MultiTSMLearnerTest {
     private MultiTSMLearner multiTSMLearner;
@@ -116,15 +116,15 @@ class MultiTSMLearnerTest {
         assertTrue(multiTSMLearner.isInPosRegion(new DataPoint(0, new double[]{6, 1.7, 2.25, 2016, 69390, 0, 0, 1, 0})));
     }
 
-    @Test
-    void isInConvexRegion_f() {
-        assertEquals(false, multiTSMLearner.isInNegRegion(new DataPoint(0, new double[]{9,1.7,2.5,2016,69390,0,0,1,0})));
-    }
-
-    @Test
-    void isInConcaveRegion_t() {
-        assertEquals(true, multiTSMLearner.isInPosRegion(new DataPoint(0, new double[]{5.2451,1.49098,1.89992,2015,69390,0,0,1,0})));
-    }
+//    @Test
+//    void isInConvexRegion_f() {
+//        assertEquals(false, multiTSMLearner.isInNegRegion(new DataPoint(0, new double[]{9,1.7,2.5,2016,69390,0,0,1,0})));
+//    }
+//
+//    @Test
+//    void isInConcaveRegion_t() {
+//        assertEquals(true, multiTSMLearner.isInPosRegion(new DataPoint(0, new double[]{5.2451,1.49098,1.89992,2015,69390,0,0,1,0})));
+//    }
 
 //    @Test
 //    void isInConcaveRegion_f() {

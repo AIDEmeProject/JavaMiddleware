@@ -2,6 +2,8 @@ package data;
 
 import utils.linalg.Vector;
 
+import java.util.Arrays;
+
 /**
  * A DataPoint is an indexed collection of values. More specifically, it is composed of two entities:
  *
@@ -28,6 +30,11 @@ public class DataPoint {
     public DataPoint(long id, Vector data) {
         this.id = id;
         this.data = data;
+    }
+
+    public DataPoint(long id, double[] data) {
+        this.id = id;
+        this.data = Vector.FACTORY.make(data);
     }
 
     public long getId() {
@@ -64,7 +71,7 @@ public class DataPoint {
      */
     public DataPoint getSelectedAttributes(int[] indices) {
         Arrays.sort(indices);
-        return new DataPoint(id, data.slice(indices));
+        return new DataPoint(id, data.select(indices));
     }
 
     @Override

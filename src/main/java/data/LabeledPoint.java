@@ -1,6 +1,7 @@
 package data;
 
 import explore.user.UserLabel;
+import machinelearning.classifier.Label;
 import utils.linalg.Vector;
 
 import java.util.Objects;
@@ -43,6 +44,10 @@ public class LabeledPoint {
         this(new DataPoint(id, data), label);
     }
 
+    public LabeledPoint(long id, double[] data, UserLabel label) {
+        this(new DataPoint(id, data), label);
+    }
+
     public long getId() {
         return dataPoint.getId();
     }
@@ -53,6 +58,22 @@ public class LabeledPoint {
 
     public UserLabel getLabel() {
         return label;
+    }
+
+    public int getDim() {
+        return dataPoint.getDim();
+    }
+
+    public double get(int index) {
+        return dataPoint.get(index);
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public LabeledPoint getSelectedAttributes(int[] indices, Label label) {
+        return new LabeledPoint(dataPoint.getSelectedAttributes(indices), label);
     }
 
     @Override

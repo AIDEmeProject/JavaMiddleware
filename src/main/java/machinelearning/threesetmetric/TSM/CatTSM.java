@@ -3,7 +3,9 @@ package machinelearning.threesetmetric.TSM;
 import data.DataPoint;
 import data.LabeledPoint;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 
 /**

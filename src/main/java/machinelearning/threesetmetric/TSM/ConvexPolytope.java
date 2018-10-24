@@ -1,7 +1,8 @@
 package machinelearning.threesetmetric.TSM;
 
-import java.util.*;
 import utils.LinearAlgebra;
+
+import java.util.*;
 
 
 /**

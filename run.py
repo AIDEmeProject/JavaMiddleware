@@ -7,8 +7,7 @@ from scripts import *
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
-TASK = "sdss_Q4_0.1%"
-#TASK = "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%"
+TASKS = ["sdss_Q1_0.1%", "sdss_Q3_0.1%"]
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = 5000
@@ -82,35 +81,32 @@ assert_positive("BUDGET", BUDGET)
 assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
 # BUILD EXPERIMENT
-experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE,
-                        active_learner=ACTIVE_LEARNER, mTSM=mTSM)
+for TASK in TASKS:
+    experiment_dir = os.path.join('experiment', TASK, ACTIVE_LEARNER.name, str(ACTIVE_LEARNER))
+    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM)
+    experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
-folder_elems = [ACTIVE_LEARNER.name]
-if SUBSAMPLE_SIZE < float('inf'): folder_elems.append('ss=%d' % SUBSAMPLE_SIZE)
-if mTSM: folder_elems.append(str(mTSM))
-folder = '_'.join(folder_elems)
+    # BUILD COMMAND LINE ARGUMENTS
+    command_line = [
+        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
+        "--experiment_dir", experiment_dir,
+        "--mode", ' '.join(MODES),
+        "--num_runs", str(NUM_RUNS),
+        "--budget", str(BUDGET),
+    ]
 
-experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
-experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
+    if RUNS:
+        command_line.append("--runs")
+        command_line.append(' '.join(map(str, RUNS)))
 
-# BUILD COMMAND LINE ARGUMENTS
-command_line = [
-    "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
-    "--experiment_dir \"", experiment_dir,
-    "\" --mode", ' '.join(MODES),
-    "--num_runs", str(NUM_RUNS),
-    "--budget", str(BUDGET),
-]
+    if METRICS and ('EVAL' in MODES or 'AVERAGE' in MODES):
+        command_line.append("--metrics")
+        for m in METRICS:
+            assert_is_instance(m, Metric)
+            command_line.append(str(m))
+            m.dump_to_config_file(experiment_dir, add_name=True)
 
-if RUNS:
-    command_line.append("--runs")
-    command_line.append(' '.join(map(str, RUNS)))
-
-if METRICS and ('EVAL' in MODES or 'AVERAGE' in MODES):
-    command_line.append("--metrics")
-    for m in METRICS:
-        assert_is_instance(m, Metric)
-        command_line.append(str(m))
-        m.dump_to_config_file(experiment_dir, add_name=True)
-
-subprocess.run(' '.join(command_line), shell=True)
+    try:
+        subprocess.run(' '.join(command_line), shell=True)
+    except:
+        print("Task " + TASK + " failed")

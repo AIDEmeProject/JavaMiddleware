@@ -1,16 +1,12 @@
 package explore;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import data.preprocessing.StandardScaler;
 import explore.user.FactoredUser;
 import explore.user.User;
 import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 public final class Experiment {
     private final FolderManager experimentFolder;
@@ -28,11 +24,12 @@ public final class Experiment {
 
         TaskReader reader = new TaskReader(configuration.getTask());
 
-        List<DataPoint> dataPoints = Collections.unmodifiableList(StandardScaler.fitAndTransform(reader.readData()));
+        IndexedDataset rawData = reader.readData();
+        IndexedDataset scaledData = rawData.copyWithSameIndexes(StandardScaler.fitAndTransform(rawData.getData()));
         User user = getUser(configuration, reader);
 
-        explore = new Explore(experimentFolder, dataPoints, user);
-        evaluate = new Evaluate(experimentFolder, dataPoints, user);
+        explore = new Explore(experimentFolder, scaledData, user);
+        evaluate = new Evaluate(experimentFolder, scaledData, user);
     }
 
     private User getUser(ExperimentConfiguration configuration, TaskReader reader) {

@@ -168,6 +168,11 @@ public class MatrixTest {
     }
 
     @Test
+    void getRowSlice_FromZeroToNumberOfRows_returnsCopyOfDataset() {
+        assertEquals(matrix1, matrix1.getRowSlice(0, matrix1.rows()));
+    }
+
+    @Test
     void getRowSlice_FromIndexEqualsToIndex_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> matrix1.getRowSlice(0, 0));
     }

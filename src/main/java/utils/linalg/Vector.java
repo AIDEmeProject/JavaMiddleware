@@ -86,6 +86,15 @@ public class Vector extends Tensor<Vector> {
         return new Vector(result);
     }
 
+    public Vector select(int... indices) {
+        Validator.assertNotEmpty(indices);
+        double[] selectedFeatures = new double[indices.length];
+        for (int i = 0; i < indices.length; i++) {
+            selectedFeatures[i] = array[indices[i]];
+        }
+        return new Vector(selectedFeatures);
+    }
+
     /**
      * @param newNorm norm of output vector
      * @return a Vector parallel to the original one, but of specified norm
