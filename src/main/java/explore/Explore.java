@@ -69,7 +69,7 @@ public final class Explore {
         }
     }
 
-    private Ranker runSingleIteration(LabeledDataset labeledDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
+    public Ranker runSingleIteration(LabeledDataset labeledDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter) throws IOException {
         Map<String, Double> metrics = new HashMap<>();
         long initialTime, start = System.nanoTime();
 
