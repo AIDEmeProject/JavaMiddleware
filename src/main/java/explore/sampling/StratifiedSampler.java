@@ -1,12 +1,13 @@
 package explore.sampling;
 
 import data.DataPoint;
+import data.IndexedDataset;
 import explore.user.User;
 import utils.Validator;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StratifiedSampler implements InitialSampler{
     /**
@@ -30,17 +31,36 @@ public class StratifiedSampler implements InitialSampler{
         this.negativeSamples = negativeSamples;
     }
 
-    public List<DataPoint> runInitialSample(Collection<DataPoint> unlabeledSet, User user){
+    /**
+     * @param unlabeledSet: initial collection of unlabeled points
+     * @param user: user instance for labeling points
+     * @return a list of DataPoints containing the specified number of positive and negative samples
+     */
+    public List<DataPoint> runInitialSample(IndexedDataset unlabeledSet, User user){
         List<DataPoint> samples = new ArrayList<>(positiveSamples + negativeSamples);
 
         if (positiveSamples > 0){
-            Collection<DataPoint> positive = ReservoirSampler.sample(unlabeledSet, positiveSamples, pt -> user.getLabel(pt).isNegative());
-            samples.addAll(positive);
+            List<DataPoint> positivePoints = unlabeledSet.stream()
+                    .filter(x -> user.getLabel(x).isPositive())
+                    .collect(Collectors.toList());
+
+            if (positivePoints.size() < positiveSamples) {
+                throw new RuntimeException("Dataset does not contain " + positivePoints + " positive points.") ;
+            }
+
+            samples.addAll(ReservoirSampler.sample(positivePoints, positiveSamples));
         }
 
         if (negativeSamples > 0){
-            Collection<DataPoint> negative = ReservoirSampler.sample(unlabeledSet, negativeSamples, pt -> user.getLabel(pt).isPositive());
-            samples.addAll(negative);
+            List<DataPoint> negativePoints = unlabeledSet.stream()
+                    .filter(x -> user.getLabel(x).isNegative())
+                    .collect(Collectors.toList());
+
+            if (negativePoints.size() < negativeSamples) {
+                throw new RuntimeException("Dataset does not contain " + negativePoints + " negative points.") ;
+            }
+
+            samples.addAll(ReservoirSampler.sample(negativePoints, negativeSamples));
         }
 
         return samples;

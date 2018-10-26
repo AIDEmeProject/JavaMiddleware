@@ -2,7 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.selecto
 
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRun;
 import utils.Validator;
-
+import utils.linalg.Vector;
 
 
 /**
@@ -42,12 +42,12 @@ public class WarmUpAndThinSelector implements SampleSelector {
     }
 
     @Override
-    public double[][] select(HitAndRun hitAndRun, int numSamples) {
+    public Vector[] select(HitAndRun hitAndRun, int numSamples) {
         Validator.assertPositive(numSamples);
 
         HitAndRun.Chain chain = hitAndRun.newChain();
 
-        double[][] samples = new double[numSamples][];
+        Vector[] samples = new Vector[numSamples];
         samples[0] = chain.advance(warmUp);
 
         for (int i = 1; i < numSamples; i++) {

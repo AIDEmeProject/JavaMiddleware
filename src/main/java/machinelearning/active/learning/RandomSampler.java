@@ -1,11 +1,9 @@
 package machinelearning.active.learning;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.active.ranker.RandomRanker;
-
-import java.util.Collection;
 
 /**
  * The RandomSampler is the most used baseline active. Basically, at every iteration it randomly samples one point from
@@ -15,7 +13,7 @@ import java.util.Collection;
  */
 public class RandomSampler implements ActiveLearner {
     @Override
-    public Ranker fit(Collection<LabeledPoint> labeledPoints) {
+    public Ranker fit(LabeledDataset labeledPoints) {
         return new RandomRanker();
     }
 }

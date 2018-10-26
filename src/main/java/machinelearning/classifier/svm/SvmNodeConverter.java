@@ -1,10 +1,8 @@
 package machinelearning.classifier.svm;
 
-import data.DataPoint;
 import libsvm.svm_node;
-
-import java.util.ArrayList;
-import java.util.List;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 
 /**
@@ -19,46 +17,16 @@ class SvmNodeConverter {
      * @param x: matrix to be converted
      * @return converted matrix
      */
-    static svm_node[] toSvmNode(double[] x){
-        svm_node[] converted = new svm_node[x.length];
+    static svm_node[] toSvmNode(Vector x) {
+        svm_node[] converted = new svm_node[x.dim()];
 
-        for (int i = 0; i < x.length; i++) {
+        for (int i = 0; i < x.dim(); i++) {
             converted[i] = new svm_node();
             converted[i].index = i;
-            converted[i].value = x[i];
+            converted[i].value = x.get(i);
         }
 
         return converted;
-    }
-
-    /**
-     * Convert a double matrix into a svm_node matrix
-     * @param x: matrix to be converted
-     * @return converted matrix
-     */
-    static svm_node[][] toSvmNode(double[][] x){
-        svm_node[][] converted = new svm_node[x.length][x[0].length];
-
-        for (int i = 0; i < x.length; i++) {
-            converted[i] = toSvmNode(x[i]);
-        }
-
-        return converted;
-    }
-
-    /**
-     * Convert a double array into a svm_node array
-     * @param nodes: matrix to be converted
-     * @return converted matrix
-     */
-    private static DataPoint toDataPoint(int index, svm_node[] nodes){
-        double[] converted = new double[nodes.length];
-
-        for (int i = 0; i < nodes.length; i++) {
-            converted[i] = nodes[i].value;
-        }
-
-        return new DataPoint(index, converted);
     }
 
     /**
@@ -66,13 +34,19 @@ class SvmNodeConverter {
      * @param nodes: matrix to be converted
      * @return converted matrix
      */
-    static List<DataPoint> toDataPoint(svm_node[][] nodes){
-        List<DataPoint> converted = new ArrayList<>(nodes.length);
-
-        for (int i = 0; i < nodes.length; i++) {
-            converted.add(toDataPoint(i, nodes[i]));
+    static Matrix toMatrix(svm_node[][] nodes, int dim){
+        if (nodes.length == 0) {
+            throw new IllegalArgumentException("Cannot convert empty node collection.");
         }
 
-        return converted;
+        double[][] converted = new double[nodes.length][dim];
+
+        for (int i = 0; i < nodes.length; i++) {
+            for (svm_node node : nodes[i]) {
+                converted[i][node.index] = node.value;
+            }
+        }
+
+        return Matrix.FACTORY.make(converted);
     }
 }

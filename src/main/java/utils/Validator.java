@@ -6,6 +6,13 @@ import java.util.Collection;
  * This utility class encloses several data validation checks used throughout our modules.
  */
 public class Validator {
+    public static String assertNotEmpty(String s) {
+        if (s.isEmpty()) {
+            throw new IllegalArgumentException("String cannot be empty.");
+        }
+        return s;
+    }
+
     /**
      * Raises an exception if object is null
      * @param object: any object
@@ -70,6 +77,18 @@ public class Validator {
     public static void assertEquals(int val1, int val2){
         if(val1 != val2) {
             throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
+     * Throws exception is objects are different
+     * @param val1: first object
+     * @param val2: second object
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(Object val1, Object val2){
+        if(!val1.equals(val2)) {
+            throw new IllegalArgumentException("Objects " + val1 + " and " + val2 + " are not equal.");
         }
     }
 
@@ -156,6 +175,12 @@ public class Validator {
      */
     public static void assertInRange(double value, double lower, double upper){
         if (value < lower || value > upper){
+            throw new IllegalArgumentException("Value must be comprised between " + lower + " and " + upper);
+        }
+    }
+
+    public static void assertIndexInBounds(int value, int lower, int upper){
+        if (value < lower || value >= upper){
             throw new IllegalArgumentException("Value must be comprised between " + lower + " and " + upper);
         }
     }

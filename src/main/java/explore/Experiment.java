@@ -1,15 +1,12 @@
 package explore;
 
-import data.DataPoint;
+import data.IndexedDataset;
 import data.preprocessing.StandardScaler;
-import explore.user.DummyUser;
+import explore.user.FactoredUser;
 import explore.user.User;
+import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 public final class Experiment {
     private final FolderManager experimentFolder;
@@ -27,13 +24,21 @@ public final class Experiment {
 
         TaskReader reader = new TaskReader(configuration.getTask());
 
-        List<DataPoint> dataPoints = Collections.unmodifiableList(StandardScaler.fitAndTransform(reader.readData()));
+        IndexedDataset rawData = reader.readData();
+        IndexedDataset scaledData = rawData.copyWithSameIndexes(StandardScaler.fitAndTransform(rawData.getData()));
+        User user = getUser(configuration, reader);
 
-        Set<Long> positiveKeys = reader.readTargetSetKeys();
-        User user = new DummyUser(positiveKeys);
+        explore = new Explore(experimentFolder, scaledData, user);
+        evaluate = new Evaluate(experimentFolder, scaledData, user);
+    }
 
-        explore = new Explore(experimentFolder, dataPoints, user);
-        evaluate = new Evaluate(experimentFolder, dataPoints, user);
+    private User getUser(ExperimentConfiguration configuration, TaskReader reader) {
+        if (configuration.hasMultiTSM()) {
+            ExperimentConfiguration.TsmConfiguration tsmConfiguration = configuration.getTsmConfiguration();
+            return new FactoredUser(reader.readFactorizedTargetSetKeys(tsmConfiguration));
+        } else {
+            return new UserStub(reader.readTargetSetKeys());
+        }
     }
 
     public Explore getExplore() {

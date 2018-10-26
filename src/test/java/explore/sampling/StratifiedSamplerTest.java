@@ -1,13 +1,13 @@
 package explore.sampling;
 
-import data.DataPoint;
-import explore.user.DummyUser;
+import data.IndexedDataset;
 import explore.user.User;
+import explore.user.UserStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,17 +16,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class StratifiedSamplerTest {
 
     private StratifiedSampler sampler;
-    private Collection<DataPoint> points;
+    private IndexedDataset points;
     private User user;
 
     @BeforeEach
     void setUp() {
         sampler = new StratifiedSampler(2, 2);
-        points = new ArrayList<>(4);
-        points.add(new DataPoint(0, new double[] {0}));
-        points.add(new DataPoint(1, new double[] {1}));
-        points.add(new DataPoint(2, new double[] {2}));
-        points.add(new DataPoint(3, new double[] {3}));
+
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+        builder.add(0, new double[] {0});
+        builder.add(1, new double[] {1});
+        builder.add(2, new double[] {2});
+        builder.add(3, new double[] {3});
+
+        points = builder.build();
     }
 
     @Test
@@ -41,20 +44,16 @@ class StratifiedSamplerTest {
 
     @Test
     void sample_sampleMorePositivePointsThanPossible_throwsException() {
-        Set<Long> keys = new HashSet<>();
-        keys.add(3L);
-        user = new DummyUser(keys);
+        Set<Long> keys = new HashSet<>(Collections.singletonList(3L));
+        user = new UserStub(keys);
 
         assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }
 
     @Test
     void sample_sampleMoreNegativePointsThanPossible_throwsException() {
-        Set<Long> keys = new HashSet<>();
-        keys.add(0L);
-        keys.add(1L);
-        keys.add(2L);
-        user = new DummyUser(keys);
+        Set<Long> keys = new HashSet<>(Arrays.asList(0L, 1L, 2L));
+        user = new UserStub(keys);
 
         assertThrows(RuntimeException.class, () -> sampler.runInitialSample(points, user));
     }

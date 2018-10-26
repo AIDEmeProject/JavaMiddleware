@@ -2,9 +2,9 @@ package machinelearning.classifier;
 
 
 import data.DataPoint;
-import data.LabeledDataset;
-
-import java.util.Collection;
+import data.IndexedDataset;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 /**
  * A classifier is any object capable of "learning from training data" and "make predictions for new data points".
@@ -14,61 +14,72 @@ import java.util.Collection;
 public interface Classifier {
 
     /**
-     * Return class probability estimation for a particular point in the dataset.
-     * @param point: data point
-     * @return probability of point being positive
+     * @param vector: a feature vector
+     * @return probability of vector belonging to the positive class
      */
-    double probability(DataPoint point);
+    double probability(Vector vector);
 
     /**
-     * Return class probability estimation for each point in the dataset.
-     * @param points: collection of data points
-     * @return probability estimation array
+     * @param matrix: a matrix whose every line corresponds to a feature vector
+     * @return class probability estimation for each row of the matrix
      */
-    default double[] probability(Collection<DataPoint> points){
-        double[] probas = new double[points.size()];
-
-        int i = 0;
-        for (DataPoint point : points) {
-            probas[i++] = probability(point);
+    default Vector probability(Matrix matrix) {
+        double[] probas = new double[matrix.rows()];
+        for (int i = 0; i < probas.length; i++) {
+            probas[i] = probability(matrix.getRow(i));
         }
-
-        return probas;
+        return Vector.FACTORY.make(probas);
     }
 
     /**
-     * Return the predicted label for a particular point in the dataset.
-     * @param point: data point
-     * @return class label of given point
+     * @param point: a data point
+     * @return probability of data point belonging to the positive class
      */
-    default Label predict(DataPoint point){
-        return probability(point) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
+    default double probability(DataPoint point){
+        return probability(point.getData());
     }
 
     /**
-     * Return predicted class labels for each point in the dataset.
-     * @param points: collection of data points
-     * @return predicted class labels
+     * @param points: a dataset
+     * @return class probability estimation for each point in the dataset.
      */
-    default Label[] predict(Collection<DataPoint> points){
-        Label[] labels = new Label[points.size()];
+    default Vector probability(IndexedDataset points){
+        return probability(points.getData());
+    }
 
-        int i = 0;
-        for (DataPoint point : points) {
-            labels[i++] = predict(point);
+    /**
+     * @param vector: a feature vector
+     * @return predicted label for the input vector
+     */
+    default Label predict(Vector vector){
+        return probability(vector) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
+    }
+
+    /**
+     * @param matrix:  a matrix whose every line corresponds to a feature vector
+     * @return predicted class labels for each row of the matrix
+     */
+    default Label[] predict(Matrix matrix) {
+        Label[] labels = new Label[matrix.rows()];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = predict(matrix.getRow(i));
         }
-
         return labels;
     }
 
     /**
-     * Upper bound on "future probabilities".
-     *
-     * @param data: labeled data
-     * @param maxPositivePoints: maximum number of positive labeled points
-     * @return probability upper bound
+     * @param point: data point
+     * @return predicted label for the input data point.
      */
-    default double computeProbabilityUpperBound(Collection<DataPoint> data, int maxPositivePoints){
-        return Double.POSITIVE_INFINITY;
+    default Label predict(DataPoint point){
+        return predict(point.getData());
+    }
+
+    /**
+     * @param points: collection of data points
+     * @return predicted class labels for each point in the dataset.
+     */
+    default Label[] predict(IndexedDataset points){
+        return predict(points.getData());
     }
 }

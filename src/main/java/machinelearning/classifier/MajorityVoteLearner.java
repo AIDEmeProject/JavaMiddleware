@@ -1,15 +1,13 @@
 package machinelearning.classifier;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import utils.Validator;
 
-import java.util.Collection;
-
 /**
- * This module builds a {@link MajorityVoteClassifier} by sampling from the {@link VersionSpace}.
+ * This module builds a {@link MajorityVote} by sampling from the {@link VersionSpace}.
  */
-public class MajorityVoteLearner implements Learner {
+public class MajorityVoteLearner<T extends Classifier> implements Learner {
     /**
      * Number of classifiers to sample from the version space
      */
@@ -18,14 +16,14 @@ public class MajorityVoteLearner implements Learner {
     /**
      * {@link VersionSpace} of classifiers
      */
-    private final VersionSpace versionSpace;
+    private final VersionSpace<T> versionSpace;
 
     /**
      * @param versionSpace: version space instance
-     * @param sampleSize: number of samples used to build a {@link MajorityVoteClassifier}
+     * @param sampleSize: number of samples used to build a {@link MajorityVote}
      * @throws IllegalArgumentException if versionSpace is null or sampleSize is not positive
      */
-    public MajorityVoteLearner(VersionSpace versionSpace, int sampleSize) {
+    public MajorityVoteLearner(VersionSpace<T> versionSpace, int sampleSize) {
         Validator.assertNotNull(versionSpace);
         Validator.assertPositive(sampleSize);
 
@@ -35,11 +33,10 @@ public class MajorityVoteLearner implements Learner {
 
     /**
      * @param labeledPoints: collection of labeled points
-     * @return {@link MajorityVoteClassifier} constructed by sampling from the Version Space delimited by the labeledPoints.
+     * @return {@link MajorityVote} constructed by sampling from the Version Space delimited by the labeledPoints.
      */
     @Override
-    public MajorityVoteClassifier fit(Collection<LabeledPoint> labeledPoints) {
-        Validator.assertNotEmpty(labeledPoints);
-        return new MajorityVoteClassifier(versionSpace.sample(labeledPoints, sampleSize));
+    public MajorityVote<T> fit(LabeledDataset labeledPoints) {
+        return versionSpace.sample(labeledPoints, sampleSize);
     }
 }

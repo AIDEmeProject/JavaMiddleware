@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
+import utils.linalg.Vector;
 
 /**
  * A line segment is a compact, connected subset of a straight line. In mathematical terms, let a straight line be defined
@@ -60,7 +61,7 @@ public class LineSegment {
      * @return the point at leftBound + proportion * length
      * @throws IllegalArgumentException if proportion is negative or larger than 1
      */
-    public double[] getPoint(double proportion) {
+    public Vector getPoint(double proportion) {
          Validator.assertInRange(proportion, 0, 1);
         return line.getPoint(leftBound + proportion * (rightBound - leftBound));
     }

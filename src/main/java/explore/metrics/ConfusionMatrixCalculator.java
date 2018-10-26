@@ -1,9 +1,13 @@
 package explore.metrics;
 
-import data.LabeledDataset;
+import data.DataPoint;
+import data.PartitionedDataset;
+import explore.user.User;
+import explore.user.UserLabel;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
+import machinelearning.threesetmetric.ExtendedLabel;
 import utils.Validator;
 
 /**
@@ -19,9 +23,21 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
     }
 
     @Override
-    public MetricStorage compute(LabeledDataset data, Label[] trueLabels) {
+    public MetricStorage compute(PartitionedDataset data, User user) {
+        UserLabel[] trueLabels = user.getLabel(data.getAllPoints());  // TODO: can we avoid recomputing these labels
+
         Classifier classifier = learner.fit(data.getLabeledPoints());
-        return compute(trueLabels, classifier.predict(data.getAllPoints()));
+
+        Label[] labels = data.getAllPoints().stream()
+                .map(x -> getLabel(x, data, classifier))
+                .toArray(Label[]::new);
+
+        return compute(trueLabels, labels);
+    }
+
+    private Label getLabel(DataPoint point, PartitionedDataset partitionedDataset, Classifier classifier){
+        ExtendedLabel extendedLabel = partitionedDataset.getLabel(point);
+        return extendedLabel.isUnknown() ? classifier.predict(point) : extendedLabel.toLabel();
     }
 
     /**
@@ -32,7 +48,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
      * @return a confusion matrix
      * @throws IllegalArgumentException if inputs have incompatible dimensions or are 0-length arrays
      */
-    public ConfusionMatrix compute(Label[] trueLabels, Label[] predictedLabels){
+    public ConfusionMatrix compute(UserLabel[] trueLabels, UserLabel[] predictedLabels){
         Validator.assertEqualLengths(trueLabels, predictedLabels);
         Validator.assertNotEmpty(trueLabels);
 

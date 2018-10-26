@@ -2,6 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.directi
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
 import java.util.Random;
 
@@ -41,7 +42,7 @@ class RandomDirectionSamplerTest {
         Random rand = mock(Random.class);
         when(rand.nextGaussian()).thenReturn(1D, 2D);
 
-        assertArrayEquals(new double[]{1, 2}, randomDirectionSampler.sampleDirection(rand));
+        assertEquals(Vector.FACTORY.make(1, 2), randomDirectionSampler.sampleDirection(rand));
     }
 
     @Test

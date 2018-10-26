@@ -1,68 +1,88 @@
 package data;
 
+import explore.user.UserLabel;
 import machinelearning.classifier.Label;
+import utils.linalg.Vector;
 
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * This class stores a labeled data point. It contains:
+ * A LabeledPoint is a {@link DataPoint} instance containing a {@link UserLabel}. More specifically, it is composed of three entities:
  *
- *   - row: row number in the original dataset
- *   - id: data point's id (i.e. database id). If not specified, the own row number is used
- *   - data: array of values contained in array
- *   - label: data point's label (0 or 1)
+ *   - id: a {@code long} uniquely identifying this data points (i.e. a database id).
+ *   - data: array of {@code double} values representing the data point's content
+ *   - label: a {@link UserLabel} (POSITIVE, NEGATIVE, ...)
  */
-public class LabeledPoint extends DataPoint {
+public class LabeledPoint {
     /**
-     * data point's label
+     * Original data point
      */
-    private Label label;
+    private DataPoint dataPoint;
 
     /**
-     * @param row: row number of data point
-     * @param id: data point's identifier
-     * @param data: values array
-     * @param label: data point's label
-     * @throws IllegalArgumentException if data is empty
-     * @throws IllegalArgumentException if label is different from 0 or 1
+     * User label
      */
-    public LabeledPoint(int row, long id, double[] data, Label label) {
-        super(row, id, data);
-        this.label = label;
-    }
-
-    /**
-     * @param row: row number of data point. It will also be used as id.
-     * @param data: values array
-     * @param label: data point's label
-     * @throws IllegalArgumentException if data is empty
-     * @throws IllegalArgumentException if label is different from 0 or 1
-     */
-    public LabeledPoint(int row, double[] data, Label label) {
-        this(row, row, data, label);
-    }
+    private UserLabel label;
 
     /**
      * @param point: a data point
-     * @param label: label
-     * @throws IllegalArgumentException if label is different from 0 or 1
+     * @param label: user label
+     * @throws NullPointerException if label is {@code null}
      */
-    public LabeledPoint(DataPoint point, Label label) {
-        this(point.row, point.id, point.data, label);
-    }
-
-    public Label getLabel() {
-        return label;
+    public LabeledPoint(DataPoint point, UserLabel label) {
+        this.dataPoint = point;
+        this.label = Objects.requireNonNull(label);
     }
 
     /**
-     * @return a new Labeled Point with the value 1 appended to its left
+     * @param id: data point's id
+     * @param data: a data vector
+     * @param label: user label
+     * @throws NullPointerException if label is {@code null}
      */
-    public LabeledPoint addBias(){
-        double[] dataWithBias = new double[getDim()+1];
-        dataWithBias[0] = 1;
-        System.arraycopy(data, 0, dataWithBias, 1, getDim());
-        return new LabeledPoint(row, id, dataWithBias, label);
+    public LabeledPoint(long id, Vector data, UserLabel label) {
+        this(new DataPoint(id, data), label);
+    }
+
+    public LabeledPoint(long id, double[] data, UserLabel label) {
+        this(new DataPoint(id, data), label);
+    }
+
+    public long getId() {
+        return dataPoint.getId();
+    }
+
+    public Vector getData() {
+        return dataPoint.getData();
+    }
+
+    public UserLabel getLabel() {
+        return label;
+    }
+
+    public int getDim() {
+        return dataPoint.getDim();
+    }
+
+    public double get(int index) {
+        return dataPoint.get(index);
+    }
+
+    /**
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
+     */
+    public LabeledPoint getSelectedAttributes(int[] indices, Label label) {
+        return new LabeledPoint(dataPoint.getSelectedAttributes(indices), label);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LabeledPoint that = (LabeledPoint) o;
+        return Objects.equals(dataPoint, that.dataPoint) &&
+                Objects.equals(label, that.label);
     }
 
     /**
@@ -70,14 +90,6 @@ public class LabeledPoint extends DataPoint {
      */
     @Override
     public String toString() {
-        return "{\"row\": " + row + ", \"id\": " + id  + ", \"data\": " + Arrays.toString(data) + ", \"label\": \"" + label + "\"}";
-    }
-
-    /**
-     * @param newData: new data array
-     * @return a new LabeledPoint with new data, but the same metadata
-     */
-    public LabeledPoint clone(double[] newData){
-        return new LabeledPoint(row, id, newData, label);
+        return "{\"id\": " + dataPoint.getId()  + ", \"data\": " + dataPoint.getData() + ", \"label\": " + label + "}";
     }
 }

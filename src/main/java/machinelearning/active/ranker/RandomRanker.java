@@ -1,10 +1,8 @@
 package machinelearning.active.ranker;
 
 import data.DataPoint;
-import explore.sampling.ReservoirSampler;
+import data.IndexedDataset;
 import machinelearning.active.Ranker;
-
-import java.util.Collection;
 
 public class RandomRanker implements Ranker {
 
@@ -12,7 +10,7 @@ public class RandomRanker implements Ranker {
      * @return a random a point from the input collection
      */
     @Override
-    public DataPoint top(Collection<DataPoint> unlabeledSet) {
-        return ReservoirSampler.sample(unlabeledSet);
+    public DataPoint top(IndexedDataset unlabeledSet) {
+        return unlabeledSet.sample(1).get(0);
     }
 }

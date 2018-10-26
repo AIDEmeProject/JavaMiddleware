@@ -29,4 +29,27 @@ class LabelTest {
         assertEquals(1, Label.POSITIVE.asSign());
         assertEquals(-1, Label.NEGATIVE.asSign());
     }
+
+    @Test
+    void getLabelsForEachSubspace_positiveAndNegativeLabels_returnExpectedValues() {
+        assertArrayEquals(new Label[] {Label.POSITIVE}, Label.POSITIVE.getLabelsForEachSubspace());
+        assertArrayEquals(new Label[] {Label.NEGATIVE}, Label.NEGATIVE.getLabelsForEachSubspace());
+    }
+
+    @Test
+    void fromSign_negativeAndPositiveValues_returnsNegativeAndPositiveLabelsRespectively() {
+        assertEquals(Label.NEGATIVE, Label.fromSign(-1));
+        assertEquals(Label.POSITIVE, Label.fromSign(1));
+    }
+
+    @Test
+    void fromSign_zeroValue_returnsNegative() {
+        assertEquals(Label.NEGATIVE, Label.fromSign(0));
+    }
+
+    @Test
+    void toString_PositiveAndNegativeLabels_ReturnExpectedValue() {
+        assertEquals("POSITIVE", Label.POSITIVE.toString());
+        assertEquals("NEGATIVE", Label.NEGATIVE.toString());
+    }
 }

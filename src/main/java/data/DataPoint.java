@@ -1,77 +1,59 @@
 package data;
 
-import utils.Validator;
+import utils.linalg.Vector;
 
 import java.util.Arrays;
 
 /**
- * This class stores a data point. It contains:
+ * A DataPoint is an indexed collection of values. More specifically, it is composed of two entities:
  *
- *   - row: row number in the original dataset
- *   - id: data point's id (i.e. database id). If not specified, the own row number is used
- *   - data: array of values contained in array
+ *   - id: a {@code long} uniquely identifying this data points (i.e. a database id).
+ *   - data: array of {@code double} values representing the data point's content
  */
 public class DataPoint {
-    /**
-     * data point's row number
-     */
-    protected int row;
 
     /**
-     * data point's id
+     * data point's unique id
      */
-    protected long id;
+    private long id;
 
     /**
      * data point's values
      */
-    protected double[] data;
+    private Vector data;
 
     /**
-     * @param id: ID of this point
-     * @param row: row number
+     * @param id: data point's unique ID
      * @param data: the features array
      * @throws IllegalArgumentException if data is emtpy
      */
-    public DataPoint(int row, long id, double[] data) {
-        Validator.assertNotEmpty(data);
-
-        this.row = row;
+    public DataPoint(long id, Vector data) {
         this.id = id;
         this.data = data;
     }
 
-    /**
-     * Initializes data point with identical row and id values.
-     * @param row: value to be used as row number and ID
-     * @param data: the features array
-     * @throws IllegalArgumentException if data is emtpy
-     */
-    public DataPoint(int row, double[] data) {
-        this(row, row, data);
-    }
-
-    public int getRow() {
-        return row;
+    public DataPoint(long id, double[] data) {
+        this.id = id;
+        this.data = Vector.FACTORY.make(data);
     }
 
     public long getId() {
         return id;
     }
 
-    public double[] getData() {
+    public Vector getData() {
         return data;
     }
 
     public double get(int i){
-        return data[i];
+        return data.get(i);
     }
 
     /**
      * @return data point's dimension (i.e. number of features)
      */
     public int getDim(){
-        return data.length;
+        return data.dim();
     }
 
     @Override
@@ -80,24 +62,20 @@ public class DataPoint {
         if (!(o instanceof DataPoint)) return false;
 
         DataPoint dataPoint = (DataPoint) o;
-
-        return row == dataPoint.row && id == dataPoint.id && Arrays.equals(data, dataPoint.data);
+        return id == dataPoint.id && data.equals(dataPoint.data);
     }
 
     /**
-     * We return the own row number of the point, since it is (in theory) unique give a database.
+     * @param indices indices of selected attributes
+     * @return map of the indices and the corresponding values
      */
-    @Override
-    public int hashCode() {
-        return row;
+    public DataPoint getSelectedAttributes(int[] indices) {
+        Arrays.sort(indices);
+        return new DataPoint(id, data.select(indices));
     }
 
     @Override
     public String toString() {
-        return "{\"row\": " + getRow() + ", \"id\": " + getId()  + ", \"data\": " + Arrays.toString(getData()) + '}';
-    }
-
-    public DataPoint clone(double[] newData){
-        return new DataPoint(row, id, newData);
+        return "{\"id\": " + getId()  + ", \"data\": " + data + '}';
     }
 }

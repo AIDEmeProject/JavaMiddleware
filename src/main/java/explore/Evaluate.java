@@ -1,13 +1,13 @@
 package explore;
 
-import data.DataPoint;
-import data.LabeledDataset;
+import data.IndexedDataset;
 import data.LabeledPoint;
+import data.PartitionedDataset;
 import explore.metrics.MetricCalculator;
 import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
-import machinelearning.classifier.Label;
+import utils.RandomState;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,41 +20,49 @@ import java.util.Map;
 public final class Evaluate {
     private FolderManager folder;
     private User user;
-    private List<DataPoint> dataPoints;
+    private IndexedDataset dataPoints;
 
-    public Evaluate(FolderManager folder, List<DataPoint> dataPoints, User user) {
+    public Evaluate(FolderManager folder, IndexedDataset dataPoints, User user) {
         this.folder = folder;
         this.user = user;
         this.dataPoints = dataPoints;
     }
 
     public void evaluate(int id, String calculatorIdentifier) {
-        MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
-
-        Label[] trueLabels = user.getLabel(dataPoints);
-        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
-
         Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
-        try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+        MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
 
+        PartitionedDataset partitionedDataset = folder.getExperimentConfig()
+                .getTsmConfiguration()
+                .getMultiTsmModel()
+                .map(x -> new PartitionedDataset(dataPoints, x))
+                .orElseGet(() -> new PartitionedDataset(dataPoints));
+
+        setRandomSeed(id);
+
+        try (BufferedWriter evalFileWriter = Files.newBufferedWriter(evalFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             long iter = 0;
             long numberOfPreviousIters = countLinesOfFile(evalFile);
 
             for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
-                labeledDataset.putOnLabeledSet(labeledPoints);
+                partitionedDataset.update(labeledPoints);
 
                 if (iter++ < numberOfPreviousIters) {
                     continue;
                 }
 
-                Map<String, Double> metrics = metricCalculator.compute(labeledDataset, trueLabels).getMetrics();
+                Map<String, Double> metrics = metricCalculator.compute(partitionedDataset, user).getMetrics();
 
                 writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
             }
         } catch (IOException ex) {
             throw new RuntimeException("evaluation failed.", ex);
         }
+    }
+
+    private void setRandomSeed(int id) {
+        RandomState.setSeed(1000L * id);
     }
 
     private static long countLinesOfFile(Path file) {

@@ -19,6 +19,5 @@ class ConfusionMatrix(Metric):
         self.learner = learner
 
 
-class TargetSetAccuracy(Metric):
+class ThreeSetMetric(Metric):
     pass
-

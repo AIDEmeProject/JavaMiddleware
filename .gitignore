@@ -2,5 +2,7 @@
 target/
 out/
 experiment/
+results/
 javadoc/
 *.ini
+__pycache__/

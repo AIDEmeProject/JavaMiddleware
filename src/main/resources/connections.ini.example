@@ -2,4 +2,4 @@
 url = postgresql://localhost:5432  # database connection string: driver://host:port
 user = postgres   # your username (avoid using postgres user!)
 password = postgres  # your password
-key = row  # which column to be used as key or row
+key = name_of_column_id  # which column to be used as key or row

@@ -2,8 +2,9 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Vector;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LineSegmentTest {
@@ -12,7 +13,7 @@ class LineSegmentTest {
 
     @BeforeEach
     void setUp() {
-        line = new Line(new double[2], new double[] {1,2});
+        line = new Line(Vector.FACTORY.zeros(2), Vector.FACTORY.make(1,2));
         segment = new LineSegment(line, -1, 2);
     }
 
@@ -48,16 +49,16 @@ class LineSegmentTest {
 
     @Test
     void getPoint_zeroProportion_returnsLeftExtreme() {
-        assertArrayEquals(new double[] {-1, -2}, segment.getPoint(0));
+        assertEquals(Vector.FACTORY.make(-1, -2), segment.getPoint(0));
     }
 
     @Test
     void getPoint_OneProportion_returnsRightExtreme() {
-        assertArrayEquals(new double[] {2, 4}, segment.getPoint(1));
+        assertEquals(Vector.FACTORY.make(2, 4), segment.getPoint(1));
     }
 
     @Test
     void getPoint_halfProportion_returnsMiddlePoint() {
-        assertArrayEquals(new double[] {0.5, 1}, segment.getPoint(0.5));
+        assertEquals(Vector.FACTORY.make(0.5, 1), segment.getPoint(0.5));
     }
 }

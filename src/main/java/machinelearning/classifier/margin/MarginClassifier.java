@@ -3,6 +3,8 @@ package machinelearning.classifier.margin;
 import data.DataPoint;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 /**
  * A margin classifier is defined by:
@@ -16,10 +18,16 @@ import machinelearning.classifier.Label;
  */
 public abstract class MarginClassifier implements Classifier {
     /**
-     * @param x: a data point
+     * @param x: a feature vector
      * @return the margin of this point
      */
-    public abstract double margin(double[] x);
+    public abstract double margin(Vector x);
+
+    /**
+     * @param xs: a matrix of feature vectors (one per row)
+     * @return a Vector containing the margins of each feature vector
+     */
+    public abstract Vector margin(Matrix xs);
 
     /**
      * @param point: a data point
@@ -29,13 +37,18 @@ public abstract class MarginClassifier implements Classifier {
         return margin(point.getData());
     }
 
-    /**
-     * @param point: a data point
-     * @return sigmoid( margin(point) )
-     */
     @Override
-    public final double probability(DataPoint point) {
-        return 1.0 / (1.0 + Math.exp(-margin(point)));
+    public double probability(Vector vector) {
+        return sigmoid(margin(vector));
+    }
+
+    @Override
+    public Vector probability(Matrix matrix) {
+        return margin(matrix).iApplyMap(MarginClassifier::sigmoid);
+    }
+
+    private static double sigmoid(double value) {
+        return 1.0 / (1.0 + Math.exp(-value));
     }
 
     /**
@@ -43,7 +56,7 @@ public abstract class MarginClassifier implements Classifier {
      * @return sign( margin(x) )
      */
     @Override
-    public final Label predict(DataPoint point) {
-        return margin(point) > 0 ? Label.POSITIVE : Label.NEGATIVE;
+    public final Label predict(Vector point) {
+        return Label.fromSign(margin(point));
     }
 }

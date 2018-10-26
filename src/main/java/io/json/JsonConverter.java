@@ -9,12 +9,16 @@ import com.google.gson.stream.JsonReader;
 import data.LabeledPoint;
 import exceptions.JsonDeserializationFailedException;
 import explore.metrics.MetricCalculator;
+import explore.user.UserLabel;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
+import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.Kernel;
+import machinelearning.threesetmetric.LabelGroup;
+import utils.linalg.Vector;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -34,6 +38,12 @@ public class JsonConverter {
     private static Gson buildGson() {
         GsonBuilder builder = new GsonBuilder();
 
+        builder.registerTypeAdapter(UserLabel.class, new UserLabelAdapter());
+        builder.registerTypeAdapter(Label.class, new UserLabelAdapter());
+        builder.registerTypeAdapter(LabelGroup.class, new UserLabelAdapter());
+
+        builder.registerTypeAdapter(Vector.class, new VectorAdapter());
+
         builder.registerTypeAdapter(Kernel.class, new KernelAdapter());
 
         builder.registerTypeAdapter(Learner.class, new LearnerAdapter());
@@ -45,7 +55,7 @@ public class JsonConverter {
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
 
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
-
+        // TODO: add TSM metrics
         return builder.create();
     }
 
@@ -111,7 +121,7 @@ public class JsonConverter {
      * @param value: an object to be serialized
      * @return a String serializing the input object
      */
-    public static String serialize(Object value) {
+    public static <T> String serialize(T value) {
         return gson.toJson(value);
     }
 }

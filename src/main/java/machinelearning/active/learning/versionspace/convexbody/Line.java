@@ -1,7 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
 import utils.Validator;
-import utils.linalg.LinearAlgebra;
+import utils.linalg.Vector;
 
 /**
  * This class represents a Line Segment in euclidean space. A line is defined by two elements:
@@ -17,31 +17,33 @@ public class Line {
     /**
      * A point on the line
      */
-    private double[] center;
+    private Vector center;
 
     /**
      * The line's direction
      */
-    private double[] direction;
+    private Vector direction;
 
     /**
      * @param center: any point on the line
      * @param direction: the direction of the line. It will NOT be normalized or changed anyhow.
-     * @throws IllegalArgumentException if center and direction have different lengths, if they are empty arrays, or direction is the zero vector
+     * @throws IllegalArgumentException if center and direction have different lengths, or direction is the zero vector
      */
-    public Line(double[] center, double[] direction) {
-        Validator.assertEqualLengths(center, direction);
-        Validator.assertPositive(LinearAlgebra.sqNorm(direction));
+    public Line(Vector center, Vector direction) {
+        Validator.assertEquals(center.dim(), direction.dim());
+        if (direction.squaredNorm() == 0) {
+            throw new IllegalArgumentException("Direction cannot be zero vector.");
+        }
 
         this.center = center;
         this.direction = direction;
     }
 
-    public double[] getCenter() {
+    public Vector getCenter() {
         return center;
     }
 
-    public double[] getDirection() {
+    public Vector getDirection() {
         return direction;
     }
 
@@ -49,21 +51,15 @@ public class Line {
      * @return the dimension of the euclidean space containing this line
      */
     public int getDim(){
-        return center.length;
+        return center.dim();
     }
 
     /**
      * @param t: position of the requested point on the line
      * @return the point center + t * direction
      */
-    public double[] getPoint(double t){
-        double[] point = new double[center.length];
-
-        for (int i = 0; i < center.length; i++) {
-            point[i] = center[i] + t * direction[i];
-        }
-
-        return point;
+    public Vector getPoint(double t){
+        return center.add(direction.scalarMultiply(t));
     }
 
     /**

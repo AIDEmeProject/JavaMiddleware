@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  * This class manages a folder in the local filesystem. It can create new files in the folder, and return a list of
  */
 public class FolderManager {
+    private static ExperimentConfiguration experimentConfiguration = null;
     private static String CONFIG_FILE = "config.json";
     private static String RUN_FILE = "Runs/%d.run";
     private static String EVAL_FILE = "%s/%d.eval";
@@ -99,7 +100,10 @@ public class FolderManager {
     }
 
     public ExperimentConfiguration getExperimentConfig() {
-        return parseConfigFile(folder.resolve("Runs/" + CONFIG_FILE), ExperimentConfiguration.class);
+        if (experimentConfiguration == null) {
+            experimentConfiguration = parseConfigFile(folder.resolve("Runs/" + CONFIG_FILE), ExperimentConfiguration.class);
+        }
+        return experimentConfiguration;
     }
 
     public MetricCalculator getMetricCalculator(String name) {

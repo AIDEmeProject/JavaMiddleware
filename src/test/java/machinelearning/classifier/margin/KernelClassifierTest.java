@@ -1,48 +1,32 @@
 package machinelearning.classifier.margin;
 
-import data.DataPoint;
 import machinelearning.classifier.svm.Kernel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class KernelClassifierTest {
-    private Collection<DataPoint> support;
+    private Matrix support;
     private Kernel kernel;
     private KernelClassifier classifier;
 
     @BeforeEach
     void setUp() {
-        kernel = mock(Kernel.class);
-
-        support = new ArrayList<>();
-        support.add(new DataPoint(0, new double[] {1,1}));
-        support.add(new DataPoint(1, new double[] {2,3}));
-
-        classifier = new KernelClassifier(1, new double[] {-2,3}, support, kernel);
+        kernel = spy(Kernel.class);
+        when(kernel.compute((Vector) any(), any())).thenReturn(1.);
+        support = Matrix.FACTORY.make(3, 2, 1, 1, 2, 3, 4, 5);
+        classifier = new KernelClassifier(1, Vector.FACTORY.make(-2,3,0), support, kernel);
     }
 
     @Test
     void linearClassifierConstructor_NullLinearClassifier_throwsException() {
         assertThrows(NullPointerException.class, () -> new KernelClassifier(null, support, kernel));
-    }
-
-    @Test
-    void linearClassifierConstructor_emptySupportVectors_throwsException() {
-        LinearClassifier linearClassifier = mock(LinearClassifier.class);
-        when(linearClassifier.getDim()).thenReturn(2);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> new KernelClassifier(linearClassifier, Collections.EMPTY_LIST, kernel));
     }
 
     @Test
@@ -56,15 +40,12 @@ class KernelClassifierTest {
         LinearClassifier linearClassifier = mock(LinearClassifier.class);
         when(linearClassifier.getDim()).thenReturn(2);
 
-        support.add(mock(DataPoint.class));
-
         assertThrows(IllegalArgumentException.class,
-                () -> new KernelClassifier(linearClassifier, support, kernel));
+                () -> new KernelClassifier(linearClassifier, mock(Matrix.class), kernel));
     }
 
     @Test
     void margin_alwaysOneKernel_returnsCorrectMargin() {
-        when(kernel.compute((Collection<? extends DataPoint>) any(), (double[]) any())).thenReturn(new double[] {1, 1});
-        assertEquals(2, classifier.margin(new double[] {1,2}));
+        assertEquals(2, classifier.margin(Vector.FACTORY.make(1, 2)));
     }
 }

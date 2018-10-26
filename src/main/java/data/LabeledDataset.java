@@ -2,120 +2,118 @@ package data;
 
 import machinelearning.classifier.Label;
 import utils.Validator;
+import utils.linalg.Matrix;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
-public class LabeledDataset {
+/**
+ * This module is a in-memory storage for labeled data points. Its main functionality is to provide easy access to its
+ * data under several different formats (iterator, stream, range, ...).
+ *
+ * @see DataPoint
+ */
+public class LabeledDataset implements Iterable<LabeledPoint> {
     /**
-     * collection of labeled points
+     * Data points and their indexes
      */
-    private final Set<LabeledPoint> labeled;
+    private IndexedDataset dataset;
 
     /**
-     * collection of unlabeled points
+     * Label of each data point
      */
-    private final Set<DataPoint> unlabeled;
+    private Label[] labels;
 
     /**
-     * Reference to the initial collection of points
+     * @param indexes: indexes of each data point
+     * @param data: feature matrix (each row represents a data point)
+     * @param labels: the label of each data point
+     * @throws IllegalArgumentException if inputs do not have the same size or are empty
      */
-    private final List<DataPoint> allPoints;
-
-    /**
-     * @param points collection of data points to be used as initial unlabeled data pool
-     */
-    public LabeledDataset(List<DataPoint> points){
-        validateDataPointCollection(points);
-
-        labeled = new LinkedHashSet<>();
-        unlabeled = new LinkedHashSet<>(points);
-        allPoints = points;
+    public LabeledDataset(List<Long> indexes, Matrix data, Label[] labels) {
+        this(new IndexedDataset(indexes, data), labels);
     }
 
     /**
-     * Asserts a collection of data points is non-empty, and that all elements have the same dimension.
-     * @param points: collection of data points
+     * @param dataset: a collection of data points and indexes
+     * @param labels: the labels for each data point
+     * @throws IllegalArgumentException if the dataset and the labels have incompatible sizes
      */
-    private static void validateDataPointCollection(Collection<DataPoint> points){
-        Validator.assertNotEmpty(points);
+    public LabeledDataset(IndexedDataset dataset, Label[] labels) {
+        Validator.assertEquals(dataset.length(), labels.length);
+        this.dataset = dataset;
+        this.labels = labels;
+    }
 
-        Iterator<DataPoint> it = points.iterator();
+    public List<Long> getIndexes() {
+        return dataset.getIndexes();
+    }
 
-        int dim = it.next().getDim();
-        it.forEachRemaining(pt -> Validator.assertEquals(dim, pt.getDim()));
+    public Matrix getData() {
+        return dataset.getData();
+    }
+
+    public Label[] getLabels() {
+        return labels;
     }
 
     /**
-     * @return collection containing all points
+     * @return number of data points
      */
-    public List<DataPoint> getAllPoints() {
-        return allPoints;
+    public int length() {
+        return labels.length;
     }
 
     /**
-     * @return Collection of labeled points
+     * @return dimension of each data point
      */
-    public Collection<LabeledPoint> getLabeledPoints() {
-        return new LinkedHashSet<>(labeled);
+    public int dim() {
+        return dataset.dim();
     }
 
     /**
-     * @return Collection of unlabeled points
+     * @param i: row index of labeled point to retrieve
+     * @return the labeled point at row {@code i}.
+     * @throws IndexOutOfBoundsException if {@code i} is out-of-bounds
      */
-    public Collection<DataPoint> getUnlabeledPoints() {
-        return new LinkedHashSet<>(unlabeled);
+    public LabeledPoint get(int i) {
+        return new LabeledPoint(dataset.get(i), labels[i]);
     }
 
     /**
-     * @return number of labeled points
+     * @param data: new features matrix
+     * @return a new LabeledDataset object with same indexes and labells as {@code this}, but with the underlying data
+     * matrix replaced by the input one
      */
-    public int getNumLabeledPoints() {
-        return labeled.size();
+    public LabeledDataset copyWithSameIndexesAndLabels(Matrix data) {
+        return new LabeledDataset(dataset.getIndexes(), data, labels);
     }
 
-    /**
-     * @return number of unlabeled points
-     */
-    public int getNumUnlabeledPoints() {
-        return unlabeled.size();
+    @Override
+    public Iterator<LabeledPoint> iterator() {
+        return new Iterator<LabeledPoint>() {
+            int row = 0;
+
+            @Override
+            public boolean hasNext() {
+                return row < labels.length;
+            }
+
+            @Override
+            public LabeledPoint next() {
+                return get(row++);
+            }
+        };
     }
 
-    public boolean hasLabeledPoints() {
-        return !labeled.isEmpty();
-    }
-
-    public boolean hasUnlabeledPoints() {
-        return !unlabeled.isEmpty();
-    }
-
-    /**
-     * Add point to labeled points collection and remove it from unlabeled collection.
-     *
-     * @param point: labeled point to put
-     * @throws IllegalArgumentException if point is not in unlabeled set
-     * @throws IllegalArgumentException if label is different from 0 or 1
-     */
-    public void putOnLabeledSet(LabeledPoint point) {
-        boolean removed = unlabeled.remove(point);
-
-        if (!removed){
-            throw new IllegalArgumentException("Point " + point + " is not in unlabeled set.");
-        }
-
-        labeled.add(point);
-    }
-
-    /**
-     * Add all points in collection to labeled points set, removing then from the unlabeled set.
-     *
-     * @param points: collection of labeled points to put
-     * @throws IllegalArgumentException if any point is not in unlabeled set
-     * @throws IllegalArgumentException if points and labels have different sizes
-     * @throws IllegalArgumentException if any label is invalid (i.e. different from 0 or 1)
-     */
-    public void putOnLabeledSet(Collection<LabeledPoint> points) {
-        for (LabeledPoint point : points) {
-            putOnLabeledSet(point);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LabeledDataset that = (LabeledDataset) o;
+        return Objects.equals(dataset, that.dataset) &&
+                Arrays.equals(labels, that.labels);
     }
 }

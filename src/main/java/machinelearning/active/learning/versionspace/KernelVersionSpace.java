@@ -1,14 +1,14 @@
 package machinelearning.active.learning.versionspace;
 
-import data.LabeledPoint;
+import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.classifier.KernelMajorityVote;
+import machinelearning.classifier.MajorityVote;
 import machinelearning.classifier.margin.KernelClassifier;
 import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import utils.linalg.Matrix;
 
 /**
  * This class defines the Version Space for the {@link KernelClassifier} classifier. It is defined by the set of
@@ -24,11 +24,11 @@ import java.util.Collection;
  * @see LinearVersionSpace
  * @see HitAndRunSampler
  */
-public class KernelVersionSpace implements VersionSpace {
+public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
     /**
      * {@link LinearVersionSpace} instance used for sampling
      */
-    private final LinearVersionSpace linearVersionSpace;
+    private final VersionSpace<LinearClassifier> linearVersionSpace;
 
     /**
      * {@link Kernel} function
@@ -40,35 +40,18 @@ public class KernelVersionSpace implements VersionSpace {
      * @param kernel: the kernel function
      * @throws NullPointerException if sampler or kernel is null
      */
-    public KernelVersionSpace(LinearVersionSpace linearVersionSpace, Kernel kernel) {
+    public KernelVersionSpace(VersionSpace<LinearClassifier> linearVersionSpace, Kernel kernel) {
         Validator.assertNotNull(linearVersionSpace);
         Validator.assertNotNull(kernel);
         this.linearVersionSpace = linearVersionSpace;
         this.kernel = kernel;
     }
 
-    private Collection<LabeledPoint> computeKernelMatrix(Collection<LabeledPoint> labeledPoints){
-        // apply kernel function
-        double[][] kernelMatrix = kernel.compute(labeledPoints);
-
-        int i = 0;
-        Collection<LabeledPoint> kernelLabeledPoints = new ArrayList<>(labeledPoints.size());
-        for (LabeledPoint point : labeledPoints) {
-            kernelLabeledPoints.add(point.clone(kernelMatrix[i++]));
-        }
-
-        return kernelLabeledPoints;
-    }
-
     @Override
-    public KernelClassifier[] sample(Collection<LabeledPoint> labeledPoints, int numSamples) {
-        LinearClassifier[] linearClassifiers = linearVersionSpace.sample(computeKernelMatrix(labeledPoints), numSamples);
-
-        KernelClassifier[] kernelClassifiers = new KernelClassifier[numSamples];
-        for (int i = 0; i < numSamples; i++) {
-            kernelClassifiers[i] = new KernelClassifier(linearClassifiers[i], labeledPoints, kernel);
-        }
-
-        return kernelClassifiers;
+    public KernelMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
+        Matrix kernelMatrix = kernel.compute(labeledPoints.getData());
+        LabeledDataset kernelLabeledPoints =  labeledPoints.copyWithSameIndexesAndLabels(kernelMatrix);
+        MajorityVote<LinearClassifier> linearClassifiers = linearVersionSpace.sample(kernelLabeledPoints, numSamples);
+        return new KernelMajorityVote(linearClassifiers.getClassifiers(), labeledPoints.getData(), kernel);
     }
 }

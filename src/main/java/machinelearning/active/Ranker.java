@@ -1,8 +1,7 @@
 package machinelearning.active;
 
 import data.DataPoint;
-
-import java.util.Collection;
+import data.IndexedDataset;
 
 public interface Ranker {
     /**
@@ -10,5 +9,5 @@ public interface Ranker {
      * @return the "most informative" point in the input collection
      * @throws IllegalArgumentException if unlabeledSet is empty
      */
-    DataPoint top(Collection<DataPoint> unlabeledSet);
+    DataPoint top(IndexedDataset unlabeledSet);
 }

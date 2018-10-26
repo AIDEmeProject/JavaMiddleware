@@ -3,132 +3,86 @@ package data;
 import machinelearning.classifier.Label;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LabeledDatasetTest {
-    private ArrayList<DataPoint> unlabeledPoints;
-    private List<LabeledPoint> labeledPoints;
-    private LabeledDataset data;
+    private List<Long> indexes;
+    private Matrix data;
+    private Label[] labels;
+    private LabeledDataset dataset;
 
     @BeforeEach
     void setUp() {
-        double[][] X = new double[][] {{1}, {2}, {3}, {4}};
-        computeUnlabeledPointsFromMatrix(X);
-
-        Label[] y = new Label[]{Label.NEGATIVE, Label.NEGATIVE, Label.POSITIVE, Label.POSITIVE};
-        labeledPoints = new ArrayList<>();
-        for (int i = 0; i < X.length; i++) {
-            labeledPoints.add(new LabeledPoint(i, X[i], y[i]));
-        }
-
-        data = new LabeledDataset(unlabeledPoints);
-    }
-
-    private void assertUnlabeledCollectionsAreEqual(Collection<DataPoint> collection1, Collection<DataPoint> collection2){
-        System.out.println(collection1);
-        System.out.println(collection2);
-        assertTrue(collection1.containsAll(collection2) && collection2.containsAll(collection1));
-    }
-
-    private void assertLabeledCollectionsAreEqual(Collection<LabeledPoint> collection1, Collection<LabeledPoint> collection2){
-        assertEquals(collection1.size(), collection2.size());
-
-        Iterator<LabeledPoint> it = collection2.iterator();
-        for (DataPoint point : collection1){
-            assertEquals(point, it.next());
-        }
-    }
-
-    private void computeUnlabeledPointsFromMatrix(double[][] X){
-        unlabeledPoints = new ArrayList<>(X.length);
-        for (int i = 0; i < X.length; i++){
-            unlabeledPoints.add(new DataPoint(i, X[i]));
-        }
-    }
-
-    private void putOnLabeledDataset(int... indexes) {
-        for (int i : indexes) {
-            data.putOnLabeledSet(labeledPoints.get(i));
-        }
+        indexes = Arrays.asList(0L, 10L, 20L);
+        data = Matrix.FACTORY.make(3, 2, 1, 2, 3, 4, 5, 6);  // [[1,2], [3,4], [5, 6]]
+        labels = new Label[]{Label.POSITIVE, Label.NEGATIVE, Label.POSITIVE};
+        dataset = new LabeledDataset(indexes, data, labels);
     }
 
     @Test
-    void constructor_noDataPoints_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(new ArrayList<>()));
+    void constructor_indexesHasIncompatibleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(Arrays.asList(1L, 2L), data, labels));
     }
 
     @Test
-    void constructor_rowsOfDifferentLengths_throwsException() {
-        computeUnlabeledPointsFromMatrix(new double[][] {{1},{1,2}});
-        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(unlabeledPoints));
+    void constructor_matrixHasIncompatibleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(indexes, Matrix.FACTORY.zeros(2, 2), labels));
     }
 
     @Test
-    void getLabeledPoints_noPointsLabeled_returnsEmptyCollection() {
-        assertTrue(data.getLabeledPoints().isEmpty());
+    void constructor_labelsHasIncompatibleSize_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(indexes, data, new Label[] {Label.POSITIVE}));
     }
 
     @Test
-    void getLabeledPoints_fewPointsLabeled_returnsExpectedCollection() {
-        putOnLabeledDataset(0, 1);
-        assertLabeledCollectionsAreEqual(labeledPoints.subList(0, 2), data.getLabeledPoints());
+    void constructor_indexedDatasetAndLabelsHaveIncompatibleSizes_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new LabeledDataset(new IndexedDataset(indexes, data), new Label[] {Label.POSITIVE}));
     }
 
     @Test
-    void getUnlabeledPoints_noLabeledPointsAdded_returnsAllPoints() {
-        assertUnlabeledCollectionsAreEqual(unlabeledPoints, data.getUnlabeledPoints());
+    void length_datasetContainsThreeDataPoints_returnsThree() {
+        assertEquals(data.rows(), dataset.length());
     }
 
     @Test
-    void getUnlabeledPoints_fewPointsLabeled_returnsExpectedCollection() {
-        int[] indexes = new int[] {0};
-
-        putOnLabeledDataset(indexes);
-        for (int index : indexes) {
-            unlabeledPoints.remove(index);
-        }
-
-        assertUnlabeledCollectionsAreEqual(unlabeledPoints, data.getUnlabeledPoints());
+    void dim_dataPointsAreTwoDimensional_returnsTwo() {
+        assertEquals(data.cols(), dataset.dim());
     }
 
     @Test
-    void getNumLabeledRows_noLabeledPointsAdded_returnsZero() {
-        assertEquals(0, data.getNumLabeledPoints());
+    void get_negativeIndex_throwsException() {
+        assertThrows(IndexOutOfBoundsException.class, () -> dataset.get(-1));
     }
 
     @Test
-    void getNumLabeledRows_addedLabeledPoints_returnsCorrectNumber() {
-        putOnLabeledDataset(0, 2);
-        assertEquals(2, data.getNumLabeledPoints());
+    void get_indexEqualsToLength_throwsException() {
+        assertThrows(IndexOutOfBoundsException.class, () -> dataset.get(dataset.length()));
     }
 
     @Test
-    void getNumUnlabeledRows_noLabeledPointsAdded_returnNumOfDataPoints() {
-        assertEquals(unlabeledPoints.size(), data.getNumUnlabeledPoints());
+    void get_indexInBounds_returnsExpectedDataPoint() {
+        assertEquals(new LabeledPoint(0L, Vector.FACTORY.make(1, 2), labels[0]), dataset.get(0));
+        assertEquals(new LabeledPoint(10L, Vector.FACTORY.make(3, 4), labels[1]), dataset.get(1));
+        assertEquals(new LabeledPoint(20L, Vector.FACTORY.make(5, 6), labels[2]), dataset.get(2));
     }
 
     @Test
-    void getNumUnlabeledRows_addedLabeledPoints_returnNumOfUnlabeledPoints() {
-        putOnLabeledDataset(0, 3);
-        assertEquals(unlabeledPoints.size() - 2, data.getNumUnlabeledPoints());
+    void copyWithSameIndexesAndLabels_newMatrixHasDifferentLength_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.copyWithSameIndexesAndLabels(Matrix.FACTORY.zeros(1, 2)));
     }
 
     @Test
-    void putOnLabeledSet_addSamePointTwice_throwsException() {
-        putOnLabeledDataset(0);
-        assertThrows(IllegalArgumentException.class, () -> data.putOnLabeledSet(labeledPoints.get(0)));
-    }
-
-    @Test
-    void putOnLabeledSet_addPoint_inLabeledSetButNotInUnlabeledSet() {
-        data.putOnLabeledSet(labeledPoints.get(0));
-        assertTrue(data.getLabeledPoints().contains(labeledPoints.get(0)));
-        assertFalse(data.getUnlabeledPoints().contains(unlabeledPoints.get(0)));
+    void copyWithSameIndexesAndLabels_compatibleMatrix_returnsDatasetWithNewDataButSameIndexes() {
+        Matrix matrix = Matrix.FACTORY.make(3, 1, 10, 11, 12);
+        LabeledDataset newDataset = dataset.copyWithSameIndexesAndLabels(matrix);
+        assertEquals(indexes, newDataset.getIndexes());
+        assertEquals(matrix, newDataset.getData());
+        assertArrayEquals(labels, newDataset.getLabels());
     }
 }
