@@ -37,6 +37,11 @@ public class NewSessionServlet extends HttpServlet {
         String sessionPath = "./session/" + sessionId;
         boolean success = (new File(sessionPath)).mkdirs();
 
+
+        req.getSession().setAttribute("sessionPath", sessionPath);
+
+        this.getServletContext().setAttribute("sessionPath", sessionPath);
+
         FolderManager folderManager = new FolderManager(sessionPath);
 
         Experiment experiment = new Experiment(folderManager);

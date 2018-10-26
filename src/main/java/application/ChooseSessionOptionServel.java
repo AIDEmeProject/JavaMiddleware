@@ -3,6 +3,7 @@ package application;
 import application.data.CsvDatasetReader;
 import com.google.gson.Gson;
 import data.DataPoint;
+import data.LabeledDataset;
 import explore.Experiment;
 import io.FolderManager;
 import org.apache.commons.csv.CSVFormat;
@@ -21,10 +22,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
 
 public class ChooseSessionOptionServel extends HttpServlet {
@@ -37,35 +36,63 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         resp.setContentType("application/json");
 
-
         Map<String, String[]> postData = req.getParameterMap();
-        System.out.println(postData.toString());
 
+
+
+        String sessionPath = (String) req.getSession().getAttribute("sessionPath");
+
+        sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
+
+        Reader in = new FileReader(sessionPath + "/data.csv");
+
+        Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
+
+        Integer columnId;
+
+
+        ArrayList<Integer> columnIds = new ArrayList<>();
 
         for (Map.Entry<String, String[]> entry : postData.entrySet()){
 
-            System.out.println(entry.getValue());
+
+            String strColumnId = String.join(",", entry.getValue());
+            columnId = Integer.parseInt(strColumnId);
+
+            columnIds.add(columnId);
         }
 
-        Gson json = new Gson();
+        ArrayList<Double> rowValues = new ArrayList();
+
+        Integer rowNumber = 0;
 
 
+        LabeledDataset labeledDataset;
 
-        resp.getWriter().println(json.toJson(req.getParameterMap()));
+        ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
-       /* List<DataPoint> dataPoints = new ArrayList<>();
-
-
-        Reader in = new FileReader("path/to/file.csv");
-        Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
         for (CSVRecord record : records) {
 
+            rowValues.removeAll(rowValues);
+
+            for (Integer id : columnIds){
+
+                rowValues.add(Double.parseDouble(record.get(id)));
+            }
+
+            double[] d = rowValues.toArray(new Double[rowValues.size()];
+            DataPoint dataPoint = new DataPoint(rowNumber, d);
 
 
-            String columnOne = record.get(0);
-            String columnTwo = record.get(1);
-        }*/
+            dataPoints.add(dataPoint);
+            rowNumber++;
+        }
 
+        labeledDataset = new LabeledDataset(dataPoints);
+
+        this.getServletContext().setAttribute("labeledDataset", labeledDataset);
+
+        resp.getWriter().println("point to label is lal");
 
         // Load Dataset with good columns
         // Start all the stuff.

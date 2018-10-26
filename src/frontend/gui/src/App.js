@@ -18,6 +18,7 @@ function uploadFile(event, onSuccess){
     
     var file = document.querySelector('form input[type=file]').files[0]
     formData.append("dataset", file);
+    
     axios.post(endPoint,
                formData, 
                 {
@@ -83,20 +84,29 @@ class NewSession extends Component{
         return (
 
             <div>
-
-                <p>
+                <h1>
                     New Session
-                </p>
-                <form 
-                    onSubmit={this.handleSubmit.bind(this)}     
-                >   
+                </h1>
 
-                    <label htmlFor="dataset">Dataset to run model on </label>
-                    <input id="dataset" name="dataset" type="file" />
+                <div>
 
-                    <input type="submit" value="learn model on this dataset" />
-                    
-                </form> 
+                
+                    <form 
+                        onSubmit={this.handleSubmit.bind(this)}     
+                    >   
+
+                        <label htmlFor="dataset">Choose the dataset to be labeled</label>
+                        <input
+                            className="form-control-file"
+                            id="dataset" name="dataset" type="file" 
+                        />
+
+                        <input
+                            className="btn btn-raised btn-primary"
+                            type="submit" value="Confirm" />
+                        
+                    </form> 
+                </div>
         
             </div>
         )
@@ -111,36 +121,53 @@ class SessionOptions extends Component{
         sendChosenColumns(e, this.props.sessionWasStarted)
     }
 
+    componentDidMount(){
+
+        window.$('form').bootstrapMaterialDesign()        
+    }
+
     render(){
         
         return (
             <div>
-                <div>
-                    Session Option. Pick the columns which will be used as feature: 
-                </div>
-                <form 
-                
+              
+                <form                 
                     id="choose-columns"
-                    onSubmit={this.onChosenColumns.bind(this)}>
-            
+                    onSubmit={this.onChosenColumns.bind(this)}
+                >
+                                                        
                     {
-                                                
+                
                         this.props.columns.map((column, key) => (
+                                                    
+                                <div 
+                                    key={key} 
+                                    className="checkbox">                                    
+                                    <label>
+                                                                    
+                                        <input        
+                                                className="form-control"                                        
+                                                type="checkbox"
+                                                name={"column" + key }
+                                                value={key} 
+                                                id={"column-" + column }  
+                                            /> {column}
 
-                            <div key={key}>
+                                    </label>
 
-                                
-                                <label htmlFor={"column-" + column}>
-                                    {column}
-                                </label>
-                                <input
-                                    type="checkbox"
-                                    name={"column" + key }
-                                    value={key} id={"column-" + column }  />
-                            </div>    
-                            
+                                </div>                                                          
                         ))
                     }
+                    
+                    
+                    <div className="form-group">
+                        <label htmlFor="algorithm-selection">Choose the algorithm for the session</label>
+                        <select className="form-control" id="algorithm-selection">
+                            <option  defaultValue value="TSM">TSM</option> 
+                            <option value="algo2">Algo 2</option>
+                            
+                        </select>
+                    </div>
 
                     <input type="submit" value="Start session" />
                 
@@ -159,9 +186,7 @@ class Exploration extends Component{
         return (
 
             <div>
-
                 <p> label this sample</p>
-
             </div>
         )
     }
@@ -173,7 +198,10 @@ class App extends Component {
   constructor(props){
       super(props)
 
-      this.state = {step : NEW_SESSION}
+      this.state = {
+          step : NEW_SESSION,
+          columns: ["hehe"]
+        }
   }
 
   sessionWasStarted(response){
@@ -217,16 +245,34 @@ class App extends Component {
     }
 
     return (
-      <div className="App">
 
+      <div className="App container">
 
-        <section>
-            <View 
-                fileUploaded={this.fileUploaded.bind(this)} 
-                sessionWasStarted={this.sessionWasStarted.bind(this)}  
-                {...this.state}
-            />
-        </section>
+        <div>
+            <ul className="nav nav-tabs">
+                <li className="nav-item">
+                  
+                    <a className="nav-link active" href="#">CEDAR - Active learning labeler</a>
+                </li>
+                
+            </ul>
+        </div>
+
+        <div className="row">
+
+            <div className="col">
+  
+  
+
+                <View 
+                    fileUploaded={this.fileUploaded.bind(this)} 
+                    sessionWasStarted={this.sessionWasStarted.bind(this)}  
+                    {...this.state}
+                />
+            
+            </div>
+        </div>
+
       </div>
     );
   }

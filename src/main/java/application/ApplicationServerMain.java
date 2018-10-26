@@ -1,6 +1,7 @@
 package application;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
@@ -21,10 +22,11 @@ public class ApplicationServerMain {
 
         ServletContextHandler handler = new ServletContextHandler(server, "/");
 
-        handler.addServlet(ExampleServlet.class, "/");
+        handler.setSessionHandler(new SessionHandler());
+
+
         handler.addServlet(NewSessionServlet.class, "/new-session");
         handler.addServlet(ChooseSessionOptionServel.class, "/choose-options");
-
 
 
         FilterHolder cors = handler.addFilter(CrossOriginFilter.class,"/*",EnumSet.allOf(DispatcherType.class));
