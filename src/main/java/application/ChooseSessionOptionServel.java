@@ -33,12 +33,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-
         resp.setContentType("application/json");
 
         Map<String, String[]> postData = req.getParameterMap();
-
-
 
         String sessionPath = (String) req.getSession().getAttribute("sessionPath");
 
@@ -50,11 +47,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         Integer columnId;
 
-
         ArrayList<Integer> columnIds = new ArrayList<>();
 
         for (Map.Entry<String, String[]> entry : postData.entrySet()){
-
 
             String strColumnId = String.join(",", entry.getValue());
             columnId = Integer.parseInt(strColumnId);
@@ -62,15 +57,12 @@ public class ChooseSessionOptionServel extends HttpServlet {
             columnIds.add(columnId);
         }
 
+
         ArrayList<Double> rowValues = new ArrayList();
-
-        Integer rowNumber = 0;
-
-
-        LabeledDataset labeledDataset;
 
         ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
+        Integer rowNumber = 0;
         for (CSVRecord record : records) {
 
             rowValues.removeAll(rowValues);
@@ -80,7 +72,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
                 rowValues.add(Double.parseDouble(record.get(id)));
             }
 
-            double[] d = rowValues.toArray(new Double[rowValues.size()];
+            double[] d = rowValues.toArray((new double[0]));
             DataPoint dataPoint = new DataPoint(rowNumber, d);
 
 
@@ -88,7 +80,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
             rowNumber++;
         }
 
-        labeledDataset = new LabeledDataset(dataPoints);
+        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
 
         this.getServletContext().setAttribute("labeledDataset", labeledDataset);
 
