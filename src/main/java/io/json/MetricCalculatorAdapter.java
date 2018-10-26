@@ -12,6 +12,8 @@ public class MetricCalculatorAdapter extends JsonDeserializedAdapter<MetricCalcu
     @Override
     public String getCanonicalName(String identifier) {
         switch (identifier.toUpperCase()) {
+            case "LABELEDSETCONFUSIONMATRIX":
+                return "LabeledSetConfusionMatrixCalculator";
             case "CONFUSIONMATRIX":
                 return "ConfusionMatrixCalculator";
             case "THREESETMETRIC":

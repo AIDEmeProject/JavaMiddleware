@@ -16,7 +16,7 @@ import utils.Validator;
  * @see ConfusionMatrix
  */
 public class ConfusionMatrixCalculator implements MetricCalculator {
-    private Learner learner;
+    protected Learner learner;
 
     public ConfusionMatrixCalculator(Learner learner) {
         this.learner = learner;
