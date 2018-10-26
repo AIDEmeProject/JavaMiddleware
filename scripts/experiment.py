@@ -14,7 +14,7 @@ from .tsm import MultipleTSM
 
 
 class Experiment(Printable):
-    def __init__(self, task, active_learner, subsample, mTSM):
+    def __init__(self, task, active_learner, subsample, mTSM=None):
         super().__init__(add_name=False)
 
         assert_positive('subsample', subsample)
