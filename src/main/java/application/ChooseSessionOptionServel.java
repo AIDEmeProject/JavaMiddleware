@@ -2,17 +2,8 @@ package application;
 
 import application.data.CsvDatasetReader;
 import com.google.gson.Gson;
+import com.opencsv.CSVReader;
 import data.DataPoint;
-import data.LabeledDataset;
-import explore.Experiment;
-import io.FolderManager;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Array;
+
 import java.util.*;
 
 
@@ -43,7 +34,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         Reader in = new FileReader(sessionPath + "/data.csv");
 
-        Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
+        CSVReader reader = new CSVReader(in);
 
         Integer columnId;
 
@@ -57,42 +48,42 @@ public class ChooseSessionOptionServel extends HttpServlet {
             columnIds.add(columnId);
         }
 
-
         ArrayList<Double> rowValues = new ArrayList();
 
         ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
         Integer rowNumber = 0;
-        for (CSVRecord record : records) {
+        String [] nextLine;
+
+        while ((nextLine = reader.readNext()) != null) {
+            // nextLine[] is an array of values from the line
 
             rowValues.removeAll(rowValues);
-
             for (Integer id : columnIds){
 
-                rowValues.add(Double.parseDouble(record.get(id)));
+                rowValues.add(Double.parseDouble(nextLine[id]));
             }
 
-            double[] d = rowValues.toArray((new double[0]));
-            DataPoint dataPoint = new DataPoint(rowNumber, d);
-
+            double[] doubleRowValues = this.doubleConversion(rowValues);
+            DataPoint dataPoint = new DataPoint(rowNumber, doubleRowValues);
 
             dataPoints.add(dataPoint);
             rowNumber++;
         }
+    }
 
-        LabeledDataset labeledDataset = new LabeledDataset(dataPoints);
 
-        this.getServletContext().setAttribute("labeledDataset", labeledDataset);
+    public double[] doubleConversion(ArrayList<Double> values){
 
-        resp.getWriter().println("point to label is lal");
+        double[] convertedValues = new double[values.size() - 1];
+        int index = 0;
+        for(Double value: values){
 
-        // Load Dataset with good columns
-        // Start all the stuff.
+            convertedValues[index] = value;
+            index++;
+        }
 
-        //save to session
-
-        //redirect to labeling point
-
+        return convertedValues;
     }
 }
 

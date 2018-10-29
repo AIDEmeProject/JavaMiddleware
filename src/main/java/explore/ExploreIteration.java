@@ -23,7 +23,7 @@ import java.util.List;
  *
  *   3) Finally, the Active Learning algorithm runs over the above sub-sample, and a most informative point is retrieved.
  */
-class ExploreIteration extends Iteration {
+public class ExploreIteration extends Iteration {
     /**
      * Size of subsample in step 2
      */
@@ -41,7 +41,7 @@ class ExploreIteration extends Iteration {
     }
 
     @Override
-    List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
+    public List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
         IndexedDataset unlabeledData = RandomState.newInstance().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
         IndexedDataset sample = unlabeledData.sample(subsampleSize);
         return Collections.singletonList(ranker.top(sample));
