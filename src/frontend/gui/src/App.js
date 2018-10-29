@@ -36,15 +36,7 @@ function uploadFile(event, onSuccess){
 function sendChosenColumns(event, onSuccess){
 
     var endPoint = backend + "/choose-options"
-    var formData = new FormData(document.querySelector('#choose-columns'));
-    var object = new FormData();
-    formData.forEach(function(value, key){
-        object[key] = value;
-
-        
-    });
-
-
+   
     $.ajax({
         type: "POST",
         url: endPoint,
@@ -89,7 +81,6 @@ class NewSession extends Component{
                 </h1>
 
                 <div>
-
                 
                     <form 
                         onSubmit={this.handleSubmit.bind(this)}     
@@ -173,9 +164,7 @@ class SessionOptions extends Component{
                 
                 </form>
             </div>
-
         )
-
     }
 }
 
@@ -187,6 +176,29 @@ class Exploration extends Component{
 
             <div>
                 <p> label this sample</p>
+
+                {
+
+                    this.props.datas.map((point, key) => {
+
+                        return (
+
+                            <div key={key}>
+                                {
+
+                                    point.values.map((value, valueKey) => {
+                                        return (
+                                            <div key={valueKey}>
+                                                {value}
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>                            
+                        )
+                    })
+                }
+
             </div>
         )
     }
@@ -207,7 +219,9 @@ class App extends Component {
   sessionWasStarted(response){
     this.setState({
         step: EXPLORATION,
-        labeledExamples: [],
+        labeledExamples: {
+            
+        },
         
     })
 

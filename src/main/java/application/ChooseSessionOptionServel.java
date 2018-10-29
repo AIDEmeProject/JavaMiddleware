@@ -4,6 +4,9 @@ import application.data.CsvDatasetReader;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
 import data.DataPoint;
+import data.IndexedDataset;
+import explore.ExperimentConfiguration;
+import io.json.JsonConverter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +58,8 @@ public class ChooseSessionOptionServel extends HttpServlet {
         Integer rowNumber = 0;
         String [] nextLine;
 
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+        reader.readNext();
         while ((nextLine = reader.readNext()) != null) {
             // nextLine[] is an array of values from the line
 
@@ -68,14 +73,58 @@ public class ChooseSessionOptionServel extends HttpServlet {
             DataPoint dataPoint = new DataPoint(rowNumber, doubleRowValues);
 
             dataPoints.add(dataPoint);
+
+            builder.add(dataPoint);
             rowNumber++;
         }
+
+
+        String json = "{\n" +
+                "   \"activeLearner\": {\n" +
+                "       \"learner\": {\n" +
+                "           \"name\": \"MajorityVote\",\n" +
+                "           \"sampleSize\": 8,\n" +
+                "           \"versionSpace\": {\n" +
+                "               \"addIntercept\": true,\n" +
+                "               \"hitAndRunSampler\": {\n" +
+                "                   \"cache\": true,\n" +
+                "                   \"rounding\": true,\n" +
+                "                   \"selector\": {\n" +
+                "                       \"name\": \"WarmUpAndThin\",\n" +
+                "                       \"thin\": 10,\n" +
+                "                       \"warmUp\": 100\n" +
+                "                   }\n" +
+                "               },\n" +
+                "               \"kernel\": {\n" +
+                "                   \"name\": \"gaussian\"\n" +
+                "               },\n" +
+                "               \"solver\": \"ojalgo\"\n" +
+                "           }\n" +
+                "       },\n" +
+                "       \"name\": \"UncertaintySampler\"\n" +
+                "   },\n" +
+                "   \"subsampleSize\": 50000,\n" +
+                "   \"task\": \"sdss_Q4_0.1%\"\n" +
+                "}";
+
+        ExperimentConfiguration configuration = JsonConverter.deserialize(json, ExperimentConfiguration.class);
+
+        IndexedDataset dataset = builder.build();
+
+        UserExperimentManager manager = new UserExperimentManager(configuration, dataset);
+
+        Gson gson = new Gson();
+
+        resp.getWriter().println(gson.toJson(manager.nextIteration(new ArrayList<>())));
+
+        this.getServletContext().setAttribute("experimentManager", manager);
+
     }
 
 
     public double[] doubleConversion(ArrayList<Double> values){
 
-        double[] convertedValues = new double[values.size() - 1];
+        double[] convertedValues = new double[values.size()];
         int index = 0;
         for(Double value: values){
 

@@ -77,13 +77,15 @@ public class UserExperimentManager implements FacadeInterface {
 
             //HERE I HAVE THE FIVE FIRST LABEL WITH ONE YES and ONE NO
 
+
+            //this.intialIteration.run(this.partitionedDataset);
             for (LabeledPoint point: userLabeledPoints){
                 this.partitionedDataset.update(point);
             }
 
             this.ranker = this.configuration.getActiveLearner().fit(this.partitionedDataset.getLabeledPoints());
             this.isFirstStep = false;
-
+            return new ArrayList<DataPoint>();
         }
         else{
 
