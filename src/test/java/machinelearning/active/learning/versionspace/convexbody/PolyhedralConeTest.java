@@ -60,7 +60,7 @@ class PolyhedralConeTest {
     @Test
     void getInteriorPoint_computeInteriorPoint_solverFactoryCalledOneWithCorrectParameter() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[] {-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[] {-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
@@ -74,7 +74,7 @@ class PolyhedralConeTest {
     @Test
     void getInteriorPoint_coneComposedOfTwoConstraints_LinearProgramProblemCorrectlySetUp() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[] {-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[] {-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
@@ -93,7 +93,7 @@ class PolyhedralConeTest {
     @Test
     void getInteriorPoint_coneComposedOfTwoConstraints_finalSolutionCorrectlyParsed() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[]{-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[]{-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
