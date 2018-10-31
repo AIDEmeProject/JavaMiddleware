@@ -18,7 +18,7 @@ class Kernel(Printable):
         assert_in_list(name, KERNELS)
         assert_positive('gamma', gamma, allow_zero=True)
 
-        if self.name != 'linear':
+        if self.name != 'linear' and gamma > 0:
             self.gamma = gamma
 
     def __repr__(self):

@@ -19,7 +19,7 @@ class Printable:
         if self.__add_name:
             result['name'] = self.__name
 
-        result.update({k: self.__resolve_value(v) for k, v in self.__dict__.items() if not k.startswith('_') and v})
+        result.update({k: self.__resolve_value(v) for k, v in self.__dict__.items() if not k.startswith('_') and v is not None})
 
         return result
 
