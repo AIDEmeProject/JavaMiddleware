@@ -481,6 +481,21 @@ public class Matrix extends Tensor<Matrix> {
         return new Matrix(rows(), other.cols(), values);
     }
 
+    /* AGGREGATION */
+
+    public Vector getRowSums() {
+        double[] sums = new double[rows()];
+
+        int p = 0;
+        for (int i = 0; i < rows(); i++) {
+            for (int j = 0; j < cols(); j++) {
+                sums[i] += array[p++];
+            }
+        }
+
+        return new Vector(sums);
+    }
+
     /* UTILITY FUNCTIONS */
 
     /**
