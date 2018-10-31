@@ -2,7 +2,6 @@ package machinelearning.classifier;
 
 
 import data.DataPoint;
-import data.IndexedDataset;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 

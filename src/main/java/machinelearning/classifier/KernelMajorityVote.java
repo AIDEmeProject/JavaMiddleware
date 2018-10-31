@@ -1,23 +1,19 @@
 package machinelearning.classifier;
 
-import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
-import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
-public class KernelMajorityVote extends MajorityVote<LinearClassifier> {
+
+public class KernelMajorityVote implements Classifier {
     private Kernel kernel;
     private Matrix supportVectors;
-    private LinearMajorityVote linearMajorityVote;
+    private Classifier linearMajorityVote;
 
-    public KernelMajorityVote(LinearClassifier[] linearClassifiers, Matrix supportVectors, Kernel kernel) {
-        super(linearClassifiers);
-
-        this.kernel = kernel;
+    public KernelMajorityVote(Classifier linearMajorityVote, Matrix supportVectors, Kernel kernel) {
+        this.linearMajorityVote = linearMajorityVote;
         this.supportVectors = supportVectors;
-        this.linearMajorityVote = new LinearMajorityVote(linearClassifiers);
-        Validator.assertEquals(linearMajorityVote.getDim(), supportVectors.rows());
+        this.kernel = kernel;
     }
 
     @Override

@@ -2,10 +2,9 @@ package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.classifier.Classifier;
 import machinelearning.classifier.KernelMajorityVote;
-import machinelearning.classifier.MajorityVote;
 import machinelearning.classifier.margin.KernelClassifier;
-import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import utils.Validator;
 import utils.linalg.Matrix;
@@ -24,11 +23,11 @@ import utils.linalg.Matrix;
  * @see LinearVersionSpace
  * @see HitAndRunSampler
  */
-public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
+public class KernelVersionSpace implements VersionSpace {
     /**
      * {@link LinearVersionSpace} instance used for sampling
      */
-    private final VersionSpace<LinearClassifier> linearVersionSpace;
+    private final VersionSpace versionSpace;
 
     /**
      * {@link Kernel} function
@@ -36,14 +35,14 @@ public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
     private final Kernel kernel;
 
     /**
-     * @param linearVersionSpace: linear version space instance
+     * @param versionSpace: linear version space instance
      * @param kernel: the kernel function
      * @throws NullPointerException if sampler or kernel is null
      */
-    public KernelVersionSpace(VersionSpace<LinearClassifier> linearVersionSpace, Kernel kernel) {
-        Validator.assertNotNull(linearVersionSpace);
+    public KernelVersionSpace(VersionSpace versionSpace, Kernel kernel) {
+        Validator.assertNotNull(versionSpace);
         Validator.assertNotNull(kernel);
-        this.linearVersionSpace = linearVersionSpace;
+        this.versionSpace = versionSpace;
         this.kernel = kernel;
     }
 
@@ -51,7 +50,7 @@ public class KernelVersionSpace implements VersionSpace<LinearClassifier> {
     public KernelMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Matrix kernelMatrix = kernel.compute(labeledPoints.getData());
         LabeledDataset kernelLabeledPoints =  labeledPoints.copyWithSameIndexesAndLabels(kernelMatrix);
-        MajorityVote<LinearClassifier> linearClassifiers = linearVersionSpace.sample(kernelLabeledPoints, numSamples);
-        return new KernelMajorityVote(linearClassifiers.getClassifiers(), labeledPoints.getData(), kernel);
+        Classifier linearClassifiers = versionSpace.sample(kernelLabeledPoints, numSamples);
+        return new KernelMajorityVote(linearClassifiers, labeledPoints.getData(), kernel);
     }
 }

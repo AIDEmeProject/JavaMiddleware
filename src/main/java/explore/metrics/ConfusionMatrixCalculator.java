@@ -1,13 +1,10 @@
 package explore.metrics;
 
-import data.DataPoint;
 import data.PartitionedDataset;
 import explore.user.User;
 import explore.user.UserLabel;
 import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-import machinelearning.threesetmetric.ExtendedLabel;
 import utils.Validator;
 
 /**

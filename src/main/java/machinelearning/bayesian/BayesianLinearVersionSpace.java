@@ -3,7 +3,7 @@ package machinelearning.bayesian;
 import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.classifier.Label;
-import machinelearning.classifier.MajorityVote;
+import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.RandomState;
 import utils.Validator;
@@ -23,7 +23,7 @@ import java.util.Arrays;
  *
  * @see StanLogisticRegressionSampler
  */
-public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier> {
+public class BayesianLinearVersionSpace implements VersionSpace {
     /**
      * Whether to fit the intercept
      */
@@ -51,7 +51,7 @@ public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier
     }
 
     @Override
-    public MajorityVote<LinearClassifier> sample(LabeledDataset labeledPoints, int numSamples) {
+    public LinearMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
         Matrix data = labeledPoints.getData();
@@ -65,7 +65,7 @@ public class BayesianLinearVersionSpace implements VersionSpace<LinearClassifier
 
         double[][] samples = sampler.run(numSamples, data.toArray(), ys, RandomState.newInstance().nextInt());
 
-        return new MajorityVote<>(Arrays.stream(samples)
+        return new LinearMajorityVote(Arrays.stream(samples)
                 .map(Vector.FACTORY::make)
                 .map(x -> new LinearClassifier(x, addIntercept))
                 .toArray(LinearClassifier[]::new)

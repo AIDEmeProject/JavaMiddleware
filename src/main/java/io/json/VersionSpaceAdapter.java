@@ -10,7 +10,6 @@ import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
 import machinelearning.bayesian.BayesianLinearVersionSpace;
-import machinelearning.classifier.margin.LinearClassifier;
 import machinelearning.classifier.svm.Kernel;
 import machinelearning.classifier.svm.LinearKernel;
 import utils.linprog.LinearProgramSolver;
@@ -24,7 +23,7 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
 
         boolean addIntercept = jsonObject.getAsJsonPrimitive("addIntercept").getAsBoolean();
 
-        VersionSpace<LinearClassifier> linearVersionSpace;
+        VersionSpace linearVersionSpace;
 
         if (jsonObject.has("hitAndRunSampler")) {
             String solver = jsonObject.getAsJsonPrimitive("solver").getAsString();

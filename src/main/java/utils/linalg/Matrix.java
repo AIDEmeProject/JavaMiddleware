@@ -483,6 +483,9 @@ public class Matrix extends Tensor<Matrix> {
 
     /* AGGREGATION */
 
+    /**
+     * @return the sum of each row
+     */
     public Vector getRowSums() {
         double[] sums = new double[rows()];
 

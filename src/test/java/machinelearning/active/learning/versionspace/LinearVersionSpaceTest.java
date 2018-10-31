@@ -2,7 +2,7 @@ package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
-import machinelearning.classifier.MajorityVote;
+import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class LinearVersionSpaceTest {
             expected[i] = new LinearClassifier(hitAndRunSamples[i], false);
         }
 
-        assertEquals(new MajorityVote<>(expected), versionSpace.sample(trainingData, hitAndRunSamples.length));
+        assertEquals(new LinearMajorityVote(expected), versionSpace.sample(trainingData, hitAndRunSamples.length));
     }
 
     //TODO: write better tests
