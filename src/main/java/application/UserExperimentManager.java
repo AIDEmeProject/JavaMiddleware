@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 public class UserExperimentManager implements FacadeInterface {
 
-
     private final ExperimentConfiguration configuration;
 
     private final ExploreIteration exploreIteration;
@@ -27,6 +26,7 @@ public class UserExperimentManager implements FacadeInterface {
     private final InitialIteration intialIteration;
 
     private Ranker ranker;
+
     private boolean isFirstStep;
 
     /**
@@ -40,8 +40,6 @@ public class UserExperimentManager implements FacadeInterface {
 
         this.intialIteration = new InitialIteration(configuration);
 
-        this.initialSampler = new RandomSampler();
-
         this.exploreIteration = new ExploreIteration(configuration);
 
         this.partitionedDataset = new PartitionedDataset(dataset);
@@ -50,8 +48,8 @@ public class UserExperimentManager implements FacadeInterface {
 
         this.isFirstStep = true;
 
+        this.initialSampler = new RandomSampler(this.partitionedDataset);
     }
-
 
     public LabeledDataset getLabeledDataset(Classifier classifier){
 
@@ -68,10 +66,7 @@ public class UserExperimentManager implements FacadeInterface {
 
         Iteration.Result result;
         if (userLabeledPoints.isEmpty()){
-            //return first Points
-
-            return this.initialSampler.getPoints();
-
+            return this.initialSampler.getPoints(3);
         }
         if (this.isFirstStep){
 

@@ -23,7 +23,6 @@ import java.util.*;
 public class ChooseSessionOptionServel extends HttpServlet {
 
     @Override
-
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -120,7 +119,6 @@ public class ChooseSessionOptionServel extends HttpServlet {
         this.getServletContext().setAttribute("experimentManager", manager);
 
     }
-
 
     public double[] doubleConversion(ArrayList<Double> values){
 

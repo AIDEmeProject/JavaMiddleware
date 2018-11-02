@@ -22,18 +22,21 @@ public class DataPointsWereLabeledServlet extends HttpServlet {
 
         resp.setContentType("application/json");
 
-
         UserExperimentManager manager = (UserExperimentManager) this.getServletContext().getAttribute("experimentManager");
 
         //stuff to get the data from the POST request
         ArrayList<LabeledPoint> labeledPoints = new ArrayList<>();
+
         ArrayList<DataPoint> nextPointsToLabel = manager.nextIteration(labeledPoints);
 
         Gson json = new Gson();
+
+
+        System.out.println(json.toJson(req.getParameterMap()));
+
+
         resp.getWriter().println(json.toJson(nextPointsToLabel));
-
     }
-
 }
 
 

@@ -5,6 +5,7 @@ import './App.css';
 import axios from "axios" ;
 
 import $ from "jquery";
+
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
@@ -21,7 +22,7 @@ function uploadFile(event, onSuccess){
     
     axios.post(endPoint,
                formData, 
-                {
+               {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -33,35 +34,6 @@ function uploadFile(event, onSuccess){
      })    
 }
 
-function sendChosenColumns(event, onSuccess){
-
-    var endPoint = backend + "/choose-options"
-   
-    $.ajax({
-        type: "POST",
-        url: endPoint,
-        data: $('#choose-columns').serialize(),
-        success: onSuccess,
-        
-      });
-
-      return
-
-/* 
-    axios.post(endPoint,
-               json, 
-                {
-                    headers: {
-                        
-                    }
-                }
-     ).then(response  => {
-        
-        onSuccess(response.data)
-     }).catch(e => {
-         alert(e)
-     }) */
-}
 
 class NewSession extends Component{
 
@@ -80,8 +52,7 @@ class NewSession extends Component{
                     New Session
                 </h1>
 
-                <div>
-                
+                <div>                
                     <form 
                         onSubmit={this.handleSubmit.bind(this)}     
                     >   
@@ -94,22 +65,46 @@ class NewSession extends Component{
 
                         <input
                             className="btn btn-raised btn-primary"
-                            type="submit" value="Confirm" />
+                            type="submit" value="Confirm" 
+                        />
                         
                     </form> 
-                </div>
-        
+                </div>        
             </div>
         )
     }
 }
 
+function sendChosenColumns(event, onSuccess){
+
+    var endPoint = backend + "/choose-options"
+   
+    $.ajax({
+        type: "POST",
+        url: endPoint,
+        data: $('#choose-columns').serialize(),
+        success: onSuccess,
+        
+      });      
+}
+
 class SessionOptions extends Component{
     
+    constructor(props){
+        super(props)
+        this.state = {
+            checkboxes: this.props.columns.map (c => false),
+            chosenColumns: []
+        }
+    }
 
     onChosenColumns(e){
         e.preventDefault()
-        sendChosenColumns(e, this.props.sessionWasStarted)
+        sendChosenColumns(e, this.props.sessionWasStarted)        
+        this.props.sessionOptionsWereChosen({
+            
+            chosenColumns: this.state.chosenColumns            
+        })
     }
 
     componentDidMount(){
@@ -117,55 +112,79 @@ class SessionOptions extends Component{
         window.$('form').bootstrapMaterialDesign()        
     }
 
+    onCheckedColumn(e){
+                    
+        var checkboxes = this.state.checkboxes.map(e=>e);
+        checkboxes[e.target.value] = e.target.checked
+
+        var chosenColumns = this.props.columns.filter((e, k)=>{
+
+            return checkboxes[k]
+        })        
+        
+        this.setState({
+            chosenColumns: chosenColumns,
+            checkboxes: checkboxes
+        })
+    }
+
     render(){
         
         return (
-            <div>
-              
+            <div>              
                 <form                 
                     id="choose-columns"
                     onSubmit={this.onChosenColumns.bind(this)}
                 >
                                                         
-                    {
-                
+                    {                
                         this.props.columns.map((column, key) => (
                                                     
                                 <div 
                                     key={key} 
-                                    className="checkbox">                                    
+                                    className="checkbox"
+                                >                                    
                                     <label>
                                                                     
                                         <input        
-                                                className="form-control"                                        
-                                                type="checkbox"
-                                                name={"column" + key }
-                                                value={key} 
-                                                id={"column-" + column }  
-                                            /> {column}
+                                            className="form-control"                                        
+                                            type="checkbox"
+                                            name={"column" + key }
+                                            value={key} 
+                                            id={"column-" + column }  
+                                            onChange={this.onCheckedColumn.bind(this)}
+                                        /> {column}
 
                                     </label>
 
                                 </div>                                                          
                         ))
                     }
-                    
-                    
+                                        
                     <div className="form-group">
                         <label htmlFor="algorithm-selection">Choose the algorithm for the session</label>
                         <select className="form-control" id="algorithm-selection">
                             <option  defaultValue value="TSM">TSM</option> 
-                            <option value="algo2">Algo 2</option>
-                            
+                            <option value="algo2">Algo 2</option>                            
                         </select>
                     </div>
 
-                    <input type="submit" value="Start session" />
-                
+                    <input type="submit" value="Start session" />                
                 </form>
             </div>
         )
     }
+}
+
+function sendPointLabel(data, onSuccess){
+
+    var endPoint = backend + "/data-point-were-labeled"
+    $.ajax({
+        type: "POST",
+        url: endPoint,
+        data: JSON.stringify(data),
+        success: onSuccess
+    })
 }
 
 class Exploration extends Component{
@@ -177,83 +196,180 @@ class Exploration extends Component{
             <div>
                 <p> label this sample</p>
 
-                {
+                <div>
 
-                    this.props.datas.map((point, key) => {
+                    <div style={{display: "inline-block", width:10, margin: 10}}>
+                        id
+                    </div>
+                    {
+                        this.props.options.chosenColumns.map((column, key) => {
+                            return (
+                                <div key={key} style={{display: "inline-block", minWidth:10, margin: 10}}>
+                                 {column} 
+                                </div>
+                            )
+                        })
+                    }
+
+                    <div style={{display: "inline-block", minWidth:10, margin: 10}}>
+                        Label 
+                    </div>
+
+                </div>
+
+                {
+                    this.props.pointsToLabel.map((point, key) => {
 
                         return (
 
                             <div key={key}>
+
+
+                                <div style={{margin: 10, width:10, display: "inline-block"}}>
+                                                {point.id}
+                                </div>
                                 {
 
-                                    point.values.map((value, valueKey) => {
+                                    point.data.array.map((value, valueKey) => {
                                         return (
-                                            <div key={valueKey}>
+                                            
+                                            <div style={{margin: 10, width:10, display: "inline-block"}} key={valueKey}>
                                                 {value}
                                             </div>
                                         )
                                     })
                                 }
+
+                                <button
+                                    className="btn btn-raised btn-primary" 
+                                    data-key={key} 
+                                    onClick={this.onPositiveLabel.bind(this)}>
+                                    Yes
+                                </button>
+
+                                <button 
+                                    className="btn btn-raised btn-primary"  
+                                    data-key={key} 
+                                    onClick={this.onNegativeLabel.bind(this)}
+                                >
+                                    No
+                                </button>
                             </div>                            
                         )
                     })
                 }
-
             </div>
         )
+    }
+
+    onPositiveLabel(e){
+        
+        this.props.onPositiveLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
+    }
+
+    onNegativeLabel(e){
+        this.props.onNegativeLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
     }
 }
 
 class App extends Component {
 
+    constructor(props){
+        super(props)
 
-  constructor(props){
-      super(props)
-
-      this.state = {
-          step : NEW_SESSION,
-          columns: ["hehe"]
+        this.state = {
+            step : NEW_SESSION,
+            columns: [],
+            labeledPoints: [],
+            pointsToLabel: []
         }
-  }
+    }
 
-  sessionWasStarted(response){
-    this.setState({
-        step: EXPLORATION,
-        labeledExamples: {
-            
-        },
+    sessionWasStarted(response){
         
-    })
+        this.setState({
+            step: EXPLORATION,
+            pointsToLabel: response,        
+        })
+    }
 
-  }
+    sessionOptionsWereChosen(options){
+
+        this.setState({
+            options: options
+        })
+    }
+
+    fileUploaded(response){
+
+        this.setState({
+            step: SESSION_OPTIONS,
+            columns: response
+        })
+    }
+
+    onNewPointsToLabel(points){
 
 
-  fileUploaded(response){
+        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
+        
+        for (var point of points){
+            pointsToLabel.push(point)
+        }
 
-    this.setState({
-      step: SESSION_OPTIONS,
-      columns: response
-    })
-}
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })
+    }
+
+    onPositiveLabel(dataIndex){
+        
+       this.dataWasLabeled(dataIndex, 1)
+    }
+    
+    onNegativeLabel(dataIndex, label){
+    
+        this.dataWasLabeled(dataIndex, 0)    
+    }
+
+    dataWasLabeled(dataIndex, label){
+        var point = this.state.pointsToLabel[dataIndex]
+
+        point.label = label
+                
+        var labeledPoints = this.state.labeledPoints.map(e=>e)
+        labeledPoints.push(point)
+
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        pointsToLabel.splice(dataIndex, 1)
+                                        
+        this.setState({
+            pointsToLabel: pointsToLabel,
+            labeledPoints: labeledPoints
+        })
+
+        sendPointLabel({
+            data: labeledPoints,
+        }, this.onNewPointsToLabel.bind(this))    
+    }
 
   render() {
-
 
     var View;
     switch(this.state.step){
         
-
         case SESSION_OPTIONS:
             View = SessionOptions
             break
 
         case EXPLORATION:
-
             View = Exploration
             break
+
         case NEW_SESSION:
             View = NewSession
             break
+
         default: 
             View = NewSession
     }
@@ -264,8 +380,7 @@ class App extends Component {
 
         <div>
             <ul className="nav nav-tabs">
-                <li className="nav-item">
-                  
+                <li className="nav-item">                  
                     <a className="nav-link active" href="#">CEDAR - Active learning labeler</a>
                 </li>
                 
@@ -275,22 +390,64 @@ class App extends Component {
         <div className="row">
 
             <div className="col">
-  
-  
-
+    
                 <View 
                     fileUploaded={this.fileUploaded.bind(this)} 
                     sessionWasStarted={this.sessionWasStarted.bind(this)}  
+                    onPositiveLabel={this.onPositiveLabel.bind(this)}
+                    onNegativeLabel={this.onNegativeLabel.bind(this)}
+                    sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
                     {...this.state}
-                />
-            
+                />            
             </div>
         </div>
 
+        <div className="row">
+            <div className="col">
+                {this.state.labeledPoints.length} points labeled                    
+            </div>
+        </div>
       </div>
     );
   }
+}
 
+class PointsAsTable extends Component{
+
+    render(){
+        return (
+            <table>
+                    <thead>
+                            <tr>
+                                {
+                                    this.props.columns.map((col, k) => {
+                                    
+                                        return (
+                                            <th key={k}>
+                                                { col }
+                                            </th>
+                                        )
+                                    })
+                                }
+                            </tr>
+                        </thead>
+                    <tbody>
+                        {
+                            this.props.rows.map((row, k) => {
+                                return (
+
+                                    <tr>
+                                        <td>
+                                            {row}
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+            </table>
+        )
+    }
 }
 
 export default App;

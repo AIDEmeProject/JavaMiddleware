@@ -27,7 +27,7 @@ public class ApplicationServerMain {
 
         handler.addServlet(NewSessionServlet.class, "/new-session");
         handler.addServlet(ChooseSessionOptionServel.class, "/choose-options");
-
+        handler.addServlet(DataPointsWereLabeledServlet.class, "/data-point-were-labeled");
 
         FilterHolder cors = handler.addFilter(CrossOriginFilter.class,"/*",EnumSet.allOf(DispatcherType.class));
         //FilterHolder cors = handler.addFilter(FilterHolder.class,"/*", EnumSet.of(DispatcherType.REQUEST));
