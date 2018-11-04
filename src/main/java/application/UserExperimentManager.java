@@ -71,8 +71,6 @@ public class UserExperimentManager implements FacadeInterface {
         if (this.isFirstStep){
 
             //HERE I HAVE THE FIVE FIRST LABEL WITH ONE YES and ONE NO
-
-
             //this.intialIteration.run(this.partitionedDataset);
             for (LabeledPoint point: userLabeledPoints){
                 this.partitionedDataset.update(point);

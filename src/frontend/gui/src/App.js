@@ -183,6 +183,9 @@ function sendPointLabel(data, onSuccess){
         type: "POST",
         url: endPoint,
         data: JSON.stringify(data),
+        header: {
+            "Content-Type":"applications/json"
+        },
         success: onSuccess
     })
 }
@@ -191,16 +194,33 @@ class Exploration extends Component{
 
     render(){
 
+        if (this.props.initialLabelingSession){
+
+            var FirstPhase = (
+
+                <p>
+                    The first phase of labeling keeps goind on
+                    until an instance of a positive and a negative example 
+                    is provided
+                </p>
+            )
+        }
+        else {
+            var FirstPhase = (<div></div>)
+        }
+
         return (
 
             <div>
                 <p> label this sample</p>
-
+                
+                { FirstPhase }
                 <div>
 
                     <div style={{display: "inline-block", width:10, margin: 10}}>
                         id
                     </div>
+
                     {
                         this.props.options.chosenColumns.map((column, key) => {
                             return (
@@ -214,7 +234,6 @@ class Exploration extends Component{
                     <div style={{display: "inline-block", minWidth:10, margin: 10}}>
                         Label 
                     </div>
-
                 </div>
 
                 {
@@ -223,7 +242,6 @@ class Exploration extends Component{
                         return (
 
                             <div key={key}>
-
 
                                 <div style={{margin: 10, width:10, display: "inline-block"}}>
                                                 {point.id}
@@ -281,7 +299,12 @@ class App extends Component {
             step : NEW_SESSION,
             columns: [],
             labeledPoints: [],
-            pointsToLabel: []
+            pointsToLabel: [],
+            initialLabelingSession: true,
+            hasYesAndNo: false,            
+            hasYes: false,
+            hasFalse: false
+
         }
     }
 
@@ -328,11 +351,12 @@ class App extends Component {
     }
     
     onNegativeLabel(dataIndex, label){
-    
-        this.dataWasLabeled(dataIndex, 0)    
+           
+        this.dataWasLabeled(dataIndex, 0)                      
     }
 
     dataWasLabeled(dataIndex, label){
+
         var point = this.state.pointsToLabel[dataIndex]
 
         point.label = label
@@ -347,10 +371,56 @@ class App extends Component {
             pointsToLabel: pointsToLabel,
             labeledPoints: labeledPoints
         })
+        
+        if (this.state.initialLabelingSession){
 
-        sendPointLabel({
-            data: labeledPoints,
-        }, this.onNewPointsToLabel.bind(this))    
+            if (label == 1){
+                this.setState({
+                    hasYes: true
+                }, () => {
+                    this.labelForInitialSession(labeledPoints, pointsToLabel)
+                })
+            }
+            else{
+                this.setState({
+                    hasNo: true
+                }, () => {
+                    this.labelForInitialSession(labeledPoints, pointsToLabel)
+                })
+            }
+            
+            
+        }
+        else{        
+            sendPointLabel({
+                data: labeledPoints,
+            }, this.onNewPointsToLabel.bind(this))    
+
+        }
+    }
+
+
+    labelForInitialSession(labeledPoints, pointsToLabel){
+
+        if  (pointsToLabel.length == 0){
+
+            if (this.state.hasYes && this.state.hasNo ){
+
+                this.setState({
+                    hasYesAndNo: true,
+                    initialLabelingSession: false
+                }, ()=> {
+                    sendPointLabel({
+                        data: labeledPoints,
+                    }, this.onNewPointsToLabel.bind(this))
+                })
+            }
+            else{
+                sendPointLabel({
+                    data: [],
+                }, this.onNewPointsToLabel.bind(this))
+            }
+        }
     }
 
   render() {
