@@ -1,6 +1,7 @@
 package machinelearning.classifier.svm;
 
 import libsvm.svm_parameter;
+import org.apache.commons.math3.util.FastMath;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -42,7 +43,7 @@ public class GaussianKernel extends Kernel {
     }
 
     private double gaussianMap(double distance, double gamma) {
-        return Math.exp(-gamma * distance);
+        return FastMath.exp(-gamma * distance);
     }
 
     @Override

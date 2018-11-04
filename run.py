@@ -8,12 +8,12 @@ from scripts import *
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    "sdss_Q1_0.1%", "sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    "sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
-    "sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
-    "sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
-    "sdss_Q2_circle_10%_Q3_rect_1%", "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
-    "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    "sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    #"sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
+    #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
+    #"sdss_Q2_circle_10%_Q3_rect_1%", "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
+    #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
 ]
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
@@ -22,7 +22,7 @@ SUBSAMPLE_SIZE = 50000
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
     #'NEW',       # run new exploration
-    'RESUME',    # resume a previous exploration
+    #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     # 'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -41,14 +41,14 @@ RUNS = [1]
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
     #ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
+    #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     # ThreeSetMetric(),
-    # ConfusionMatrix(MajorityVote(
-    #     num_samples=4,
-    #     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
-    #     kernel='gaussian', gamma=0,  # kernel
-    #     add_intercept=True, solver="ojalgo")  # extra
-    # ),
+    ConfusionMatrix(MajorityVote(
+        num_samples=8,
+        warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
+        kernel='gaussian', gamma=0,  # kernel
+        add_intercept=True, solver="ojalgo")  # extra
+    ),
 ]
 
 # you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
