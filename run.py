@@ -127,7 +127,7 @@ for TASK in TASKS:
 
     # BUILD COMMAND LINE ARGUMENTS
     command_line = [
-        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/* RunExperiment",
+        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
         "--experiment_dir", experiment_dir,
         "--mode", ' '.join(MODES),
         "--num_runs", str(NUM_RUNS),

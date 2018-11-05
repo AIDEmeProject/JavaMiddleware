@@ -16,6 +16,8 @@ public class GurobiSolver implements LinearProgramSolver {
 
         try {
             GRBEnv env = new GRBEnv();
+            env.set(GRB.IntParam.OutputFlag, 0);
+
             model = new GRBModel(env);
 
             // Create variables
