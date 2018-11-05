@@ -2,7 +2,7 @@ from .printable import *
 from .validation import *
 
 
-LINPROG_SOLVERS = ['apache', 'ojalgo']
+LINPROG_SOLVERS = ['apache', 'ojalgo', 'gurobi']
 KERNELS = ['linear', 'gaussian']
 SAMPLE_SELECTORS = ['single', 'independent']
 
@@ -18,7 +18,7 @@ class Kernel(Printable):
         assert_in_list(name, KERNELS)
         assert_positive('gamma', gamma, allow_zero=True)
 
-        if self.name != 'linear' and gamma > 0:
+        if self.name != 'linear':
             self.gamma = gamma
 
     def __repr__(self):

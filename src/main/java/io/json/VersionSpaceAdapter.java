@@ -63,6 +63,8 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
                 return LinearProgramSolver.LIBRARY.APACHE;
             case "OJALGO":
                 return LinearProgramSolver.LIBRARY.OJALGO;
+            case "GUROBI":
+                return LinearProgramSolver.LIBRARY.GUROBI;
             default:
                 throw new UnknownClassIdentifierException("LinearProgramSolver.LIBRARY", solver);
         }

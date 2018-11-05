@@ -22,7 +22,7 @@ public interface LinearProgramSolver {
      * @see OjalgoLinearProgramSolver
      */
     enum LIBRARY {
-        APACHE, OJALGO
+        APACHE, OJALGO, GUROBI
     }
 
     /**
@@ -61,6 +61,8 @@ public interface LinearProgramSolver {
                 return new ApacheLinearProgramSolver(dim);
             case OJALGO:
                 return new OjalgoLinearProgramSolver(dim);
+            case GUROBI:
+                return new GurobiSolver(dim);
             default:
                 throw new RuntimeException("Unknown Linear Program library: " + library);
         }

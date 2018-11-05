@@ -8,7 +8,8 @@ from scripts import *
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    "sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    "sdss_Q1_0.1%",
+    #"sdss_Q1_0.1%", "sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
     #"sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
@@ -31,11 +32,11 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 100
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 # RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-RUNS = [1]
+RUNS = [5]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
@@ -44,10 +45,10 @@ METRICS = [
     #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     # ThreeSetMetric(),
     ConfusionMatrix(MajorityVote(
-        num_samples=8,
-        warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
+        num_samples=1,
+        warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=False,  # hit-and-run
         kernel='gaussian', gamma=0,  # kernel
-        add_intercept=True, solver="ojalgo")  # extra
+        add_intercept=True, solver="scp")  # extra
     ),
 ]
 
@@ -119,13 +120,14 @@ folder = '_'.join(folder_elems)
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
+    print(TASK)
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
     experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM)
     experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
     # BUILD COMMAND LINE ARGUMENTS
     command_line = [
-        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
+        "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/* RunExperiment",
         "--experiment_dir", experiment_dir,
         "--mode", ' '.join(MODES),
         "--num_runs", str(NUM_RUNS),
