@@ -35,6 +35,21 @@ public class VectorTest {
     }
 
     @Test
+    void fill_zeroDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.fill(0, 0));
+    }
+
+    @Test
+    void fill_negativeDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.fill(-1, 0));
+    }
+
+    @Test
+    void fill_fiveDimensionVectorFilledWithOnes_returnsExpectedVector() {
+        assertEquals(Vector.FACTORY.make(1, 1, 1, 1, 1), Vector.FACTORY.fill(5, 1.0));
+    }
+
+    @Test
     void get_negativeIndex_throwsException() {
         assertThrows(RuntimeException.class, () -> vector1.get(-1));
     }
@@ -51,6 +66,34 @@ public class VectorTest {
         assertEquals(3, vector1.get(2));
         assertEquals(4, vector1.get(3));
         assertEquals(5, vector1.get(4));
+    }
+
+    @Test
+    void set_negativeIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> vector1.set(-1, 0));
+    }
+
+    @Test
+    void set_indexEqualsDim_throwsException() {
+        assertThrows(RuntimeException.class, () -> vector1.set(vector1.dim(), 0));
+    }
+
+    @Test
+    void set_indexFromZeroToDimMinusOne_correctValuesReturned() {
+        vector1.set(0, -1.0);
+        assertEquals(-1, vector1.get(0));
+
+        vector1.set(1, -2.0);
+        assertEquals(-2, vector1.get(1));
+
+        vector1.set(2, -3.0);
+        assertEquals(-3, vector1.get(2));
+
+        vector1.set(3, -4.0);
+        assertEquals(-4, vector1.get(3));
+
+        vector1.set(4, -5.0);
+        assertEquals(-5, vector1.get(4));
     }
 
     @Test

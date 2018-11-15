@@ -170,7 +170,7 @@ public class PolyhedralCone implements ConvexBody {
         Validator.assertEquals(x.dim(), getDim());
 
         if (x.squaredNorm() > 1) {
-            return Optional.of(new LinearClassifier(-x.squaredNorm(), x));  // return -1 for bias?
+            return Optional.of(new LinearClassifier(-1, x.normalize(1.0)));  // return -1 for bias?
         }
 
         for (LabeledPoint point : labeledPoints) {
@@ -181,5 +181,10 @@ public class PolyhedralCone implements ConvexBody {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return labeledPoints.toString();
     }
 }

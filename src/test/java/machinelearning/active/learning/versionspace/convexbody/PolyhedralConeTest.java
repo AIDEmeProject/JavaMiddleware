@@ -135,7 +135,7 @@ class PolyhedralConeTest {
         Vector x = Vector.FACTORY.make(1, 1);
         Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
         assertTrue(hyperplane.isPresent());
-        assertEquals(new LinearClassifier(-2, x), hyperplane.get());
+        assertEquals(new LinearClassifier(-1, x.normalize(1.0)), hyperplane.get());
     }
 
     @Test

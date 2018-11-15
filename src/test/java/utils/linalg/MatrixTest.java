@@ -126,6 +126,42 @@ public class MatrixTest {
     }
 
     @Test
+    void set_negativeRowIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(-1, 0, 0));
+    }
+
+    @Test
+    void set_rowIndexEqualsNumRows_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(matrix1.rows(), 0, 0));
+    }
+
+    @Test
+    void set_negativeColumnIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(0, -1, 0));
+    }
+
+    @Test
+    void set_columnIndexEqualsNumCols_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(0, matrix1.cols(), 0));
+    }
+
+    @Test
+    void set_runOverAllValidIndexes_ValuesAreCorrectlySet() {
+        matrix1.set(0, 0, -1);
+        assertEquals(-1, matrix1.get(0,0));
+        matrix1.set(0, 1, -2);
+        assertEquals(-2, matrix1.get(0,1));
+        matrix1.set(0, 2, -3);
+        assertEquals(-3, matrix1.get(0,2));
+        matrix1.set(1, 0, -4);
+        assertEquals(-4, matrix1.get(1,0));
+        matrix1.set(1, 1, -5);
+        assertEquals(-5, matrix1.get(1,1));
+        matrix1.set(1, 2, -6);
+        assertEquals(-6, matrix1.get(1,2));
+    }
+
+    @Test
     void getRow_negativeIndex_throwsException() {
         assertThrows(RuntimeException.class, () -> matrix1.getRow(-1));
     }

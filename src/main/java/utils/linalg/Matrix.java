@@ -118,6 +118,16 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     /**
+     * @param i: row index
+     * @param j: column index
+     * @param value: value to set at position (i, j)
+     * @throws IllegalArgumentException if either i or j is out of bounds
+     */
+    public void set(int i, int j, double value) {
+        super.set(value, i, j);
+    }
+
+    /**
      * @param i row index
      * @return a Vector containing the elements of the i-th row
      * @throws IllegalArgumentException if row index is out of bounds

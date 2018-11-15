@@ -43,6 +43,12 @@ public class Vector extends Tensor<Vector> {
         public static Vector zeroslike(Vector vector) {
             return zeros(vector.dim());
         }
+
+        public static Vector fill(int dim, double value) {
+            double[] values = new double[dim];
+            Arrays.fill(values, value);
+            return new Vector(values);
+        }
     }
 
     Vector(double[] vector) {
@@ -63,6 +69,15 @@ public class Vector extends Tensor<Vector> {
      */
     public double get(int index) {
         return super.get(index);
+    }
+
+    /**
+     * @param index: index to set
+     * @param value: new value to set
+     * @throws IllegalArgumentException if index is out of bounds
+     */
+    public void set(int index, double value) {
+        super.set(value, index);
     }
 
     @Override

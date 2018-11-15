@@ -1,5 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
+import utils.Validator;
 import utils.linalg.CholeskyDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -15,7 +16,7 @@ import java.util.Random;
  * where the matrix A is assumed to be known. In this case, we can sample a random point on it by the following algorithm:
  *
  *      1) Sampler a vector X uniformly at random from the unit sphere
- *      2) Compute the Cholesky decomposition of A: \( A = L L^T \)  TODO: couldn't we use PD^{1/2} instead, where A = PDP^T
+ *      2) Compute the Cholesky decomposition of A: \( A = L L^T \)
  *      3) Output the vector \( LX \) as the sample
  */
 class EllipsoidSampler implements DirectionSampler {
@@ -24,10 +25,17 @@ class EllipsoidSampler implements DirectionSampler {
 
     /**
      * @param matrix the matrix A in the description.
-     * @throws RuntimeException if computing its Cholesky decomposition failed.
+     * @param decompose whether to compute the cholesky decomposition of the input matrix
      */
-    EllipsoidSampler(Matrix matrix) {
-        this.matrix = new CholeskyDecomposition(matrix).getL();
+    EllipsoidSampler(Matrix matrix, boolean decompose) {
+        Validator.assertEquals(matrix.rows(), matrix.cols());
+
+        this.matrix = matrix;
+
+        if (decompose) {
+            this.matrix = new CholeskyDecomposition(this.matrix).getL();
+        }
+
         this.randomDirectionSampler = new RandomDirectionSampler(matrix.cols());
     }
 

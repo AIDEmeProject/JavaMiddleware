@@ -2,6 +2,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.directi
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.classifier.margin.LinearClassifier;
+import utils.Validator;
 import utils.linalg.EigenvalueDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -46,10 +47,15 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      */
     private Matrix matrix;
 
+    private Matrix L;
+    private Vector D;
+
+    //TODO: add max iters
+
     @Override
     public DirectionSampler fit(ConvexBody body) {
         fitWeakLownerJohnEllipsoid(body);
-        return new EllipsoidSampler(matrix);
+        return new EllipsoidSampler(L.multiplyRow(D.applyMap(Math::sqrt)), false);
     }
 
     /**
@@ -68,6 +74,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         initialize(body);
 
         boolean converged = false;
+
         while (!converged) {
             converged = true;
 
@@ -75,7 +82,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
             while (converged && iterator.hasNext()) {
                 Optional<LinearClassifier> separatingHyperplane = body.getSeparatingHyperplane(iterator.next());
 
-                // if a separating hyperplane exists, it means E_k / (n+1) is not contained in K, and E_k must be updated
+                // if a separating hyperplane exists, it means E_k / sqrt(n) (n+1) is not contained in K, and E_k must be updated
                 if (separatingHyperplane.isPresent()) {
                     converged = false;
                     ellipsoidMethodUpdate(separatingHyperplane.get());
@@ -88,21 +95,12 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      * Initialize center to the zero vector and matrix to the identity matrix
      */
     private void initialize(ConvexBody body) {
-        center = Vector.FACTORY.zeros(body.getDim());
-        matrix = Matrix.FACTORY.identity(body.getDim());
-    }
+        int dim = body.getDim();
+        center = Vector.FACTORY.zeros(dim);
+        matrix = Matrix.FACTORY.identity(dim);
 
-    private double tau(double alpha, int dim) {
-        return (1 + dim * alpha) / (dim + 1);
-    }
-
-    private double delta(double alpha, int dim) {
-        int dimSq = dim * dim;
-        return dimSq * (1 - alpha * alpha) / (dimSq - 1);
-    }
-
-    private double sigma(double alpha, int dim) {
-        return 2 * (1 + dim * alpha) / ((dim + 1) * (1 + alpha));
+        L = Matrix.FACTORY.identity(dim);
+        D = Vector.FACTORY.fill(dim, 1.0);
     }
 
     /**
@@ -112,24 +110,72 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      * For more details, check lemma 2.2.1 from [1].
      */
     private void ellipsoidMethodUpdate(LinearClassifier hyperplane) {
-        Vector g = hyperplane.getWeights();
-        Vector Pg = matrix.multiply(g);
-        double norm = Math.sqrt(Pg.dot(g));  // TODO: numerical instability problem: Pg.dot(g) can be negative!
-        Pg.iScalarDivide(norm);
-
         int n = center.dim();
-        double alpha = hyperplane.margin(center) / norm;
+        Vector g = hyperplane.getWeights();
+
+        Vector aHat = L.transpose().multiply(g);
+        double gamma = Math.sqrt(aHat.multiply(aHat).dot(D));
+        double alpha = hyperplane.margin(center) / gamma;
 
         if (alpha >= 1) {
             throw new RuntimeException("Invalid hyperplane: ellipsoid is contained in its positive semi-space (expected the negative one)");
         }
-        else if (alpha <= -1.0 / n) {
-            System.out.println("Sub-optimal cut: ellipsoid remains unchanged.");
-            return;
+        if (alpha <= -1.0 / n) {
+            throw new RuntimeException("Too shallow cut: ellipsoid remains unchanged.");
         }
 
-        center.iSubtract(Pg.scalarMultiply(tau(alpha, n)));
-        matrix.iSubtract(Pg.outerProduct(Pg).iScalarMultiply(sigma(alpha, n))).iScalarMultiply(delta(alpha, n));
+        Vector p = D.multiply(aHat).iScalarDivide(gamma);
+        Vector Pg = L.multiply(p);
+
+        // update center
+        double tau = (1 + n * alpha) / (n + 1);
+        center.iSubtract(Pg.scalarMultiply(tau));
+
+        // update LDL^T
+        double sigma = 2 * tau / (alpha + 1);
+        double delta = (1 - alpha * alpha) * (n * n / (n * n - 1.));
+
+        Vector beta = updateDiagonal(p, sigma, delta);
+        updateCholeskyFactor(p, beta);
+
+        // update P
+        matrix.iSubtract(Pg.outerProduct(Pg).iScalarMultiply(sigma));
+        matrix.iScalarMultiply(delta);
+    }
+
+    private Vector updateDiagonal(Vector p, double sigma, double delta) {
+        int n = center.dim();
+
+        Vector beta = Vector.FACTORY.zeros(n);
+        double tI, tNext = 1 - sigma;
+
+        for (int i = n - 1; i >= 0; i--) {
+            double pI = p.get(i), dI = D.get(i);
+
+            tI = tNext + sigma * pI * pI / dI;
+            D.set(i, dI * tNext / tI);
+            beta.set(i, -sigma * pI / (dI * tNext));
+
+            tNext = tI;
+        }
+
+        D.iScalarMultiply(delta);
+
+        return beta;
+    }
+
+    private void updateCholeskyFactor(Vector p, Vector beta) {
+        int n = center.dim();
+
+        for (int i = 1; i < n; i++) {
+            double v = p.get(i);
+
+            for (int j = i - 1; j >= 0; j--) {
+                double val = L.get(i, j);
+                L.set(i, j, val + beta.get(j) * v);
+                v += val * p.get(j);
+            }
+        }
     }
 
     /**
@@ -147,7 +193,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
         @Override
         public boolean hasNext() {
-            return counter < 2*center.dim();
+            return counter < 2 * center.dim();
         }
 
         @Override
@@ -166,6 +212,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
             counter++;
 
             double eigenvalue = decomposition.getEigenvalue(index);
+
             Vector ellipsoidSemiAxisDirection = decomposition.getEigenvector(index);
             Vector scaledAxisDirection = ellipsoidSemiAxisDirection.scalarMultiply(sign * Math.sqrt(eigenvalue) / (center.dim() + 1.));
 

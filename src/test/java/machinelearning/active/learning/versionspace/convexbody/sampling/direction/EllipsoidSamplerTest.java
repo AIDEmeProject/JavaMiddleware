@@ -19,25 +19,26 @@ class EllipsoidSamplerTest {
     void setUp() {
         dim = 2;
         double[][] matrix = new double[][]{{1, 0}, {0, 4}};
-        ellipsoidSampler = new EllipsoidSampler(Matrix.FACTORY.make(matrix));
+        ellipsoidSampler = new EllipsoidSampler(Matrix.FACTORY.make(matrix), true);
     }
 
     @Test
     void constructor_nonSquareMatrix_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 3, 1, 1, 1, 2, 2, 2);
-        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix));
+        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix, false));
+        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix, true));
     }
 
     @Test
-    void constructor_nonSymmetricMatrix_throwsException() {
+    void constructor_decomposeEqualsTrueAndMatrixIsNotSymmetric_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 2, 1, 1, 2, 4);
-        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix));
+        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix, true));
     }
 
     @Test
-    void constructor_symmetricButNotPositiveDefiniteMatrix_throwsException() {
+    void applyCholeskyDecomposition_decomposeEqualsTrueAndMatrixIsNotPositiveDefinite_throwsException() {
         Matrix matrix = Matrix.FACTORY.make(2, 2, -1, 0, 0, 4);
-        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix));
+        assertThrows(RuntimeException.class, () -> new EllipsoidSampler(matrix, true));
     }
 
     @Test

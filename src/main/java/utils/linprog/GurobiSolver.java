@@ -16,7 +16,8 @@ public class GurobiSolver implements LinearProgramSolver {
 
         try {
             GRBEnv env = new GRBEnv();
-            env.set(GRB.IntParam.OutputFlag, 0);
+
+            env.set(GRB.IntParam.OutputFlag, 0);  // disable console logging
 
             model = new GRBModel(env);
 
