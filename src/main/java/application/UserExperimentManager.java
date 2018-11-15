@@ -7,7 +7,7 @@ import explore.ExploreIteration;
 import explore.InitialIteration;
 import explore.Iteration;
 
-import explore.user.GuiUser;
+
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 
@@ -81,7 +81,7 @@ public class UserExperimentManager implements FacadeInterface {
             return new ArrayList<DataPoint>();
         }
         else{
-
+/*
             for (LabeledPoint point: userLabeledPoints){
 
                 GuiUser user = new GuiUser();
@@ -93,6 +93,8 @@ public class UserExperimentManager implements FacadeInterface {
             }
             GuiUser user = new GuiUser();
             return (ArrayList<DataPoint>) this.exploreIteration.getNextPointsToLabel(this.partitionedDataset, user, this.ranker);
+            */
+            return new ArrayList<DataPoint>();
         }
     }
 }

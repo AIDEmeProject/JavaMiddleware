@@ -34,7 +34,6 @@ function uploadFile(event, onSuccess){
      })    
 }
 
-
 class NewSession extends Component{
 
   handleSubmit(event){
@@ -177,12 +176,15 @@ class SessionOptions extends Component{
 }
 
 function sendPointLabel(data, onSuccess){
-
+    console.log(data)
     var endPoint = backend + "/data-point-were-labeled"
     $.ajax({
         type: "POST",
+        dataType: 'JSON',
         url: endPoint,
-        data: JSON.stringify(data),
+        data: {
+            labeledPoints: JSON.stringify(data.data)
+        },
         header: {
             "Content-Type":"applications/json"
         },
