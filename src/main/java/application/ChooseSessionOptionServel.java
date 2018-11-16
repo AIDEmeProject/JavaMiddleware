@@ -1,23 +1,21 @@
 package application;
 
-import application.data.CsvDatasetReader;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
 import data.DataPoint;
 import data.IndexedDataset;
-import explore.ExperimentConfiguration;
+import config.ExperimentConfiguration;
 import io.json.JsonConverter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
 
 
 public class ChooseSessionOptionServel extends HttpServlet {

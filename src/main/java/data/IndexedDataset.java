@@ -5,6 +5,7 @@ import utils.Validator;
 import utils.linalg.Matrix;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -207,6 +208,10 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
     public Stream<DataPoint> stream() {
         return StreamSupport.stream(this.spliterator(), false);
+    }
+
+    public List<DataPoint> toList() {
+        return stream().collect(Collectors.toList());
     }
 
     @Override

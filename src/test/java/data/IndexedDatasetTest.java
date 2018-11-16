@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -178,5 +179,14 @@ class IndexedDatasetTest {
         IndexedDataset newDataset = dataset.copyWithSameIndexes(matrix);
         assertEquals(indexes, newDataset.getIndexes());
         assertEquals(matrix, newDataset.getData());
+    }
+
+    @Test
+    void toListCorrectlyConvertsTheDataset() {
+        List<DataPoint> dataPoints = new ArrayList<>();
+        for (int i = 0; i < dataset.length(); i++) {
+            dataPoints.add(dataset.get(i));
+        }
+        assertEquals(dataPoints, dataset.toList());
     }
 }

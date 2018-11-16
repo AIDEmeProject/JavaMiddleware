@@ -1,7 +1,7 @@
 package io;
 
+import config.TsmConfiguration;
 import data.IndexedDataset;
-import explore.ExperimentConfiguration;
 import utils.Validator;
 
 import java.util.*;
@@ -36,11 +36,11 @@ public class TaskReader {
         return reader.readKeys(datasetConfig.table, datasetConfig.key, taskConfig.predicate);
     }
 
-    public List<Set<Long>> readFactorizedTargetSetKeys(ExperimentConfiguration.TsmConfiguration tsmConfiguration){
+    public List<Set<Long>> readFactorizedTargetSetKeys(TsmConfiguration tsmConfiguration){
         // if no factorization structure is specified in run.py, set default ones
         tsmConfiguration.setColumns(taskConfig.columns);
 
-        if (tsmConfiguration.emptyFactorizationStructure()) {
+        if (tsmConfiguration.hasEmptyFactorizationStructure()) {
             tsmConfiguration.setFlags(taskConfig.tsmFlags);
             tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);
         }
@@ -78,7 +78,7 @@ public class TaskReader {
                 .collect(Collectors.toList());
     }
 
-    private int getPartitionNumber(ExperimentConfiguration.TsmConfiguration tsmConfiguration, String predicate) {
+    private int getPartitionNumber(TsmConfiguration tsmConfiguration, String predicate) {
         int partitionNumber = -1, i = 0;
         for (String[] featureGroup : tsmConfiguration.getFeatureGroups()) {
             if (Arrays.stream(featureGroup).anyMatch(predicate::contains)) {
