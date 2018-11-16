@@ -60,7 +60,7 @@ class PolyhedralConeTest {
     @Test
     void getInteriorPoint_computeInteriorPoint_solverFactoryCalledOneWithCorrectParameter() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[] {-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[] {-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
@@ -74,7 +74,7 @@ class PolyhedralConeTest {
     @Test
     void getInteriorPoint_coneComposedOfTwoConstraints_LinearProgramProblemCorrectlySetUp() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[] {-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[] {-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);
@@ -85,15 +85,15 @@ class PolyhedralConeTest {
         verify(solver).setLower(new double[] {-1, -1, -1});  // x, y, s >= -1
         verify(solver).setUpper(new double[] {1, 1, 1});  // x, y, s <= 1
         verify(solver).setObjectiveFunction(new double[] {1, 0, 0});  // minimize s
-        verify(solver).addLinearConstrain(new double[] {1, 1, 0}, InequalitySign.GEQ, 0);  // x >= -s -> s + x >= 0
-        verify(solver).addLinearConstrain(new double[] {-1, 0, 1}, InequalitySign.LEQ, 0);  // y <= s -> -s + y <= 0
+        verify(solver).addLinearConstrain(new double[] {-1, -1, -0D}, InequalitySign.LEQ, 0);  // x >= 0 -> -x <= 0 -> - s - x <= 0
+        verify(solver).addLinearConstrain(new double[] {-1, 0, 1}, InequalitySign.LEQ, 0);  // y <= 0 -> -s + y <= 0
         verify(solver).findMinimizer();  // findMinimizer() called once
     }
 
     @Test
     void getInteriorPoint_coneComposedOfTwoConstraints_finalSolutionCorrectlyParsed() {
         LinearProgramSolver solver = mock(LinearProgramSolver.class);
-        when(solver.findMinimizer()).thenReturn(new double[]{-1, 1, -1});
+        when(solver.findMinimizer()).thenReturn(new double[]{-1, 0.5, -0.5});
 
         LinearProgramSolver.FACTORY solverFactory = mock(LinearProgramSolver.FACTORY.class);
         when(solverFactory.getSolver(anyInt())).thenReturn(solver);

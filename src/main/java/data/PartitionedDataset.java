@@ -1,5 +1,6 @@
 package data;
 
+import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedClassifierStub;
@@ -157,6 +158,22 @@ public final class PartitionedDataset {
         return points.stream()
                 .map(this::getLabel)
                 .toArray(ExtendedLabel[]::new);
+    }
+
+    /**
+     * @param classifier: classification model
+     * @return the predicted labels over the entire data. Points on the known partition have their labels maintained.
+     */
+    public Label[] predictLabels(Classifier classifier) {
+        Label[] predictedLabels = new Label[points.length()];
+        for (int i = 0; i < unknownStart; i++) {
+            predictedLabels[i] = labels[i].toLabel();
+        }
+
+        Label[] classifierLabels = classifier.predict(getUnknownPoints().getData());
+        System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
+
+        return predictedLabels;
     }
 
     /**

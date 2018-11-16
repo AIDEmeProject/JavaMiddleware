@@ -4,7 +4,7 @@ import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
 import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
-import machinelearning.classifier.MajorityVote;
+import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
 import utils.linalg.Vector;
@@ -23,7 +23,7 @@ import java.util.Objects;
  * @see HitAndRunSampler
  * @see PolyhedralCone
  */
-public class LinearVersionSpace implements VersionSpace<LinearClassifier> {
+public class LinearVersionSpace implements VersionSpace {
     /**
      * Whether to add intercept to data points
      */
@@ -65,14 +65,14 @@ public class LinearVersionSpace implements VersionSpace<LinearClassifier> {
      * @return sample of Linear Classifiers obtained through the Hit-and-Run algorithm.
      */
     @Override
-    public MajorityVote<LinearClassifier> sample(LabeledDataset labeledPoints, int numSamples) {
+    public LinearMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
         ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
 
         Vector[] samples = hitAndRunSampler.sample(cone, numSamples);
 
-        return new MajorityVote<>(getLinearClassifiers(samples));
+        return new LinearMajorityVote(getLinearClassifiers(samples));
     }
 
     private LabeledDataset addIntercept(LabeledDataset labeledPoints) {

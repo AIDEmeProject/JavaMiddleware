@@ -114,7 +114,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
     private void ellipsoidMethodUpdate(LinearClassifier hyperplane) {
         Vector g = hyperplane.getWeights();
         Vector Pg = matrix.multiply(g);
-        double norm = Math.sqrt(Pg.dot(g));
+        double norm = Math.sqrt(Pg.dot(g));  // TODO: numerical instability problem: Pg.dot(g) can be negative!
         Pg.iScalarDivide(norm);
 
         int n = center.dim();

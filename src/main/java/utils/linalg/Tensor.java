@@ -30,6 +30,17 @@ public class Tensor<T extends Tensor<T>> implements VectorSpace<T> {
         this.shape = shape;
     }
 
+    /**
+     * @return the sum of all values
+     */
+    public double sum() {
+        double sum = 0;
+        for (double value : array) {
+            sum += value;
+        }
+        return sum;
+    }
+
     public int length() {
         return array.length;
     }

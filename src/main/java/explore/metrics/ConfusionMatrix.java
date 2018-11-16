@@ -85,6 +85,17 @@ public class ConfusionMatrix implements MetricStorage {
         return (b == 0) ? 0 : a / b;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConfusionMatrix that = (ConfusionMatrix) o;
+        return truePositives == that.truePositives &&
+                trueNegatives == that.trueNegatives &&
+                falsePositives == that.falsePositives &&
+                falseNegatives == that.falseNegatives;
+    }
+
     /**
      * @return Map object containing all metrics  stored in the ConfusionMatrix object.
      */

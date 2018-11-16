@@ -10,6 +10,15 @@ class Metric(Printable):
         return "{0}_{1}".format(self.name, super().__repr__()).strip('_')
 
 
+class LabeledSetConfusionMatrix(Metric):
+    def __init__(self, learner):
+        super().__init__()
+
+        assert_is_instance(learner, Learner)
+
+        self.learner = learner
+
+
 class ConfusionMatrix(Metric):
     def __init__(self, learner):
         super().__init__()
