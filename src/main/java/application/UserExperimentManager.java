@@ -2,7 +2,7 @@ package application;
 
 import data.*;
 
-import explore.ExperimentConfiguration;
+import config.ExperimentConfiguration;
 import explore.ExploreIteration;
 import explore.InitialIteration;
 import explore.Iteration;

@@ -46,6 +46,13 @@ public enum ExtendedLabel {
     }
 
     /**
+     * @return whether the label is POSITIVE or NEGATIVE
+     */
+    public boolean isKnown(){
+        return !isUnknown();
+    }
+
+    /**
      * Attempts to convert this ExtendedLabel into the corresponding {@link Label} object.
      * @return a Label object of same name (i.e. POSITIVE/NEGATIVE is converted into POSITIVE/NEGATIVE)
      * @throws IllegalArgumentException if {@code this} is UNKNOWN

@@ -1,5 +1,7 @@
 package explore;
 
+import config.ExperimentConfiguration;
+import config.TsmConfiguration;
 import data.IndexedDataset;
 import data.preprocessing.StandardScaler;
 import explore.user.FactoredUser;
@@ -33,9 +35,8 @@ public final class Experiment {
     }
 
     private User getUser(ExperimentConfiguration configuration, TaskReader reader) {
-        if (configuration.hasMultiTSM()) {
-            ExperimentConfiguration.TsmConfiguration tsmConfiguration = configuration.getTsmConfiguration();
-            return new FactoredUser(reader.readFactorizedTargetSetKeys(tsmConfiguration));
+        if (configuration.getTsmConfiguration().hasTsm()) {
+            return new FactoredUser(reader.readFactorizedTargetSetKeys(configuration.getTsmConfiguration()));
         } else {
             return new UserStub(reader.readTargetSetKeys());
         }
