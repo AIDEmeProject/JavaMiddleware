@@ -419,7 +419,7 @@ class App extends Component {
             }
             else{
                 sendPointLabel({
-                    data: [],
+                    data: labeledPoints,
                 }, this.onNewPointsToLabel.bind(this))
             }
         }

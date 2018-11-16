@@ -32,12 +32,15 @@ public class ExplorationManager {
      */
     private Ranker ranker;
 
+    private boolean isInitialSamplingStep;
+
     /**
      * @param dataset: collection of unlabeled points
      * @param configuration: experiment configurations
      */
     public ExplorationManager(IndexedDataset dataset, ExperimentConfiguration configuration) {
         this.ranker = null;
+        this.isInitialSamplingStep = true;
         this.configuration = configuration;
         this.partitionedDataset = getPartitionedDataset(dataset);
     }
@@ -53,9 +56,49 @@ public class ExplorationManager {
     /**
      * @return an initial selection of points to be labeled by the user
      */
-    public List<DataPoint> runInitialSampling() {
+    public List<DataPoint> runInitialSampling(int sampleSize) {
         //TODO: how to guarantee that at least one positive and one negative point has been retrieved ?
-        return configuration.getInitialSampler().runInitialSample(partitionedDataset.getUnlabeledPoints(), null);
+        return  this.partitionedDataset.getUnlabeledPoints().sample(sampleSize).toList();
+        //configuration.getInitialSampler().runInitialSample(partitionedDataset.getUnlabeledPoints(), null);
+    }
+
+    public List<DataPoint> getNextPointsToLabel(List<LabeledPoint> labeledPoints){
+
+        this.partitionedDataset.update(labeledPoints);
+        if (this.isInitialSamplingStep){
+
+            if (this.hasPositiveAndNegativeExamples()){
+                this.isInitialSamplingStep = false;
+                return Collections.singletonList(this.runExploreIteration(labeledPoints));
+            }
+            else{
+                // TODO : not resample previously propsed points.
+                return this.runInitialSampling(3);
+            }
+        }
+        else{
+            return Collections.singletonList(this.runExploreIteration(labeledPoints));
+        }
+    }
+
+    protected boolean hasPositiveAndNegativeExamples(){
+
+        boolean hasPositive = false;
+        boolean hasNegative = false;
+
+        for (LabeledPoint point: partitionedDataset.getLabeledPoints()
+             ) {
+
+
+            if (point.getLabel().isPositive()){
+                hasPositive = true;
+            }
+            if (point.getLabel().isNegative()){
+                hasNegative = true;
+            }
+        }
+
+        return hasPositive && hasNegative;
     }
 
     /**
@@ -80,7 +123,7 @@ public class ExplorationManager {
 
     private DataPoint updateModelAndRetrieveNextPointToLabel(List<LabeledPoint> labeledPoints) {
         // update data partition
-        partitionedDataset.update(labeledPoints);
+        //partitionedDataset.update(labeledPoints);
 
         // fit active learning model
         ranker = configuration.getActiveLearner().fit(partitionedDataset.getLabeledPoints());

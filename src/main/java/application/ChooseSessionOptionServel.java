@@ -75,19 +75,18 @@ public class ChooseSessionOptionServel extends HttpServlet {
             rowNumber++;
         }
 
-
         String json = "{\n" +
                 "   \"activeLearner\": {\n" +
                 "       \"learner\": {\n" +
-                "           \"name\": \"MajorityVote\",\n" +
-                "           \"sampleSize\": 8,\n" +
+                "           \"name\": \"MajorityVote\",\n" + // MajorityVote | SVM |
+                "           \"sampleSize\": 8,\n" + // Only for MajorityVote : >= 1
                 "           \"versionSpace\": {\n" +
                 "               \"addIntercept\": true,\n" +
                 "               \"hitAndRunSampler\": {\n" +
                 "                   \"cache\": true,\n" +
                 "                   \"rounding\": true,\n" +
                 "                   \"selector\": {\n" +
-                "                       \"name\": \"WarmUpAndThin\",\n" +
+                "                       \"name\": \"WarmUpAndThin\",\n" + // Only For Majority Vote
                 "                       \"thin\": 10,\n" +
                 "                       \"warmUp\": 100\n" +
                 "                   }\n" +
@@ -104,15 +103,34 @@ public class ChooseSessionOptionServel extends HttpServlet {
                 "   \"task\": \"sdss_Q4_0.1%\"\n" +
                 "}";
 
+        String json2 = "{\n" +
+                "   \"activeLearner\": {\n" +
+                "       \"name\": \"SimpleMargin\",\n" +
+                "       \"svmLearner\": {\n" +
+                "           \"C\": 1024,\n" +
+                "           \"kernel\": {\n" +
+                "               \"name\": \"gaussian\"\n" +
+                "           },\n" +
+                "           \"name\": \"SVM\"\n" +
+                "       }\n" +
+                "   },\n" +
+                "   \"multiTSM\": {\n" + // pas de champ si n'est pas activé
+                "       \"searchUnknownRegionProbability\": 0.5\n" +
+                "   },\n" +
+                "   \"subsampleSize\": 5000,\n" +
+                "   \"task\": \"sdss_Q1_0.1%\"\n" +
+                "}";
+
         ExperimentConfiguration configuration = JsonConverter.deserialize(json, ExperimentConfiguration.class);
 
         IndexedDataset dataset = builder.build();
 
-        UserExperimentManager manager = new UserExperimentManager(configuration, dataset);
-
+        //UserExperimentManager manager = new UserExperimentManager(configuration, dataset);
+        ExplorationManager manager = new ExplorationManager(dataset, configuration);
         Gson gson = new Gson();
 
-        resp.getWriter().println(gson.toJson(manager.nextIteration(new ArrayList<>())));
+        int nInitialPoints = 3;
+        resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
 
         this.getServletContext().setAttribute("experimentManager", manager);
 

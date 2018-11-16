@@ -55,15 +55,18 @@ public class UserExperimentManager implements FacadeInterface {
 
         IndexedDataset unlabeledPoints = this.partitionedDataset.getUnlabeledPoints();
 
-        LabeledDataset labeledDataset = new LabeledDataset(unlabeledPoints, classifier.predict(unlabeledPoints));
+        //LabeledDataset labeledDataset = new LabeledDataset(unlabeledPoints, classifier.predict(unlabeledPoints));
 
-        return labeledDataset;
-
+        //return labeledDataset;
+        return null;
     }
 
     @Override
     public ArrayList<DataPoint> nextIteration(ArrayList<LabeledPoint> userLabeledPoints) {
 
+
+        return new ArrayList<DataPoint>();
+        /*
         Iteration.Result result;
         if (userLabeledPoints.isEmpty()){
             return this.initialSampler.getPoints(3);
@@ -81,7 +84,6 @@ public class UserExperimentManager implements FacadeInterface {
             return new ArrayList<DataPoint>();
         }
         else{
-/*
             for (LabeledPoint point: userLabeledPoints){
 
                 GuiUser user = new GuiUser();
@@ -93,8 +95,11 @@ public class UserExperimentManager implements FacadeInterface {
             }
             GuiUser user = new GuiUser();
             return (ArrayList<DataPoint>) this.exploreIteration.getNextPointsToLabel(this.partitionedDataset, user, this.ranker);
-            */
+
             return new ArrayList<DataPoint>();
+
+
         }
+           */
     }
 }
