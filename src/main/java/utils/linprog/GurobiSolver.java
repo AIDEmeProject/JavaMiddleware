@@ -18,6 +18,7 @@ public class GurobiSolver implements LinearProgramSolver {
             GRBEnv env = new GRBEnv();
 
             env.set(GRB.IntParam.OutputFlag, 0);  // disable console logging
+            env.set(GRB.DoubleParam.FeasibilityTol, 1e-9);  // set constraint violation tolerance to minimum allowed value
 
             model = new GRBModel(env);
 

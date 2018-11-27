@@ -63,17 +63,12 @@ public class PolyhedralCone implements ConvexBody {
     // TODO: is there a mechanism to stop the LP solver once a s > 0 point has been found?
     @Override
     public Vector getInteriorPoint() {
-        LinearProgramSolver solver = solverFactory.getSolver(getDim()+1);
-        configureLinearProgrammingProblem(solver);
-
-        double[] interiorPoint = parseLinearProgramSolution(solver.findMinimizer());
-        return Vector.FACTORY.make(interiorPoint).normalize(0.9);  // normalize point so it is contained on the unit ball
-    }
-
-    private void configureLinearProgrammingProblem(LinearProgramSolver solver) {
         int dim = getDim();
 
-        double[] constrain = new double[dim+1];
+        // configure linear program
+        LinearProgramSolver solver = solverFactory.getSolver(dim + 1);
+
+        double[] constrain = new double[dim + 1];
         constrain[0] = 1;
         solver.setObjectiveFunction(constrain);
 
@@ -96,12 +91,10 @@ public class PolyhedralCone implements ConvexBody {
         constrain = new double[dim+1];
         Arrays.fill(constrain, 1);
         solver.setUpper(constrain);
-    }
 
-    private double[] parseLinearProgramSolution(double[] solution) {
-        double[] optimalX = new double[solution.length-1];
-        System.arraycopy(solution, 1, optimalX, 0, optimalX.length);
-        return optimalX;
+        // find solution and return answer
+        Vector solution = Vector.FACTORY.make(solver.findMinimizer());
+        return solution.slice(1, solution.dim()).normalize(0.9);  // normalize point so it is contained on the unit ball
     }
 
     /**
