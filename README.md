@@ -17,3 +17,35 @@ Learning domain. Some of the algorithms currently supported are:
 [1]   Tong, S., Koller, D.
       Support Vector Machine Active Learning with Applications to Text Classification
       Journal of Machine Learning Research (2001) 
+
+
+
+
+# Application
+
+## Installation
+
+Install nodejs: https://nodejs.org/en/ 
+
+Install java and maven
+
+## quick start
+
+Launch the Jetty web server
+
+```bash
+mvn cean compile && mvn -e exec:java -Dexec.mainClass="application.ApplicationServerMain"
+```
+
+Launch the web interface
+
+```bash
+
+cd src/frontend/gui/
+npm start
+
+```
+
+Go to localhost:3000
+
+
