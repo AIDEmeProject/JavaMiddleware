@@ -3,7 +3,9 @@ package machinelearning.active.learning.versionspace.convexbody.sampling;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCache;
 import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCacheStub;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSamplingAlgorithm;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RoundingAlgorithm;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import utils.Validator;
 import utils.linalg.Vector;
@@ -75,9 +77,19 @@ public class HitAndRunSampler {
     public Vector[] sample(ConvexBody body, int numSamples) {
         Validator.assertPositive(numSamples);
 
+        DirectionSampler sampler = directionSamplingAlgorithm.fit(body);
+
+        // in the special case of RoundingAlgorithm, it is guaranteed that the fitted ellipsoid's center is contained in
+        // the convex body. Thus, it can be used as starting point to the Hit-and-Run algorithm.
+        if (directionSamplingAlgorithm instanceof RoundingAlgorithm) {
+            sampleCache.updateCache(new Vector[] {
+                    ((RoundingAlgorithm) directionSamplingAlgorithm).getCenter()
+            });
+        }
+
         body = sampleCache.attemptToSetDefaultInteriorPoint(body);
 
-        HitAndRun chain = new HitAndRun(body, directionSamplingAlgorithm.fit(body));
+        HitAndRun chain = new HitAndRun(body, sampler);
         Vector[] samples = sampleSelector.select(chain, numSamples);
 
         sampleCache.updateCache(samples);

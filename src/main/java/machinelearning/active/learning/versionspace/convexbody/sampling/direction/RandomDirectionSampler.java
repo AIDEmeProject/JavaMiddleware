@@ -24,7 +24,7 @@ public class RandomDirectionSampler implements DirectionSampler {
      * @param dim: dimension of the output samples
      * @throws IllegalArgumentException if dim is not positive
      */
-    RandomDirectionSampler(int dim) {
+    public RandomDirectionSampler(int dim) {
         Validator.assertPositive(dim);
         this.dim = dim;
     }

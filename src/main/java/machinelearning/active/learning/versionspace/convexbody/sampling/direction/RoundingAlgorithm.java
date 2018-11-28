@@ -43,19 +43,39 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
     private Vector center;
 
     /**
-     * Ellipsoid's matrix
+     * Ellipsoid's scaling matrix
      */
     private Matrix matrix;
 
+    /**
+     * LDL^T decomposition of matrix
+     */
     private Matrix L;
     private Vector D;
 
     //TODO: add max iters
 
-    @Override
+
+    public Vector getCenter() {
+        return center;
+    }
+
     public DirectionSampler fit(ConvexBody body) {
+        initialize(body);
         fitWeakLownerJohnEllipsoid(body);
         return new EllipsoidSampler(L.multiplyRow(D.applyMap(Math::sqrt)), false);
+    }
+
+    /**
+     * Initialize center to the zero vector and matrix to the identity matrix
+     */
+    private void initialize(ConvexBody body) {
+        int dim = body.getDim();
+        center = Vector.FACTORY.zeros(dim);
+        matrix = Matrix.FACTORY.identity(dim);
+
+        L = Matrix.FACTORY.identity(dim);
+        D = Vector.FACTORY.fill(dim, 1.0);
     }
 
     /**
@@ -71,8 +91,6 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      * In particular, we start the algorithm with a large enough ball E_0 = B(0, R) containing K. TODO: add getRadius() to ConvexBody?
      */
     private void fitWeakLownerJohnEllipsoid(ConvexBody body) {
-        initialize(body);
-
         boolean converged = false;
 
         while (!converged) {
@@ -89,18 +107,6 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
                 }
             }
         }
-    }
-
-    /**
-     * Initialize center to the zero vector and matrix to the identity matrix
-     */
-    private void initialize(ConvexBody body) {
-        int dim = body.getDim();
-        center = Vector.FACTORY.zeros(dim);
-        matrix = Matrix.FACTORY.identity(dim);
-
-        L = Matrix.FACTORY.identity(dim);
-        D = Vector.FACTORY.fill(dim, 1.0);
     }
 
     /**

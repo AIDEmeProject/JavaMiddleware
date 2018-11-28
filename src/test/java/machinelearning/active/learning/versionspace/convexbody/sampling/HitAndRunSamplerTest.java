@@ -5,6 +5,8 @@ import machinelearning.active.learning.versionspace.convexbody.sampling.cache.Sa
 import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCacheStub;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.convexbody.sampling.direction.DirectionSamplingAlgorithm;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RandomDirectionSampler;
+import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RoundingAlgorithm;
 import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,5 +84,25 @@ class HitAndRunSamplerTest {
         sampler.sample(body, 3);
 
         verify(selector).select(any(), eq(3));
+    }
+
+    @Test
+    void sample_roundingAlgorithmUsedForSamplingDirections_ellipsoidCenterPutInCache() {
+        RoundingAlgorithm algorithm = mock(RoundingAlgorithm.class);
+        when(algorithm.fit(any())).thenReturn(new RandomDirectionSampler(1));
+
+        Vector center = Vector.FACTORY.make(10);
+        when(algorithm.getCenter()).thenReturn(center);
+
+        sampler = new HitAndRunSampler
+                .Builder(algorithm, selector)
+                .cache(cache)
+                .build();
+
+        ConvexBody body = mock(ConvexBody.class);
+
+        sampler.sample(body, 3);
+
+        verify(cache).updateCache(new Vector[] {center});
     }
 }
