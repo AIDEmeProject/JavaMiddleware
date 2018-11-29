@@ -47,6 +47,8 @@ class Printable:
                 if 'name' in v:
                     flattened[k] = v.pop('name')
                 flattened.update(Printable.__flatten_dict(v))
+            elif isinstance(v, tuple) or isinstance(v, list):
+                flattened[k] = '_'.join([str(x) for x in v])
             elif k != 'name':
                 flattened[k] = v
         return flattened

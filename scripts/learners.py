@@ -3,7 +3,7 @@ from .validation import *
 
 
 LINPROG_SOLVERS = ['apache', 'ojalgo', 'gurobi']
-KERNELS = ['linear', 'gaussian']
+KERNELS = ['linear', 'gaussian', 'diagonal']
 SAMPLE_SELECTORS = ['single', 'independent']
 
 
@@ -12,14 +12,18 @@ class Learner(Printable):
 
 
 class Kernel(Printable):
-    def __init__(self, name='gaussian', gamma=0):
+    def __init__(self, name='gaussian', gamma=0, diagonal=[]):
         super().__init__(name=name)
 
         assert_in_list(name, KERNELS)
         assert_positive('gamma', gamma, allow_zero=True)
+        if any([d <= 0 for d in diagonal]):
+            raise ValueError("Non-negative value found in diagonal.")
 
-        if self.name != 'linear':
+        if self.name == 'gaussian':
             self.gamma = gamma
+        if self.name == 'diagonal':
+            self.diagonal = diagonal
 
     def __repr__(self):
         return 'linear' if self.name == 'linear' else 'gaussian gamma=' + str(self.gamma)
@@ -84,7 +88,7 @@ class BayesianSampler(Printable):
 
 class VersionSpace(Printable):
     def __init__(self, hit_and_run,
-                 kernel='linear', gamma=0,
+                 kernel='linear', gamma=0, diagonal=(),
                  add_intercept=True, solver="ojalgo"):
         super().__init__(add_name=False)
 
@@ -92,7 +96,7 @@ class VersionSpace(Printable):
 
         self.addIntercept = add_intercept
         self.solver = solver
-        self.kernel = Kernel(kernel, gamma)
+        self.kernel = Kernel(kernel, gamma, diagonal)
         self.hitAndRunSampler = hit_and_run
 
 
@@ -108,7 +112,7 @@ class BayesianVersionSpace(Printable):
 class MajorityVote(Learner):
     def __init__(self, num_samples=8,
                  warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,
-                 kernel='linear', gamma=0,
+                 kernel='linear', gamma=0, diagonal=(),
                  add_intercept=True, solver="ojalgo"):
         super().__init__()
 
@@ -120,7 +124,7 @@ class MajorityVote(Learner):
                 selector=SampleSelector(name=selector, warmup=warmup, thin=thin, chain_length=chain_length),
                 rounding=rounding, cache=cache
             ),
-            kernel=kernel, gamma=gamma,
+            kernel=kernel, gamma=gamma, diagonal=diagonal,
             add_intercept=add_intercept, solver=solver
         )
 
