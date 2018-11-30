@@ -3,23 +3,51 @@ import React, { Component } from 'react';
 import $ from "jquery";
 import {backend} from '../constants/constants'
 
+import ModelVisualization from './ModelVisualization'
+
 class Exploration extends Component{
 
     render(){
+        var FirstPhase,
+            Bottom
 
         if (this.props.initialLabelingSession){
 
-            var FirstPhase = (
-
+            FirstPhase = () => {
+                return (
                 <p>
-                    The first phase of labeling keeps goind on
-                    until an instance of a positive and a negative example 
-                    is provided
+                    The first phase of labeling continues until we obtain 
+                    a positive example and a negative example.                    
                 </p>
-            )
+            )}
+
+            Bottom = () => {return(
+                <div></div>
+            )}
+
         }
         else {
-            var FirstPhase = (<div></div>)
+            
+            FirstPhase = () => {return(<div></div>)}
+
+            Bottom = () => {
+                return (
+                <div>
+                    <button 
+                        className="btn btn-primary btn-raised"
+                    >
+
+                        Visualize model
+
+                    </button>
+
+                    <button
+                        className="btn btn-primary btn-raised"
+                    >
+                        Get the whole dataset labeled
+                    </button>
+                </div>
+            )}            
         }
 
         return (
@@ -27,7 +55,7 @@ class Exploration extends Component{
             <div>
                 <p> label this sample</p>
                 
-                { FirstPhase }
+                <FirstPhase />
                 <div>
 
                     <div style={{display: "inline-block", width:10, margin: 10}}>
@@ -59,6 +87,7 @@ class Exploration extends Component{
                                 <div style={{margin: 10, width:10, display: "inline-block"}}>
                                                 {point.id}
                                 </div>
+                      
                                 {
 
                                     point.data.array.map((value, valueKey) => {
@@ -87,14 +116,15 @@ class Exploration extends Component{
                                 </button>
                             </div>                            
                         )
-                    })
+                    })                    
                 }
+
+                <Bottom />
             </div>
         )
     }
 
-    onPositiveLabel(e){
-        
+    onPositiveLabel(e){        
         this.props.onPositiveLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
     }
 
