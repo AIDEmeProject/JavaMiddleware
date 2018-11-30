@@ -1,5 +1,6 @@
 package data;
 
+import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.ExtendedLabel;
@@ -257,6 +258,24 @@ class PartitionedDatasetTest {
                 ExtendedLabel.UNKNOWN,   // relabeling
                 ExtendedLabel.NEGATIVE   // previous classification, remained unchanged
         );
+    }
+
+    @Test
+    void predictLabels_noUpdatesAndPositiveClassifierStub_returnsPositiveLabels() {
+        Classifier classifier = spy(Classifier.class);
+        when(classifier.probability((Vector) any())).thenReturn(1.0);
+
+        assertArrayEquals(new Label[] {POSITIVE, POSITIVE, POSITIVE, POSITIVE, POSITIVE}, dataset.predictLabels(classifier));
+    }
+
+    @Test
+    void predictLabels_singleUpdateAndPositiveClassifierStub_returnsPositiveLabels() {
+        Classifier classifier = spy(Classifier.class);
+        when(classifier.probability((Vector) any())).thenReturn(1.0);
+
+        dataset.update(new LabeledPoint(dataPoints.get(0), NEGATIVE));
+
+        assertArrayEquals(new Label[] {NEGATIVE, POSITIVE, POSITIVE, POSITIVE, POSITIVE}, dataset.predictLabels(classifier));
     }
 
     private class MockClassifier implements ExtendedClassifier {

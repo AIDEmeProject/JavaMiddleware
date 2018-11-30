@@ -903,6 +903,21 @@ public class MatrixTest {
     }
 
     /* *************************************
+     *         AGGREGATION METHODS
+     * *************************************
+     */
+
+    @Test
+    void sum_rectangularMatrix_returnsExpectedSum() {
+        assertEquals(21, matrix1.sum());
+    }
+
+    @Test
+    void getRowsSum_rectangularMatrix_returnsExpectedValues() {
+        assertEquals(Vector.FACTORY.make(6, 15), matrix1.getRowSums());
+    }
+
+    /* *************************************
      *           UTILITY METHODS
      * *************************************
      */

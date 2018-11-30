@@ -2,7 +2,6 @@ package machinelearning.classifier;
 
 
 import data.DataPoint;
-import data.IndexedDataset;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -40,14 +39,6 @@ public interface Classifier {
     }
 
     /**
-     * @param points: a dataset
-     * @return class probability estimation for each point in the dataset.
-     */
-    default Vector probability(IndexedDataset points){
-        return probability(points.getData());
-    }
-
-    /**
      * @param vector: a feature vector
      * @return predicted label for the input vector
      */
@@ -73,13 +64,5 @@ public interface Classifier {
      */
     default Label predict(DataPoint point){
         return predict(point.getData());
-    }
-
-    /**
-     * @param points: collection of data points
-     * @return predicted class labels for each point in the dataset.
-     */
-    default Label[] predict(IndexedDataset points){
-        return predict(points.getData());
     }
 }

@@ -46,6 +46,7 @@ public final class Evaluate {
             long numberOfPreviousIters = countLinesOfFile(evalFile);
 
             for (List<LabeledPoint> labeledPoints : folder.getLabeledPoints(id)) {
+                long start = System.nanoTime();
                 partitionedDataset.update(labeledPoints);
 
                 if (iter++ < numberOfPreviousIters) {
@@ -55,6 +56,8 @@ public final class Evaluate {
                 Map<String, Double> metrics = metricCalculator.compute(partitionedDataset, user).getMetrics();
 
                 writeLineToFile(evalFileWriter, JsonConverter.serialize(metrics));
+                System.out.println("#" + iter + ": " + (System.nanoTime() - start) / 1e9 + " seconds");
+                System.out.println();
             }
         } catch (IOException ex) {
             throw new RuntimeException("evaluation failed.", ex);

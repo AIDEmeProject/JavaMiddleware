@@ -1,13 +1,10 @@
 package explore.metrics;
 
-import data.DataPoint;
 import data.PartitionedDataset;
 import explore.user.User;
 import explore.user.UserLabel;
 import machinelearning.classifier.Classifier;
-import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-import machinelearning.threesetmetric.ExtendedLabel;
 import utils.Validator;
 
 /**
@@ -16,7 +13,7 @@ import utils.Validator;
  * @see ConfusionMatrix
  */
 public class ConfusionMatrixCalculator implements MetricCalculator {
-    private Learner learner;
+    protected Learner learner;
 
     public ConfusionMatrixCalculator(Learner learner) {
         this.learner = learner;
@@ -25,19 +22,8 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
     @Override
     public MetricStorage compute(PartitionedDataset data, User user) {
         UserLabel[] trueLabels = user.getLabel(data.getAllPoints());  // TODO: can we avoid recomputing these labels
-
         Classifier classifier = learner.fit(data.getLabeledPoints());
-
-        Label[] labels = data.getAllPoints().stream()
-                .map(x -> getLabel(x, data, classifier))
-                .toArray(Label[]::new);
-
-        return compute(trueLabels, labels);
-    }
-
-    private Label getLabel(DataPoint point, PartitionedDataset partitionedDataset, Classifier classifier){
-        ExtendedLabel extendedLabel = partitionedDataset.getLabel(point);
-        return extendedLabel.isUnknown() ? classifier.predict(point) : extendedLabel.toLabel();
+        return compute(trueLabels, data.predictLabels(classifier));
     }
 
     /**

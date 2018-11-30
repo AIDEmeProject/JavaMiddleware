@@ -5,9 +5,9 @@ import machinelearning.active.learning.versionspace.VersionSpace;
 import utils.Validator;
 
 /**
- * This module builds a {@link MajorityVote} by sampling from the {@link VersionSpace}.
+ * This module builds a majority vote classifier by sampling from the {@link VersionSpace}.
  */
-public class MajorityVoteLearner<T extends Classifier> implements Learner {
+public class MajorityVoteLearner implements Learner {
     /**
      * Number of classifiers to sample from the version space
      */
@@ -16,14 +16,14 @@ public class MajorityVoteLearner<T extends Classifier> implements Learner {
     /**
      * {@link VersionSpace} of classifiers
      */
-    private final VersionSpace<T> versionSpace;
+    private final VersionSpace versionSpace;
 
     /**
      * @param versionSpace: version space instance
-     * @param sampleSize: number of samples used to build a {@link MajorityVote}
+     * @param sampleSize: number of samples used to build a majority vote classifier
      * @throws IllegalArgumentException if versionSpace is null or sampleSize is not positive
      */
-    public MajorityVoteLearner(VersionSpace<T> versionSpace, int sampleSize) {
+    public MajorityVoteLearner(VersionSpace versionSpace, int sampleSize) {
         Validator.assertNotNull(versionSpace);
         Validator.assertPositive(sampleSize);
 
@@ -33,10 +33,10 @@ public class MajorityVoteLearner<T extends Classifier> implements Learner {
 
     /**
      * @param labeledPoints: collection of labeled points
-     * @return {@link MajorityVote} constructed by sampling from the Version Space delimited by the labeledPoints.
+     * @return Majority vote classifier constructed by sampling from the Version Space delimited by the labeledPoints.
      */
     @Override
-    public MajorityVote<T> fit(LabeledDataset labeledPoints) {
+    public Classifier fit(LabeledDataset labeledPoints) {
         return versionSpace.sample(labeledPoints, sampleSize);
     }
 }

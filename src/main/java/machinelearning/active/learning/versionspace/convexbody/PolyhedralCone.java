@@ -2,9 +2,11 @@ package machinelearning.active.learning.versionspace.convexbody;
 
 import data.LabeledDataset;
 import data.LabeledPoint;
+import explore.user.UserLabel;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.SecondDegreeEquationSolver;
 import utils.Validator;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
@@ -65,7 +67,6 @@ public class PolyhedralCone implements ConvexBody {
         configureLinearProgrammingProblem(solver);
 
         double[] interiorPoint = parseLinearProgramSolution(solver.findMinimizer());
-
         return Vector.FACTORY.make(interiorPoint).normalize(0.9);  // normalize point so it is contained on the unit ball
     }
 
@@ -76,10 +77,16 @@ public class PolyhedralCone implements ConvexBody {
         constrain[0] = 1;
         solver.setObjectiveFunction(constrain);
 
-        for (LabeledPoint labeledPoint : labeledPoints) {
-            constrain = labeledPoint.getData().addBias().toArray();
-            constrain[0] = labeledPoint.getLabel().asSign();
-            solver.addLinearConstrain(constrain, labeledPoint.getLabel().isPositive() ? InequalitySign.GEQ : InequalitySign.LEQ, 0);
+        Vector y = Vector.FACTORY.make(
+                Arrays.stream(labeledPoints.getLabels())
+                        .mapToDouble(UserLabel::asSign)
+                        .toArray()
+        );
+        Matrix X = labeledPoints.getData();
+        Matrix A = X.multiplyColumn(y).addBiasColumn().iScalarMultiply(-1);  // a_i = (-1, -y_i x_i)
+
+        for (int i = 0; i < A.rows(); i++) {
+            solver.addLinearConstrain(A.getRow(i).toArray(), InequalitySign.LEQ, 0);  // -s - y_i <x_i, w> <= 0
         }
 
         constrain = new double[dim+1];

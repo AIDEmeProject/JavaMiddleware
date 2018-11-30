@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static utils.linprog.InequalitySign.LEQ;
 
 abstract class LinearProgramSolverTest {
     int dim = 2;
@@ -28,7 +29,7 @@ abstract class LinearProgramSolverTest {
 
     @Test
     void addLinearConstrain_ConstrainWithWrongDimension_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> solver.addLinearConstrain(new double[dim+1], InequalitySign.LEQ, 0));
+        assertThrows(IllegalArgumentException.class, () -> solver.addLinearConstrain(new double[dim+1], LEQ, 0));
     }
 
     @Test
@@ -42,7 +43,7 @@ abstract class LinearProgramSolverTest {
     }
 
     @Test
-    void solve_noConstrainsAddedToSolver_throwsUnboundedSolutionException() {
+    void findMinimizer_noConstrainsAddedToSolver_throwsUnboundedSolutionException() {
         solver.setObjectiveFunction(new double[] {1,1});
         assertThrows(UnboundedSolutionException.class, () -> solver.findMinimizer());
     }
@@ -53,7 +54,7 @@ abstract class LinearProgramSolverTest {
      * TODO: Ojalgo solver fails this test for unknown reason. Fix this!
      */
 //    @Test
-//    void solve_EmptyFeasibleRegion_ThrowsException() {
+//    void findMinimizer_EmptyFeasibleRegion_ThrowsException() {
 //        solver.setObjectiveFunction(new double[] {1,1});
 //        solver.setLower(new double[] {1, 1});
 //        solver.setUpper(new double[] {0, 0});
@@ -65,7 +66,7 @@ abstract class LinearProgramSolverTest {
      * Only a single point is feasible: (0,0)
      */
     @Test
-    void solve_FeasibleRegionConsistsOfSinglePoint_ThrowsException() {
+    void findMinimizer_FeasibleRegionConsistsOfSinglePoint_ThrowsException() {
         solver.setLower(new double[] {0, 0});
         solver.setUpper(new double[] {0, 0});
         assertSolverSolution(new double[] {0,0}, new double[] {1,1});
@@ -76,7 +77,7 @@ abstract class LinearProgramSolverTest {
      * Unbounded solution (-infinity)
      */
     @Test
-    void solve_UnboundedFeasibleRegionAndSolution_ThrowsException() {
+    void findMinimizer_UnboundedFeasibleRegionAndSolution_ThrowsException() {
         solver.setObjectiveFunction(new double[] {1,0});
         solver.setUpper(new double[] {0, 0});
         assertThrows(UnboundedSolutionException.class, () -> solver.findMinimizer());
@@ -87,8 +88,9 @@ abstract class LinearProgramSolverTest {
      * Feasible region is unbounded, but there is a solution at (0,0)
      */
     @Test
-    void solve_UnboundedFeasibleRegionButBoundedSolution_CorrectSolutionComputed() {
+    void findMinimizer_UnboundedFeasibleRegionButBoundedSolution_CorrectSolutionComputed() {
         solver.setLower(new double[] {0, 0});
+        solver.addLinearConstrain(new double[2], LEQ, 0);
         assertSolverSolution(new double[] {0, 0}, new double[] {1, 1});
     }
 
@@ -97,10 +99,10 @@ abstract class LinearProgramSolverTest {
      * we choose (a,b) s.t. each time the solution falls in a different vertex of the feasible region polytope
      */
     @Test
-    void solver_NonEmptyAndBoundedFeasibleRegion_MinimizerCorrectlyComputed() {
+    void findMinimizer_NonEmptyAndBoundedFeasibleRegion_MinimizerCorrectlyComputed() {
         solver.setLower(new double[] {0.2, 0.3});
         solver.setUpper(new double[] {0.6, 0.7});
-        solver.addLinearConstrain(new double[] {1, 1}, InequalitySign.LEQ, 1);
+        solver.addLinearConstrain(new double[] {1, 1}, LEQ, 1);
         solver.addLinearConstrain(new double[] {1, 1}, InequalitySign.GEQ, 0.6);
         assertSolverSolution(new double[] {0.2, 0.4}, new double[] {1.1, 0.9});
         assertSolverSolution(new double[] {0.3, 0.3}, new double[] {0.9, 1.1});

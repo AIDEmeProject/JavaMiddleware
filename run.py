@@ -22,7 +22,7 @@ SUBSAMPLE_SIZE = 5000  # float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    'NEW',       # run new exploration
+    #'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
     #'EVAL',      # run evaluation procedure over finished runs
     # 'AVERAGE'    # average all evaluation file for a given metric
@@ -70,12 +70,12 @@ IS_CATEGORICAL = [
 SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
 # Multiple TSM configuration. Set as None if you do now want it to be used.
-#mTSM = None
-mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
+mTSM = None
+# mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+# ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 # ACTIVE_LEARNER = RandomSampler()
 # ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
 #     num_samples=8,
@@ -111,7 +111,9 @@ assert_positive("NUM_RUNS", NUM_RUNS)
 assert_positive("BUDGET", BUDGET)
 assert_positive("SUBSAMPLE_SIZE", SUBSAMPLE_SIZE)
 
-folder_elems = [ACTIVE_LEARNER.name, 'ss=' + str(SUBSAMPLE_SIZE)]
+folder_elems = [ACTIVE_LEARNER.name]
+if SUBSAMPLE_SIZE < float('inf'):
+    folder_elems.append('ss=%d' % SUBSAMPLE_SIZE)
 if mTSM:
     folder_elems.append(str(mTSM))
 folder = '_'.join(folder_elems)

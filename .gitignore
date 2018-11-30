@@ -6,3 +6,4 @@ results/
 javadoc/
 *.ini
 __pycache__/
+.DS_Store/
