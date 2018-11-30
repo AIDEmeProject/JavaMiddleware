@@ -2,6 +2,7 @@ package application.data;
 
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+import data.DataPoint;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +66,14 @@ public class CsvDatasetReader {
         Gson json = new Gson();
 
         return json.toJson(dataset.columns);
+
+    }
+
+
+    public void savedLabeledPointsAsCsv(ArrayList<DataPoint> labeledPoints){
+
+
+
 
     }
 }

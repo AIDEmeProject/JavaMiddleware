@@ -6,6 +6,10 @@ import data.DataPoint;
 import data.IndexedDataset;
 import config.ExperimentConfiguration;
 import io.json.JsonConverter;
+import machinelearning.classifier.Learner;
+import machinelearning.classifier.svm.GaussianKernel;
+import machinelearning.classifier.svm.Kernel;
+import machinelearning.classifier.svm.SvmLearner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -116,6 +120,11 @@ public class ChooseSessionOptionServel extends HttpServlet {
                 "   },\n" +
                 "   \"multiTSM\": {\n" + // pas de champ si n'est pas activé
                 "       \"searchUnknownRegionProbability\": 0.5\n" +
+                "       \"featureGroups\": [" +
+                "                ['age'], ['sex']" +
+                "           ]" +
+                "       \"columns: ['age', 'sex']    " +
+
                 "   },\n" +
                 "   \"subsampleSize\": 5000,\n" +
                 "   \"task\": \"sdss_Q1_0.1%\"\n" +
@@ -126,7 +135,10 @@ public class ChooseSessionOptionServel extends HttpServlet {
         IndexedDataset dataset = builder.build();
 
         //UserExperimentManager manager = new UserExperimentManager(configuration, dataset);
-        ExplorationManager manager = new ExplorationManager(dataset, configuration);
+        double C = 1000;
+        Kernel kernel = new GaussianKernel();
+        Learner learner = new SvmLearner(C, kernel);
+        ExplorationManager manager = new ExplorationManager(dataset, configuration, learner);
         Gson gson = new Gson();
 
         int nInitialPoints = 3;

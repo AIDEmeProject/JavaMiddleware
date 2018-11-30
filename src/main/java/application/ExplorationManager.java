@@ -5,10 +5,16 @@ import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
 import config.ExperimentConfiguration;
+import explore.metrics.MetricStorage;
+import explore.metrics.ThreeSetMetricCalculator;
 import machinelearning.active.Ranker;
+import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Label;
+import machinelearning.classifier.Learner;
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.RandomState;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,6 +33,8 @@ public class ExplorationManager {
      */
     private final ExperimentConfiguration configuration;
 
+    private final Learner learner;
+
     /**
      * The current Active Learning model
      */
@@ -38,11 +46,13 @@ public class ExplorationManager {
      * @param dataset: collection of unlabeled points
      * @param configuration: experiment configurations
      */
-    public ExplorationManager(IndexedDataset dataset, ExperimentConfiguration configuration) {
+    public ExplorationManager(IndexedDataset dataset, ExperimentConfiguration configuration, Learner learner) {
         this.ranker = null;
         this.isInitialSamplingStep = true;
         this.configuration = configuration;
         this.partitionedDataset = getPartitionedDataset(dataset);
+
+        this.learner = learner;
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -133,4 +143,60 @@ public class ExplorationManager {
         IndexedDataset sample = unlabeledData.sample(configuration.getSubsampleSize());
         return ranker.top(sample);
     }
+
+    public ArrayList<LabeledPoint> labelWholeDataset(){
+
+
+        Classifier classifier = this.learner.fit(this.partitionedDataset.getLabeledPoints());
+
+
+        ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
+
+        for (DataPoint point: this.partitionedDataset.getUnlabeledPoints()
+             ) {
+
+            Label label = classifier.predict(point.getData());
+
+            LabeledPoint labeledPoint = new LabeledPoint(point, label);
+            labeledDataset.add(labeledPoint);
+        }
+
+        //add user labeled points
+
+        return labeledDataset;
+    }
+
+
+    public void getModelVisualizationData(int idxVariable1, int idxVariable2){
+
+        // show some prediction of the model
+        // so the user can say if he is happy and label the whole dataset or not
+        // show also the class repartition.
+
+        if (this.configuration.getTsmConfiguration().hasTsm()){
+            // add return bound
+
+            ThreeSetMetricCalculator calculator = new ThreeSetMetricCalculator();
+
+            MetricStorage storage = calculator.compute(this.partitionedDataset, null);
+
+            Double lowerBound = storage.getMetrics().get("ThreeSetMetric");
+        }
+
+        //return some predict (confirm yanlei)
+
+        //return visualization Data
+        // heatmap data ?
+        //
+
+    }
+}
+
+
+class ModelPerformanceData{
+
+
+    public double TSMbound;
+
+    public double sdsd;
 }
