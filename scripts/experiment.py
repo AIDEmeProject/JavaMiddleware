@@ -11,10 +11,11 @@ from .active_learners import ActiveLearner
 from .printable import Printable
 from .validation import *
 from .tsm import MultipleTSM
+from .initial_sampling import StratifiedSampler
 
 
 class Experiment(Printable):
-    def __init__(self, task, active_learner, subsample, mTSM=None):
+    def __init__(self, task, active_learner, subsample, mTSM=None, initial_sampler=StratifiedSampler(1, 1)):
         super().__init__(add_name=False)
 
         assert_positive('subsample', subsample)
@@ -27,3 +28,5 @@ class Experiment(Printable):
         if mTSM is not None:
             assert_is_instance(mTSM, MultipleTSM)
             self.multiTSM = mTSM
+        if initial_sampler is not None:
+            self.initialSampler = initial_sampler

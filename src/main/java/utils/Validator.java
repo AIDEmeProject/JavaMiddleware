@@ -47,6 +47,17 @@ public class Validator {
     }
 
     /**
+     * Raises an exception if data vector is emtpy
+     * @param data: data vector
+     * @throws IllegalArgumentException if data vector is empty
+     */
+    public static void assertNotEmpty(long[] data){
+        if (data.length == 0){
+            throw new IllegalArgumentException("Array must contain at least one element.");
+        }
+    }
+
+    /**
      * Raises an exception if data vector is null or emtpy
      * @param data: data vector
      * @throws IllegalArgumentException if data is null or empty

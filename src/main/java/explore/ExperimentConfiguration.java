@@ -16,7 +16,7 @@ public final class ExperimentConfiguration {
     private String task;
     private ActiveLearner activeLearner;
 
-    private InitialSampler initialSampler = new StratifiedSampler(1, 1);
+    private InitialSampler initialSampler;
     private int subsampleSize = Integer.MAX_VALUE;
 
     private TsmConfiguration multiTSM = new TsmConfiguration(false);
@@ -27,6 +27,10 @@ public final class ExperimentConfiguration {
 
     public InitialSampler getInitialSampler() {
         return initialSampler;
+    }
+
+    public void setInitialSampler(InitialSampler initialSampler) {
+        this.initialSampler = initialSampler;
     }
 
     public int getSubsampleSize() {

@@ -2,6 +2,9 @@ package io;
 
 import data.IndexedDataset;
 import explore.ExperimentConfiguration;
+import explore.sampling.FixedSampler;
+import explore.sampling.InitialSampler;
+import explore.sampling.StratifiedSampler;
 import utils.Validator;
 
 import java.util.*;
@@ -26,6 +29,10 @@ public class TaskReader {
         datasetConfig = new DatasetConfiguration(taskConfig.dataset);
         ConnectionConfiguration connectionConfig = new ConnectionConfiguration(datasetConfig.connection);
         reader = new DatabaseReader(connectionConfig.url, datasetConfig.database, connectionConfig.user, connectionConfig.password);
+    }
+
+    public TaskConfiguration getTaskConfig() {
+        return taskConfig;
     }
 
     public IndexedDataset readData(){
@@ -101,7 +108,7 @@ public class TaskReader {
     /**
      * This class holds the task configuration properties
      */
-    private static class TaskConfiguration {
+    public static class TaskConfiguration {
         /**
          * Dataset name (in datasets.ini file)
          */
@@ -127,6 +134,8 @@ public class TaskReader {
          */
         private final ArrayList<boolean[]> tsmFlags;
 
+        private final InitialSampler defaultInitialSampler;
+
         private static final Pattern splitPattern = Pattern.compile("\\s*,\\s*");
         private static final Pattern featureGroupMatcher = Pattern.compile("\\[\\s*(.*?)\\s*\\]");
 
@@ -142,6 +151,24 @@ public class TaskReader {
             this.featureGroups = parseFeatureGroups(config.getOrDefault("feature_groups", ""));
             this.tsmFlags = parseTsmFlags(config);
             Validator.assertEquals(featureGroups.size(), tsmFlags.size());
+
+            if (config.containsKey("posId")) {
+                this.defaultInitialSampler = parseInitialSampler(config);
+            }
+            else {
+                this.defaultInitialSampler = new StratifiedSampler(1, 1);
+            }
+        }
+
+        private InitialSampler parseInitialSampler(Map<String, String> config) {
+            long posId = Long.parseLong(config.get("posId"));
+            long[] negIds = splitPattern.splitAsStream(config.get("negIds")).mapToLong(Long::parseLong).toArray();
+
+            return new FixedSampler(posId, negIds);
+        }
+
+        public InitialSampler getDefaultInitialSampler() {
+            return defaultInitialSampler;
         }
 
         private ArrayList<String[]> parseFeatureGroups(String s) {

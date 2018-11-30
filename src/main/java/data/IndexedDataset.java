@@ -115,6 +115,14 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     /**
+     * @param index: index of data point to be retrieved
+     * @return the data point corresponding to the specified index
+     */
+    public DataPoint getFromIndex(long index) {
+        return get(indexes.indexOf(index));
+    }
+
+    /**
      * @param rows: rows to be retrieved
      * @return an IndexedDataset containing only the specified rows (data will be copied in this process)
      * @throws IllegalArgumentException if rows is empty

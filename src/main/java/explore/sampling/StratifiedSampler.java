@@ -65,4 +65,12 @@ public class StratifiedSampler implements InitialSampler{
 
         return samples;
     }
+
+    @Override
+    public String toString() {
+        return "StratifiedSampler{" +
+                "positiveSamples=" + positiveSamples +
+                ", negativeSamples=" + negativeSamples +
+                '}';
+    }
 }

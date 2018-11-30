@@ -3,6 +3,7 @@ package explore;
 import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
+import explore.sampling.FixedSampler;
 import explore.statistics.Statistics;
 import explore.statistics.StatisticsCollection;
 import explore.user.BudgetedUser;
@@ -60,6 +61,11 @@ public final class Explore {
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
         setRandomSeed(id);
+
+        // set run id for fixed sampler
+        if (configuration.getInitialSampler() instanceof FixedSampler) {
+            ((FixedSampler) configuration.getInitialSampler()).setId(id - 1);
+        }
 
         PartitionedDataset partitionedDataset = getPartitionedDataset(id);
         BudgetedUser budgetedUser = new BudgetedUser(user, budget);
@@ -121,7 +127,6 @@ public final class Explore {
                 .map(x -> new PartitionedDataset(dataPoints, x))
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
 
-        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().length());
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader;
 import data.LabeledPoint;
 import exceptions.JsonDeserializationFailedException;
 import explore.metrics.MetricCalculator;
+import explore.sampling.InitialSampler;
 import explore.user.UserLabel;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.versionspace.VersionSpace;
@@ -55,7 +56,9 @@ public class JsonConverter {
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
 
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
-        // TODO: add TSM metrics
+
+        builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
+
         return builder.create();
     }
 

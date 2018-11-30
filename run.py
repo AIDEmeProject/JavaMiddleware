@@ -12,7 +12,7 @@ TASKS = [
     #"sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
-    #"sdss_Q2_circle_10%_Q3_rect_1%", "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
+    #"sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
     #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
 ]
 
@@ -26,16 +26,16 @@ SUBSAMPLE_SIZE = float('inf')
 MODES = [
     'NEW',       # run new exploration
     #'RESUME',    # resume a previous exploration
-    'EVAL',      # run evaluation procedure over finished runs
-    # 'AVERAGE'    # average all evaluation file for a given metric
+    #'EVAL',      # run evaluation procedure over finished runs
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
 # Q1 10% -> 2 new runs + eval
 # Q3 0.1% -> eval 5 to 10
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 10
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 25
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 # RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -46,10 +46,9 @@ RUNS = [1]
 mv = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-    kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.05, 0.05, 0.001, 0.001),  # kernel
+    kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"    # extra
 )
-
 
 METRICS = [
     #ConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
@@ -79,6 +78,13 @@ SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 mTSM = None
 # mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
+# INITIAL SAMPLING
+# Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
+# You can override the default behavior below by choosing the method yourself
+INITIAL_SAMPLING = None
+#INITIAL_SAMPLING = StratifiedSampler(pos=5, neg=1)
+#INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
+
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
 # ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
@@ -103,6 +109,7 @@ if 'EVAL' in MODES or 'AVERAGE' in MODES:
     print('METRICS =', METRICS)
 if mTSM:
     print("TSM =", mTSM)
+print("INITIAL_SAMPLER =", INITIAL_SAMPLING)
 
 # PARAMETER VALIDATION
 for mode in MODES:
@@ -116,13 +123,15 @@ if SUBSAMPLE_SIZE < float('inf'):
     folder_elems.append('ss=%d' % SUBSAMPLE_SIZE)
 if mTSM:
     folder_elems.append(str(mTSM))
+if INITIAL_SAMPLING is not None:
+    folder_elems.append(str(INITIAL_SAMPLING))
 folder = '_'.join(folder_elems)
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
     print(TASK)
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
-    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM)
+    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM, initial_sampler=INITIAL_SAMPLING)
     experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
     # BUILD COMMAND LINE ARGUMENTS

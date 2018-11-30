@@ -24,6 +24,11 @@ public final class Experiment {
 
         TaskReader reader = new TaskReader(configuration.getTask());
 
+        // if no initial sampler was set in the config, try to set the default one
+        if (configuration.getInitialSampler() == null) {
+            configuration.setInitialSampler(reader.getTaskConfig().getDefaultInitialSampler());
+        }
+
         IndexedDataset rawData = reader.readData();
         IndexedDataset scaledData = rawData.copyWithSameIndexes(StandardScaler.fitAndTransform(rawData.getData()));
         User user = getUser(configuration, reader);
