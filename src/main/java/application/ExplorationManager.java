@@ -1,14 +1,16 @@
 package application;
 
+import config.ExperimentConfiguration;
 import data.DataPoint;
 import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
-import config.ExperimentConfiguration;
+import data.preprocessing.StandardScaler;
 import machinelearning.active.Ranker;
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.RandomState;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class ExplorationManager {
      * The dataset partition (labeled and unlabeled points)
      */
     private final PartitionedDataset partitionedDataset;
+
+    private final IndexedDataset rawDataset;
 
     /**
      * The experiment configuration (active learner, initial sampler, ...)
@@ -39,7 +43,11 @@ public class ExplorationManager {
     public ExplorationManager(IndexedDataset dataset, ExperimentConfiguration configuration) {
         this.ranker = null;
         this.configuration = configuration;
-        this.partitionedDataset = getPartitionedDataset(dataset);
+        this.rawDataset = dataset;
+
+        IndexedDataset scaledDataset = rawDataset.copyWithSameIndexes(StandardScaler.fitAndTransform(rawDataset.getData()));
+        this.partitionedDataset = getPartitionedDataset(scaledDataset);
+
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -55,7 +63,7 @@ public class ExplorationManager {
      */
     public List<DataPoint> runInitialSampling() {
         //TODO: how to guarantee that at least one positive and one negative point has been retrieved ?
-        return configuration.getInitialSampler().runInitialSample(partitionedDataset.getUnlabeledPoints(), null);
+        return configuration.getInitialSampler().runInitialSample(rawDataset, null);
     }
 
     /**
@@ -63,19 +71,27 @@ public class ExplorationManager {
      * @return the next point to be labeled by the user
      */
     public DataPoint runExploreIteration(List<LabeledPoint> labeledPoints) {
-        DataPoint mostInformativePoint = updateModelAndRetrieveNextPointToLabel(labeledPoints);
+        // pick scaled data
+        List<LabeledPoint> scaledLabeledPoints = new ArrayList<>(labeledPoints.size());
+        for (LabeledPoint point : labeledPoints) {
+            long id = point.getId();
+            scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
+        }
+
+        DataPoint mostInformativePoint = updateModelAndRetrieveNextPointToLabel(scaledLabeledPoints);
 
         // the next point's label can be inferred by TSM; in this case, keep selecting points until an UNKNOWN point
         // appears, or the dataset runs empty
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
 
         while (extendedLabel.isKnown() && partitionedDataset.hasUnknownPoints()) {
-            labeledPoints = Collections.singletonList(new LabeledPoint(mostInformativePoint, extendedLabel.toLabel()));
-            mostInformativePoint = updateModelAndRetrieveNextPointToLabel(labeledPoints);
+            scaledLabeledPoints = Collections.singletonList(new LabeledPoint(mostInformativePoint, extendedLabel.toLabel()));
+            mostInformativePoint = updateModelAndRetrieveNextPointToLabel(scaledLabeledPoints);
             extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
         }
 
-        return mostInformativePoint;
+        // get unscaled labeled point
+        return rawDataset.getFromIndex(mostInformativePoint.getId());
     }
 
     private DataPoint updateModelAndRetrieveNextPointToLabel(List<LabeledPoint> labeledPoints) {
