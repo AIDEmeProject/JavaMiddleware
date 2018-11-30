@@ -115,6 +115,10 @@ public class IndexedDataset implements Iterable<DataPoint> {
         return new DataPoint(indexes.get(i), data.getRow(i));
     }
 
+    public DataPoint getFromIndex(long index) {
+        return get(indexes.indexOf(index));  // TODO: optimize this
+    }
+
     /**
      * @param rows: rows to be retrieved
      * @return an IndexedDataset containing only the specified rows (data will be copied in this process)

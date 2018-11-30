@@ -1,12 +1,17 @@
 package application;
 
+import config.ExperimentConfiguration;
 import data.DataPoint;
 import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
+
 import config.ExperimentConfiguration;
 import explore.metrics.MetricStorage;
 import explore.metrics.ThreeSetMetricCalculator;
+
+import data.preprocessing.StandardScaler;
+
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
@@ -27,6 +32,8 @@ public class ExplorationManager {
      * The dataset partition (labeled and unlabeled points)
      */
     private final PartitionedDataset partitionedDataset;
+
+    private final IndexedDataset rawDataset;
 
     /**
      * The experiment configuration (active learner, initial sampler, ...)
@@ -50,9 +57,14 @@ public class ExplorationManager {
         this.ranker = null;
         this.isInitialSamplingStep = true;
         this.configuration = configuration;
-        this.partitionedDataset = getPartitionedDataset(dataset);
 
+        this.rawDataset = dataset;
         this.learner = learner;
+
+        IndexedDataset scaledDataset = rawDataset.copyWithSameIndexes(StandardScaler.fitAndTransform(rawDataset.getData()));
+        this.partitionedDataset = getPartitionedDataset(scaledDataset);
+
+
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -67,19 +79,25 @@ public class ExplorationManager {
      * @return an initial selection of points to be labeled by the user
      */
     public List<DataPoint> runInitialSampling(int sampleSize) {
-        //TODO: how to guarantee that at least one positive and one negative point has been retrieved ?
-        return  this.partitionedDataset.getUnlabeledPoints().sample(sampleSize).toList();
-        //configuration.getInitialSampler().runInitialSample(partitionedDataset.getUnlabeledPoints(), null);
+        return rawDataset.sample(sampleSize).toList();
     }
 
     public List<DataPoint> getNextPointsToLabel(List<LabeledPoint> labeledPoints){
 
-        this.partitionedDataset.update(labeledPoints);
+
+        // pick scaled data
+        List<LabeledPoint> scaledLabeledPoints = new ArrayList<>(labeledPoints.size());
+        for (LabeledPoint point : labeledPoints) {
+            long id = point.getId();
+            scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
+        }
+        
+        this.partitionedDataset.update(scaledLabeledPoints);
         if (this.isInitialSamplingStep){
 
             if (this.hasPositiveAndNegativeExamples()){
                 this.isInitialSamplingStep = false;
-                return Collections.singletonList(this.runExploreIteration(labeledPoints));
+                return Collections.singletonList(this.runExploreIteration(scaledLabeledPoints));
             }
             else{
                 // TODO : not resample previously propsed points.
@@ -87,7 +105,7 @@ public class ExplorationManager {
             }
         }
         else{
-            return Collections.singletonList(this.runExploreIteration(labeledPoints));
+            return Collections.singletonList(this.runExploreIteration(scaledLabeledPoints));
         }
     }
 
@@ -116,6 +134,7 @@ public class ExplorationManager {
      * @return the next point to be labeled by the user
      */
     public DataPoint runExploreIteration(List<LabeledPoint> labeledPoints) {
+
         DataPoint mostInformativePoint = updateModelAndRetrieveNextPointToLabel(labeledPoints);
 
         // the next point's label can be inferred by TSM; in this case, keep selecting points until an UNKNOWN point
@@ -128,7 +147,8 @@ public class ExplorationManager {
             extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
         }
 
-        return mostInformativePoint;
+        // get unscaled labeled point
+        return rawDataset.getFromIndex(mostInformativePoint.getId());
     }
 
     private DataPoint updateModelAndRetrieveNextPointToLabel(List<LabeledPoint> labeledPoints) {
