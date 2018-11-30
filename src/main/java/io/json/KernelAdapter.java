@@ -22,12 +22,8 @@ class KernelAdapter implements JsonDeserializer<Kernel> {
                 return new LinearKernel();
 
             case "GAUSSIAN":
-                if (!jsonObject.has("gamma")) {
-                    return new GaussianKernel();
-                }
-
-                double gamma = jsonObject.get("gamma").getAsDouble();
-                return new GaussianKernel(gamma);
+                double gamma = jsonObject.has("gamma") ? jsonObject.get("gamma").getAsDouble() : 0;
+                return gamma == 0 ? new GaussianKernel() : new GaussianKernel(gamma);
 
             case "DIAGONAL":
                 JsonArray array = jsonObject.get("diagonal").getAsJsonArray();
