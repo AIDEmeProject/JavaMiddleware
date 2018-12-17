@@ -10,15 +10,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class TsmConfiguration {
-    private boolean hasTsm = true;
-    private double searchUnknownRegionProbability = 0D;
-    private List<boolean[]> flags = new ArrayList<>();
-    private List<String[]> featureGroups = new ArrayList<>();
-    private String[] columns = new String[0];
+    private boolean hasTsm;
+    private double searchUnknownRegionProbability;
+    private List<boolean[]> flags;
+    private List<String[]> featureGroups ;
+    private String[] columns;
 
-    public TsmConfiguration(boolean hasTsm) {
-        this.hasTsm = hasTsm;
+    public TsmConfiguration(boolean hasTSM) {
+        this.hasTsm = hasTSM;
     }
+
+
 
     public boolean hasTsm() {
         return hasTsm;
@@ -34,6 +36,10 @@ public final class TsmConfiguration {
 
     public void setFeatureGroups(List<String[]> featureGroups) {
         this.featureGroups = featureGroups;
+    }
+
+    public void setSearchUnknownRegionProbability(double searchUnknownRegionProbability) {
+        this.searchUnknownRegionProbability = searchUnknownRegionProbability;
     }
 
     public void setFlags(List<boolean[]> flags) {

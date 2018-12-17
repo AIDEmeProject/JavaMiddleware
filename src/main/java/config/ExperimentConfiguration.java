@@ -11,7 +11,7 @@ public final class ExperimentConfiguration {
     private InitialSampler initialSampler = new StratifiedSampler(1, 1);
     private int subsampleSize = Integer.MAX_VALUE;
 
-    private TsmConfiguration multiTSM = new TsmConfiguration(false);
+    private TsmConfiguration multiTSM;
 
     public ExperimentConfiguration() {
         // avoid instantiating this class

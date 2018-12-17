@@ -106,34 +106,22 @@ public class ChooseSessionOptionServel extends HttpServlet {
                 "   },\n" +
                 "   \"subsampleSize\": 50000,\n" +
                 "   \"task\": \"sdss_Q4_0.1%\"\n" +
+                "    \"multiTSM\": {" +
+                "        \"searchUnknownRegionProbability\": 0.5"  +
+                "         \" columns\": ['age', 'sex']" +
+                "         \" flags\": [[true, false], [true, false]]" +
+                "         \" featureGroups\": [['age'], ['sex']" +
+                "       } " +
                 "}";
 
-        String json2 = "{\n" +
-                "   \"activeLearner\": {\n" +
-                "       \"name\": \"SimpleMargin\",\n" +
-                "       \"svmLearner\": {\n" +
-                "           \"C\": 1024,\n" +
-                "           \"kernel\": {\n" +
-                "               \"name\": \"gaussian\"\n" +
-                "           },\n" +
-                "           \"name\": \"SVM\"\n" +
-                "       }\n" +
-                "   },\n" +
-                "   \"multiTSM\": {\n" + // pas de champ si n'est pas activé
-                "       \"searchUnknownRegionProbability\": 0.5\n" +
-                "       \"featureGroups\": [" +
-                "                ['age'], ['sex']" +
-                "           ]" +
-                "       \"columns: ['age', 'sex']    " +
 
-                "   },\n" +
-                "   \"subsampleSize\": 5000,\n" +
-                "   \"task\": \"sdss_Q1_0.1%\"\n" +
-                "}";
 
         String clientJson = req.getParameter("configuration");
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
+
+
+        Gson gson = new Gson();
 
         IndexedDataset dataset = builder.build();
 
@@ -142,7 +130,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
         Kernel kernel = new GaussianKernel();
         Learner learner = new SvmLearner(C, kernel);
         ExplorationManager manager = new ExplorationManager(dataset, configuration, learner);
-        Gson gson = new Gson();
+
 
         int nInitialPoints = 3;
         resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
