@@ -66,6 +66,7 @@ public class NewSessionServlet extends HttpServlet {
         // Create a new file upload handler
         ServletFileUpload upload = new ServletFileUpload(factory);
 
+
         try {
             List fileItems = upload.parseRequest(req);
             FileItem uploadedFile = (FileItem) fileItems.get(0);
@@ -81,7 +82,13 @@ public class NewSessionServlet extends HttpServlet {
 
             CsvDatasetReader csvDatasetReader = new CsvDatasetReader();
 
-            String columnNames = csvDatasetReader.getColumnNames(file);
+
+
+            FileItem separatorItem = (FileItem) fileItems.get(1);
+            char separator = separatorItem.getString().charAt(0);
+
+
+            String columnNames = csvDatasetReader.getColumnNames(file, separator);
 
             resp.setStatus(HttpStatus.OK_200);
 

@@ -91,7 +91,7 @@ public class ExplorationManager {
             long id = point.getId();
             scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
         }
-        
+
         this.partitionedDataset.update(scaledLabeledPoints);
         if (this.isInitialSamplingStep){
 

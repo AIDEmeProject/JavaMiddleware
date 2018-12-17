@@ -5,12 +5,30 @@ import {backend} from '../constants/constants'
 
 import ModelVisualization from './ModelVisualization'
 
+
+
 class Exploration extends Component{
+
+    constructor(props){
+        super(props)
+        this.state = {
+            showModelVisualisation: false
+        }
+    }
 
     render(){
         var FirstPhase,
             Bottom
 
+
+        var Viz
+        if (this.state.showModelVisualisation){
+            Viz = () => {return(<ModelVisualization />)}
+        }
+        else {
+            Viz = () => { return (<div></div>) }
+        }        
+        
         if (this.props.initialLabelingSession){
 
             FirstPhase = () => {
@@ -33,12 +51,14 @@ class Exploration extends Component{
             Bottom = () => {
                 return (
                 <div>
+
+                    <hr />
+                    
                     <button 
                         className="btn btn-primary btn-raised"
+                        onClick={ () => {this.setState({showModelVisualisation: ! this.state.showModelVisualisation})} }
                     >
-
                         Visualize model
-
                     </button>
 
                     <button
@@ -53,73 +73,100 @@ class Exploration extends Component{
         return (
 
             <div>
-                <p> label this sample</p>
-                
+
+                <h4>
+                    Labeleling phase
+                </h4>
+
+                            
                 <FirstPhase />
-                <div>
+                
+                <p>Please label the following samples</p>
 
-                    <div style={{display: "inline-block", width:10, margin: 10}}>
-                        id
-                    </div>
+                
 
-                    {
-                        this.props.options.chosenColumns.map((column, key) => {
-                            return (
-                                <div key={key} style={{display: "inline-block", minWidth:10, margin: 10}}>
-                                 {column} 
-                                </div>
-                            )
-                        })
-                    }
+                <table className="table-label">
+                    <thead>                        
+                        <tr>
+                        
+                            <th>
+                                id
+                            </th>
 
-                    <div style={{display: "inline-block", minWidth:10, margin: 10}}>
-                        Label 
-                    </div>
-                </div>
+                            {
+                                this.props.options.chosenColumns.map((column, key) => {
+                                    return (
+                                        <th key={key} >
+                                        {column} 
+                                        </th>
+                                    )
+                                })
+                            }
 
+                            <th>
+                                Label 
+                            </th>                                                    
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    
                 {
                     this.props.pointsToLabel.map((point, key) => {
 
                         return (
 
-                            <div key={key}>
+                            <tr key={key}>
 
-                                <div style={{margin: 10, width:10, display: "inline-block"}}>
+                                <td >
                                                 {point.id}
-                                </div>
+                                </td>
                       
                                 {
 
                                     point.data.array.map((value, valueKey) => {
                                         return (
                                             
-                                            <div style={{margin: 10, width:10, display: "inline-block"}} key={valueKey}>
+                                            <td  key={valueKey}>
                                                 {value}
-                                            </div>
+                                            </td>
                                         )
                                     })
                                 }
 
-                                <button
-                                    className="btn btn-raised btn-primary" 
-                                    data-key={key} 
-                                    onClick={this.onPositiveLabel.bind(this)}>
-                                    Yes
-                                </button>
+                                <td>
+                                    <button
+                                        className="btn btn-raised btn-primary" 
+                                        data-key={key} 
+                                        onClick={this.onPositiveLabel.bind(this)}>
+                                        Yes
+                                    </button>
 
-                                <button 
-                                    className="btn btn-raised btn-primary"  
-                                    data-key={key} 
-                                    onClick={this.onNegativeLabel.bind(this)}
-                                >
-                                    No
-                                </button>
-                            </div>                            
+                                    <button 
+                                        className="btn btn-raised btn-primary"  
+                                        data-key={key} 
+                                        onClick={this.onNegativeLabel.bind(this)}
+                                    >
+                                        No
+                                    </button>
+                                </td>
+                            </tr>
                         )
                     })                    
                 }
+                </tbody>
+
+                </table>
+
 
                 <Bottom />
+                
+
+                <Viz />
+
+                
+
+                
             </div>
         )
     }

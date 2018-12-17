@@ -32,9 +32,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         Map<String, String[]> postData = req.getParameterMap();
 
-        String sessionPath = (String) req.getSession().getAttribute("sessionPath");
-
-        sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
+        String sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
 
         Reader in = new FileReader(sessionPath + "/data.csv");
 
@@ -46,10 +44,13 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         for (Map.Entry<String, String[]> entry : postData.entrySet()){
 
-            String strColumnId = String.join(",", entry.getValue());
-            columnId = Integer.parseInt(strColumnId);
+            if (entry.getKey().indexOf("column") != -1){
 
-            columnIds.add(columnId);
+                String strColumnId = String.join(",", entry.getValue());
+                columnId = Integer.parseInt(strColumnId);
+
+                columnIds.add(columnId);
+            }
         }
 
         ArrayList<Double> rowValues = new ArrayList();
@@ -130,7 +131,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
                 "   \"task\": \"sdss_Q1_0.1%\"\n" +
                 "}";
 
-        ExperimentConfiguration configuration = JsonConverter.deserialize(json, ExperimentConfiguration.class);
+        String clientJson = req.getParameter("configuration");
+
+        ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
 
         IndexedDataset dataset = builder.build();
 

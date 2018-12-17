@@ -10,14 +10,13 @@ import './App.css';
 
 import {backend} from './constants/constants'
 
-
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
 
-
 function sendPointLabel(data, onSuccess){
-    console.log(data)
+
+    
     var endPoint = backend + "/data-point-were-labeled"
     $.ajax({
         type: "POST",
@@ -195,7 +194,9 @@ class App extends Component {
         <div>
             <ul className="nav nav-tabs">
                 <li className="nav-item">                  
-                    <a className="nav-link active" href="#">CEDAR - Active learning labeler</a>
+                    <a className="nav-link active" href="/">
+                    CEDAR - Active learning labeler
+                    </a>
                 </li>
                 
             </ul>
@@ -203,7 +204,7 @@ class App extends Component {
 
         <div className="row">
 
-            <div className="col">
+            <div className="col col-lg-8 offset-lg-2">
     
                 <View 
                     fileUploaded={this.fileUploaded.bind(this)} 
@@ -215,12 +216,13 @@ class App extends Component {
                 />            
             </div>
         </div>
-
+        {/* 
         <div className="row">
-            <div className="col">
+            <div className="col col-lg-8 offset-lg-2">
                 {this.state.labeledPoints.length} points labeled                    
             </div>
-        </div>
+        </div> */}
+        
       </div>
     );
   }

@@ -1,127 +1,46 @@
 import React, { Component } from 'react';
 import $ from "jquery";
 
-import {backend} from '../constants/constants'
+import {backend, defaultConfiguration} from '../constants/constants'
+import GroupVariables from './GroupVariables'
 
 function sendChosenColumns(event, onSuccess){
 
     var endPoint = backend + "/choose-options"
-   
+    
+    var json = JSON.stringify(defaultConfiguration)
+    
+    $('#conf').val(json)
+    
     $.ajax({
 
         type: "POST",
         url: endPoint,
         data: $('#choose-columns').serialize(),
+        
         success: onSuccess,
         
       });      
-}
-
-class GroupVariables extends Component {
-    
-    constructor(props){
-        super(props)
-        
-        this.state = {
-            groups: [
-                [
-                    {
-                        name: "age",
-                        i: 2
-                    }
-                ]
-            ],
-            
-        }
-
-    }
-
-    render(){
-        return (
-            <div>
-                {
-                    this.state.groups.map((group, i)=> {
-                        return (
-                            <div
-                                key={i}
-                            >
-                                Group {i}
-
-                                {
-                                    group.map((variable, j) => {
-                                        return (
-                                            <div
-                                                key={j}
-                                            >
-                                            
-                                                {variable.name}
-                                            </div>
-                                        )
-                                        
-                                    })
-                                }   
-
-                                <select
-                                    className="form-control"        
-                                >
-
-                                    {
-                                        this.props.availableVariables.map((v, i) => {
-                                            return (
-                                                <option
-                                                    value={v.i}    
-                                                >
-                                                    {v.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-
-                                </select>
-
-                                
-                            </div>
-                        )
-                    })
-                }
-
-
-                <button
-
-                    role="button"
-                    type="button"
-                    className ="btn btn-primary btn-raised"
-                    onClick={this.addVariableGroup.bind(this)}
-                >
-                    Add variable group
-                </button>
-
-            </div>
-        )
-    }
-
-
-    addVariableGroup(){
-
-        var groups = this.state.groups.map(e => e)
-        groups.push([])
-
-        this.setState({
-            groups: groups
-        })
-    }
 }
 
 
 class SessionOptions extends Component{
     
     constructor(props){
+
         super(props)
+
         this.state = {
             checkboxes: this.props.columns.map (c => false),
             chosenColumns: [],
             showAdvancedOptions: false,
-            availableVariables: []
+            showVariableGroups: false,
+            availableVariables: [],            
+            variableGroups: [
+                [],
+                []
+            ],
+            
         }
     }
 
@@ -159,7 +78,7 @@ class SessionOptions extends Component{
                 })
             }
         })
-
+        
         this.setState({
             chosenColumns: chosenColumns,
             checkboxes: checkboxes,
@@ -180,11 +99,12 @@ class SessionOptions extends Component{
                         <div className="form-group">
                             <label htmlFor="algorithm-selection">Learner</label>
                             <select 
-                                    className="form-control" 
-                                    id="algorithm-selection"
+                                className="form-control" 
+                                id="algorithm-selection"
+                                name="active-learner"
                             >
                                 <option 
-                                    value="algo2"
+                                    value="UncertaintySampler"
                                     defaultValue
                                 >
                                     Uncertainty Sampling
@@ -195,11 +115,13 @@ class SessionOptions extends Component{
                             </select>
                         </div>
 
+
                         <div className="form-group">
                             <label htmlFor="classifier">Classifier</label>
                             <select 
-                                        className="form-control" 
-                                        id="classfier-selection"
+                                className="form-control" 
+                                id="classfier-selection"
+                                name="classifier"
                             >
                                 <option 
                                     value="SVM"
@@ -219,13 +141,21 @@ class SessionOptions extends Component{
             AdvancedOptions = () => { return(<div></div>)}
         }
 
+
         return (
-            <div>              
+            <div>        
+
+                 <p>
+                        The following columns were found. Pick the one you want to use for this session.
+                    </p>
+
                 <form                 
                     id="choose-columns"
                     onSubmit={this.onChosenColumns.bind(this)}
                 >
-                                                        
+
+                
+
                     {                
                         this.props.columns.map((column, key) => (
                                                     
@@ -250,7 +180,34 @@ class SessionOptions extends Component{
                         ))
                     }
 
+                    <p>
+                        By grouping variable in formal subgroups, the convergence
+                        speed can be improved. 
+                    </p>
+
+
+                    <input id="conf" name="configuration" type="text" style={{visibility: "hidden"}}/>
+
+
+                    <input 
+                        className="btn btn-success btn-raised"
+                        type="submit" value="Start session" 
+                    />        
+
+
                     <button 
+                        type="button"
+                        className="btn btn-primary btn-raised"
+                        onClick={() => this.setState({
+                            showVariableGroups: ! this.state.showVariableGroups
+                        })}    
+                    >
+                        Group Variables
+                    </button>
+
+
+                    <button 
+                        type="button"
                         className="btn btn-primary btn-raised"
                         onClick={() => this.setState({
                             showAdvancedOptions: ! this.state.showAdvancedOptions
@@ -258,15 +215,57 @@ class SessionOptions extends Component{
                     >
                         Show advanced options
                     </button>
+                    
+                 
+                    <AdvancedOptions {...this.state} />
 
-                    <AdvancedOptions  />
-
-                    <GroupVariables availableVariables={this.state.availableVariables} />
-
-                    <input type="submit" value="Start session" />                
+                    <GroupVariables 
+                        
+                        showVariableGroups={this.state.showVariableGroups}
+                        availableVariables={this.state.availableVariables}
+                        groupWasAdded={this.groupWasAdded.bind(this)}
+                        variableWasAddedToGroup={this.variableWasAddedToGroup.bind(this)}
+                        
+                    />
+                           
                 </form>
             </div>
         )
+    }
+
+  
+
+    groupWasAdded(){
+        var groups = this.state.variableGroups.map(e => e)
+        groups.push([])
+
+        this.setState({
+            variableGroups: groups
+        })
+
+        this.forceUpdate()
+    }
+
+    variableWasAddedToGroup(variable, target){
+
+        
+        var usedVariables = this.state.usedVariables.map(e => e)                
+        if (target.checked){
+
+            var value = target.value
+                        
+            usedVariables.push(variable)
+        }
+        else{
+            usedVariables.splice(target.value, 1)
+        }
+        
+
+        this.setState({
+            usedVariables: usedVariables,
+            
+        })
+        
     }
 }
 

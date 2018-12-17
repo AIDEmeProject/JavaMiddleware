@@ -4,14 +4,25 @@ import axios from "axios" ;
 
 import {backend} from '../constants/constants'
 
+import TSMExploration from './TSMExploration'
+
+import ModelVisualization from './ModelVisualization'
+import GroupVariables from './GroupVariables'
+
 function uploadFile(event, onSuccess){
 
     var endPoint = backend + "/new-session"
     var formData = new FormData();
     
     var file = document.querySelector('form input[type=file]').files[0]
+
+    if (! file){
+        alert('Please select a file')
+        return
+    }
     formData.append("dataset", file);
-    
+    formData.append('separator', document.getElementById('csv-separator').value)
+
     axios.post(endPoint,
                formData, 
                {
@@ -39,6 +50,7 @@ class NewSession extends Component{
         return (
 
             <div>
+                
                 <h1>
                     New Session
                 </h1>
@@ -47,18 +59,45 @@ class NewSession extends Component{
                     <form 
                         onSubmit={this.handleSubmit.bind(this)}     
                     >   
-
-                        <label htmlFor="dataset">Choose the dataset to be labeled</label>
-                        <input
-                            className="form-control-file"
-                            id="dataset" name="dataset" type="file" 
-                        />
-
-                        <input
-                            className="btn btn-raised btn-primary"
-                            type="submit" value="Confirm" 
-                        />
+                        <div className="form-group ">
                         
+                            <label htmlFor="dataset">
+                                Choose the dataset to be labeled
+                            </label>
+                            <input
+                                required
+                                className="form-control-file"
+                                id="dataset" name="dataset" type="file" 
+                            />
+                            <small className="text-muted">CSV and TSV are supported</small>
+                        </div>
+
+
+                        <div className="form-group ">
+
+                            <label htmlFor="separator" className="bmd-label-floating">
+                                Separator    
+                            </label>
+                                <select
+                                    className="form-control"
+                                    id="csv-separator"
+                                    name="separator"
+                                >
+                                    <option value="," >Comma ","</option>                                
+                                    <option value="\t" >Tab</option>
+                                    <option value=";" >Semi-colon ";"</option>                                
+                                </select>
+                            
+                        </div>
+
+                        <div className="form-group bmd-form-group">
+                           
+                            <input
+                                
+                                className="btn btn-raised btn-primary"
+                                type="submit" value="Confirm" 
+                            />
+                        </div>
                     </form> 
                 </div>        
             </div>

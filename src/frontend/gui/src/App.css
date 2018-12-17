@@ -1,0 +1,21 @@
+.group-variable td, .group-variable th {
+    border: 1px solid black;
+    min-width: 200px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.predicted td, .predicted th, .table-label td, .table-label th {
+    border: 1px solid black;
+    min-width: 200px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.predicted td, .predicted th {
+    border: 1px solid black;
+    min-width: 200px;
+    text-align: center;
+    border-radius: 6px;
+}
+

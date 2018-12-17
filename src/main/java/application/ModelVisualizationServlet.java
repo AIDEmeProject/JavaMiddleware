@@ -29,7 +29,7 @@ public class ModelVisualizationServlet extends HttpServlet {
         String jsonLabeledPoints = req.getParameter("labeledPoints");
 
 
-        manager.getModelVisualizationData();
+        //manager.getModelVisualizationData();
 
 
 

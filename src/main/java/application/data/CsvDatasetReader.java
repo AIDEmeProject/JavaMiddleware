@@ -45,11 +45,11 @@ public class CsvDatasetReader {
         }
     }
 
-    public String getColumnNames(File csvFile) throws IOException {
+    public String getColumnNames(File csvFile, char separator) throws IOException {
 
 
         Reader reader = Files.newBufferedReader(Paths.get(csvFile.getAbsolutePath()));
-        CSVReader csvReader = new CSVReader(reader);
+        CSVReader csvReader = new CSVReader(reader, separator);
 
 
         List<String> columnNames = new ArrayList<String>();
@@ -60,7 +60,7 @@ public class CsvDatasetReader {
         String[] columns = csvReader.readNext();
 
         for(String col : columns){
-            dataset.columns.add(col);
+            dataset.columns.add(col.trim());
         }
 
         Gson json = new Gson();
