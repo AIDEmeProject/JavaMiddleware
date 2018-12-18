@@ -4,21 +4,58 @@ import $ from "jquery";
 import {backend, defaultConfiguration} from '../constants/constants'
 import GroupVariables from './GroupVariables'
 
-function sendChosenColumns(event, onSuccess){
+function sendChosenColumns(state, onSuccess){
 
-    var endPoint = backend + "/choose-options"
+    var endPoint = backend + "/choose-options"    
+    var configuration = defaultConfiguration
+              
+    if (state.finalGroups){
+
+        var tsmJson = {
+            multiTSM: {
+                hasTSM: true,
+                searchUnknownRegionProbability: 0.5,
+                featureGroups: state.finalGroups.map( g => { return g.map(v => v.name)}),
+                columns: state.finalVariables.map( e => e.name),
+                flags: state.finalGroups.map(g => {return [true, false]})                    
+            },
+        }
+
+        configuration = Object.assign(configuration, tsmJson)
+    }
+    else if (state.availableVariables.length == 2){
+        var tsmJson = {
+            multiTSM: {
+                hasTSM: true,
+                searchUnknownRegionProbability: 0.5,
+                featureGroups: state.availableVariables.map( v => { return [v.name]}),
+                columns: state.availableVariables.map( e => {return e.name}),
+                flags: state.availableVariables.map(g => {return [true, false]}) 
+            },
+        }
+
+        configuration = Object.assign(configuration, tsmJson)
+    }
     
-    var json = JSON.stringify(defaultConfiguration)
-    
+    var json = JSON.stringify(configuration)
+
     $('#conf').val(json)
     
+    
+    var variableData = {
+        availableVariables: state.availableVariables.map((v, i) => {
+            return {name: v.name, i:i}
+        }),
+        finalGroups: state.finalGroups,
+        finalVariables: state.finalVariables
+    }
+
     $.ajax({
 
         type: "POST",
         url: endPoint,
-        data: $('#choose-columns').serialize(),
-        
-        success: onSuccess,
+        data: $('#choose-columns').serialize(),        
+        success: (response) =>  {onSuccess(response, variableData)},
         
       });      
 }
@@ -39,52 +76,11 @@ class SessionOptions extends Component{
             variableGroups: [
                 [],
                 []
-            ],
-            
+            ],            
         }
     }
 
-    onChosenColumns(e){
-        e.preventDefault()
-        sendChosenColumns(e, this.props.sessionWasStarted)        
-        this.props.sessionOptionsWereChosen({
-            
-            chosenColumns: this.state.chosenColumns            
-        })
-    }
-
-    componentDidMount(){
-
-        window.$('form').bootstrapMaterialDesign()        
-    }
-
-    onCheckedColumn(e){
-                    
-        var checkboxes = this.state.checkboxes.map(e=>e);
-        checkboxes[e.target.value] = e.target.checked
-
-        var chosenColumns = this.props.columns.filter((e, k)=>{
-
-            return checkboxes[k]
-        })        
-
-
-        var availableVariables = []
-        this.props.columns.forEach((c, i) => {
-            if (checkboxes[i]){
-                availableVariables.push({
-                    name: c,
-                    i: i
-                })
-            }
-        })
-        
-        this.setState({
-            chosenColumns: chosenColumns,
-            checkboxes: checkboxes,
-            availableVariables: availableVariables
-        })
-    }
+   
 
     render(){
         
@@ -115,7 +111,6 @@ class SessionOptions extends Component{
                             </select>
                         </div>
 
-
                         <div className="form-group">
                             <label htmlFor="classifier">Classifier</label>
                             <select 
@@ -141,7 +136,6 @@ class SessionOptions extends Component{
             AdvancedOptions = () => { return(<div></div>)}
         }
 
-
         return (
             <div>        
 
@@ -154,8 +148,7 @@ class SessionOptions extends Component{
                     onSubmit={this.onChosenColumns.bind(this)}
                 >
 
-                
-
+            
                     {                
                         this.props.columns.map((column, key) => (
                                                     
@@ -166,11 +159,14 @@ class SessionOptions extends Component{
                                     <label>
                                                                     
                                         <input        
-                                            className="form-control"                                        
-                                            type="checkbox"
-                                            name={"column" + key }
-                                            value={key} 
                                             id={"column-" + column }  
+                                            name={"column" + key }
+
+                                            type="checkbox"
+                                            className="form-control"                                        
+                                                                                        
+                                            value={key} 
+                                            
                                             onChange={this.onCheckedColumn.bind(this)}
                                         /> {column}
 
@@ -225,17 +221,48 @@ class SessionOptions extends Component{
                         availableVariables={this.state.availableVariables}
                         groupWasAdded={this.groupWasAdded.bind(this)}
                         variableWasAddedToGroup={this.variableWasAddedToGroup.bind(this)}
-                        
+                        groupsWereValidated={this.groupsWereValidated.bind(this)}
                     />
                            
                 </form>
             </div>
         )
     }
-
   
+    groupsWereValidated(options){
+
+        var groups = options.groups
+        console.log(options)
+
+        var availableVariables = {}
+        options.availableVariables.forEach((e, i) => {
+            availableVariables[e.name] = i
+        })
+        console.log(availableVariables)
+
+        var finalGroups = groups.map(g => {
+            
+            return g.map((v, i) => {
+                return {name: v.name, i: availableVariables[v.name]}
+            })    
+        })
+
+        
+        var finalVariables = options.availableVariables.map ( (e,i) => {
+            return {name: e.name, i:i}
+        })
+
+        console.log(finalVariables)
+        console.log(finalGroups)
+        
+        this.setState({
+            finalGroups: finalGroups,
+            finalVariables: finalVariables
+        })
+    }
 
     groupWasAdded(){
+
         var groups = this.state.variableGroups.map(e => e)
         groups.push([])
 
@@ -246,8 +273,58 @@ class SessionOptions extends Component{
         this.forceUpdate()
     }
 
-    variableWasAddedToGroup(variable, target){
+    onChosenColumns(e){
+        
+        e.preventDefault()
+        
+        sendChosenColumns(this.state, this.props.sessionWasStarted)        
 
+        this.props.sessionOptionsWereChosen({
+            
+            chosenColumns: this.state.chosenColumns.map( (c, i) => {
+                return {
+                    name: c.name,
+                    i: i
+                }
+            })            
+        })
+    }
+
+    componentDidMount(){
+
+        window.$('form').bootstrapMaterialDesign()        
+    }
+
+    onCheckedColumn(e){
+                    
+        var checkboxes = this.state.checkboxes.map(e=>e);
+        checkboxes[e.target.value] = e.target.checked
+
+        var chosenColumns = this.props.columns.filter((e, k)=>{
+
+            return checkboxes[k]
+        })        
+
+        var availableVariables = []
+
+        this.props.columns.forEach((c, i) => {
+            if (checkboxes[i]){
+                availableVariables.push({
+                    name: c,
+                    i: i
+                })
+            }
+        })
+        
+        
+        this.setState({
+            chosenColumns: chosenColumns,
+            checkboxes: checkboxes,
+            availableVariables: availableVariables
+        })
+    }
+
+    variableWasAddedToGroup(variable, target){
         
         var usedVariables = this.state.usedVariables.map(e => e)                
         if (target.checked){
@@ -264,8 +341,7 @@ class SessionOptions extends Component{
         this.setState({
             usedVariables: usedVariables,
             
-        })
-        
+        })        
     }
 }
 

@@ -26,17 +26,14 @@ class TSMExploration extends Component{
                     <thead>
                         <tr>
                             {
-                                this.props.variableGroups.map((g, i) => {
+                                this.props.finalGroups.map((g, i) => {
                                     
-                                    var reducer = (acc, v) => { return v. name + ', ' + acc }
-                                    var names = g.reduce(reducer, "")
-                                    names = names.slice(0, -2)
                                     return (
                                         <th 
                                             key ={i}
                                             colSpan={g.length}
                                         >
-                                            {names}
+                                            {g.map(e => e.name).join(", ")}
                                         </th>
                                     )
                                 })
@@ -50,27 +47,26 @@ class TSMExploration extends Component{
                     <tbody>                
                     {
                     this.state.pointsToLabel.map((point, i) => {
-
+                        
                         return (
 
                             <tr 
                                 key={i}
                                 className="variable-group">
                                 {
-                                    this.props.variableGroups.map((g, j) => {
+                                    this.props.finalGroups.map((g, iGroup) => {
                                         
-                                        var values = g.reduce((acc, v) => {
+                                        var values = g.map( variable => {
                                             
-                                            return point.data[v.id] + ", " + acc
+                                            return point.data[variable.i]
 
-                                        }, "")
-                                        
-                                        
+                                        }).join(", ")
+                                                                                                                         
                                         if ( typeof point.label !== "undefined"){
                                             var L = () => {
                                                 return <button
                                                             data-point={i}
-                                                            data-subgroup={j}
+                                                            data-subgroup={iGroup}
                                                             className="btn btn-primary btn-raised"
                                                             onClick = {this.onSubGroupNo.bind(this)}
                                                         >
@@ -80,14 +76,12 @@ class TSMExploration extends Component{
                                         }
                                         else{
                                             var L = () => {return <span></span>}
-                                        }
-                                         
-                                        values = values.slice(0, -2)
+                                        }                                
                                         
                                         return (
                                             <td 
                                                 colSpan={g.length}
-                                                key={j}
+                                                key={iGroup}
                                             >
                                                 {values} <L />
                                             </td>
@@ -212,18 +206,7 @@ class TSMExploration extends Component{
 
 TSMExploration.defaultProps = {
 
-    variableGroups: [
-        [
-            {name: "Age", id: 2},            
-        ],
-        [
-            {name: "City", id: 1},
-            {name: "Social Category", id: 0},
-        ],
-        [
-            {name: "Sex", id: 3},
-        ]
-    ],
+    
 
     pointsToLabel:[
 

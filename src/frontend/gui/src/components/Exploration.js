@@ -5,8 +5,6 @@ import {backend} from '../constants/constants'
 
 import ModelVisualization from './ModelVisualization'
 
-
-
 class Exploration extends Component{
 
     constructor(props){
@@ -17,11 +15,11 @@ class Exploration extends Component{
     }
 
     render(){
+
         var FirstPhase,
-            Bottom
-
-
-        var Viz
+            Bottom,
+            Viz
+        
         if (this.state.showModelVisualisation){
             Viz = () => {return(<ModelVisualization />)}
         }
@@ -124,7 +122,7 @@ class Exploration extends Component{
                       
                                 {
 
-                                    point.data.array.map((value, valueKey) => {
+                                    point.data.map((value, valueKey) => {
                                         return (
                                             
                                             <td  key={valueKey}>

@@ -131,6 +131,8 @@ class GroupVariables extends Component {
                 </button>
 
                 <button 
+                    type="button"
+                    role="button"
                     className ="btn btn-primary btn-raised"
                     onClick={this.validateGroups.bind(this)}
                 >
@@ -149,10 +151,11 @@ class GroupVariables extends Component {
         this.setState({
             availableVariables: nextProps.availableVariables.map (e => e)
         }, this.forceUpdate)
+
     }
 
     validateGroups(){
-        this.props.groupsWereValidated(this.state.groups)
+        this.props.groupsWereValidated(this.state)
     }
 
     onVariableCheckboxClick(e){
@@ -222,9 +225,7 @@ GroupVariables.defaultProps = {
 
         ]
     ],
-    groupsWereValidated: function(groups){
     
-    }
 }
 
 export default GroupVariables
