@@ -10,11 +10,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class TsmConfiguration {
-    private boolean hasTsm;
-    private double searchUnknownRegionProbability;
-    private List<boolean[]> flags;
-    private List<String[]> featureGroups ;
-    private String[] columns;
+    private boolean hasTsm = true;
+    private double searchUnknownRegionProbability = 0D;
+    private List<boolean[]> flags = new ArrayList<>();
+    private List<String[]> featureGroups = new ArrayList<>();
+    private String[] columns = new String[0];
 
     public TsmConfiguration(boolean hasTSM) {
         this.hasTsm = hasTSM;

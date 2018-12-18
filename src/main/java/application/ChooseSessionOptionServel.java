@@ -2,6 +2,7 @@ package application;
 
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+import config.TsmConfiguration;
 import data.DataPoint;
 import data.IndexedDataset;
 import config.ExperimentConfiguration;
@@ -80,52 +81,20 @@ public class ChooseSessionOptionServel extends HttpServlet {
             rowNumber++;
         }
 
-        String json = "{\n" +
-                "   \"activeLearner\": {\n" +
-                "       \"learner\": {\n" +
-                "           \"name\": \"MajorityVote\",\n" + // MajorityVote | SVM |
-                "           \"sampleSize\": 8,\n" + // Only for MajorityVote : >= 1
-                "           \"versionSpace\": {\n" +
-                "               \"addIntercept\": true,\n" +
-                "               \"hitAndRunSampler\": {\n" +
-                "                   \"cache\": true,\n" +
-                "                   \"rounding\": true,\n" +
-                "                   \"selector\": {\n" +
-                "                       \"name\": \"WarmUpAndThin\",\n" + // Only For Majority Vote
-                "                       \"thin\": 10,\n" +
-                "                       \"warmUp\": 100\n" +
-                "                   }\n" +
-                "               },\n" +
-                "               \"kernel\": {\n" +
-                "                   \"name\": \"gaussian\"\n" +
-                "               },\n" +
-                "               \"solver\": \"ojalgo\"\n" +
-                "           }\n" +
-                "       },\n" +
-                "       \"name\": \"UncertaintySampler\"\n" +
-                "   },\n" +
-                "   \"subsampleSize\": 50000,\n" +
-                "   \"task\": \"sdss_Q4_0.1%\"\n" +
-                "    \"multiTSM\": {" +
-                "        \"searchUnknownRegionProbability\": 0.5"  +
-                "         \" columns\": ['age', 'sex']" +
-                "         \" flags\": [[true, false], [true, false]]" +
-                "         \" featureGroups\": [['age'], ['sex']" +
-                "       } " +
-                "}";
-
-
 
         String clientJson = req.getParameter("configuration");
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
 
+        TsmConfiguration tsmConf = configuration.getTsmConfiguration();
+        System.out.println(tsmConf.hasTsm());
+        System.out.println(tsmConf.getSearchUnknownRegionProbability());
 
         Gson gson = new Gson();
 
         IndexedDataset dataset = builder.build();
 
-        //UserExperimentManager manager = new UserExperimentManager(configuration, dataset);
+
         double C = 1000;
         Kernel kernel = new GaussianKernel();
         Learner learner = new SvmLearner(C, kernel);
@@ -133,6 +102,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
 
         int nInitialPoints = 3;
+
+
+
         resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
 
         this.getServletContext().setAttribute("experimentManager", manager);
