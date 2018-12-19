@@ -6,6 +6,7 @@ import NewSession from './components/NewSession'
 import SessionOptions from './components/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSMExploration'
+import HeatMap from './components/HeatMap'
 
 import './App.css';
 
@@ -244,7 +245,7 @@ class App extends Component {
             </div>
         </div>
       
-        
+      
       </div>
     );
   }

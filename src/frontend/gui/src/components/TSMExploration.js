@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import ExplorationActions from './ExplorationActions'
+
 class TSMExploration extends Component{
 
     constructor(props){
@@ -124,10 +126,18 @@ class TSMExploration extends Component{
                 </tbody>
 
                 </table>
+
+
+                {this.explorationActions()}
             </div>
         )
     }
 
+    explorationActions(){
+        return (
+            <ExplorationActions />
+        )
+    }
 
     groupSubLabelisationFinished(e){
         

@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 
-import $ from "jquery";
-import {backend} from '../constants/constants'
 
+import  HeatMap from './HeatMap'
 
 function getVisualizationData(){
 
 }
-
 
 class ModelBoundaries extends Component{
 
@@ -108,7 +106,8 @@ class ModelVisualization extends Component{
                     }
                     
                     </table>
-                
+                    
+                    <HeatMap />
             </div>
         )
     }
