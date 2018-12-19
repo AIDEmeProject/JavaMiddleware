@@ -19,7 +19,7 @@ public class ConfigurationTest {
 
 
 
-        String json = "{\"activeLearner\":{\"learner\":{\"name\":\"MajorityVote\",\"sampleSize\":8,\"versionSpace\":{\"addIntercept\":true,\"hitAndRunSampler\":{\"cache\":true,\"rounding\":true,\"selector\":{\"name\":\"WarmUpAndThin\",\"thin\":10,\"warmUp\":100}},\"kernel\":{\"name\":\"gaussian\"},\"solver\":\"ojalgo\"}},\"name\":\"UncertaintySampler\"},\"subsampleSize\":50000,\"task\":\"sdss_Q4_0.1%\",\"multiTSM\":{\"hasTSM\":true,\"searchUnknownRegionProbability\":0.5,\"featureGroups\":[[\"age\"],[\"sex\"]],\"columns\":[\"age\",\"sex\"],\"flags\":[[true,false],[true,false]]}}";
+        String json = "[{\"dataPoint\":{\"id\":1237646508760564393,\"data\":[-0.13119041937947784,-0.014898676303238882]},\"label\":[\"POSITIVE\"]},{\"dataPoint\":{\"id\":1237654896851026426,\"data\":[-0.19952449741497963,0.02997197718063128]},\"label\":[\"POSITIVE\"]}]";
 
 
         ExperimentConfiguration configuration =  JsonConverter.deserialize(json, ExperimentConfiguration.class);
