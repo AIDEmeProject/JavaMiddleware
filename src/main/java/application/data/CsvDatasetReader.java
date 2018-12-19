@@ -2,11 +2,11 @@ package application.data;
 
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import data.DataPoint;
+import data.LabeledPoint;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,10 +70,7 @@ public class CsvDatasetReader {
     }
 
 
-    public void savedLabeledPointsAsCsv(ArrayList<DataPoint> labeledPoints){
 
 
 
-
-    }
 }
