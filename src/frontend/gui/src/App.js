@@ -5,6 +5,7 @@ import $ from "jquery";
 import NewSession from './components/NewSession'
 import SessionOptions from './components/SessionOptions'
 import Exploration from './components/Exploration'
+import TSMExploration from './components/TSMExploration'
 
 import './App.css';
 
@@ -13,9 +14,9 @@ import {backend} from './constants/constants'
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
+const TSM_EXPLORATION = "TSMExploration"
 
 function sendPointLabel(data, onSuccess){
-
     
     var endPoint = backend + "/data-point-were-labeled"
     $.ajax({
@@ -51,12 +52,32 @@ class App extends Component {
         }
     }
 
-    sessionWasStarted(response){
+    sessionWasStarted(response, variableData){
         
-        this.setState({
-            step: EXPLORATION,
-            pointsToLabel: response,        
+
+        var pointsToLabel = response.map( pointToLabel => {
+            return {
+                id: pointToLabel.id,
+                data: pointToLabel.data.array
+            }
         })
+        
+        if (variableData.finalGroups){
+            this.setState({
+                step: TSM_EXPLORATION,
+                pointsToLabel: pointsToLabel,     
+                finalGroups: variableData.finalGroups,
+                finalVariables: variableData.finalVariables   
+            })    
+        }
+        else{
+            this.setState({
+                step: EXPLORATION,
+                pointsToLabel: pointsToLabel,        
+            })
+        }
+
+        
     }
 
     sessionOptionsWereChosen(options){
@@ -166,6 +187,8 @@ class App extends Component {
         }
     }
 
+    
+
   render() {
 
     var View;
@@ -173,6 +196,10 @@ class App extends Component {
         
         case SESSION_OPTIONS:
             View = SessionOptions
+            break
+
+        case TSM_EXPLORATION:
+            View = TSMExploration
             break
 
         case EXPLORATION:
@@ -216,54 +243,12 @@ class App extends Component {
                 />            
             </div>
         </div>
-        {/* 
-        <div className="row">
-            <div className="col col-lg-8 offset-lg-2">
-                {this.state.labeledPoints.length} points labeled                    
-            </div>
-        </div> */}
+      
         
       </div>
     );
   }
 }
 
-class PointsAsTable extends Component{
-
-    render(){
-        return (
-            <table>
-                    <thead>
-                            <tr>
-                                {
-                                    this.props.columns.map((col, k) => {
-                                    
-                                        return (
-                                            <th key={k}>
-                                                { col }
-                                            </th>
-                                        )
-                                    })
-                                }
-                            </tr>
-                        </thead>
-                    <tbody>
-                        {
-                            this.props.rows.map((row, k) => {
-                                return (
-
-                                    <tr>
-                                        <td>
-                                            {row}
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-            </table>
-        )
-    }
-}
 
 export default App;
