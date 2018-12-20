@@ -43,13 +43,13 @@ public class GetLabeledDatasetServlet extends HttpServlet {
 
         String id = req.getParameter("id");
 
-        String fileName = "test.csv";
-        String fileType = "csv";
+
+        String contentType = "application/octet-stream";
         // Find this file id in database to get file name, and file type
 
         // You must tell the browser the file type you are going to send
         // for example application/pdf, text/plain, text/html, image/jpg
-        resp.setContentType(fileType);
+        resp.setContentType(contentType);
 
         // Make sure to show the download dialog
         resp.setHeader("Content-disposition","attachment; filename=labeled_dataset.csv");
@@ -57,7 +57,7 @@ public class GetLabeledDatasetServlet extends HttpServlet {
         // Assume file name is retrieved from database
         // For example D:\\file\\test.pdf
 
-        File my_file = new File(fileName);
+        File my_file = new File(filePath);
 
         // This should send the file to browser
         OutputStream out = resp.getOutputStream();

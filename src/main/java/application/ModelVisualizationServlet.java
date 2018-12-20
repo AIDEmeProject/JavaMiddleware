@@ -17,25 +17,35 @@ import java.util.List;
 public class ModelVisualizationServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         resp.setContentType("application/json");
 
-        //UserExperimentManager manager = (UserExperimentManager) this.getServletContext().getAttribute("experimentManager");
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        String jsonLabeledPoints = req.getParameter("labeledPoints");
+        Gson gson = new Gson();
 
+        ArrayList<LabeledPoint> predictions = manager.labelWholeDataset(4);
 
-        //manager.getModelVisualizationData();
+        Double TSMBound = manager.getTSMBound();
 
-
-
-
-        //resp.getWriter().println(json.toJson(nextPointsToLabel));
+        VisualizationDataDTO dto = new VisualizationDataDTO(predictions, TSMBound);
+        resp.getWriter().println(gson.toJson(dto));
     }
 }
 
+
+class VisualizationDataDTO{
+
+    ArrayList<LabeledPoint> predictions;
+
+    Double TSMBound;
+
+    public VisualizationDataDTO(ArrayList<LabeledPoint> predictions, Double TSMBound) {
+        this.predictions = predictions;
+        this.TSMBound = TSMBound;
+    }
+}
 

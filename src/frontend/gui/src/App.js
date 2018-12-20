@@ -19,13 +19,26 @@ const TSM_EXPLORATION = "TSMExploration"
 
 function sendPointLabel(data, onSuccess){
     
+
+
+    var labeledPoints = data.data.map(e => {
+        return {
+            id: e.id,
+            label: e.label,
+            data: {
+                array: e.data
+            }
+        }
+    })
+
+    
     var endPoint = backend + "/data-point-were-labeled"
     $.ajax({
         type: "POST",
         dataType: 'JSON',
         url: endPoint,
         data: {
-            labeledPoints: JSON.stringify(data.data)
+            labeledPoints: JSON.stringify(labeledPoints)
         },
         header: {
             "Content-Type":"applications/json"
@@ -74,11 +87,11 @@ class App extends Component {
         else{
             this.setState({
                 step: EXPLORATION,
-                pointsToLabel: pointsToLabel,        
+                pointsToLabel: pointsToLabel,
+                finalVariables: variableData.availableVariables,
+                availableVariables: variableData.availableVariables
             })
-        }
-
-        
+        }        
     }
 
     sessionOptionsWereChosen(options){
@@ -97,11 +110,18 @@ class App extends Component {
     }
 
     onNewPointsToLabel(points){
-
-
-        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
         
-        for (var point of points){
+        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
+
+        var receivedPoints = points.map(e => {
+            return {
+                id: e.id,
+                data: e.data.array
+            }
+        })
+
+
+        for (var point of receivedPoints){
             pointsToLabel.push(point)
         }
 
@@ -232,7 +252,7 @@ class App extends Component {
 
         <div className="row">
 
-            <div className="col col-lg-8 offset-lg-2">
+            <div className="col col-lg-10 offset-lg-1">
     
                 <View 
                     fileUploaded={this.fileUploaded.bind(this)} 

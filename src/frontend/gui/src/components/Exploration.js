@@ -4,6 +4,33 @@ import $ from "jquery";
 import {backend} from '../constants/constants'
 
 import ModelVisualization from './ModelVisualization'
+import ExplorationActions from './ExplorationActions'
+
+function getWholedatasetLabeled(){
+
+    var url = backend + "/get-labeled-dataset"
+
+    $.get(url, response => {
+
+        var blob = new Blob([response]);
+        var link = document.createElement('a');
+        
+        link.href = window.URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.download = "labeled_dataset.csv";
+        link.click();
+    })
+}
+
+function getVisualizationData(dataWasReceived){
+
+    var url = backend + "/get-visualization-data"
+
+    $.get(url, dataWasReceived)
+
+
+    
+}
 
 class Exploration extends Component{
 
@@ -11,8 +38,36 @@ class Exploration extends Component{
         super(props)
         this.state = {
             showModelVisualisation: false
+            
         }
     }
+
+    onPositiveLabel(e){        
+        this.props.onPositiveLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
+    }
+
+    onNegativeLabel(e){
+        this.props.onNegativeLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
+    }
+    
+    onLabelWholeDatasetClick(){
+        getWholedatasetLabeled()
+    }
+
+    onVisualizeClick(){
+        getVisualizationData(this.dataWasReceived.bind(this))
+        
+    }
+
+    dataWasReceived(data){
+        
+        this.setState({
+            showModelVisualisation: true,
+            visualizationData: data
+        })
+    }
+
+
 
     render(){
 
@@ -21,7 +76,14 @@ class Exploration extends Component{
             Viz
         
         if (this.state.showModelVisualisation){
-            Viz = () => {return(<ModelVisualization />)}
+            Viz = () => {
+                return (
+                    <ModelVisualization 
+                        {...this.props}
+                        {...this.state}
+                    />
+                )
+            }
         }
         else {
             Viz = () => { return (<div></div>) }
@@ -36,53 +98,22 @@ class Exploration extends Component{
                     a positive example and a negative example.                    
                 </p>
             )}
-
-            Bottom = () => {return(
-                <div></div>
-            )}
-
         }
-        else {
-            
-            FirstPhase = () => {return(<div></div>)}
-
-            Bottom = () => {
-                return (
-                <div>
-
-                    <hr />
-                    
-                    <button 
-                        className="btn btn-primary btn-raised"
-                        onClick={ () => {this.setState({showModelVisualisation: ! this.state.showModelVisualisation})} }
-                    >
-                        Visualize model
-                    </button>
-
-                    <button
-                        className="btn btn-primary btn-raised"
-                    >
-                        Get the whole dataset labeled
-                    </button>
-                </div>
-            )}            
+        else {            
+            FirstPhase = () => {return(<div></div>)}                       
         }
 
         return (
 
             <div>
-
                 <h4>
                     Labeleling phase
                 </h4>
-
                             
                 <FirstPhase />
                 
                 <p>Please label the following samples</p>
-
-                
-
+            
                 <table className="table-label">
                     <thead>                        
                         <tr>
@@ -92,10 +123,11 @@ class Exploration extends Component{
                             </th>
 
                             {
-                                this.props.options.chosenColumns.map((column, key) => {
+                                this.props.availableVariables.map((column, key) => {
+                                    
                                     return (
                                         <th key={key} >
-                                        {column} 
+                                        {column.name} 
                                         </th>
                                     )
                                 })
@@ -111,13 +143,13 @@ class Exploration extends Component{
                     
                 {
                     this.props.pointsToLabel.map((point, key) => {
-
+                        
                         return (
 
                             <tr key={key}>
 
                                 <td >
-                                                {point.id}
+                                        {point.id}
                                 </td>
                       
                                 {
@@ -156,25 +188,17 @@ class Exploration extends Component{
 
                 </table>
 
-
-                <Bottom />
+                <ExplorationActions
+                    show={ ! this.props.initialLabelingSession}
+                    onLabelWholeDatasetClick={this.onLabelWholeDatasetClick.bind(this)}
+                    onVisualizeClick={this.onVisualizeClick.bind(this)}
+                />
                 
 
                 <Viz />
-
-                
-
                 
             </div>
         )
-    }
-
-    onPositiveLabel(e){        
-        this.props.onPositiveLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
-    }
-
-    onNegativeLabel(e){
-        this.props.onNegativeLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
     }
 }
 

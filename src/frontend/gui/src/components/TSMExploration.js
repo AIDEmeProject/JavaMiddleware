@@ -14,6 +14,86 @@ class TSMExploration extends Component{
         }        
     }
 
+    explorationActions(){
+        return (
+            <ExplorationActions show={ ! this.props.initialLabelingSession}/>
+        )
+    }
+
+    groupSubLabelisationFinished(e){
+        
+        var iPoint = e.target.dataset.point
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        var point = pointsToLabel[iPoint]
+
+        if ( typeof point.subGroupLabels === "undefined"){
+            alert('please label at least one subgroup')
+            return
+        }
+
+        pointsToLabel.splice(iPoint, 1)
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })
+    }
+
+    onSubGroupNo(e){
+
+        var data = e.target.dataset
+        var iPoint = data.point
+        var iSubgroup = data.subgroup
+
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        var point = pointsToLabel[iPoint]
+
+        var label = {
+            iSubgroup: iSubgroup,
+            label: 0
+        }
+
+        if ( ! point.subGroupLabels){
+            point.subGroupLabels = [
+                label
+            ]
+        }
+        else{
+            point.subGroupLabels.push(label)
+        }
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })
+
+    }
+
+    groupWasLabeledAsYes(e){
+
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+
+
+        pointsToLabel.splice(e.target.dataset.point, 1)
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })
+      
+    }
+
+    groupWasLabeledAsNo(e){
+
+        var iPoint = e.target.dataset.point
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+
+
+        var point = pointsToLabel[iPoint]
+        point.label = 0
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })   
+    }
+
     render(){
 
         return (
@@ -127,97 +207,16 @@ class TSMExploration extends Component{
 
                 </table>
 
-
                 {this.explorationActions()}
             </div>
         )
     }
-
-    explorationActions(){
-        return (
-            <ExplorationActions />
-        )
-    }
-
-    groupSubLabelisationFinished(e){
-        
-        var iPoint = e.target.dataset.point
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-        var point = pointsToLabel[iPoint]
-
-        if ( typeof point.subGroupLabels === "undefined"){
-            alert('please label at least one subgroup')
-            return
-        }
-
-        pointsToLabel.splice(iPoint, 1)
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })
-    }
-
-    onSubGroupNo(e){
-
-        var data = e.target.dataset
-        var iPoint = data.point
-        var iSubgroup = data.subgroup
-
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-        var point = pointsToLabel[iPoint]
-
-        var label = {
-            iSubgroup: iSubgroup,
-            label: 0
-        }
-
-        if ( ! point.subGroupLabels){
-            point.subGroupLabels = [
-                label
-            ]
-        }
-        else{
-            point.subGroupLabels.push(label)
-        }
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })
-
-    }
-
-    groupWasLabeledAsYes(e){
-
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-
-
-        pointsToLabel.splice(e.target.dataset.point, 1)
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })
-      
-    }
-
-    groupWasLabeledAsNo(e){
-
-        var iPoint = e.target.dataset.point
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-
-
-        var point = pointsToLabel[iPoint]
-        point.label = 0
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })   
-    }
+ 
 }
 
 TSMExploration.defaultProps = {
 
     
-
     pointsToLabel:[
 
         {

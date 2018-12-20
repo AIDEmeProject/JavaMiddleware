@@ -186,8 +186,32 @@ public class ExplorationManager {
         return labeledDataset;
     }
 
+    public ArrayList<LabeledPoint> labelWholeDataset(int n){
 
-    public void getModelVisualizationData(int idxVariable1, int idxVariable2){
+
+        Classifier classifier = this.learner.fit(this.partitionedDataset.getLabeledPoints());
+
+
+        ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
+
+
+        IndexedDataset unlabeledPoints =this.partitionedDataset.getUnlabeledPoints();
+        for ( int i = 0; i<n ; i++)
+        {
+            DataPoint point = unlabeledPoints.get(i);
+            Label label = classifier.predict(point.getData());
+
+            LabeledPoint labeledPoint = new LabeledPoint(point, label);
+            labeledDataset.add(labeledPoint);
+        }
+
+        //add user labeled points
+
+        return labeledDataset;
+    }
+
+
+    public Double getTSMBound(){
 
         // show some prediction of the model
         // so the user can say if he is happy and label the whole dataset or not
@@ -201,6 +225,10 @@ public class ExplorationManager {
             MetricStorage storage = calculator.compute(this.partitionedDataset, null);
 
             Double lowerBound = storage.getMetrics().get("ThreeSetMetric");
+            return lowerBound;
+        }
+        else{
+            return null;
         }
 
         //return some predict (confirm yanlei)

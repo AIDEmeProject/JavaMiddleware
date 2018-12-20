@@ -4,7 +4,10 @@ import React, { Component } from 'react';
 class ExplorationActions extends Component{
 
     render(){
-           
+            if ( ! this.props.show){
+                return (<div></div>)
+            }
+            
             return (
             <div>
 

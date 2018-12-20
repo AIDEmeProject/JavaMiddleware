@@ -80,6 +80,121 @@ class SessionOptions extends Component{
         }
     }
 
+
+    groupsWereValidated(options){
+
+        var groups = options.groups
+        console.log(options)
+
+        var availableVariables = {}
+        options.availableVariables.forEach((e, i) => {
+            availableVariables[e.name] = i
+        })
+        console.log(availableVariables)
+
+        var finalGroups = groups.map(g => {
+            
+            return g.map((v, i) => {
+                return {name: v.name, i: availableVariables[v.name]}
+            })    
+        })
+
+        
+        var finalVariables = options.availableVariables.map ( (e,i) => {
+            return {name: e.name, i:i}
+        })
+
+        console.log(finalVariables)
+        console.log(finalGroups)
+        
+        this.setState({
+            finalGroups: finalGroups,
+            finalVariables: finalVariables
+        })
+    }
+
+    groupWasAdded(){
+
+        var groups = this.state.variableGroups.map(e => e)
+        groups.push([])
+
+        this.setState({
+            variableGroups: groups
+        })
+
+        this.forceUpdate()
+    }
+
+    onChosenColumns(e){
+        
+        e.preventDefault()
+        
+        sendChosenColumns(this.state, this.props.sessionWasStarted)        
+
+        this.props.sessionOptionsWereChosen({
+            
+            chosenColumns: this.state.chosenColumns.map( (c, i) => {
+                return {
+                    name: c.name,
+                    i: i
+                }
+            })            
+        })
+    }
+
+    componentDidMount(){
+
+        window.$('form').bootstrapMaterialDesign()        
+    }
+
+    onCheckedColumn(e){
+                    
+        var checkboxes = this.state.checkboxes.map(e=>e);
+        checkboxes[e.target.value] = e.target.checked
+
+        var chosenColumns = this.props.columns.filter((e, k)=>{
+
+            return checkboxes[k]
+        })        
+
+        var availableVariables = []
+
+        this.props.columns.forEach((c, i) => {
+            if (checkboxes[i]){
+                availableVariables.push({
+                    name: c,
+                    i: i
+                })
+            }
+        })
+        
+        
+        this.setState({
+            chosenColumns: chosenColumns,
+            checkboxes: checkboxes,
+            availableVariables: availableVariables
+        })
+    }
+
+    variableWasAddedToGroup(variable, target){
+        
+        var usedVariables = this.state.usedVariables.map(e => e)                
+        if (target.checked){
+
+            var value = target.value
+                        
+            usedVariables.push(variable)
+        }
+        else{
+            usedVariables.splice(target.value, 1)
+        }
+        
+
+        this.setState({
+            usedVariables: usedVariables,
+            
+        })        
+    }
    
 
     render(){
@@ -229,120 +344,7 @@ class SessionOptions extends Component{
         )
     }
   
-    groupsWereValidated(options){
-
-        var groups = options.groups
-        console.log(options)
-
-        var availableVariables = {}
-        options.availableVariables.forEach((e, i) => {
-            availableVariables[e.name] = i
-        })
-        console.log(availableVariables)
-
-        var finalGroups = groups.map(g => {
-            
-            return g.map((v, i) => {
-                return {name: v.name, i: availableVariables[v.name]}
-            })    
-        })
-
-        
-        var finalVariables = options.availableVariables.map ( (e,i) => {
-            return {name: e.name, i:i}
-        })
-
-        console.log(finalVariables)
-        console.log(finalGroups)
-        
-        this.setState({
-            finalGroups: finalGroups,
-            finalVariables: finalVariables
-        })
-    }
-
-    groupWasAdded(){
-
-        var groups = this.state.variableGroups.map(e => e)
-        groups.push([])
-
-        this.setState({
-            variableGroups: groups
-        })
-
-        this.forceUpdate()
-    }
-
-    onChosenColumns(e){
-        
-        e.preventDefault()
-        
-        sendChosenColumns(this.state, this.props.sessionWasStarted)        
-
-        this.props.sessionOptionsWereChosen({
-            
-            chosenColumns: this.state.chosenColumns.map( (c, i) => {
-                return {
-                    name: c.name,
-                    i: i
-                }
-            })            
-        })
-    }
-
-    componentDidMount(){
-
-        window.$('form').bootstrapMaterialDesign()        
-    }
-
-    onCheckedColumn(e){
-                    
-        var checkboxes = this.state.checkboxes.map(e=>e);
-        checkboxes[e.target.value] = e.target.checked
-
-        var chosenColumns = this.props.columns.filter((e, k)=>{
-
-            return checkboxes[k]
-        })        
-
-        var availableVariables = []
-
-        this.props.columns.forEach((c, i) => {
-            if (checkboxes[i]){
-                availableVariables.push({
-                    name: c,
-                    i: i
-                })
-            }
-        })
-        
-        
-        this.setState({
-            chosenColumns: chosenColumns,
-            checkboxes: checkboxes,
-            availableVariables: availableVariables
-        })
-    }
-
-    variableWasAddedToGroup(variable, target){
-        
-        var usedVariables = this.state.usedVariables.map(e => e)                
-        if (target.checked){
-
-            var value = target.value
-                        
-            usedVariables.push(variable)
-        }
-        else{
-            usedVariables.splice(target.value, 1)
-        }
-        
-
-        this.setState({
-            usedVariables: usedVariables,
-            
-        })        
-    }
+    
 }
 
 SessionOptions.defaultProps = {

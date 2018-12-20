@@ -17,7 +17,6 @@ class ModelBoundaries extends Component{
             </div>
         )
     }
-
 }
 
 class ModelVisualization extends Component{
@@ -28,13 +27,21 @@ class ModelVisualization extends Component{
 
     render(){
 
+        var predictions = this.props.visualizationData.predictions.map(e => {
+            return {
+                id: e.dataPoint.id,
+                label: e.label,
+                data: e.dataPoint.data.array
+            }
+        })
+        
         var TSMBound
 
-        if (this.props.tsmBound){
+        if (this.props.TSMBound){
             TSMBound = () => {
                 return (
                     <p>                    
-                        Estimated model performance >= {this.props.tsmBound * 100} %
+                        Estimated model performance >= {this.props.TSMBound * 100} %
                     </p>
                 )
             }
@@ -58,15 +65,19 @@ class ModelVisualization extends Component{
                 <table className='predicted'>
                     <thead>
                         <tr>
+
+                            <th>
+                                Id
+                            </th>
                             
                         {
                             
-                            this.props.chosenColumns.map((c, i) => {
+                            this.props.availableVariables.map((c, i) => {
                                 return (
                                     <th
                                         key={i}
                                     >
-                                        {c}
+                                        {c.name}
                                     </th>
                                 )
                             })
@@ -80,12 +91,16 @@ class ModelVisualization extends Component{
                     </thead>
                 
                     {
-                        this.props.predictions.map((data, i) => {
+                        predictions.map((data, i) => {
                             return (
                                 <tr key={i}>
 
+                                    <td>
+                                        {data.id}
+                                    </td>
+
                                     {
-                                        data.values.map( (d, j) => {
+                                        data.data.map( (d, j) => {
                                             return (
                                                 <td
                                                     key={j}
@@ -114,26 +129,9 @@ class ModelVisualization extends Component{
 }
 
 ModelVisualization.defaultProps = {
-    tsmBound: 0.9,
+    
 
-    chosenColumns: ['age', 'sex'],
-
-    predictions : [
-        {            
-            values: [1, 2],
-            label: 1
-        },
-
-        {            
-            values: [4, 5],
-            label: 0
-        },
-
-        {            
-            values: [4, 5],
-            label: 0
-        },
-    ]
+    
 }
 
 export default ModelVisualization
