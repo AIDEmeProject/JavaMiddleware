@@ -19,7 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 
 
@@ -48,11 +51,17 @@ public class ChooseSessionOptionServel extends HttpServlet {
             if (entry.getKey().indexOf("column") != -1){
 
                 String strColumnId = String.join(",", entry.getValue());
+
                 columnId = Integer.parseInt(strColumnId);
 
                 columnIds.add(columnId);
             }
         }
+
+
+        columnIds.sort(Comparator.comparingInt((Integer n) -> n));
+
+
 
         ArrayList<Double> rowValues = new ArrayList();
 
@@ -68,8 +77,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
             rowValues.removeAll(rowValues);
             for (Integer id : columnIds){
+                Double value = Double.parseDouble(nextLine[id]);
 
-                rowValues.add(Double.parseDouble(nextLine[id]));
+                rowValues.add(value);
             }
 
             double[] doubleRowValues = this.doubleConversion(rowValues);

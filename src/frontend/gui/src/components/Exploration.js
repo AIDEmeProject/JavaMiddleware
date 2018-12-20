@@ -55,8 +55,7 @@ class Exploration extends Component{
     }
 
     onVisualizeClick(){
-        getVisualizationData(this.dataWasReceived.bind(this))
-        
+        getVisualizationData(this.dataWasReceived.bind(this))        
     }
 
     dataWasReceived(data){

@@ -2,6 +2,36 @@ import React, { Component } from 'react';
 
 import ExplorationActions from './ExplorationActions'
 
+import $ from 'jquery'
+import {backend} from '../constants/constants'
+
+function sendLabels(labeledPoints, onSuccess){
+    
+    var labeledPoints = labeledPoints.map(e => {
+        return {
+            id: e.id,
+            labels: e.labels,
+            data: {
+                array: e.data
+            }
+        }
+    })
+    
+    var endPoint = backend + "/tsm-data-point-were-labeled"
+    $.ajax({
+        type: "POST",
+        dataType: 'JSON',
+        url: endPoint,
+        data: {
+            labeledPoints: JSON.stringify(labeledPoints)
+        },
+        header: {
+            "Content-Type":"applications/json"
+        },
+        success: onSuccess
+    })
+}
+
 class TSMExploration extends Component{
 
     constructor(props){
@@ -10,14 +40,48 @@ class TSMExploration extends Component{
 
         this.state = {
             pointsToLabel: this.props.pointsToLabel,
-            noPoints: []
+            noPoints: [],
+            labeledPoints: [],            
         }        
     }
 
-    explorationActions(){
-        return (
-            <ExplorationActions show={ ! this.props.initialLabelingSession}/>
-        )
+    newPointsToLabel(points){
+        
+        var pointsToLabels = points.map(e => {
+            return {
+                id: e.id,
+                data: e.data.array
+            }
+        })
+        this.setState({
+            pointsToLabel: pointsToLabels,
+            labeledPoints: []
+        })
+    }
+     
+    groupWasLabeledAsYes(e){
+
+        var pointId = e.target.dataset.point
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+
+        var labeledPoint = this.state.pointsToLabel[pointId]
+        
+        labeledPoint.labels = this.props.finalGroups.map( e => 1)
+        console.log(labeledPoint)
+        pointsToLabel.splice(pointId, 1)
+        
+        var labeledPoints = this.state.labeledPoints.map(e => e)
+
+        labeledPoints.push(labeledPoint)
+        console.log(labeledPoints)
+        this.setState({
+            pointsToLabel: pointsToLabel,
+            labeledPoints: labeledPoints
+        })
+      
+        if (pointsToLabel.length == 0){
+            sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
+        }
     }
 
     groupSubLabelisationFinished(e){
@@ -26,16 +90,25 @@ class TSMExploration extends Component{
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         var point = pointsToLabel[iPoint]
 
-        if ( typeof point.subGroupLabels === "undefined"){
+        if ( point.labels.reduce( (acc, v) => acc + v) == point.labels.length ){
             alert('please label at least one subgroup')
             return
         }
 
+        
         pointsToLabel.splice(iPoint, 1)
 
+        var labeledPoints = this.state.labeledPoints.map(e => e)
+        labeledPoints.push(point)
+
         this.setState({
-            pointsToLabel: pointsToLabel
+            pointsToLabel: pointsToLabel,
+            labeledPoints: labeledPoints
         })
+
+        if (pointsToLabel.length == 0){
+            sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
+        }
     }
 
     onSubGroupNo(e){
@@ -46,40 +119,17 @@ class TSMExploration extends Component{
 
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         var point = pointsToLabel[iPoint]
+       
+        point.labels[iSubgroup] = 0
+            
+        console.log(point)
 
-        var label = {
-            iSubgroup: iSubgroup,
-            label: 0
-        }
-
-        if ( ! point.subGroupLabels){
-            point.subGroupLabels = [
-                label
-            ]
-        }
-        else{
-            point.subGroupLabels.push(label)
-        }
-
+        pointsToLabel[iPoint] = point
         this.setState({
             pointsToLabel: pointsToLabel
         })
-
     }
-
-    groupWasLabeledAsYes(e){
-
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-
-
-        pointsToLabel.splice(e.target.dataset.point, 1)
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })
-      
-    }
-
+    
     groupWasLabeledAsNo(e){
 
         var iPoint = e.target.dataset.point
@@ -87,14 +137,34 @@ class TSMExploration extends Component{
 
 
         var point = pointsToLabel[iPoint]
-        point.label = 0
+        point.labels = this.props.finalGroups.map (e => 1)
 
         this.setState({
             pointsToLabel: pointsToLabel
         })   
     }
 
+    explorationActions(){
+        return (
+            <ExplorationActions show={ ! this.props.initialLabelingSession}/>
+        )
+    }
+
     render(){
+        var FirstPhase
+        if (this.props.initialLabelingSession){
+
+            FirstPhase = () => {
+                return (
+                <p>
+                    The first phase of labeling continues until we obtain 
+                    a positive example and a negative example.                    
+                </p>
+            )}
+        }
+        else {            
+            FirstPhase = () => {return(<div></div>)}                       
+        }
 
         return (
             <div>
@@ -103,6 +173,14 @@ class TSMExploration extends Component{
                     Grouped variable exploration. If you chose no, you will be asked to label each subgroups
                     independantly                    
                 </p>
+
+                <h4>
+                    Labeleling phase
+                </h4>
+                            
+                <FirstPhase />
+                
+                <p>Please label the following samples</p>
 
                 <table className="group-variable">
                     <thead>
@@ -144,7 +222,7 @@ class TSMExploration extends Component{
 
                                         }).join(", ")
                                                                                                                          
-                                        if ( typeof point.label !== "undefined"){
+                                        if ( typeof point.labels !== "undefined"){
                                             var L = () => {
                                                 return <button
                                                             data-point={i}
@@ -173,7 +251,7 @@ class TSMExploration extends Component{
                                 <td>
                                 
                                     <button 
-                                        style={{display: typeof point.label === "undefined" ? "inherit": "none"}}
+                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
                                         className="btn btn-primary btn-raised"
                                         data-point={i}
                                         onClick={this.groupWasLabeledAsYes.bind(this)}
@@ -182,7 +260,7 @@ class TSMExploration extends Component{
                                     </button>
                                                         
                                     <button 
-                                        style={{display: typeof point.label === "undefined" ? "inherit": "none"}}
+                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
                                         className="btn btn-primary btn-raised"
                                         data-point={i}
                                         onClick={this.groupWasLabeledAsNo.bind(this)}
@@ -192,7 +270,7 @@ class TSMExploration extends Component{
 
                                     <button
                                         className="btn btn-primary btn-raised"
-                                        style={{display: typeof point.label === "undefined" ? "none": "inherit"}}
+                                        style={{display: typeof point.labels === "undefined" ? "none": "inherit"}}
                                         data-point={i}
                                         onClick={this.groupSubLabelisationFinished.bind(this)}
                                     >

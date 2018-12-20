@@ -6,7 +6,7 @@ import NewSession from './components/NewSession'
 import SessionOptions from './components/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSMExploration'
-import HeatMap from './components/HeatMap'
+
 
 import './App.css';
 
@@ -19,8 +19,6 @@ const TSM_EXPLORATION = "TSMExploration"
 
 function sendPointLabel(data, onSuccess){
     
-
-
     var labeledPoints = data.data.map(e => {
         return {
             id: e.id,
@@ -30,7 +28,6 @@ function sendPointLabel(data, onSuccess){
             }
         }
     })
-
     
     var endPoint = backend + "/data-point-were-labeled"
     $.ajax({

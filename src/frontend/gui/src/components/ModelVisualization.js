@@ -130,8 +130,6 @@ class ModelVisualization extends Component{
 
 ModelVisualization.defaultProps = {
     
-
-    
 }
 
 export default ModelVisualization

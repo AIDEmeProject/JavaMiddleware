@@ -28,6 +28,7 @@ public class ApplicationServerMain {
         handler.addServlet(NewSessionServlet.class, "/new-session");
         handler.addServlet(ChooseSessionOptionServel.class, "/choose-options");
         handler.addServlet(DataPointsWereLabeledServlet.class, "/data-point-were-labeled");
+        handler.addServlet(TSMDataPointsWereLabeledServlet.class, "/tsm-data-point-were-labeled");
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
 

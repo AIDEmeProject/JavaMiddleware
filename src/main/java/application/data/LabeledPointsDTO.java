@@ -11,6 +11,7 @@ import java.util.Collection;
 
 
 import machinelearning.classifier.Label;
+import machinelearning.threesetmetric.LabelGroup;
 import utils.linalg.Vector;
 
 public class LabeledPointsDTO {
@@ -44,51 +45,81 @@ public class LabeledPointsDTO {
         return lblPoints;
     }
 
+
+    public Collection<LabeledPoint> getTSMLabeledPoints(String json){
+
+        Gson gson = new Gson();
+
+        Type collectionType = new TypeToken<Collection<TSMLabeledPointDTO>>(){}.getType();
+        Collection<TSMLabeledPointDTO> points = gson.fromJson(json, collectionType);
+        System.out.println(points.size());
+
+        ArrayList<LabeledPoint> lblPoints = new ArrayList<>();
+
+        for (TSMLabeledPointDTO point : points){
+            System.out.println(point.data.array[0]);System.out.println(point.id);
+            DataPoint dataPoint = new DataPoint(point.id, point.data.array);
+
+            int nPartialLabel = point.labels.length;
+
+            System.out.println(nPartialLabel);
+            Label[] partialLabels = new Label[nPartialLabel];
+
+            for (int i = 0; i < nPartialLabel; i++){
+
+                Label label = Label.fromSign((double) point.labels[i]);
+                partialLabels[i] = label;
+
+                System.out.println(label.toString());
+            }
+
+            LabelGroup labelGroup = new LabelGroup(partialLabels);
+            LabeledPoint lblPoint = new LabeledPoint(dataPoint, labelGroup);
+
+            lblPoints.add(lblPoint);
+        }
+
+        return lblPoints;
+    }
+
     public static void main(String[] args){
 
         String json = "[" +
                 "{" +
                 "   \"id\":0," +
                 "   \"data\":" +
-                "       {\"array\":[22,0],\"shape\":{\"dimensions\":[2],\"capacities\":[2,1]}}," +
-                "   \"label\":1" +
-                "}," +
-        "       {" +
-                "   \"id\":1," +
-                "   \"data\": " +
-                "       {\"array\":[23,1],\"shape\":{\"dimensions\":[2],\"capacities\":[2,1]}}," +
-                "   \"label\":1" +
-                "}," +
-                "{" +
-                "   \"id\":2," +
-                "   \"data\":" +
-                "       {\"array\":[33,1],\"shape\":{\"dimensions\":[2],\"capacities\":[2,1]}}," +
-                    "\"label\":0" +
-               "}" +
+                "       {" +
+                "           \"array\":[22,0]," +
+            "               \"shape\":{\"dimensions\":[2],\"capacities\":[2,1]}" +
+            "           }," +
+                "   \"labels\":[1, 0]" +
+                "}" +
         "]";
 
         Gson gson = new Gson();
 
-        Type collectionType = new TypeToken<Collection<LabeledPointDTO>>(){}.getType();
-        Collection<LabeledPointDTO> points = gson.fromJson(json, collectionType);
 
-        for (LabeledPointDTO point: points
-        ) {
-            System.out.println(point.id);
-            System.out.println(point.label);
-        }
+        LabeledPointsDTO s = new LabeledPointsDTO();
+        s.getTSMLabeledPoints(json);
 
-        LabeledPointsDTO converter = new LabeledPointsDTO();
-        Collection<LabeledPoint> points2 = converter.getLabeledPoints(json);
-
-        for (LabeledPoint point: points2
-             ) {
-            System.out.println(point.getId());
-            System.out.println(point.getLabel());
-        }
     }
     
 }
+
+
+class TSMLabeledPointDTO{
+
+    public long id;
+
+    public Integer[] labels;
+
+    public data data;
+
+    class data{
+        public double[] array;
+    }
+}
+
 
 class LabeledPointDTO{
 
@@ -101,12 +132,4 @@ class LabeledPointDTO{
     class data{
         public double[] array;
     }
-}
-
-class Target{
-
-    public Integer a;
-
-    public Integer b;
-
 }
