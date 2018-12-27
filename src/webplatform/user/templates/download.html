@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>
+        AidePlus - automatic labeling of datasets
+    </h1>
+
+    <p>
+        By downloading the following software you agree with our licence and agreement terms
+        which are summarized below
+    </p>
+
+    <ul>
+        <li>
+            No commercial use - for testing only. You can reach us for a commercial licence.
+        </li>
+        <li>
+            In order to let us know our model performance, you agree to let us collecting anonymous and data agnostic metrics
+            such as: the number of row and columns of your dataset, the number of iteration before you were
+            satisfied with the model.
+        </li>
+    </ul>
+
+    <p>
+        Getting started
+    </p>
+
+    <ul>
+        <li>
+            <a href="/get-aide-plus/download">Download</a> and unzip the software
+        </li>
+        <li>
+
+            The software requires Java. You can either launch it with
+
+            <pre>
+
+    java -jar package.jar
+            </pre>
+
+            or with docker
+
+            <pre>
+
+    docker build . -t aideplus && docker run aideplus
+            </pre>
+        </li>
+
+        <li>
+            Enter your user token "fdfdfdfdfdf" and start using the software
+        </li>
+
+        <li>
+
+        </li>
+    </ul>
+
+{% endblock %}
