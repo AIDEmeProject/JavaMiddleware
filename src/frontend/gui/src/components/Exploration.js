@@ -5,6 +5,7 @@ import {backend} from '../constants/constants'
 
 import ModelVisualization from './ModelVisualization'
 import ExplorationActions from './ExplorationActions'
+import SpecificPointToLabel from './SpecificPointToLabel'
 
 function getWholedatasetLabeled(){
 
@@ -59,7 +60,7 @@ class Exploration extends Component{
     }
 
     dataWasReceived(data){
-        
+        console.log('cou')
         this.setState({
             showModelVisualisation: true,
             visualizationData: data
@@ -111,14 +112,14 @@ class Exploration extends Component{
                             
                 <FirstPhase />
                 
-                <p>Please label the following samples</p>
+                <p>Please label the following examples</p>
             
                 <table className="table-label">
                     <thead>                        
                         <tr>
                         
                             <th>
-                                id
+                                Row id
                             </th>
 
                             {
@@ -186,6 +187,13 @@ class Exploration extends Component{
                 </tbody>
 
                 </table>
+
+
+                <SpecificPointToLabel 
+                    onNewPointsToLabel={this.props.onNewPointsToLabel}
+                    show={this.props.initialLabelingSession}
+                />
+
 
                 <ExplorationActions
                     show={ ! this.props.initialLabelingSession}

@@ -82,6 +82,14 @@ public class ExplorationManager {
         return rawDataset.sample(sampleSize).toList();
     }
 
+    public ArrayList<DataPoint> getPointByRowId(int id){
+        DataPoint point = this.rawDataset.get(id);
+
+        ArrayList<DataPoint> points = new ArrayList();
+        points.add(point);
+        return points;
+    }
+
     public List<DataPoint> getNextPointsToLabel(List<LabeledPoint> labeledPoints){
 
 

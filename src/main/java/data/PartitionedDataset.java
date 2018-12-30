@@ -85,6 +85,10 @@ public final class PartitionedDataset {
         }
     }
 
+    public DataPoint get(int i){
+        return this.getAllPoints().get(findPosition(i));
+    }
+
     /**
      * @return the entire list of data points. The order of data points MAY CHANGE after every update() call.
      */

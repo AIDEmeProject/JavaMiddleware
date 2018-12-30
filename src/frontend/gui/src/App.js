@@ -252,6 +252,7 @@ class App extends Component {
             <div className="col col-lg-10 offset-lg-1">
     
                 <View 
+                    onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                     fileUploaded={this.fileUploaded.bind(this)} 
                     sessionWasStarted={this.sessionWasStarted.bind(this)}  
                     onPositiveLabel={this.onPositiveLabel.bind(this)}

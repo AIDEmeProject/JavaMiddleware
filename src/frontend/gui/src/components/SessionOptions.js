@@ -84,13 +84,12 @@ class SessionOptions extends Component{
     groupsWereValidated(options){
 
         var groups = options.groups
-        console.log(options)
-
+        
         var availableVariables = {}
         options.availableVariables.forEach((e, i) => {
             availableVariables[e.name] = i
         })
-        console.log(availableVariables)
+        
 
         var finalGroups = groups.map(g => {
             
@@ -104,8 +103,6 @@ class SessionOptions extends Component{
             return {name: e.name, i:i}
         })
 
-        console.log(finalVariables)
-        console.log(finalGroups)
         
         this.setState({
             finalGroups: finalGroups,
@@ -286,6 +283,8 @@ class SessionOptions extends Component{
                                         /> {column}
 
                                     </label>
+
+                                    <input />
 
                                 </div>                                                          
                         ))

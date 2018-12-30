@@ -33,9 +33,10 @@ public class ApplicationServerMain {
 
         handler.setSessionHandler(new SessionHandler());
 
-
         handler.addServlet(NewSessionServlet.class, "/new-session");
         handler.addServlet(ChooseSessionOptionServel.class, "/choose-options");
+
+        handler.addServlet(GetSpecificDataToLabelServlet.class, "/get-specific-point-to-label");
         handler.addServlet(DataPointsWereLabeledServlet.class, "/data-point-were-labeled");
         handler.addServlet(TSMDataPointsWereLabeledServlet.class, "/tsm-data-point-were-labeled");
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");

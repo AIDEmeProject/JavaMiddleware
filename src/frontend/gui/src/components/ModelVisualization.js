@@ -37,11 +37,11 @@ class ModelVisualization extends Component{
         
         var TSMBound
 
-        if (this.props.TSMBound){
+        if (this.props.visualizationData.TSMBound){
             TSMBound = () => {
                 return (
                     <p>                    
-                        Estimated model performance >= {this.props.TSMBound * 100} %
+                        Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
                     </p>
                 )
             }
@@ -53,6 +53,11 @@ class ModelVisualization extends Component{
                 )
             }
         }
+
+        if( this.props.TSM){
+            return (<TSMBound />)
+        }
+
         return (
             <div>
                 <p>
