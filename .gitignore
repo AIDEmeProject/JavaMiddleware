@@ -10,3 +10,6 @@ __pycache__/
 
 session/*
 !session/.gitkeep
+
+build/*
+!build/.gitkeep
