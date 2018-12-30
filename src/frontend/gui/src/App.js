@@ -6,7 +6,7 @@ import NewSession from './components/NewSession'
 import SessionOptions from './components/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSMExploration'
-
+import DataPoints from './components/DataPoints'
 
 import './App.css';
 
@@ -58,7 +58,9 @@ class App extends Component {
             initialLabelingSession: true,
             hasYesAndNo: false,            
             hasYes: false,
-            hasFalse: false
+            hasFalse: false,
+            availableVariables: [],
+            finalVariables: []
 
         }
     }
@@ -263,7 +265,18 @@ class App extends Component {
             </div>
         </div>
       
-      
+        <div className="row">
+
+            <div className="col col-lg-10 offset-lg-1">
+
+
+                <DataPoints 
+                    show={this.state.step == "Exploration" || this.state.step == "TSMExploration" }
+                    availableVariables={this.state.finalVariables}
+                    points={this.state.labeledPoints}
+                />
+            </div>
+        </div>
       </div>
     );
   }

@@ -4,10 +4,6 @@ import axios from "axios" ;
 
 import {backend} from '../constants/constants'
 
-import TSMExploration from './TSMExploration'
-
-import ModelVisualization from './ModelVisualization'
-import GroupVariables from './GroupVariables'
 
 function uploadFile(event, onSuccess){
 
@@ -62,21 +58,26 @@ class NewSession extends Component{
                         <div className="form-group ">
                         
                             <label htmlFor="dataset">
-                                Choose the dataset to be labeled
+                               1. Choose the dataset to be labeled
                             </label>
                             <input
                                 required
                                 className="form-control-file"
                                 id="dataset" name="dataset" type="file" 
                             />
-                            <small className="text-muted">CSV and TSV are supported</small>
+                           
                         </div>
 
-
+                        <p>
+                            2. Choose the separator.
+                        </p>
+                        <p>
+                            CSV, TSV and Semi-colon separator are supported
+                        </p>
                         <div className="form-group ">
-
-                            <label htmlFor="separator" className="bmd-label-floating">
-                                Separator    
+                            
+                            <label htmlFor="separator" >
+                                Separator
                             </label>
                                 <select
                                     className="form-control"

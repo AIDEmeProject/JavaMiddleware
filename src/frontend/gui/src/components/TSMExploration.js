@@ -93,6 +93,8 @@ class TSMExploration extends Component{
             labeledPoints: [],
             initialLabelingSession: ! (this.state.hasYes && this.state.hasNo)
         })
+
+        
     }
      
     groupWasLabeledAsYes(e){
