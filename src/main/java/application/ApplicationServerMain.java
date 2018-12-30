@@ -1,6 +1,9 @@
 package application;
 
+import org.eclipse.jetty.io.SelectChannelEndPoint;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -18,8 +21,14 @@ public class ApplicationServerMain {
     public static void main(String[] args) throws Exception {
 
 
-        Server server = new Server(7060);
+        Server server = new Server();
 
+        ServerConnector http = new ServerConnector(server);
+
+        http.setHost("0.0.0.0");
+        http.setPort(7060);
+
+        server.addConnector(http);
         ServletContextHandler handler = new ServletContextHandler(server, "/");
 
         handler.setSessionHandler(new SessionHandler());
@@ -40,6 +49,7 @@ public class ApplicationServerMain {
         cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
 
         server.start();
+        server.join();
 
     }
 }
