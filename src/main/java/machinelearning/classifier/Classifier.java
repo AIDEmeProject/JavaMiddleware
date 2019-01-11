@@ -1,7 +1,6 @@
 package machinelearning.classifier;
 
 
-import data.DataPoint;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -31,14 +30,6 @@ public interface Classifier {
     }
 
     /**
-     * @param point: a data point
-     * @return probability of data point belonging to the positive class
-     */
-    default double probability(DataPoint point){
-        return probability(point.getData());
-    }
-
-    /**
      * @param vector: a feature vector
      * @return predicted label for the input vector
      */
@@ -56,13 +47,5 @@ public interface Classifier {
             labels[i] = predict(matrix.getRow(i));
         }
         return labels;
-    }
-
-    /**
-     * @param point: data point
-     * @return predicted label for the input data point.
-     */
-    default Label predict(DataPoint point){
-        return predict(point.getData());
     }
 }

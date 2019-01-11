@@ -1,6 +1,5 @@
 package machinelearning.classifier.margin;
 
-import data.DataPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.linalg.Vector;
@@ -41,13 +40,13 @@ class LinearClassifierTest {
 
     @Test
     void predict_incompatibleDimension_throwsException() {
-        DataPoint point = new DataPoint(0, Vector.FACTORY.zeros(3));
+        Vector point = Vector.FACTORY.zeros(3);
         assertThrows(RuntimeException.class, () -> classifier.predict(point));
     }
 
     @Test
     void probability_incompatibleDimension_throwsException() {
-        DataPoint point = new DataPoint(0, Vector.FACTORY.zeros(3));
+        Vector point = Vector.FACTORY.zeros(3);
         assertThrows(RuntimeException.class, () -> classifier.probability(point));
     }
 }
