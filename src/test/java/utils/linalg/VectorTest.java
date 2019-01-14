@@ -635,6 +635,16 @@ public class VectorTest {
         assertEquals(Vector.FACTORY.make(1, 1, 2, 3, 4, 5), vector1.addBias());
     }
 
+    @Test
+    void argmin_allDistinctValues_returnsTheIndexOfTheSmallestElement() {
+        assertEquals(2, Vector.FACTORY.make(5, 4, 1, 2, 3).argmin());
+    }
+
+    @Test
+    void argmin_allRepeatedValues_returnsTheIndexOfTheFirstAppearanceOfTheSmallestElement() {
+        assertEquals(2, Vector.FACTORY.make(5, 4, 1, 1, 2, 1, 3).argmin());
+    }
+
     /* *************************************
      *           UTILITY METHODS
      * *************************************

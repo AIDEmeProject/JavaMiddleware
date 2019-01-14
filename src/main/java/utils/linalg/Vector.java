@@ -174,6 +174,23 @@ public class Vector extends Tensor<Vector> {
     }
 
     /**
+     * @return the index of the minimum element in this Vector
+     */
+    public int argmin() {
+        int minIndex = 0;
+        double minValue = array[0];
+
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < minValue) {
+                minIndex = i;
+                minValue = array[i];
+            }
+        }
+
+        return minIndex;
+    }
+
+    /**
      * @return an array copy of {@code this}'s content
      */
     public double[] toArray() {
