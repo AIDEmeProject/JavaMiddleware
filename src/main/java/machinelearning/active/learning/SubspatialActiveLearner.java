@@ -50,7 +50,7 @@ public class SubspatialActiveLearner implements ActiveLearner {
 
         try {
             // execute all tasks
-            ExecutorService executor = Executors.newFixedThreadPool(size);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(size, Runtime.getRuntime().availableProcessors() - 1));
             List<Future<Ranker>> subspaceRankersFuture = executor.invokeAll(workers);
             executor.shutdownNow();
 

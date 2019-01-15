@@ -38,16 +38,18 @@ public class SubspatialRanker implements Ranker {
 
     @Override
     public Vector score(IndexedDataset unlabeledData) {
+        int size = subspaceRankers.length;
+
         // create list of tasks to be run
         List<Callable<Vector>> workers = new ArrayList<>();
 
-        for(int i = 0; i < subspaceRankers.length; i++){
+        for(int i = 0; i < size; i++){
             workers.add(new RankerWorker(subspaceRankers[i], unlabeledData, columnIndexesPartition[i]));
         }
 
         try {
             // execute all tasks
-            ExecutorService executor = Executors.newFixedThreadPool(columnIndexesPartition.length);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(size, Runtime.getRuntime().availableProcessors() - 1));
             List<Future<Vector>> scores = executor.invokeAll(workers);
             executor.shutdownNow();
 
