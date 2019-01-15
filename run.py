@@ -23,11 +23,11 @@ TASKS.extend(
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = float('inf')
+SUBSAMPLE_SIZE = 50000  # float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',  # run new exploration
+    'NEW',  # run new exploration
     # 'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     # 'AVERAGE'    # average all evaluation file for a given metric
@@ -53,7 +53,10 @@ mv = MajorityVote(
 )
 
 # Where should partition information be stored? How to specify it?
-# TODO 3: add a Confusion Matrix over subspaces
+# TODO: add a Confusion Matrix over subspaces
+# TODO: how to solve the "too long filename" error
+# TODO: partition data into subspaces right from beginning?
+# TODO: optimize computation of SubspaceClassifier over Matrix
 
 METRICS = [
     #ConfusionMatrix(SVM(C=1e7, kernel='gaussian', gamma=0)),

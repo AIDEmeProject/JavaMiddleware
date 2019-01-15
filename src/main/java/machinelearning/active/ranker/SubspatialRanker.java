@@ -5,13 +5,32 @@ import machinelearning.active.Ranker;
 import utils.Validator;
 import utils.linalg.Vector;
 
-public class SubspatialRanker implements Ranker {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
+/**
+ * A Subspatial Ranker contains a collection of Ranker objects, each one fitted over a particular data subspace.
+ * The final score will be computed by summing the partial scores of each subspace. We assume that all partial scores
+ * are somewhat "in the same range".
+ */
+public class SubspatialRanker implements Ranker {
+    /**
+     * Column partitioning
+     */
     private final int[][] columnIndexesPartition;
+
+    /**
+     * Ranker objects for each subspace
+     */
     private final Ranker[] subspaceRankers;
 
+    /**
+     * @throws IllegalArgumentException if input arrays have incompatible sizes or are empty
+     */
     public SubspatialRanker(int[][] columnIndexesPartition, Ranker[] subspaceRankers) {
         Validator.assertEqualLengths(columnIndexesPartition, subspaceRankers);
+        Validator.assertNotEmpty(subspaceRankers);
 
         this.columnIndexesPartition = columnIndexesPartition;
         this.subspaceRankers = subspaceRankers;
@@ -19,14 +38,54 @@ public class SubspatialRanker implements Ranker {
 
     @Override
     public Vector score(IndexedDataset unlabeledData) {
-        Vector score = Vector.FACTORY.zeros(unlabeledData.length());
+        // create list of tasks to be run
+        List<Callable<Vector>> workers = new ArrayList<>();
 
-        //Arrays.stream(subspaceRankers).map(ranker -> ranker.score(unlabeledData)).reduce(VectorSpace::iAdd);
-        // TODO: run concurrently?
-        for (int i = 0; i < subspaceRankers.length; i++) {
-            score.iAdd(subspaceRankers[i].score(unlabeledData.getCols(columnIndexesPartition[i])));
+        for(int i = 0; i < subspaceRankers.length; i++){
+            workers.add(new RankerWorker(subspaceRankers[i], unlabeledData, columnIndexesPartition[i]));
         }
 
-        return score;
+        try {
+            // execute all tasks
+            ExecutorService executor = Executors.newFixedThreadPool(columnIndexesPartition.length);
+            List<Future<Vector>> scores = executor.invokeAll(workers);
+            executor.shutdownNow();
+
+            // compute final score
+            Vector score = Vector.FACTORY.zeros(unlabeledData.length());
+
+            for (Future<Vector> s : scores) {
+                score.iAdd(s.get());
+            }
+
+            return score;
+
+        } catch (InterruptedException ex) {
+            throw new RuntimeException("Thread was abruptly interrupted.", ex);
+        } catch (ExecutionException ex) {
+            throw new RuntimeException("Exception thrown at running task.", ex);
+        }
+    }
+
+    /**
+     * Helper class for multi-threaded score() method
+     */
+    private static class RankerWorker implements Callable<Vector> {
+
+        private final Ranker ranker;
+        private final IndexedDataset unlabeledData;
+        private final int[] cols;
+
+        RankerWorker(Ranker ranker, IndexedDataset unlabeledData, int[] cols) {
+            this.ranker = ranker;
+            this.unlabeledData = unlabeledData;
+            this.cols = cols;
+        }
+
+        @Override
+        public Vector call() {
+            return ranker.score(unlabeledData.getCols(cols));
+        }
     }
 }
+
