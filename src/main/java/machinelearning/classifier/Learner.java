@@ -1,8 +1,9 @@
 package machinelearning.classifier;
 
 import data.LabeledDataset;
+import explore.SubspatialDecompositionInjectable;
 
-public interface Learner {
+public interface Learner extends SubspatialDecompositionInjectable {
 
     /**
      * Train a classification model over training data. Only the labeled points are considered for training.

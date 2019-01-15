@@ -6,7 +6,6 @@ class Metric(Printable):
         super().__init__(add_name=True)
 
     def __repr__(self):
-
         return "{0}_{1}".format(self.name, super().__repr__()).strip('_')
 
 

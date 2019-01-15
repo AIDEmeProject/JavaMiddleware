@@ -99,6 +99,28 @@ class IndexedDatasetTest {
     }
 
     @Test
+    void getCols_emptyIndexesArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getCols());
+    }
+
+    @Test
+    void getCols_negativeIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getCols(-1));
+    }
+
+    @Test
+    void getCols_indexEqualsToDimension_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> dataset.getCols(dataset.dim()));
+    }
+
+    @Test
+    void getCols_indexInBounds_returnsExpectedIndexedDataset() {
+        IndexedDataset expected = new IndexedDataset(indexes, Matrix.FACTORY.make(3, 1, 2, 4, 6));
+        assertEquals(expected, dataset.getCols(1));
+    }
+
+
+    @Test
     void getRange_negativeIndex_throwsException() {
         assertThrows(IndexOutOfBoundsException.class, () -> dataset.getRange(-1, 0));
     }

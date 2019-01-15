@@ -1,5 +1,6 @@
 package data;
 
+import explore.user.UserLabel;
 import machinelearning.classifier.Label;
 import utils.Validator;
 import utils.linalg.Matrix;
@@ -24,7 +25,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     /**
      * Label of each data point
      */
-    private Label[] labels;
+    private UserLabel[] labels;
 
     /**
      * @param indexes: indexes of each data point
@@ -32,7 +33,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      * @param labels: the label of each data point
      * @throws IllegalArgumentException if inputs do not have the same size or are empty
      */
-    public LabeledDataset(List<Long> indexes, Matrix data, Label[] labels) {
+    public LabeledDataset(List<Long> indexes, Matrix data, UserLabel[] labels) {
         this(new IndexedDataset(indexes, data), labels);
     }
 
@@ -41,7 +42,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      * @param labels: the labels for each data point
      * @throws IllegalArgumentException if the dataset and the labels have incompatible sizes
      */
-    public LabeledDataset(IndexedDataset dataset, Label[] labels) {
+    public LabeledDataset(IndexedDataset dataset, UserLabel[] labels) {
         Validator.assertEquals(dataset.length(), labels.length);
         this.dataset = dataset;
         this.labels = labels;
@@ -55,8 +56,29 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
         return dataset.getData();
     }
 
-    public Label[] getLabels() {
+    public UserLabel getLabel(int index) {
+        return labels[index];
+    }
+
+    public UserLabel[] getLabels() {
         return labels;
+    }
+
+    /**
+     * @param cols: index of columns to retrieve
+     * @param index: user label subspace index
+     * @return a new LabeledDataset whose data matrix is restricted to the specified columns and labels to the specified subspace
+     */
+    public LabeledDataset getPartition(int[] cols, int index) {
+        Validator.assertIndexInBounds(index, 0, labels[0].getLabelsForEachSubspace().length);
+
+        Label[] subspatialLabels = new Label[labels.length];
+
+        for (int i = 0; i < subspatialLabels.length; i++) {
+            subspatialLabels[i] = labels[i].getLabelsForEachSubspace()[index];
+        }
+
+        return new LabeledDataset(dataset.getCols(cols), subspatialLabels);
     }
 
     /**
@@ -84,7 +106,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
 
     /**
      * @param data: new features matrix
-     * @return a new LabeledDataset object with same indexes and labells as {@code this}, but with the underlying data
+     * @return a new LabeledDataset object with same indexes and labels as {@code this}, but with the underlying data
      * matrix replaced by the input one
      */
     public LabeledDataset copyWithSameIndexesAndLabels(Matrix data) {

@@ -22,6 +22,16 @@ public class LabeledSetConfusionMatrixCalculator extends ConfusionMatrixCalculat
         Matrix labeledData = labeledDataset.getData();
         Label[] predictedLabels = learner.fit(labeledDataset).predict(labeledData);
 
-        return super.compute(labeledDataset.getLabels(), predictedLabels);
+        Label[] trueLabels = new Label[predictedLabels.length];
+        for (int i = 0; i < trueLabels.length; i++) {
+            trueLabels[i] = labeledDataset.getLabel(i).isPositive() ? Label.POSITIVE : Label.NEGATIVE;
+        }
+
+        return super.compute(trueLabels, predictedLabels);
+    }
+
+    @Override
+    public void setFactorizationStructure(int[][] partition) {
+        learner.setFactorizationStructure(partition);
     }
 }

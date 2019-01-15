@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 public final class Evaluate {
-    private FolderManager folder;
-    private User user;
-    private IndexedDataset dataPoints;
+    private final FolderManager folder;
+    private final ExperimentConfiguration configuration;
+    private final User user;
+    private final IndexedDataset dataPoints;
 
-    public Evaluate(FolderManager folder, IndexedDataset dataPoints, User user) {
+    public Evaluate(FolderManager folder, ExperimentConfiguration configuration, IndexedDataset dataPoints, User user) {
         this.folder = folder;
+        this.configuration = configuration;
         this.user = user;
         this.dataPoints = dataPoints;
     }
@@ -33,7 +35,11 @@ public final class Evaluate {
 
         MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
 
-        PartitionedDataset partitionedDataset = folder.getExperimentConfig()
+        if (configuration.hasFactorizationInformation()) {
+            metricCalculator.setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
+        }
+
+        PartitionedDataset partitionedDataset = configuration
                 .getTsmConfiguration()
                 .getMultiTsmModel()
                 .map(x -> new PartitionedDataset(dataPoints, x))

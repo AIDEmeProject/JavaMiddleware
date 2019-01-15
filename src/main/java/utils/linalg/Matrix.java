@@ -190,6 +190,26 @@ public class Matrix extends Tensor<Matrix> {
             }
         }
     }
+
+    /**
+     * @param cols: columns to retrieve
+     * @return a new matrix containing only the specified columns
+     * @throws IllegalArgumentException if column index is out-of-bounds
+     */
+    public Matrix getCols(int... cols) {
+        Validator.assertNotEmpty(cols);
+
+        double[] result = new double[rows() * cols.length];
+
+        int p = 0;
+        for (int i = 0; i < rows(); i++) {
+            for(int j : cols) {
+                result[p++] = get(i, j);
+            }
+        }
+
+        return new Matrix(rows(), cols.length, result);
+    }
     
     /* ROW-WISE OPERATIONS */
     

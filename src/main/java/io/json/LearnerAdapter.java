@@ -17,6 +17,8 @@ class LearnerAdapter extends JsonDeserializedAdapter<Learner> {
                 return "neighbors.NearestNeighborsLearner";
             case "MAJORITYVOTE":
                 return "MajorityVoteLearner";
+            case "SUBSPATIALLEARNER":
+                return "SubspatialLearner";
             default:
                 throw new UnknownClassIdentifierException("Learner ", identifier);
         }

@@ -1,5 +1,6 @@
 package data;
 
+import explore.user.UserLabel;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
@@ -40,6 +41,11 @@ public final class PartitionedDataset {
      * The current known / inferred label for each data point
      */
     private final ExtendedLabel[] labels;
+
+    /**
+     * List of user labels
+     */
+    private List<UserLabel> userLabels = new ArrayList<>();
 
     /**
      * Starting position of INFERRED LABELS partition
@@ -96,11 +102,7 @@ public final class PartitionedDataset {
      * @return all the data points in the MOST INFORMATIVE partition
      */
     public LabeledDataset getLabeledPoints() {
-        Label[] labels = new Label[inferredStart];
-        for (int i = 0; i < inferredStart; i++) {
-            labels[i] = this.labels[i].toLabel();
-        }
-        return new LabeledDataset(points.getRange(0, inferredStart), labels);
+        return new LabeledDataset(points.getRange(0, inferredStart), userLabels.toArray(new UserLabel[0]));
     }
 
     /**
@@ -108,10 +110,6 @@ public final class PartitionedDataset {
      */
     public boolean hasLabeledPoints() {
         return inferredStart > 0;
-    }
-
-    public int numberOfLabeledPoints() {
-        return inferredStart;
     }
 
     /**
@@ -187,6 +185,10 @@ public final class PartitionedDataset {
      * @param labeledPoint: a new labeled point provided by an Active Learning exploration routine
      */
     public void update(LabeledPoint labeledPoint) {
+        // update user labels
+        userLabels.add(labeledPoint.getLabel());
+
+        // update partitions
         ExtendedLabel previousLabel = labels[findPosition(labeledPoint.getId())];
 
         updateMostInformativePointsPartition(labeledPoint);
@@ -202,6 +204,14 @@ public final class PartitionedDataset {
 
             attemptToLabelUnknownPoints();
         }
+    }
+
+    /**
+     * Perform a sequence of update operations, in the order of the labeledPoints input
+     * @param labeledPoints: list of labeled points to update
+     */
+    public void update(List<LabeledPoint> labeledPoints) {
+        labeledPoints.forEach(this::update);
     }
 
     private void relabelInferredPartition() {
@@ -220,15 +230,6 @@ public final class PartitionedDataset {
                 }
             }
         }
-    }
-
-
-    /**
-     * Perform a sequence of update operations, in the order of the labeledPoints input
-     * @param labeledPoints: list of labeled points to update
-     */
-    public void update(List<LabeledPoint> labeledPoints) {
-        labeledPoints.forEach(this::update);
     }
 
     private void updateMostInformativePointsPartition(LabeledPoint labeledPoint) {
@@ -256,7 +257,7 @@ public final class PartitionedDataset {
     }
 
     private void swap(int i, int j) {
-            swapMapKeys(indexToPosition, points.get(i).getId(), points.get(j).getId());
+            swapMapKeys(indexToPosition, points.getIndexes().get(i), points.getIndexes().get(j));
             swapArrayElements(labels, i, j);
             points.swap(i, j);
     }

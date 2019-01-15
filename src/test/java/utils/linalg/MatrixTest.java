@@ -243,6 +243,22 @@ public class MatrixTest {
         assertEquals(Matrix.FACTORY.make(2, 3, 4, 5, 6, 1, 2, 3), matrix1);
     }
 
+    @Test
+    void getCols_emtpyArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols());
+    }
+
+    @Test
+    void getCols_outOfBoundsIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols(-1));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols(matrix1.cols()));
+    }
+
+    @Test
+    void getCols_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 2, 3, 1, 6, 4), matrix1.getCols(2, 0));
+    }
+
     /* *************************************
      *              ADDITION
      * ************************************

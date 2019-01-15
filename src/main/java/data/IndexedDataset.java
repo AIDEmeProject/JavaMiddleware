@@ -180,6 +180,14 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     /**
+     * @param cols: index of columns to retrieve
+     * @return a new dataset whose data matrix was restricted to the specified columns
+     */
+    public IndexedDataset getCols(int... cols) {
+        return new IndexedDataset(indexes, data.getCols(cols));
+    }
+
+    /**
      * @return a copy of this object
      */
     public IndexedDataset copy() {

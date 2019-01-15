@@ -7,6 +7,7 @@ import explore.user.User;
 import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
+import machinelearning.active.learning.SubspatialActiveLearner;
 
 public final class Experiment {
     private final FolderManager experimentFolder;
@@ -33,14 +34,17 @@ public final class Experiment {
         IndexedDataset scaledData = rawData.copyWithSameIndexes(StandardScaler.fitAndTransform(rawData.getData()));
         User user = getUser(configuration, reader);
 
+        if(configuration.hasFactorizationInformation()) {
+            configuration.getActiveLearner().setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
+        }
+
         explore = new Explore(experimentFolder, scaledData, user);
-        evaluate = new Evaluate(experimentFolder, scaledData, user);
+        evaluate = new Evaluate(experimentFolder, configuration, scaledData, user);
     }
 
     private User getUser(ExperimentConfiguration configuration, TaskReader reader) {
-        if (configuration.hasMultiTSM()) {
-            ExperimentConfiguration.TsmConfiguration tsmConfiguration = configuration.getTsmConfiguration();
-            return new FactoredUser(reader.readFactorizedTargetSetKeys(tsmConfiguration));
+        if (configuration.hasFactorizationInformation()) {
+            return new FactoredUser(reader.readFactorizedTargetSetKeys(configuration.getTsmConfiguration()));
         } else {
             return new UserStub(reader.readTargetSetKeys());
         }

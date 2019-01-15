@@ -18,6 +18,8 @@ class ActiveLearnerAdapter extends JsonDeserializedAdapter<ActiveLearner> {
                 return "UncertaintySampler";
             case "SIMPLEMARGIN":
                 return "SimpleMargin";
+            case "SUBSPATIALSAMPLER":
+                return "SubspatialActiveLearner";
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }

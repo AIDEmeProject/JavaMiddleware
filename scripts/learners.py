@@ -111,7 +111,7 @@ class BayesianVersionSpace(Printable):
 
 class MajorityVote(Learner):
     def __init__(self, num_samples=8,
-                 warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,
+                 warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=False,
                  kernel='linear', gamma=0, diagonal=(),
                  add_intercept=True, solver="ojalgo"):
         super().__init__()
@@ -144,6 +144,8 @@ class BayesianMajorityVote(Learner):
         )
 
 
+class SubspatialLearner(Learner):
+    def __init__(self, learners):
+        super().__init__()
 
-
-
+        self.subspaceLearners = learners

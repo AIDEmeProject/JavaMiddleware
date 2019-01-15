@@ -47,9 +47,12 @@ public class TaskReader {
         // if no factorization structure is specified in run.py, set default ones
         tsmConfiguration.setColumns(taskConfig.columns);
 
-        if (tsmConfiguration.emptyFactorizationStructure()) {
-            tsmConfiguration.setFlags(taskConfig.tsmFlags);
+        if(tsmConfiguration.getFeatureGroups().isEmpty()) {
             tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);
+        }
+
+        if(tsmConfiguration.getFlags().isEmpty()) {
+            tsmConfiguration.setFlags(taskConfig.tsmFlags);
         }
 
         System.out.println(tsmConfiguration);

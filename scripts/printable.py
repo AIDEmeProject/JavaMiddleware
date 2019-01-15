@@ -12,14 +12,14 @@ class Printable:
         return self.__name
 
     def __repr__(self):
-        return '_'.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict()).items()])
+        return '_'.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict(flag=False)).items()])
 
-    def as_dict(self):
+    def as_dict(self, flag=True):
         result = {}
         if self.__add_name:
             result['name'] = self.__name
 
-        result.update({k: self.__resolve_value(v) for k, v in self.__dict__.items() if not k.startswith('_') and v is not None})
+        result.update({k: self.__resolve_value(v, flag) for k, v in self.__dict__.items() if not k.startswith('_') and v is not None})
 
         return result
 
@@ -28,7 +28,7 @@ class Printable:
 
     def dump_to_config_file(self, folder, add_name=False):
         if add_name:
-            folder = os.path.join(folder, self.__repr__())
+            folder = os.path.join(folder, self.__repr__()[:100])
 
         if not os.path.exists(folder):
             os.makedirs(folder)
@@ -53,8 +53,10 @@ class Printable:
                 flattened[k] = v
         return flattened
 
-    @staticmethod
-    def __resolve_value(value):
+    @classmethod
+    def __resolve_value(cls, value, flag):
         if isinstance(value, Printable):
-            return value.as_dict()
+            return value.as_dict(flag)
+        if isinstance(value, list) and flag:
+            return [cls.__resolve_value(v, flag) for v in value]
         return value

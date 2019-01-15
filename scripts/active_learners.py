@@ -2,7 +2,8 @@ from .learners import *
 
 
 class ActiveLearner(Printable):
-    pass
+    def is_factorized(self):
+        return False
 
 
 class SimpleMargin(ActiveLearner):
@@ -22,3 +23,13 @@ class UncertaintySampler(ActiveLearner):
         assert_is_instance(learner, Learner)
 
         self.learner = learner
+
+
+class SubspatialSampler(ActiveLearner):
+    def __init__(self, active_learners):
+        super().__init__()
+
+        self.activeLearners = active_learners
+
+    def is_factorized(self):
+        return True

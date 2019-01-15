@@ -21,6 +21,8 @@ public final class ExperimentConfiguration {
 
     private TsmConfiguration multiTSM = new TsmConfiguration(false);
 
+    private boolean useFactorizationInformation = false;
+
     public String getTask() {
         return task;
     }
@@ -47,6 +49,10 @@ public final class ExperimentConfiguration {
 
     public TsmConfiguration getTsmConfiguration() {
         return multiTSM;
+    }
+
+    public boolean hasFactorizationInformation() {
+        return useFactorizationInformation;
     }
 
     private ExperimentConfiguration() {
@@ -79,20 +85,16 @@ public final class ExperimentConfiguration {
             return flags;
         }
 
-        public List<String[]> getFeatureGroups() {
-            return featureGroups;
-        }
-
         public void setFlags(List<boolean[]> flags) {
             this.flags = flags;
         }
 
-        public void setFeatureGroups(List<String[]> featureGroups) {
-            this.featureGroups = featureGroups;
+        public List<String[]> getFeatureGroups() {
+            return featureGroups;
         }
 
-        public boolean emptyFactorizationStructure() {
-            return flags.isEmpty();
+        public void setFeatureGroups(List<String[]> featureGroups) {
+            this.featureGroups = featureGroups;
         }
 
         public Optional<ExtendedClassifier> getMultiTsmModel() {
@@ -103,8 +105,7 @@ public final class ExperimentConfiguration {
             List<int[]> featureGroupIndexes = featureGroups.stream()
                     .map(this::getColumnIndex)
                     .collect(Collectors.toList());
-            System.out.println(featureGroups.size());
-            System.out.println(Arrays.toString(featureGroupIndexes.get(0)));
+
             return Optional.of(new MultiTSMLearner(featureGroupIndexes, getFlagsCopy()));
         }
 
@@ -112,20 +113,25 @@ public final class ExperimentConfiguration {
             return flags.stream().map(boolean[]::clone).collect(Collectors.toList());
         }
 
+        public int[][] getColumnPartitionIndexes() {
+            int[][] partition = new int[featureGroups.size()][];
+
+            for (int i = 0; i < partition.length; i++) {
+                partition[i] = getColumnIndex(featureGroups.get(i));
+            }
+            return partition;
+        }
 
         private int[] getColumnIndex(String[] attributes) {
             return Arrays.stream(attributes).mapToInt(this::getColumnIndex).toArray();
         }
 
         private int getColumnIndex(String column) {
-            int i = 0;
-            for (String col : columns) {
-                if (column.equals(col)) {
-                    return i;
-                }
-                i++;
+            int i = Arrays.asList(columns).indexOf(column);
+            if (i < 0) {
+                throw new IllegalArgumentException("Column " + column + " not in columns list " + Arrays.toString(columns));
             }
-            throw new IllegalArgumentException("Column " + column + " not in columns list " + Arrays.toString(columns));
+            return i;
         }
 
         public void setColumns(String[] columns) {

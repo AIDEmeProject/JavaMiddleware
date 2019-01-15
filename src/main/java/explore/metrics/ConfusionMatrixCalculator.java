@@ -57,4 +57,9 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
 
         return new ConfusionMatrix(truePositives, trueNegatives, falsePositives, falseNegatives);
     }
+
+    @Override
+    public void setFactorizationStructure(int[][] partition) {
+        learner.setFactorizationStructure(partition);
+    }
 }
