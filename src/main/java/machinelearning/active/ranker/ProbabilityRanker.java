@@ -19,6 +19,6 @@ public class ProbabilityRanker implements Ranker {
      */
     @Override
     public Vector score(IndexedDataset unlabeledData) {
-        return classifier.probability(unlabeledData.getData()).iScalarSubtract(0.5).iApplyMap(Math::abs);
+        return classifier.probability(unlabeledData).iScalarSubtract(0.5).iApplyMap(Math::abs);
     }
 }

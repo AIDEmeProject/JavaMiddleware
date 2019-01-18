@@ -20,12 +20,14 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     /**
      * Data points and their indexes
      */
-    private IndexedDataset dataset;
+    private final IndexedDataset dataset;
 
     /**
      * Label of each data point
      */
-    private UserLabel[] labels;
+    private final UserLabel[] labels;
+
+    private Label[][] partialLabels;
 
     /**
      * @param indexes: indexes of each data point
@@ -44,8 +46,16 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      */
     public LabeledDataset(IndexedDataset dataset, UserLabel[] labels) {
         Validator.assertEquals(dataset.length(), labels.length);
+        Validator.assertEquals(dataset.partitionSize(), labels[0].getLabelsForEachSubspace().length);
         this.dataset = dataset;
         this.labels = labels;
+
+        this.partialLabels = new Label[dataset.partitionSize()][labels.length];
+        for (int i = 0; i < partialLabels.length; i++) {
+            for (int j = 0; j < labels.length; j++) {
+                this.partialLabels[i][j] = labels[j].getLabelsForEachSubspace()[i];
+            }
+        }
     }
 
     public List<Long> getIndexes() {
@@ -62,23 +72,6 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
 
     public UserLabel[] getLabels() {
         return labels;
-    }
-
-    /**
-     * @param cols: index of columns to retrieve
-     * @param index: user label subspace index
-     * @return a new LabeledDataset whose data matrix is restricted to the specified columns and labels to the specified subspace
-     */
-    public LabeledDataset getPartition(int[] cols, int index) {
-        Validator.assertIndexInBounds(index, 0, labels[0].getLabelsForEachSubspace().length);
-
-        Label[] subspatialLabels = new Label[labels.length];
-
-        for (int i = 0; i < subspatialLabels.length; i++) {
-            subspatialLabels[i] = labels[i].getLabelsForEachSubspace()[index];
-        }
-
-        return new LabeledDataset(dataset.getCols(cols), subspatialLabels);
     }
 
     /**
@@ -137,5 +130,24 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
         LabeledDataset that = (LabeledDataset) o;
         return Objects.equals(dataset, that.dataset) &&
                 Arrays.equals(labels, that.labels);
+    }
+
+    public LabeledDataset[] getPartitionedData() {
+        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
+
+        LabeledDataset[] labeledDatasets = new LabeledDataset[dataset.partitionSize()];
+        for (int i = 0; i < labeledDatasets.length; i++) {
+            labeledDatasets[i] = new LabeledDataset(partitionedDatasets[i], partialLabels[i]);
+        }
+
+        return labeledDatasets;
+    }
+
+    public int partitionSize() {
+        return dataset.partitionSize();
+    }
+
+    public int[][] getPartitionIndexes() {
+        return dataset.getPartitionIndexes();
     }
 }

@@ -1,6 +1,7 @@
 package machinelearning.classifier;
 
 
+import data.IndexedDataset;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -29,6 +30,10 @@ public interface Classifier {
         return Vector.FACTORY.make(probas);
     }
 
+    default Vector probability(IndexedDataset dataset) {
+        return probability(dataset.getData());
+    }
+
     /**
      * @param vector: a feature vector
      * @return predicted label for the input vector
@@ -47,5 +52,9 @@ public interface Classifier {
             labels[i] = predict(matrix.getRow(i));
         }
         return labels;
+    }
+
+    default Label[] predict(IndexedDataset dataset) {
+        return predict(dataset.getData());
     }
 }

@@ -19,8 +19,7 @@ public class LabeledSetConfusionMatrixCalculator extends ConfusionMatrixCalculat
     public MetricStorage compute(PartitionedDataset data, User user) {
         LabeledDataset labeledDataset = data.getLabeledPoints();
 
-        Matrix labeledData = labeledDataset.getData();
-        Label[] predictedLabels = learner.fit(labeledDataset).predict(labeledData);
+        Label[] predictedLabels = learner.fit(labeledDataset).predict(labeledDataset.getData());
 
         Label[] trueLabels = new Label[predictedLabels.length];
         for (int i = 0; i < trueLabels.length; i++) {
@@ -28,10 +27,5 @@ public class LabeledSetConfusionMatrixCalculator extends ConfusionMatrixCalculat
         }
 
         return super.compute(trueLabels, predictedLabels);
-    }
-
-    @Override
-    public void setFactorizationStructure(int[][] partition) {
-        learner.setFactorizationStructure(partition);
     }
 }

@@ -26,18 +26,14 @@ public final class Evaluate {
     public Evaluate(FolderManager folder, ExperimentConfiguration configuration, IndexedDataset dataPoints, User user) {
         this.folder = folder;
         this.configuration = configuration;
-        this.user = user;
         this.dataPoints = dataPoints;
+        this.user = user;
     }
 
     public void evaluate(int id, String calculatorIdentifier) {
         Path evalFile = folder.getEvalFile(calculatorIdentifier, id);
 
         MetricCalculator metricCalculator = folder.getMetricCalculator(calculatorIdentifier);
-
-        if (configuration.hasFactorizationInformation()) {
-            metricCalculator.setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
-        }
 
         PartitionedDataset partitionedDataset = configuration
                 .getTsmConfiguration()

@@ -34,11 +34,11 @@ public final class Explore {
      * @param dataPoints: unlabeled pool of points
      * @param user: the user for labeling points
      */
-    public Explore(FolderManager folder, IndexedDataset dataPoints, User user) {
+    public Explore(FolderManager folder, ExperimentConfiguration configuration, IndexedDataset dataPoints, User user) {
         this.folder = folder;
+        this.configuration = configuration;
         this.dataPoints = dataPoints;
         this.user = user;
-        this.configuration = folder.getExperimentConfig();
     }
 
     /**

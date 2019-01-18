@@ -35,10 +35,10 @@ public final class Experiment {
         User user = getUser(configuration, reader);
 
         if(configuration.hasFactorizationInformation()) {
-            configuration.getActiveLearner().setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
+            scaledData.setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
         }
 
-        explore = new Explore(experimentFolder, scaledData, user);
+        explore = new Explore(experimentFolder, configuration, scaledData, user);
         evaluate = new Evaluate(experimentFolder, configuration, scaledData, user);
     }
 

@@ -99,30 +99,19 @@ class IndexedDatasetTest {
     }
 
     @Test
-    void getCols_emptyIndexesArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getCols());
-    }
+    void getRows_withFactorizationStructure_partitionsCorrectlyFiltered() {
+        int[] rows = new int[] {2, 1};
+        dataset.setFactorizationStructure(new int[][] {{0}, {1}});
+        IndexedDataset result = dataset.getRows(rows);
 
-    @Test
-    void getCols_negativeIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getCols(-1));
+        List<Long> idx = Arrays.asList(20L, 10L);
+        assertEquals(new IndexedDataset(idx, data.getCols(0).getRows(rows)), result.getPartitionedData()[0]);
+        assertEquals(new IndexedDataset(idx, data.getCols(1).getRows(rows)), result.getPartitionedData()[1]);
     }
-
-    @Test
-    void getCols_indexEqualsToDimension_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getCols(dataset.dim()));
-    }
-
-    @Test
-    void getCols_indexInBounds_returnsExpectedIndexedDataset() {
-        IndexedDataset expected = new IndexedDataset(indexes, Matrix.FACTORY.make(3, 1, 2, 4, 6));
-        assertEquals(expected, dataset.getCols(1));
-    }
-
 
     @Test
     void getRange_negativeIndex_throwsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getRange(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> dataset.getRange(-1, 0));
     }
 
     @Test
@@ -134,6 +123,16 @@ class IndexedDatasetTest {
     void getRange_indexInBounds_returnsExpectedIndexedDataset() {
         IndexedDataset expected = new IndexedDataset(Arrays.asList(10L, 20L), Matrix.FACTORY.make(2, 2, 3, 4, 5, 6));
         assertEquals(expected, dataset.getRange(1, 3));
+    }
+
+    @Test
+    void getRange_withFactorizationStructure_partitionsCorrectlyFiltered() {
+        dataset.setFactorizationStructure(new int[][] {{0}, {1}});
+        IndexedDataset result = dataset.getRange(1, 3);
+
+        List<Long> idx = Arrays.asList(10L, 20L);
+        assertEquals(new IndexedDataset(idx, data.getCols(0).getRowSlice(1, 3)), result.getPartitionedData()[0]);
+        assertEquals(new IndexedDataset(idx, data.getCols(1).getRowSlice(1, 3)), result.getPartitionedData()[1]);
     }
 
     @Test
@@ -160,6 +159,16 @@ class IndexedDatasetTest {
         IndexedDataset expected = new IndexedDataset(Arrays.asList(10L, 0L, 20L), Matrix.FACTORY.make(3, 2,  3, 4, 1, 2, 5, 6));
         dataset.swap(0, 1);
         assertEquals(expected, dataset);
+    }
+
+    @Test
+    void swap_withFactorizationStructure_partitionsCorrectlySwapped() {
+        dataset.setFactorizationStructure(new int[][] {{0}, {1}});
+        dataset.swap(0, 1);
+
+        List<Long> idx = Arrays.asList(10L, 0L, 20L);
+        assertEquals(new IndexedDataset(idx, Matrix.FACTORY.make(3, 1,  3, 1, 5)), dataset.getPartitionedData()[0]);
+        assertEquals(new IndexedDataset(idx, Matrix.FACTORY.make(3, 1,  4, 2, 6)), dataset.getPartitionedData()[1]);
     }
 
     @Test

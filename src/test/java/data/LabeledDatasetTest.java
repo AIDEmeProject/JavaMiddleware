@@ -75,35 +75,6 @@ class LabeledDatasetTest {
     }
 
     @Test
-    void getPartition_emptyColumnIndexesArray_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getPartition(new int[0], 0));
-    }
-
-    @Test
-    void getPartition_negativeIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getPartition(new int[] {-1}, 0));
-        assertThrows(IllegalArgumentException.class, () -> dataset.getPartition(new int[] {0}, -1));
-    }
-
-    @Test
-    void getPartition_OutOfBoundsIndex_throwsException() {
-        assertThrows(IllegalArgumentException.class, () -> dataset.getPartition(new int[] {dataset.length()}, 0));
-        assertThrows(IllegalArgumentException.class, () -> dataset.getPartition(new int[] {0}, 1));
-    }
-
-    @Test
-    void getPartition_indexInBounds_returnsExpectedIndexedDataset() {
-        labels = new UserLabel[] {new LabelGroup(Label.POSITIVE, Label.POSITIVE), new LabelGroup(Label.NEGATIVE, Label.NEGATIVE), new LabelGroup(Label.POSITIVE, Label.NEGATIVE)};
-        dataset = new LabeledDataset(indexes, data, labels);
-
-        LabeledDataset expected = new LabeledDataset(indexes, Matrix.FACTORY.make(3, 1, 1, 3, 5), new Label[] {Label.POSITIVE, Label.NEGATIVE, Label.POSITIVE});
-        assertEquals(expected, dataset.getPartition(new int[] {0}, 0));
-
-        expected = new LabeledDataset(indexes, Matrix.FACTORY.make(3, 1, 2, 4, 6), new Label[] {Label.POSITIVE, Label.NEGATIVE, Label.NEGATIVE});
-        assertEquals(expected, dataset.getPartition(new int[] {1}, 1));
-    }
-
-    @Test
     void copyWithSameIndexesAndLabels_newMatrixHasDifferentLength_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> dataset.copyWithSameIndexesAndLabels(Matrix.FACTORY.zeros(1, 2)));
     }

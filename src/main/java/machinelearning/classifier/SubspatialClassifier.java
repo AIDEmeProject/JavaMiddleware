@@ -1,7 +1,7 @@
 package machinelearning.classifier;
 
+import data.IndexedDataset;
 import utils.Validator;
-import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 public class SubspatialClassifier implements Classifier {
@@ -29,12 +29,22 @@ public class SubspatialClassifier implements Classifier {
 
         return minProbability;
     }
+    
+    @Override
+    public Vector probability(IndexedDataset dataset) {
+        int size = dataset.partitionSize();
+        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
+        Vector proba = subspaceClassifiers[0].probability(partitionedDatasets[0]);
 
-    //TODO: implement this
-//    @Override
-//    public Vector probability(Matrix matrix) {
-//        return null;
-//    }
+        for (int i = 1; i < size; i++) {
+            Vector newProba = subspaceClassifiers[i].probability(partitionedDatasets[i]);
+            for (int j = 0; j < proba.dim(); j++) {
+                proba.set(j, Math.min(proba.get(j), newProba.get(j)));
+            }
+        }
+
+        return proba;
+    }
 
     @Override
     public Label predict(Vector vector) {
@@ -47,9 +57,28 @@ public class SubspatialClassifier implements Classifier {
         return Label.POSITIVE;
     }
 
-    //TODO: implement this
-//    @Override
-//    public Label[] predict(Matrix matrix) {
-//        return new Label[0];
-//    }
+    @Override
+    public Label[] predict(IndexedDataset dataset) {
+        int size = dataset.partitionSize();
+        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
+        Label[][] allLabels = new Label[size][dataset.length()];
+
+        for (int i = 0; i < size; i++) {
+            allLabels[i] = subspaceClassifiers[i].predict(partitionedDatasets[i]);
+        }
+
+        Label[] labels = new Label[dataset.length()];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = Label.POSITIVE;
+
+            for (int j = 0; j < size; j++) {
+                if (allLabels[i][j].isNegative()){
+                    labels[i] = Label.NEGATIVE;
+                    break;
+                }
+            }
+        }
+
+        return labels;
+    }
 }

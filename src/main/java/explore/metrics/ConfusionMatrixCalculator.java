@@ -21,7 +21,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
 
     @Override
     public MetricStorage compute(PartitionedDataset data, User user) {
-        UserLabel[] trueLabels = user.getLabel(data.getAllPoints());  // TODO: can we avoid recomputing these labels
+        UserLabel[] trueLabels = user.getLabel(data.getAllPoints());
         Classifier classifier = learner.fit(data.getLabeledPoints());
         return compute(trueLabels, data.predictLabels(classifier));
     }
@@ -56,10 +56,5 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
         }
 
         return new ConfusionMatrix(truePositives, trueNegatives, falsePositives, falseNegatives);
-    }
-
-    @Override
-    public void setFactorizationStructure(int[][] partition) {
-        learner.setFactorizationStructure(partition);
     }
 }

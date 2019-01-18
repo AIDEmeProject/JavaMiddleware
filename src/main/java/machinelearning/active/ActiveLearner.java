@@ -1,7 +1,6 @@
 package machinelearning.active;
 
 import data.LabeledDataset;
-import explore.SubspatialDecompositionInjectable;
 
 /**
  * An ActiveLearner object is responsible for training a {@link Ranker} from labeled data. In can also be thought as a
@@ -9,7 +8,7 @@ import explore.SubspatialDecompositionInjectable;
  *
  * @author luciano
  */
-public interface ActiveLearner extends SubspatialDecompositionInjectable {
+public interface ActiveLearner {
     /**
      * @param labeledPoints: labeled data to fit Ranker
      * @return a Ranker trained over the input labeled data

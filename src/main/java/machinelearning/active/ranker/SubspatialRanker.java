@@ -16,11 +16,6 @@ import java.util.concurrent.*;
  */
 public class SubspatialRanker implements Ranker {
     /**
-     * Column partitioning
-     */
-    private final int[][] columnIndexesPartition;
-
-    /**
      * Ranker objects for each subspace
      */
     private final Ranker[] subspaceRankers;
@@ -28,23 +23,22 @@ public class SubspatialRanker implements Ranker {
     /**
      * @throws IllegalArgumentException if input arrays have incompatible sizes or are empty
      */
-    public SubspatialRanker(int[][] columnIndexesPartition, Ranker[] subspaceRankers) {
-        Validator.assertEqualLengths(columnIndexesPartition, subspaceRankers);
+    public SubspatialRanker(Ranker[] subspaceRankers) {
         Validator.assertNotEmpty(subspaceRankers);
 
-        this.columnIndexesPartition = columnIndexesPartition;
         this.subspaceRankers = subspaceRankers;
     }
 
     @Override
     public Vector score(IndexedDataset unlabeledData) {
         int size = subspaceRankers.length;
+        IndexedDataset[] partitionedData = unlabeledData.getPartitionedData();
 
         // create list of tasks to be run
         List<Callable<Vector>> workers = new ArrayList<>();
 
         for(int i = 0; i < size; i++){
-            workers.add(new RankerWorker(subspaceRankers[i], unlabeledData, columnIndexesPartition[i]));
+            workers.add(new RankerWorker(subspaceRankers[i], partitionedData[i]));
         }
 
         try {
@@ -76,17 +70,15 @@ public class SubspatialRanker implements Ranker {
 
         private final Ranker ranker;
         private final IndexedDataset unlabeledData;
-        private final int[] cols;
 
-        RankerWorker(Ranker ranker, IndexedDataset unlabeledData, int[] cols) {
+        RankerWorker(Ranker ranker, IndexedDataset unlabeledData) {
             this.ranker = ranker;
             this.unlabeledData = unlabeledData;
-            this.cols = cols;
         }
 
         @Override
         public Vector call() {
-            return ranker.score(unlabeledData.getCols(cols));
+            return ranker.score(unlabeledData);
         }
     }
 }
