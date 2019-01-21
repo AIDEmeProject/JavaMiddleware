@@ -83,6 +83,8 @@ public class TaskReader {
             factorizedPredicates[i] = joiner.toString();
         }
 
+        System.out.println(Arrays.toString(factorizedPredicates));
+
         return Arrays.stream(factorizedPredicates)
                 .map(subPredicate -> reader.readKeys(datasetConfig.table, datasetConfig.key, subPredicate))
                 .collect(Collectors.toList());
@@ -91,7 +93,7 @@ public class TaskReader {
     private int getPartitionNumber(ExperimentConfiguration.TsmConfiguration tsmConfiguration, String predicate) {
         int partitionNumber = -1, i = 0;
         for (String[] featureGroup : tsmConfiguration.getFeatureGroups()) {
-            if (Arrays.stream(featureGroup).anyMatch(predicate::contains)) {
+            if (Arrays.stream(featureGroup).anyMatch(attr -> checkHasAttr(predicate, attr))) {
                 if (partitionNumber < 0) {
                     partitionNumber = i;
                 }
@@ -106,6 +108,31 @@ public class TaskReader {
         }
 
         return partitionNumber;
+    }
+
+    private boolean checkHasAttr(String predicate, String attr) {
+        int start = predicate.indexOf(attr);
+
+        // if not found, return false
+        if (start < 0)
+            return false;
+
+        // if previous char is valid, return false
+        if (start > 0 && isAlphaNumOrUnderline(predicate.charAt(start - 1))) {
+            return false;
+        }
+
+        // if next char is valid, return false
+        int end = start + attr.length();
+        if (end < predicate.length() && isAlphaNumOrUnderline(predicate.charAt(end))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isAlphaNumOrUnderline(char ch) {
+        return Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == '_';
     }
 
     /**

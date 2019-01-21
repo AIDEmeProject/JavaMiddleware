@@ -12,22 +12,46 @@ TASKS = [
     # "sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     # "sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     # "sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
-    "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
 ]
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        #'10'
+        '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
+
     ]]
 )
+
+NUM_PARTITIONS = {
+    'sdss_Q2_circle_1%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%': 3,
+    'user_study_01': 5,
+    'user_study_02': 8,
+    'user_study_03': 6,
+    'user_study_04': 6,
+    'user_study_05': 6,
+    'user_study_06': 4,
+    'user_study_07': 6,
+    'user_study_08': 8,
+    'user_study_09': 4,
+    'user_study_10': 8,
+    'user_study_11': 6,
+    'user_study_12': 4,
+    'user_study_13': 10,
+    'user_study_14': 5,
+    'user_study_15': 6,
+    'user_study_16': 4,
+    'user_study_17': 6,
+    'user_study_18': 6,
+}
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',  # run new exploration
+    'NEW',  # run new exploration
     # 'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     # 'AVERAGE'    # average all evaluation file for a given metric
@@ -37,57 +61,51 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 20
+BUDGET = 25
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 # RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-RUNS = [2]
+RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 mv = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-    kernel='gaussian', gamma=0.0001, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
+    kernel='gaussian', gamma=None, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
 
 # Where should partition information be stored? How to specify it?
 # TODO: add a Confusion Matrix over subspaces
-# TODO: how to solve the "too long filename" error
-# TODO: partition data into subspaces right from beginning?
-# TODO: optimize computation of SubspaceClassifier over Matrix
-
 METRICS = [
-    #ConfusionMatrix(SVM(C=1e7, kernel='gaussian', gamma=0)),
-    # LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    # ThreeSetMetric(),
+    #ConfusionMatrix(SVM(C=1024, kernel='gaussian', gamma=0)),
+    #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
+    #ThreeSetMetric(),
     #ConfusionMatrix(mv),
-    ConfusionMatrix(SubspatialLearner(
-        [
-            #SVM(C=1024, kernel='gaussian', gamma=0),
-            #SVM(C=1024, kernel='gaussian', gamma=0),
-            #SVM(C=1024, kernel='gaussian', gamma=0),
-            MajorityVote(
-                num_samples=8,
-                warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-                kernel='gaussian', gamma=0.5,  # kernel
-                add_intercept=True, solver="gurobi"  # extra
-            ),
-            MajorityVote(
-                num_samples=8,
-                warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-                kernel='gaussian', gamma=0.05,  # kernel
-                add_intercept=True, solver="gurobi"  # extra
-            ),
-            MajorityVote(
-                num_samples=8,
-                warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-                kernel='gaussian', gamma=0.001,  # kernel
-                add_intercept=True, solver="gurobi"  # extra
-            ),
-        ]
-    ))
+    # ConfusionMatrix(SubspatialLearner(
+    #     [
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.5,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.05,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.001,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #     ]
+    # ))
+    ConfusionMatrix(SubspatialLearner(mv))
 ]
 
 # you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
@@ -123,31 +141,32 @@ INITIAL_SAMPLING = None
 #ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
 #ACTIVE_LEARNER = RandomSampler()
 #ACTIVE_LEARNER = UncertaintySampler(mv)
-ACTIVE_LEARNER = SubspatialSampler(
-    [
-        #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-        #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-        #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-        UncertaintySampler(MajorityVote(
-            num_samples=8,
-            warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-            kernel='gaussian', gamma=0.5,  # kernel
-            add_intercept=True, solver="gurobi"  # extra
-        )),
-        UncertaintySampler(MajorityVote(
-            num_samples=8,
-            warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-            kernel='gaussian', gamma=0.05,  # kernel
-            add_intercept=True, solver="gurobi"  # extra
-        )),
-        UncertaintySampler(MajorityVote(
-            num_samples=8,
-            warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-            kernel='gaussian', gamma=0.001,  # kernel
-            add_intercept=True, solver="gurobi"  # extra
-        )),
-    ]
-)
+# ACTIVE_LEARNER = SubspatialSampler(
+#     [
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.5,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.05,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.001,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#     ]
+# )
+ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
 
 #############################
 # DO NOT CHANGE
@@ -196,11 +215,11 @@ if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
-    print(TASK)
+    #print(TASK)
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
 
-    if len(experiment_dir) > 100:
-        experiment_dir = experiment_dir[:100]
+    if isinstance(ACTIVE_LEARNER, SubspatialSampler):
+        ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
 
     experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM,
                             initial_sampler=INITIAL_SAMPLING)
@@ -223,7 +242,11 @@ for TASK in TASKS:
         command_line.append("--metrics")
         for m in METRICS:
             assert_is_instance(m, Metric)
-            command_line.append(str(m)[:100])
+
+            if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
+                m.learner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+
+            command_line.append(str(m))
             m.dump_to_config_file(experiment_dir, add_name=True)
 
     try:

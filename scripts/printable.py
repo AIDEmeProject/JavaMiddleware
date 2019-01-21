@@ -28,7 +28,7 @@ class Printable:
 
     def dump_to_config_file(self, folder, add_name=False):
         if add_name:
-            folder = os.path.join(folder, self.__repr__()[:100])
+            folder = os.path.join(folder, self.__repr__())
 
         if not os.path.exists(folder):
             os.makedirs(folder)
@@ -57,6 +57,12 @@ class Printable:
     def __resolve_value(cls, value, flag):
         if isinstance(value, Printable):
             return value.as_dict(flag)
-        if isinstance(value, list) and flag:
-            return [cls.__resolve_value(v, flag) for v in value]
+
+        if isinstance(value, list):
+            if all([x is value[0] for x in value]):
+                value = [value[0]]
+            if flag:
+                return [cls.__resolve_value(v, flag) for v in value]
+
         return value
+

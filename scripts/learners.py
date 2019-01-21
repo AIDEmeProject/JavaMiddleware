@@ -149,3 +149,7 @@ class SubspatialLearner(Learner):
         super().__init__()
 
         self.subspaceLearners = learners
+
+    def set_repeat(self, repeat):
+        if isinstance(self.subspaceLearners, Learner):
+            self.repeat = repeat
