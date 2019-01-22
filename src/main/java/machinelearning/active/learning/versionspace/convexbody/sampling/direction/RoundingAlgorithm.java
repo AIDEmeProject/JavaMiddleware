@@ -102,8 +102,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
                 // if a separating hyperplane exists, it means E_k / sqrt(n) (n+1) is not contained in K, and E_k must be updated
                 if (separatingHyperplane.isPresent()) {
-                    converged = false;
-                    ellipsoidMethodUpdate(separatingHyperplane.get());
+                    converged = !ellipsoidMethodUpdate(separatingHyperplane.get());
                 }
             }
         }
@@ -115,7 +114,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      *
      * For more details, check lemma 2.2.1 from [1].
      */
-    private void ellipsoidMethodUpdate(LinearClassifier hyperplane) {
+    private boolean ellipsoidMethodUpdate(LinearClassifier hyperplane) {
         int n = center.dim();
         Vector g = hyperplane.getWeights();
 
@@ -127,7 +126,8 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
             throw new RuntimeException("Invalid hyperplane: ellipsoid is contained in its positive semi-space (expected the negative one)");
         }
         if (alpha <= -1.0 / n) {
-            throw new RuntimeException("Too shallow cut: ellipsoid remains unchanged.");
+            //throw new RuntimeException("Too shallow cut: ellipsoid remains unchanged.");
+            return false;
         }
 
         Vector p = D.multiply(aHat).iScalarDivide(gamma);
@@ -147,6 +147,8 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         // update P
         matrix.iSubtract(Pg.outerProduct(Pg).iScalarMultiply(sigma));
         matrix.iScalarMultiply(delta);
+
+        return true;
     }
 
     private Vector updateDiagonal(Vector p, double sigma, double delta) {
