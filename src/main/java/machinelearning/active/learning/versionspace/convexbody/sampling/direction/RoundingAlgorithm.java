@@ -102,6 +102,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
                 // if a separating hyperplane exists, it means E_k / sqrt(n) (n+1) is not contained in K, and E_k must be updated
                 if (separatingHyperplane.isPresent()) {
+                    // in case of shallow cut, continue to next axis
                     converged = !ellipsoidMethodUpdate(separatingHyperplane.get());
                 }
             }
@@ -112,7 +113,11 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      * Let E_k be the current ellipsoid, and let H be a hyperplane cutting E_k. This method will update E_k to be the
      * smallest volume ellipsoid containing E_k intersection with the negative half space of H.
      *
+     * In case of a shallow cut, we skip the execution and try the next one.
+     *
      * For more details, check lemma 2.2.1 from [1].
+     *
+     * @return true if cut succeeded (i.e. was not shallow)
      */
     private boolean ellipsoidMethodUpdate(LinearClassifier hyperplane) {
         int n = center.dim();
@@ -126,7 +131,6 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
             throw new RuntimeException("Invalid hyperplane: ellipsoid is contained in its positive semi-space (expected the negative one)");
         }
         if (alpha <= -1.0 / n) {
-            //throw new RuntimeException("Too shallow cut: ellipsoid remains unchanged.");
             return false;
         }
 
