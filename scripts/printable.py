@@ -19,9 +19,17 @@ class Printable:
         if self.__add_name:
             result['name'] = self.__name
 
-        result.update({k: self.__resolve_value(v, flag) for k, v in self.__dict__.items() if not k.startswith('_') and v is not None})
+        result.update({k: self.__resolve_value(v, flag) for k, v in self.__dict__.items() if self.__accept(k, v, flag)})
 
         return result
+
+    @staticmethod
+    def __accept(k, v, flag):
+        if k.startswith('_') or v is None:
+            return False
+        if not flag and k == 'repeat':
+            return False
+        return True
 
     def to_json(self):
         return json.dumps(self.as_dict(), sort_keys=True, indent=4, separators=(',', ': '), allow_nan=False)
@@ -65,4 +73,3 @@ class Printable:
                 return [cls.__resolve_value(v, flag) for v in value]
 
         return value
-
