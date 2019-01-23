@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import $ from "jquery";
 
-import {backend, defaultConfiguration} from '../constants/constants'
+import {backend, webplatformApi, defaultConfiguration} from '../constants/constants'
 import GroupVariables from './GroupVariables'
 
-function sendChosenColumns(state, onSuccess){
+function sendChosenColumns(tokens, state, onSuccess){
 
     var endPoint = backend + "/choose-options"    
     var configuration = defaultConfiguration
               
+    var hasTSM = state.finalGroups || state.availableVariables.length == 2
+
     if (state.finalGroups){
 
         var tsmJson = {
@@ -50,6 +52,7 @@ function sendChosenColumns(state, onSuccess){
         finalVariables: state.finalVariables
     }
 
+
     $.ajax({
 
         type: "POST",
@@ -57,7 +60,30 @@ function sendChosenColumns(state, onSuccess){
         data: $('#choose-columns').serialize(),        
         success: (response) =>  {onSuccess(response, variableData)},
         
-      });      
+      });    
+          
+    var sessionOptionsUrl = webplatformApi + "/session/" + tokens.sessionToken + "/options"
+
+    var statisticData = {
+        column_number: variableData.availableVariables.length,
+        has_tsm: hasTSM,
+        learner: state.learner,
+        classifier: state.classifier
+    }
+
+
+    if (hasTSM){
+        statisticData['number_of_variable_groups'] = tsmJson.featureGroups.length       
+    }
+    
+    $.ajax({
+        type: "PUT",
+        url: sessionOptionsUrl,
+        data: statisticData,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        }
+    })
 }
 
 
@@ -76,7 +102,9 @@ class SessionOptions extends Component{
             variableGroups: [
                 [],
                 []
-            ],            
+            ],  
+            learner: "Uncertainty sampling",
+            classifier: "SVM"
         }
     }
 
@@ -126,7 +154,7 @@ class SessionOptions extends Component{
         
         e.preventDefault()
         
-        sendChosenColumns(this.state, this.props.sessionWasStarted)        
+        sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
 
         this.props.sessionOptionsWereChosen({
             
@@ -195,7 +223,7 @@ class SessionOptions extends Component{
    
 
     render(){
-        
+
         var AdvancedOptions
 
         if (this.state.showAdvancedOptions){

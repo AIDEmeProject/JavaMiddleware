@@ -29,5 +29,6 @@ var defautConfiguration = {
 
 module.exports = {
     backend: "http://localhost:7060",
+    webplatformApi: "http://localhost:8000/api",
     defaultConfiguration: defautConfiguration
 }

@@ -55,6 +55,8 @@ class NewSession extends Component{
                     <form 
                         onSubmit={this.handleSubmit.bind(this)}     
                     >   
+
+
                         <div className="form-group ">
                         
                             <label htmlFor="dataset">

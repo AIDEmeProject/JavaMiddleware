@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import $ from "jquery";
 
+import Authentication from './components/Authentication'
 import NewSession from './components/NewSession'
 import SessionOptions from './components/SessionOptions'
 import Exploration from './components/Exploration'
@@ -10,14 +11,15 @@ import DataPoints from './components/DataPoints'
 
 import './App.css';
 
-import {backend} from './constants/constants'
+import {backend, webplatformApi} from './constants/constants'
 
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
 const TSM_EXPLORATION = "TSMExploration"
+const AUTHENTICATION = "Authentication"
 
-function sendPointLabel(data, onSuccess){
+function sendPointLabel(data, tokens, onSuccess){
     
     var labeledPoints = data.data.map(e => {
         return {
@@ -30,6 +32,7 @@ function sendPointLabel(data, onSuccess){
     })
     
     var endPoint = backend + "/data-point-were-labeled"
+
     $.ajax({
         type: "POST",
         dataType: 'JSON',
@@ -37,10 +40,22 @@ function sendPointLabel(data, onSuccess){
         data: {
             labeledPoints: JSON.stringify(labeledPoints)
         },
-        header: {
-            "Content-Type":"applications/json"
-        },
+        
         success: onSuccess
+    })
+    
+    var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
+    
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: updateLabelData,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data: {
+            number_of_labeled_points: data.data.length
+        }
     })
 }
 
@@ -51,7 +66,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            step : NEW_SESSION,
+            step : AUTHENTICATION,
             columns: [],
             labeledPoints: [],
             pointsToLabel: [],
@@ -63,6 +78,16 @@ class App extends Component {
             finalVariables: []
 
         }
+    }
+
+
+    onAuthenticationSuccess(response){
+        
+        this.setState({
+            authorizationToken: response.authorizationToken,
+            sessionToken: response.sessionToken,
+            step: NEW_SESSION
+        })
     }
 
     sessionWasStarted(response, variableData){
@@ -119,7 +144,6 @@ class App extends Component {
             }
         })
 
-
         for (var point of receivedPoints){
             pointsToLabel.push(point)
         }
@@ -139,7 +163,18 @@ class App extends Component {
         this.dataWasLabeled(dataIndex, 0)                      
     }
 
+
+    getTokens(){
+        return {
+            authorizationToken: this.state.authorizationToken, 
+            sessionToken: this.state.sessionToken
+        }
+    }
+
     dataWasLabeled(dataIndex, label){
+
+
+        var tokens = this.getTokens()
 
         var point = this.state.pointsToLabel[dataIndex]
 
@@ -178,13 +213,15 @@ class App extends Component {
         else{        
             sendPointLabel({
                 data: labeledPoints,
-            }, this.onNewPointsToLabel.bind(this))    
+            }, tokens, this.onNewPointsToLabel.bind(this))    
 
         }
     }
 
 
     labelForInitialSession(labeledPoints, pointsToLabel){
+        
+        var tokens = this.getTokens()
 
         if  (pointsToLabel.length === 0){
 
@@ -196,13 +233,13 @@ class App extends Component {
                 }, ()=> {
                     sendPointLabel({
                         data: labeledPoints,
-                    }, this.onNewPointsToLabel.bind(this))
+                    }, tokens, this.onNewPointsToLabel.bind(this))
                 })
             }
             else{
                 sendPointLabel({
                     data: labeledPoints,
-                }, this.onNewPointsToLabel.bind(this))
+                }, tokens, this.onNewPointsToLabel.bind(this))
             }
         }
     }
@@ -214,6 +251,15 @@ class App extends Component {
     var View;
     switch(this.state.step){
         
+
+        case AUTHENTICATION: 
+            View = Authentication
+            break
+
+        case NEW_SESSION:
+            View = NewSession
+            break
+
         case SESSION_OPTIONS:
             View = SessionOptions
             break
@@ -225,58 +271,60 @@ class App extends Component {
         case EXPLORATION:
             View = Exploration
             break
-
-        case NEW_SESSION:
-            View = NewSession
-            break
-
+        
         default: 
-            View = NewSession
+            View = Authentication
     }
 
     return (
 
-      <div className="App container">
-
         <div>
-            <ul className="nav nav-tabs">
-                <li className="nav-item">                  
-                    <a className="nav-link active" href="/">
+        
+        <nav className="navbar navbar-dark bg-dark box-shadow ">
+                 
+                <a className="navbar-brand" href="/">
                     CEDAR - Active learning labeler
-                    </a>
-                </li>
-                
-            </ul>
-        </div>
+                </a>
+         
 
-        <div className="row">
-
-            <div className="col col-lg-10 offset-lg-1">
+        </nav>
+            <div className="App container">
     
-                <View 
-                    onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
-                    fileUploaded={this.fileUploaded.bind(this)} 
-                    sessionWasStarted={this.sessionWasStarted.bind(this)}  
-                    onPositiveLabel={this.onPositiveLabel.bind(this)}
-                    onNegativeLabel={this.onNegativeLabel.bind(this)}
-                    sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
-                    {...this.state}
-                />            
+                
+                <div className="row">
+
+                    <div className="col col-lg-10 offset-lg-1">
+            
+                        <View 
+                            onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
+                            fileUploaded={this.fileUploaded.bind(this)} 
+                            sessionWasStarted={this.sessionWasStarted.bind(this)}  
+                            onPositiveLabel={this.onPositiveLabel.bind(this)}
+                            onNegativeLabel={this.onNegativeLabel.bind(this)}
+                            sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
+                            {...this.state}
+                            onAuthenticationSuccess={this.onAuthenticationSuccess.bind(this)}
+                            tokens={{
+                                authorizationToken: this.state.authorizationToken, 
+                                sessionToken: this.state.sessionToken
+                            }}
+                        />            
+                    </div>
+                </div>
+            
+                <div className="row">
+
+                    <div className="col col-lg-10 offset-lg-1">
+
+
+                        <DataPoints 
+                            show={this.state.step == "Exploration" || this.state.step == "TSMExploration" }
+                            availableVariables={this.state.finalVariables}
+                            points={this.state.labeledPoints}
+                        />
+                    </div>
+                </div>
             </div>
-        </div>
-      
-        <div className="row">
-
-            <div className="col col-lg-10 offset-lg-1">
-
-
-                <DataPoints 
-                    show={this.state.step == "Exploration" || this.state.step == "TSMExploration" }
-                    availableVariables={this.state.finalVariables}
-                    points={this.state.labeledPoints}
-                />
-            </div>
-        </div>
       </div>
     );
   }
