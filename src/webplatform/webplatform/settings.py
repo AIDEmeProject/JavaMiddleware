@@ -31,8 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
+    'rest_framework.authtoken',
+    'restapi.apps.RestapiConfig',
     'user.apps.UserConfig',
+    'backoffice.apps.BackofficeConfig',
     'home.apps.HomeConfig',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,6 +78,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'webplatform.wsgi.application'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Database
@@ -123,4 +131,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+LOGIN_REDIRECT_URL = '/get-aide-plus'
+
+
 ACCOUNT_ACTIVATION_DAYS = 7
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
+AUTH_USER_MODEL = 'user.User'

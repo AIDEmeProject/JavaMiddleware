@@ -16,12 +16,21 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
+from django_registration.backends.one_step.views import RegistrationView
+
+import backoffice
+from user.forms import MyCustomUserForm
 
 urlpatterns = [
+    path('backoffice/',include('backoffice.urls')),
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('get-aide-plus/', include('user.urls')),
 
+    url(r'^accounts/register/',
+        RegistrationView.as_view(success_url="/get-aide-plus", form_class=MyCustomUserForm),
+        name='django_registration_register'),
     url(r'^accounts/', include('django_registration.backends.one_step.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^api/', include('restapi.urls'))
 ]

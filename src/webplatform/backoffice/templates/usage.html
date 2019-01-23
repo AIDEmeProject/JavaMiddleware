@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    User
+                </th>
+
+                <th>
+                    Session
+                </th>
+
+                <th>
+                    Learner
+                </th>
+
+                <th>
+                    Classifier
+                </th>
+
+                <th>
+                    Column number
+                </th>
+
+                <th>
+                    Has TSM
+                </th>
+
+                <th>
+                    Number of labeled points
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for session in sessions %}
+        <tr>
+            <td>
+                {{ session.user.profile.email }}
+            </td>
+            <td>
+                {{ session.token }}
+            </td>
+            <td>
+                {{ session.learner }}
+            </td>
+
+            <td>
+                {{ session.classifier }}
+            </td>
+
+            <td>
+                {{ session.column_number }}
+            </td>
+            <td>
+                {{ session.has_tsm }}
+            </td>
+
+            <td>
+                {{ session.number_of_labeled_points }}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

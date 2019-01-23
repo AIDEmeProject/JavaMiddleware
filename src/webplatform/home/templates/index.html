@@ -1,25 +1,94 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AidePlus - Dataset labeling </title>
 
-{% block content %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-    <h1>
-        AidePlus - automatic labeling of datasets
-    </h1>
+    {% load static %}
 
-    <p>
-        Welcome
-    </p>
+    <link rel="stylesheet" href="{% static 'webplatform/css/font-awesome.min.css' %}" />
 
-    <p>
-        <a href="/accounts/register/">Register</a> to use download and test our software on your dataset.
-    </p>
+    <link rel="stylesheet" href="{% static 'user/main.css' %}" />
 
-    <p>Already have an account ? <a href="/accounts/login">login</a></p>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous">
+    </script>
 
-    <p>
-        Your data remains in your
-    </p>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous">
+    </script>
+
+    <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous">
+    </script>
+
+</head>
+<body>
 
 
+    <!-- Header -->
+    <section id="header">
+        <div class="inner">
+            <span class="icon major fa-cloud"></span>
+            <h1>
 
-{% endblock %}
+                <strong>AidePlus </strong>- automatic labeling of datasets
+            </h1>
+            <p>
+                Gathering labels is often expensive and tedious.
+                AidePlus solution lowers the number of labels required to train
+                models.
+            </p>
+            <ul class="actions special">
+                <li><a href="#one" class="button scrolly">Discover</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- One -->
+    <section id="one" class="main style1">
+        <div class="container">
+            <div class="row gtr-150">
+                <div class="">
+                    <header class="major">
+                        <h2>
+                            Train model with few labels
+                        </h2>
+                    </header>
+                    <ol>
+                        <li>
+                            Start with unlabeled datasets and label several exemples.
+
+                        </li>
+                        <li>
+                            Get your whole dataset labeled by our solution
+                        </li>
+                        <li>
+                             Your data remains on your local computer.
+                        </li>
+                    </ol>
+
+                    <p>
+                        <a href="/accounts/register/">Register</a> to download and use our solution on your dataset.
+                    </p>
+
+                    <p>Already have an account ? <a href="/accounts/login">login</a></p>
+
+                </div>
+                <div class="col-6 col-12-medium imp-medium">
+                    <span class="image fit"><img src="images/pic01.jpg" alt="" /></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
