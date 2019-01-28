@@ -7,25 +7,36 @@ from scripts import *
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    # "sdss_Q1_0.1%", "sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    # "sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
-    # "sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
-    # "sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
-    # "sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
+    #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
+    #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
+    #"sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
     #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    #'sdss_log_7.8%',
+    #'sdss_log_squared',
+    #"sdss_overlapping_5.5%",
+    #"sdss_overlapping_1.5%",
+    #"sdss_overlapping_0.5%",
+    #"sdss_overlapping_0.1%",
 ]
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-
+        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
+        '01'
     ]]
 )
-
 NUM_PARTITIONS = {
     'sdss_Q2_circle_1%_Q3_rect_1%': 2,
     'sdss_Q2_circle_10%_Q3_rect_1%': 2,
     'sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%': 3,
+    'sdss_log_squared': 2,
+    'sdss_log_7.8%': 2,
+    'sdss_overlapping_5.5%': 6,
+    'sdss_overlapping_1.5%': 4,
+    'sdss_overlapping_0.5%': 5,
+    'sdss_overlapping_0.1%': 5,
     'user_study_01': 5,
     'user_study_02': 8,
     'user_study_03': 6,
@@ -47,7 +58,7 @@ NUM_PARTITIONS = {
 }
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = float('inf')
+SUBSAMPLE_SIZE = 50000  # float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -61,7 +72,7 @@ MODES = [
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 25
+BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 # RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -72,7 +83,7 @@ RUNS = [1]
 mv = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-    kernel='gaussian', gamma=None, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
+    kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
 
@@ -108,26 +119,12 @@ METRICS = [
     ConfusionMatrix(SubspatialLearner(mv))
 ]
 
-# you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
-# note that must override all the three configurations at once
-FEATURE_GROUPS = [
-    # ['rowc', 'colc'], ['ra', 'dec']
-]
-
-IS_CONVEX_POSITIVE = [
-    # True, True
-]
-
-IS_CATEGORICAL = [
-    # False, False
-]
-
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
 SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
 # Multiple TSM configuration. Set as None if you do now want it to be used.
 mTSM = None
-# mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
+# mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
 # INITIAL SAMPLING
 # Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)

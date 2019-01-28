@@ -22,8 +22,6 @@ public class TaskReader {
     private final DatasetConfiguration datasetConfig;
     private final DatabaseReader reader;
 
-    private static final Pattern predicateSplittingPattern = Pattern.compile("\\s+AND\\s+", Pattern.CASE_INSENSITIVE);
-
     public TaskReader(String task) {
         taskConfig = new TaskConfiguration(task);
         datasetConfig = new DatasetConfiguration(taskConfig.dataset);
@@ -44,95 +42,20 @@ public class TaskReader {
     }
 
     public List<Set<Long>> readFactorizedTargetSetKeys(ExperimentConfiguration.TsmConfiguration tsmConfiguration){
-        // if no factorization structure is specified in run.py, set default ones
+        // set factorization structure specified in tasks.ini
         tsmConfiguration.setColumns(taskConfig.columns);
-
-        if(tsmConfiguration.getFeatureGroups().isEmpty()) {
-            tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);
-        }
-
-        if(tsmConfiguration.getFlags().isEmpty()) {
-            tsmConfiguration.setFlags(taskConfig.tsmFlags);
-        }
+        tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);
+        tsmConfiguration.setFlags(taskConfig.tsmFlags);
 
         System.out.println(tsmConfiguration);
 
-        // match predicates to feature groups
-        Map<Integer, StringJoiner> predicateBuilder = new HashMap<>();
-        for (String predicate : predicateSplittingPattern.split(taskConfig.predicate)) {
-            int partitionNumber = getPartitionNumber(tsmConfiguration, predicate);
-
-            if (predicateBuilder.containsKey(partitionNumber)) {
-                predicateBuilder.get(partitionNumber).add(predicate);
-            }
-            else {
-                StringJoiner joiner = new StringJoiner(" AND ");
-                joiner.add(predicate);
-                predicateBuilder.put(partitionNumber, joiner);
-            }
-        }
-
-        String[] factorizedPredicates = new String[tsmConfiguration.getFeatureGroups().size()];
-        for (int i = 0; i < factorizedPredicates.length; i++) {
-            StringJoiner joiner = predicateBuilder.get(i);
-
-            if (joiner == null) {
-                throw new RuntimeException("There are no predicates containing attributes of feature group " + i);
-            }
-
-            factorizedPredicates[i] = joiner.toString();
-        }
+        String[] factorizedPredicates = taskConfig.subpredicates.clone();
 
         System.out.println(Arrays.toString(factorizedPredicates));
 
         return Arrays.stream(factorizedPredicates)
                 .map(subPredicate -> reader.readKeys(datasetConfig.table, datasetConfig.key, subPredicate))
                 .collect(Collectors.toList());
-    }
-
-    private int getPartitionNumber(ExperimentConfiguration.TsmConfiguration tsmConfiguration, String predicate) {
-        int partitionNumber = -1, i = 0;
-        for (String[] featureGroup : tsmConfiguration.getFeatureGroups()) {
-            if (Arrays.stream(featureGroup).anyMatch(attr -> checkHasAttr(predicate, attr))) {
-                if (partitionNumber < 0) {
-                    partitionNumber = i;
-                }
-                else {
-                    throw new RuntimeException("Predicate \"" + predicate + "\" matches more than one partition: " + partitionNumber + " and " + i);
-                }
-            }
-            i++;
-        }
-        if (partitionNumber < 0) {
-            throw new RuntimeException("There is no feature group associated with predicate \"" + predicate + "\"");
-        }
-
-        return partitionNumber;
-    }
-
-    private boolean checkHasAttr(String predicate, String attr) {
-        int start = predicate.indexOf(attr);
-
-        // if not found, return false
-        if (start < 0)
-            return false;
-
-        // if previous char is valid, return false
-        if (start > 0 && isAlphaNumOrUnderline(predicate.charAt(start - 1))) {
-            return false;
-        }
-
-        // if next char is valid, return false
-        int end = start + attr.length();
-        if (end < predicate.length() && isAlphaNumOrUnderline(predicate.charAt(end))) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isAlphaNumOrUnderline(char ch) {
-        return Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == '_';
     }
 
     /**
@@ -160,6 +83,12 @@ public class TaskReader {
         private final ArrayList<String[]> featureGroups;
 
         /**
+         * True predicates in each subspace
+         */
+        private final String[] subpredicates;
+        private boolean overlapping = false;
+
+        /**
          * Default TSM flags for Multiple TSM algorithm
          */
         private final ArrayList<boolean[]> tsmFlags;
@@ -168,6 +97,7 @@ public class TaskReader {
 
         private static final Pattern splitPattern = Pattern.compile("\\s*,\\s*");
         private static final Pattern featureGroupMatcher = Pattern.compile("\\[\\s*(.*?)\\s*\\]");
+        private static final Pattern predicateSplittingPattern = Pattern.compile("\\s+AND\\s+", Pattern.CASE_INSENSITIVE);
 
         TaskConfiguration(String task) {
             Map<String, String> config = new IniConfigurationParser("tasks").read(task);
@@ -182,12 +112,83 @@ public class TaskReader {
             this.tsmFlags = parseTsmFlags(config);
             Validator.assertEquals(featureGroups.size(), tsmFlags.size());
 
+            this.subpredicates = config.containsKey("subpredicates") ? parseSubpredicates(config.get("subpredicates")) : defaultPredicatePartitioning();
+            Validator.assertEquals(subpredicates.length, featureGroups.size());
+
             if (config.containsKey("posId")) {
                 this.defaultInitialSampler = parseInitialSampler(config);
             }
             else {
                 this.defaultInitialSampler = new StratifiedSampler(1, 1);
             }
+        }
+
+        private String[] defaultPredicatePartitioning() {
+            if (overlapping) {
+                throw new RuntimeException("Cannot have overlapping feature groups without specifying the subpredicates.");
+            }
+
+            Map<Integer, StringJoiner> predicateBuilder = new HashMap<>();
+
+            for (String predicate : predicateSplittingPattern.split(predicate)) {
+                int partitionNumber = getPartitionNumber(predicate);
+
+                if (predicateBuilder.containsKey(partitionNumber)) {
+                    predicateBuilder.get(partitionNumber).add(predicate);
+                }
+                else {
+                    StringJoiner joiner = new StringJoiner(" AND ");
+                    joiner.add(predicate);
+                    predicateBuilder.put(partitionNumber, joiner);
+                }
+            }
+
+            String[] factorizedPredicates = new String[featureGroups.size()];
+            for (int i = 0; i < factorizedPredicates.length; i++) {
+                StringJoiner joiner = predicateBuilder.get(i);
+
+                if (joiner == null) {
+                    throw new RuntimeException("There are no predicates containing attributes of feature group " + i);
+                }
+
+                factorizedPredicates[i] = joiner.toString();
+            }
+
+            return factorizedPredicates;
+        }
+
+        private int getPartitionNumber(String predicate) {
+            int partitionNumber = -1, i = 0;
+            for (String[] featureGroup : featureGroups) {
+                if (Arrays.stream(featureGroup).anyMatch(predicate::contains)) {
+                    if (partitionNumber < 0) {
+                        partitionNumber = i;
+                    }
+                    else {
+                        throw new RuntimeException("Predicate \"" + predicate + "\" matches more than one partition: " + partitionNumber + " and " + i);
+                    }
+                }
+                i++;
+            }
+            if (partitionNumber < 0) {
+                throw new RuntimeException("There is no feature group associated with predicate \"" + predicate + "\"");
+            }
+
+            return partitionNumber;
+        }
+
+        private String[] parseSubpredicates(String config) {
+            if (config.isEmpty()){
+                return new String[]{predicate};
+            }
+
+            List<String> ans = new ArrayList<>();
+            Matcher matcher = featureGroupMatcher.matcher(config);
+            while(matcher.find()) {
+                ans.add(matcher.group(1));
+            }
+
+            return ans.toArray(new String[0]);
         }
 
         private InitialSampler parseInitialSampler(Map<String, String> config) {
@@ -209,6 +210,7 @@ public class TaskReader {
                 featureGroups.add(columns);
                 return featureGroups;
             }
+
             Matcher matcher = featureGroupMatcher.matcher(s);
             while(matcher.find()) {
                 String[] featureGroup = splitPattern.splitAsStream(matcher.group(1))
@@ -220,6 +222,7 @@ public class TaskReader {
                     throw new RuntimeException("Found empty feature group: " + matcher.group(1));
                 }
 
+                // check for extra columns
                 if (!Arrays.asList(columns).containsAll(Arrays.asList(featureGroup))) {
                     throw new RuntimeException("Feature group " + Arrays.toString(featureGroup) + " contains a extra column.");
                 }
@@ -227,9 +230,17 @@ public class TaskReader {
                 featureGroups.add(featureGroup);
             }
 
-            if (featureGroups.stream().map(x -> x.length).reduce(0, (x,y) -> x+y) != columns.length) {
-                throw new RuntimeException("Feature groups contains repeated or missing columns.");
+            // check if there are missing attributes in the feature groups
+            HashSet<String> set = new HashSet<>();
+            featureGroups.stream()
+                    .map(Arrays::asList)
+                    .forEach(set::addAll);
+
+            if (set.size() < columns.length){
+                throw new RuntimeException("Some attributes are missing from feature groups: " + Arrays.stream(columns).filter(x -> !set.contains(x)).collect(Collectors.toList()));
             }
+
+            overlapping = set.size() != featureGroups.stream().map(x -> x.length).reduce(0, (x,y) -> x + y);
 
             return featureGroups;
         }
