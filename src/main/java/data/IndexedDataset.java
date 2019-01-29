@@ -271,4 +271,8 @@ public class IndexedDataset implements Iterable<DataPoint> {
     public int[][] getPartitionIndexes() {
         return partitionIndexes;
     }
+
+    public boolean hasFactorizationStructure() {
+        return partitionSize() > 1;
+    }
 }

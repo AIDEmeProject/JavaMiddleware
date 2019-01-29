@@ -46,14 +46,17 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      */
     public LabeledDataset(IndexedDataset dataset, UserLabel[] labels) {
         Validator.assertEquals(dataset.length(), labels.length);
-        Validator.assertEquals(dataset.partitionSize(), labels[0].getLabelsForEachSubspace().length);
         this.dataset = dataset;
         this.labels = labels;
 
-        this.partialLabels = new Label[dataset.partitionSize()][labels.length];
-        for (int i = 0; i < partialLabels.length; i++) {
-            for (int j = 0; j < labels.length; j++) {
-                this.partialLabels[i][j] = labels[j].getLabelsForEachSubspace()[i];
+        if (dataset.hasFactorizationStructure()) {
+            Validator.assertEquals(dataset.partitionSize(), labels[0].getLabelsForEachSubspace().length);
+
+            this.partialLabels = new Label[dataset.partitionSize()][labels.length];
+            for (int i = 0; i < partialLabels.length; i++) {
+                for (int j = 0; j < labels.length; j++) {
+                    this.partialLabels[i][j] = labels[j].getLabelsForEachSubspace()[i];
+                }
             }
         }
     }

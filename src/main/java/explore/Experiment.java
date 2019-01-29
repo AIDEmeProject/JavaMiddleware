@@ -43,7 +43,7 @@ public final class Experiment {
     }
 
     private User getUser(ExperimentConfiguration configuration, TaskReader reader) {
-        if (configuration.hasFactorizationInformation()) {
+        if (configuration.hasFactorizationInformation() || configuration.hasMultiTSM()) {
             return new FactoredUser(reader.readFactorizedTargetSetKeys(configuration.getTsmConfiguration()));
         } else {
             return new UserStub(reader.readTargetSetKeys());

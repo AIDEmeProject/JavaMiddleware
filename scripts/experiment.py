@@ -31,4 +31,4 @@ class Experiment(Printable):
         if initial_sampler is not None:
             self.initialSampler = initial_sampler
 
-        self.useFactorizationInformation = mTSM is not None or active_learner.is_factorized()
+        self.useFactorizationInformation = active_learner.is_factorized()
