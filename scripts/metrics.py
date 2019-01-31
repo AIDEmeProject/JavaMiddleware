@@ -27,5 +27,14 @@ class ConfusionMatrix(Metric):
         self.learner = learner
 
 
+class SubspatialConfusionMatrix(Metric):
+    def __init__(self, subspatialLearner):
+        super().__init__()
+
+        assert_is_instance(subspatialLearner, SubspatialLearner)
+
+        self.subspatialLearner = subspatialLearner
+
+
 class ThreeSetMetric(Metric):
     pass

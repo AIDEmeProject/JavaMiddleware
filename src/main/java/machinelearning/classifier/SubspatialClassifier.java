@@ -60,12 +60,7 @@ public class SubspatialClassifier implements Classifier {
     @Override
     public Label[] predict(IndexedDataset dataset) {
         int size = dataset.partitionSize();
-        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
-        Label[][] allLabels = new Label[size][dataset.length()];
-
-        for (int i = 0; i < size; i++) {
-            allLabels[i] = subspaceClassifiers[i].predict(partitionedDatasets[i]);
-        }
+        Label[][] allLabels = predictAllSubspaces(dataset);
 
         Label[] labels = new Label[dataset.length()];
         for (int i = 0; i < labels.length; i++) {
@@ -81,4 +76,17 @@ public class SubspatialClassifier implements Classifier {
 
         return labels;
     }
+
+    public Label[][] predictAllSubspaces(IndexedDataset dataset) {
+        int size = dataset.partitionSize();
+        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
+
+        Label[][] allLabels = new Label[size][dataset.length()];
+        for (int i = 0; i < size; i++) {
+            allLabels[i] = subspaceClassifiers[i].predict(partitionedDatasets[i]);
+        }
+
+        return allLabels;
+    }
+
 }

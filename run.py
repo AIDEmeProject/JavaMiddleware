@@ -19,64 +19,36 @@ TASKS = [
     #"sdss_overlapping_1.5%",
     #"sdss_overlapping_0.5%",
     #"sdss_overlapping_0.1%",
+    #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
 
 TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        '01'
+        '01', '10'
     ]]
 )
-NUM_PARTITIONS = {
-    'sdss_Q2_circle_1%_Q3_rect_1%': 2,
-    'sdss_Q2_circle_10%_Q3_rect_1%': 2,
-    'sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%': 3,
-    'sdss_log_squared': 2,
-    'sdss_log_7.8%': 2,
-    'sdss_overlapping_5.5%': 6,
-    'sdss_overlapping_1.5%': 4,
-    'sdss_overlapping_0.5%': 5,
-    'sdss_overlapping_0.1%': 5,
-    'user_study_01': 5,
-    'user_study_02': 8,
-    'user_study_03': 6,
-    'user_study_04': 6,
-    'user_study_05': 6,
-    'user_study_06': 4,
-    'user_study_07': 6,
-    'user_study_08': 8,
-    'user_study_09': 4,
-    'user_study_10': 8,
-    'user_study_11': 6,
-    'user_study_12': 4,
-    'user_study_13': 10,
-    'user_study_14': 5,
-    'user_study_15': 6,
-    'user_study_16': 4,
-    'user_study_17': 6,
-    'user_study_18': 6,
-}
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000  # float('inf')
+SUBSAMPLE_SIZE = float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    'NEW',  # run new exploration
+    #'NEW',  # run new exploration
     # 'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    # 'AVERAGE'    # average all evaluation file for a given metric
+    'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 100
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-# RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-RUNS = [1]
+RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
@@ -116,7 +88,8 @@ METRICS = [
     #         ),
     #     ]
     # ))
-    ConfusionMatrix(SubspatialLearner(mv))
+    #ConfusionMatrix(SubspatialLearner(mv)),
+    SubspatialConfusionMatrix(SubspatialLearner(mv))
 ]
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
@@ -124,7 +97,7 @@ SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
 # Multiple TSM configuration. Set as None if you do now want it to be used.
 mTSM = None
-# mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
+#mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
 
 # INITIAL SAMPLING
 # Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
@@ -135,7 +108,7 @@ INITIAL_SAMPLING = None
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-#ACTIVE_LEARNER = SimpleMargin(C=1e7, kernel="gaussian", gamma=0)
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 #ACTIVE_LEARNER = RandomSampler()
 #ACTIVE_LEARNER = UncertaintySampler(mv)
 # ACTIVE_LEARNER = SubspatialSampler(
@@ -168,6 +141,39 @@ ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
 #############################
 # DO NOT CHANGE
 #############################
+
+NUM_PARTITIONS = {
+    'sdss_Q2_circle_1%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%': 3,
+    'sdss_log_squared': 2,
+    'sdss_log_7.8%': 2,
+    'sdss_overlapping_5.5%': 6,
+    'sdss_overlapping_1.5%': 4,
+    'sdss_overlapping_0.5%': 5,
+    'sdss_overlapping_0.1%': 5,
+    'sdss_overlapping_5.5%_tsm': 4,
+    'sdss_overlapping_1.5%_tsm': 1,
+    'sdss_overlapping_0.5%_tsm': 1,
+    'user_study_01': 5,
+    'user_study_02': 8,
+    'user_study_03': 6,
+    'user_study_04': 6,
+    'user_study_05': 6,
+    'user_study_06': 4,
+    'user_study_07': 6,
+    'user_study_08': 8,
+    'user_study_09': 4,
+    'user_study_10': 8,
+    'user_study_11': 6,
+    'user_study_12': 4,
+    'user_study_13': 10,
+    'user_study_14': 5,
+    'user_study_15': 6,
+    'user_study_16': 4,
+    'user_study_17': 6,
+    'user_study_18': 6,
+}
 
 # PRINTS
 print("TASKS =", TASKS)
@@ -242,6 +248,9 @@ for TASK in TASKS:
 
             if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
                 m.learner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+
+            if hasattr(m, 'subspatialLearner') and isinstance(m.subspatialLearner, SubspatialLearner):
+                m.subspatialLearner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
 
             command_line.append(str(m))
             m.dump_to_config_file(experiment_dir, add_name=True)

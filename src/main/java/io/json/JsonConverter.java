@@ -73,7 +73,7 @@ public class JsonConverter {
         try {
             return gson.fromJson(json, type);
         } catch (JsonParseException ex) {
-            throw new JsonDeserializationFailedException(type);
+            throw new JsonDeserializationFailedException(type, ex);
         }
     }
 
@@ -87,8 +87,8 @@ public class JsonConverter {
     public static <T> T deserialize(Reader reader, Class<T> type) throws JsonDeserializationFailedException {
         try {
             return gson.fromJson(new JsonReader(reader), type);
-        } catch (JsonSyntaxException ex) {
-            throw new JsonDeserializationFailedException(type);
+        } catch (JsonParseException ex) {
+            throw new JsonDeserializationFailedException(type, ex);
         }
     }
 
@@ -101,8 +101,8 @@ public class JsonConverter {
         Type listType = new TypeToken<ArrayList<LabeledPoint>>(){}.getType();
         try {
             return gson.fromJson(json, listType);
-        } catch (JsonSyntaxException ex) {
-            throw new JsonDeserializationFailedException(listType);
+        } catch (JsonParseException ex) {
+            throw new JsonDeserializationFailedException(listType, ex);
         }
     }
 
@@ -116,7 +116,7 @@ public class JsonConverter {
         try {
             return gson.fromJson(json, mapType);
         } catch (JsonParseException ex) {
-            throw new JsonDeserializationFailedException(mapType);
+            throw new JsonDeserializationFailedException(mapType, ex);
         }
     }
 

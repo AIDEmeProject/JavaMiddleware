@@ -3,6 +3,7 @@ package explore.user;
 import data.DataPoint;
 import data.IndexedDataset;
 import machinelearning.classifier.Label;
+import utils.Validator;
 
 /**
  * An User represents the "oracle" of Active Learning scenario, i.e. a human annotator capable of, given a {@link DataPoint},
@@ -25,5 +26,19 @@ public interface User {
         return points.stream()
                 .map(this::getLabel)
                 .toArray(UserLabel[]::new);
+    }
+
+    default Label[][] getPartialLabels(IndexedDataset dataset) {
+        UserLabel[] labels = getLabel(dataset);
+
+        Validator.assertEquals(dataset.partitionSize(), labels[0].getLabelsForEachSubspace().length);
+
+        Label[][] partialLabels = new Label[dataset.partitionSize()][dataset.length()];
+        for (int i = 0; i < partialLabels.length; i++) {
+            for (int j = 0; j < dataset.length(); j++) {
+                partialLabels[i][j] = labels[j].getLabelsForEachSubspace()[i];
+            }
+        }
+        return partialLabels;
     }
 }

@@ -34,7 +34,7 @@ public class ConfusionMatrixCalculator implements MetricCalculator {
      * @return a confusion matrix
      * @throws IllegalArgumentException if inputs have incompatible dimensions or are 0-length arrays
      */
-    public ConfusionMatrix compute(UserLabel[] trueLabels, UserLabel[] predictedLabels){
+    public static ConfusionMatrix compute(UserLabel[] trueLabels, UserLabel[] predictedLabels){
         Validator.assertEqualLengths(trueLabels, predictedLabels);
         Validator.assertNotEmpty(trueLabels);
 

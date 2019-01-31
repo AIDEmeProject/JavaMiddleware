@@ -13,7 +13,7 @@ public class SubspatialLearner implements Learner {
     }
 
     @Override
-    public Classifier fit(LabeledDataset labeledPoints) {
+    public SubspatialClassifier fit(LabeledDataset labeledPoints) {
         Validator.assertEquals(labeledPoints.partitionSize(), subspaceLearners.length);
 
         int size = labeledPoints.partitionSize();
