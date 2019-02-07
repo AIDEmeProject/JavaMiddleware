@@ -31,9 +31,14 @@ class SubspatialSampler(ActiveLearner):
 
         self.activeLearners = active_learners
 
+
     def set_repeat(self, repeat):
         if isinstance(self.activeLearners, ActiveLearner):
             self.repeat = repeat
+
+    def set_categorical(self, categorical):
+        if categorical:
+            self.categorical = categorical
 
     def is_factorized(self):
         return True

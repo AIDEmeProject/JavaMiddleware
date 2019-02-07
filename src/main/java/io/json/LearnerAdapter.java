@@ -3,6 +3,7 @@ package io.json;
 import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.learning.versionspace.VersionSpace;
+import machinelearning.classifier.CategoricalLearner;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.MajorityVoteLearner;
 import machinelearning.classifier.SubspatialLearner;
@@ -43,9 +44,23 @@ public class LearnerAdapter implements JsonDeserializer<Learner> {
                     learners = jsonDeserializationContext.deserialize(jsonObject.get("subspaceLearners"), Learner[].class);
                 }
 
+                int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
+                for (int index: categoricalIndexes) {
+                    learners[index] = new CategoricalLearner();
+                }
+
                 return new SubspatialLearner(learners);
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }
+    }
+
+    private static int[] convertJsonArray(JsonArray array) {
+        int size = array.size();
+        int[] values = new int[size];
+        for (int i = 0; i < size; i++) {
+            values[i] = array.get(i).getAsInt();
+        }
+        return values;
     }
 }

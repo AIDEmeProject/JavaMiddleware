@@ -27,7 +27,7 @@ class Printable:
     def __accept(k, v, flag):
         if k.startswith('_') or v is None:
             return False
-        if not flag and k == 'repeat':
+        if not flag and k in ['repeat', 'categorical']:
             return False
         return True
 

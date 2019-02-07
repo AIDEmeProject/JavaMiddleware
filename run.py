@@ -24,8 +24,8 @@ TASKS = [
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        '01', '10'
+        '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
+        #'01',
     ]]
 )
 
@@ -34,17 +34,17 @@ SUBSAMPLE_SIZE = float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',  # run new exploration
+    'NEW',  # run new exploration
     # 'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 10
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 100
+BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -88,8 +88,8 @@ METRICS = [
     #         ),
     #     ]
     # ))
-    #ConfusionMatrix(SubspatialLearner(mv)),
-    SubspatialConfusionMatrix(SubspatialLearner(mv))
+    ConfusionMatrix(SubspatialLearner(mv)),
+    #SubspatialConfusionMatrix(SubspatialLearner(mv))
 ]
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
@@ -141,6 +141,27 @@ ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
 #############################
 # DO NOT CHANGE
 #############################
+
+CATEGORIES = {
+    'user_study_01': [2, 3, 4],
+    'user_study_02': [6, 7],
+    'user_study_03': [4, 5],
+    'user_study_04': [5],
+    'user_study_05': [2, 3, 4, 5],
+    'user_study_06': [2, 3],
+    'user_study_07': [3, 4, 5],
+    'user_study_08': [5, 6, 7],
+    'user_study_09': [3],
+    'user_study_10': [4, 5, 6, 7],
+    'user_study_11': [3, 4, 5],
+    'user_study_12': [],
+    'user_study_13': [7, 8, 9],
+    'user_study_14': [3, 4],
+    'user_study_15': [4, 5],
+    'user_study_16': [3],
+    'user_study_17': [4, 5],
+    'user_study_18': [4, 5],
+}
 
 NUM_PARTITIONS = {
     'sdss_Q2_circle_1%_Q3_rect_1%': 2,
@@ -218,11 +239,11 @@ if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
-    #print(TASK)
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
 
     if isinstance(ACTIVE_LEARNER, SubspatialSampler):
         ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+        ACTIVE_LEARNER.set_categorical(CATEGORIES.get(TASK, None))
 
     experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM,
                             initial_sampler=INITIAL_SAMPLING)
@@ -248,9 +269,11 @@ for TASK in TASKS:
 
             if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
                 m.learner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+                m.learner.set_categorical(CATEGORIES.get(TASK, None))
 
             if hasattr(m, 'subspatialLearner') and isinstance(m.subspatialLearner, SubspatialLearner):
                 m.subspatialLearner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+                m.subspatialLearner.set_categorical(CATEGORIES.get(TASK, None))
 
             command_line.append(str(m))
             m.dump_to_config_file(experiment_dir, add_name=True)

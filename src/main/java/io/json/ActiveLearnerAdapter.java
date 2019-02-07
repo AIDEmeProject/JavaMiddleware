@@ -7,6 +7,7 @@ import machinelearning.active.learning.RandomSampler;
 import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.SubspatialActiveLearner;
 import machinelearning.active.learning.UncertaintySampler;
+import machinelearning.classifier.CategoricalLearner;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.SvmLearner;
 
@@ -42,9 +43,23 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                     activeLearners = jsonDeserializationContext.deserialize(jsonObject.get("activeLearners"), ActiveLearner[].class);
                 }
 
+                int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
+                for (int index: categoricalIndexes) {
+                    activeLearners[index] = new UncertaintySampler(new CategoricalLearner());
+                }
+
                 return new SubspatialActiveLearner(activeLearners);
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }
+    }
+
+    private static int[] convertJsonArray(JsonArray array) {
+        int size = array.size();
+        int[] values = new int[size];
+        for (int i = 0; i < size; i++) {
+            values[i] = array.get(i).getAsInt();
+        }
+        return values;
     }
 }
