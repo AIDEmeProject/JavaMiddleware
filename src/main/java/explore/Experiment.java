@@ -7,7 +7,7 @@ import explore.user.User;
 import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
-import machinelearning.active.learning.SubspatialActiveLearner;
+import machinelearning.active.learning.QueryByDisagreement;
 
 public final class Experiment {
     private final FolderManager experimentFolder;
@@ -36,6 +36,10 @@ public final class Experiment {
 
         if(configuration.hasFactorizationInformation()) {
             scaledData.setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
+        }
+
+        if (configuration.getActiveLearner() instanceof QueryByDisagreement) {
+            ((QueryByDisagreement) configuration.getActiveLearner()).setDataset(scaledData);
         }
 
         explore = new Explore(experimentFolder, configuration, scaledData, user);

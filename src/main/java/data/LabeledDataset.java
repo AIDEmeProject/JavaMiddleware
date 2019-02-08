@@ -109,6 +109,13 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
         return new LabeledDataset(dataset.getIndexes(), data, labels);
     }
 
+    public LabeledDataset append(IndexedDataset data, UserLabel[] label) {
+        UserLabel[] stackedLabels = new Label[labels.length + label.length];
+        System.arraycopy(labels, 0, stackedLabels, 0, labels.length);
+        System.arraycopy(label, 0, stackedLabels, labels.length, label.length);
+        return new LabeledDataset(dataset.append(data), stackedLabels);
+    }
+
     @Override
     public Iterator<LabeledPoint> iterator() {
         return new Iterator<LabeledPoint>() {

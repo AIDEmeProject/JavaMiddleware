@@ -37,3 +37,15 @@ class SubspatialSampler(ActiveLearner):
 
     def is_factorized(self):
         return True
+
+
+class QueryByDisagreement(ActiveLearner):
+
+    def __init__(self, learner, sample_size):
+        super().__init__()
+
+        assert_is_instance(learner, Learner)
+        assert_positive('sample_size', sample_size)
+
+        self.learner = learner
+        self.backgroundSampleSize = sample_size

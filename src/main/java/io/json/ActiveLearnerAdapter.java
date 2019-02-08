@@ -3,10 +3,7 @@ package io.json;
 import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.ActiveLearner;
-import machinelearning.active.learning.RandomSampler;
-import machinelearning.active.learning.SimpleMargin;
-import machinelearning.active.learning.SubspatialActiveLearner;
-import machinelearning.active.learning.UncertaintySampler;
+import machinelearning.active.learning.*;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.SvmLearner;
 
@@ -43,6 +40,11 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                 }
 
                 return new SubspatialActiveLearner(activeLearners);
+            case "QUERYBYDISAGREEMENT":
+                learner = jsonDeserializationContext.deserialize(jsonObject.get("learner"), Learner.class);
+                int backgroundSampleSize = jsonObject.get("backgroundSampleSize").getAsInt();
+                return new QueryByDisagreement(learner, backgroundSampleSize);
+
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }

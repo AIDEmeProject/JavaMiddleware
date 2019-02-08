@@ -174,6 +174,17 @@ public class IndexedDataset implements Iterable<DataPoint> {
             Arrays.stream(partitionedData).forEach(x -> x.swapRows(row1, row2));
     }
 
+    public IndexedDataset append(IndexedDataset data) {
+        Builder builder = new Builder();
+        for (DataPoint point: this) {
+            builder.add(point);
+        }
+        for (DataPoint point: data) {
+            builder.add(point);
+        }
+        return builder.build();
+    }
+
     /**
      * @param sampleSize: size of random sample to be retrieved
      * @return a IndexedDataset containing a random sample of the original data. This own dataset will be returned if
