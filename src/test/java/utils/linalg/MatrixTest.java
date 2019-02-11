@@ -162,6 +162,29 @@ public class MatrixTest {
     }
 
     @Test
+    void setRow_rowIndexEqualsNumRows_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(matrix1.rows(), new double[3]));
+    }
+
+    @Test
+    void setRow_negativeRowIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(-1, new double[3]));
+    }
+
+    @Test
+    void setRow_rowHas_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(0, new double[2]));
+    }
+
+    @Test
+    void setRow_runOverAllValidIndexes_ValuesAreCorrectlySet() {
+        matrix1.setRow(0, new double[] {-1, -2, -3});
+        assertEquals(Vector.FACTORY.make(-1, -2, -3), matrix1.getRow(0));
+        matrix1.setRow(1,  new double[] {-4, -5, -6});
+        assertEquals(Vector.FACTORY.make(-4, -5, -6), matrix1.getRow(1));
+    }
+
+    @Test
     void getRow_negativeIndex_throwsException() {
         assertThrows(RuntimeException.class, () -> matrix1.getRow(-1));
     }

@@ -139,6 +139,13 @@ public class Matrix extends Tensor<Matrix> {
         return new Vector(row);
     }
 
+    public void setRow(int row, double[] values) {
+        Validator.assertIndexInBounds(row, 0, rows());
+        Validator.assertEquals(cols(), values.length);
+
+        System.arraycopy(values, 0, array, row * cols(), values.length);
+    }
+
     /**
      * @param rows: row indexes to extract from {@code this} matrix
      * @return a new matrix containing the input rows in the provided order
