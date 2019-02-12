@@ -1,7 +1,7 @@
 package machinelearning.classifier.svm;
 
-import libsvm.svm_parameter;
 import org.apache.commons.math3.util.FastMath;
+import smile.math.kernel.MercerKernel;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -65,9 +65,10 @@ public class GaussianKernel extends Kernel {
     }
 
     @Override
-    void setSvmParameters(svm_parameter parameters) {
-        parameters.kernel_type = svm_parameter.RBF;
-        parameters.gamma = gamma;
+    MercerKernel<double[]> getSmileKernel(int dim) {
+        double sig = this.gamma == 0 ? 1.0 / dim : this.gamma;
+        double std = 1 / Math.sqrt(2 * sig);
+        return new smile.math.kernel.GaussianKernel(std);
     }
 
     @Override

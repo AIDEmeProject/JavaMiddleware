@@ -1,6 +1,5 @@
 package machinelearning.classifier.svm;
 
-import libsvm.svm_parameter;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -39,10 +38,5 @@ public class DiagonalGaussianKernel extends Kernel {
     @Override
     public Matrix compute(Matrix xs) {
         return gaussianKernel.compute(xs.multiplyRow(this.diagonal));
-    }
-
-    @Override
-    void setSvmParameters(svm_parameter parameters) {
-        throw new RuntimeException("Diagonal kernel cannot be used with SVM");
     }
 }
