@@ -5,7 +5,9 @@ import data.LabeledPoint;
 import data.PartitionedDataset;
 import explore.user.FactoredUser;
 import explore.user.User;
-import machinelearning.classifier.*;
+import machinelearning.classifier.Label;
+import machinelearning.classifier.Learner;
+import machinelearning.classifier.SubspatialLearner;
 import machinelearning.threesetmetric.LabelGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +18,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class SubspatialConfusionMatrixCalculatorTest {
     private IndexedDataset dataset;

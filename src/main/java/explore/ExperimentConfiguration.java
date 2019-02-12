@@ -1,7 +1,6 @@
 package explore;
 
 import explore.sampling.InitialSampler;
-import explore.sampling.StratifiedSampler;
 import machinelearning.active.ActiveLearner;
 import machinelearning.threesetmetric.ExtendedClassifier;
 import machinelearning.threesetmetric.TSM.MultiTSMLearner;

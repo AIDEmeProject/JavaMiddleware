@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 Class-Path: junit-platform-commons-1.2.0.jar apiguardian-api-1.0.0.jar
   commons-math3-3.6.1.jar junit-jupiter-api-5.2.0.jar gson-2.8.5.jar o
  jalgo-44.0.0.jar jcommander-1.72.jar opentest4j-1.1.0.jar ini4j-0.5.4
- .jar postgresql-42.2.2.jar libsvm-3.17.jar
+ .jar postgresql-42.2.2.jar
 

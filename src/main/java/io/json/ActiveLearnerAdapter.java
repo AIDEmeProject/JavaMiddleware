@@ -43,7 +43,8 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
             case "QUERYBYDISAGREEMENT":
                 learner = jsonDeserializationContext.deserialize(jsonObject.get("learner"), Learner.class);
                 int backgroundSampleSize = jsonObject.get("backgroundSampleSize").getAsInt();
-                return new QueryByDisagreement(learner, backgroundSampleSize);
+                double backgroundSamplesWeight = jsonObject.get("backgroundSamplesWeight").getAsDouble();
+                return new QueryByDisagreement(learner, backgroundSampleSize, backgroundSamplesWeight);
 
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);

@@ -8,7 +8,7 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    "sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
@@ -25,12 +25,12 @@ TASKS = [
 TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        '03', #'03'
+        #'03'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = float('inf')
+SUBSAMPLE_SIZE = 50000  # float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -41,13 +41,16 @@ MODES = [
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 10
+NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 100
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+if 'NEW' in MODES and 'EVAL' in MODES:
+    RUNS = [i+1 for i in range(NUM_RUNS)]
+
+#RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 #RUNS = [1]
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
@@ -59,10 +62,13 @@ mv = MajorityVote(
     add_intercept=True, solver="gurobi"  # extra
 )
 
+C = 1e6
+sample_weight = 1.0 / C
+sample_size = 40
+
 # Where should partition information be stored? How to specify it?
-# TODO: add a Confusion Matrix over subspaces
 METRICS = [
-    ConfusionMatrix(SVM(C=1024, kernel='gaussian', gamma=0)),
+    ConfusionMatrix(SVM(C=C, kernel='gaussian', gamma=0)),
     #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     #ThreeSetMetric(),
     #ConfusionMatrix(mv),
@@ -108,8 +114,9 @@ INITIAL_SAMPLING = None
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 #ACTIVE_LEARNER = RandomSampler()
+ACTIVE_LEARNER = QueryByDisagreement(SVM(C=C, gamma=0), sample_size, sample_weight)
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 #ACTIVE_LEARNER = UncertaintySampler(mv)
 # ACTIVE_LEARNER = SubspatialSampler(
 #     [
@@ -137,7 +144,7 @@ INITIAL_SAMPLING = None
 #     ]
 # )
 #ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
-ACTIVE_LEARNER = QueryByDisagreement(SVM(C=1024, gamma=0), 200)
+
 
 #############################
 # DO NOT CHANGE

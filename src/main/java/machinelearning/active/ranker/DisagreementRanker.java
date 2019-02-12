@@ -4,7 +4,10 @@ import data.IndexedDataset;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
+import utils.RandomState;
 import utils.linalg.Vector;
+
+import java.util.stream.IntStream;
 
 public class DisagreementRanker implements Ranker {
     private final Classifier positiveClassifier;
@@ -17,17 +20,26 @@ public class DisagreementRanker implements Ranker {
 
     @Override
     public Vector score(IndexedDataset unlabeledData) {
+        // compute positively and negatively biased predictions
         Label[] positiveClassifierLabels = positiveClassifier.predict(unlabeledData);
         Label[] negativeClassifierLabels = negativeClassifier.predict(unlabeledData);
 
-        Vector score = Vector.FACTORY.zeros(unlabeledData.length());
-        for (int i = 0; i < score.dim(); i++) {
-            if (positiveClassifierLabels[i] != negativeClassifierLabels[i]) {
-                score.set(i, -1);
-                break;
-            }
+        // select a random row such that the predictions differ
+        int[] rows = IntStream
+                .range(0, unlabeledData.length())
+                .filter(row -> positiveClassifierLabels[row] != negativeClassifierLabels[row])
+                .toArray();
+
+        if (rows.length == 0) {
+            System.out.println("random");
+            return new RandomRanker().score(unlabeledData);
         }
 
+        int randomRow = rows[RandomState.newInstance().nextInt(rows.length)];
+
+        // return score function: all zeros, except for the randomly selected differing point
+        Vector score = Vector.FACTORY.zeros(unlabeledData.length());
+        score.set(randomRow, -1);
         return score;
     }
 }

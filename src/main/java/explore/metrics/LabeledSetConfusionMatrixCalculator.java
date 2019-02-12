@@ -5,7 +5,6 @@ import data.PartitionedDataset;
 import explore.user.User;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-import utils.linalg.Matrix;
 
 /**
  * Computes the confusion matrix over the labeled set. This is to be used as a sanity check for our implementation

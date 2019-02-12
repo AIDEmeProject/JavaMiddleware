@@ -41,11 +41,13 @@ class SubspatialSampler(ActiveLearner):
 
 class QueryByDisagreement(ActiveLearner):
 
-    def __init__(self, learner, sample_size):
+    def __init__(self, learner, sample_size, samples_weight):
         super().__init__()
 
         assert_is_instance(learner, Learner)
         assert_positive('sample_size', sample_size)
+        assert_positive('sample_weight', samples_weight)
 
         self.learner = learner
         self.backgroundSampleSize = sample_size
+        self.backgroundSamplesWeight = samples_weight

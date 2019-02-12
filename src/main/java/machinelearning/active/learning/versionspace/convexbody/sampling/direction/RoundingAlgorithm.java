@@ -2,7 +2,6 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.directi
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.classifier.margin.LinearClassifier;
-import utils.Validator;
 import utils.linalg.EigenvalueDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
