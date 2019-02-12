@@ -31,7 +31,7 @@ public class DisagreementRanker implements Ranker {
                 .toArray();
 
         if (rows.length == 0) {
-            System.out.println("random");
+            System.out.println("Falling back to RANDOM sampling -------------");
             return new RandomRanker().score(unlabeledData);
         }
 

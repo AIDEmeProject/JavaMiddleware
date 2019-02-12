@@ -30,7 +30,7 @@ TASKS.extend(
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000  # float('inf')
+SUBSAMPLE_SIZE = 50000   #float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -41,7 +41,7 @@ MODES = [
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 10
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
 BUDGET = 100
@@ -63,10 +63,9 @@ mv = MajorityVote(
 )
 
 C = 1e6
-sample_weight = 1.0 / C
-sample_size = 40
+sample_size = 100
+sample_weight = 1e-5
 
-# Where should partition information be stored? How to specify it?
 METRICS = [
     ConfusionMatrix(SVM(C=C, kernel='gaussian', gamma=0)),
     #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
