@@ -175,6 +175,8 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     public IndexedDataset append(IndexedDataset data) {
+        Validator.assertEquals(dim(), data.dim());
+
         Builder builder = new Builder();
         for (DataPoint point: this) {
             builder.add(point);

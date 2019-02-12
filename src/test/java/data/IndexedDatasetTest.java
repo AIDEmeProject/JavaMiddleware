@@ -210,4 +210,15 @@ class IndexedDatasetTest {
         assertEquals(indexes, newDataset.getIndexes());
         assertEquals(matrix, newDataset.getData());
     }
+
+    @Test
+    void append_dataOfIncompatibleDimension_throwsException() {;
+        assertThrows(IllegalArgumentException.class, () -> dataset.append(new IndexedDataset(Arrays.asList(30L), Matrix.FACTORY.make(1, 3, 7, 8, 9))));
+    }
+
+    @Test
+    void append_newData_returnsNewDatasetWithNewDataAppendedToEnd() {
+        IndexedDataset newData = new IndexedDataset(Arrays.asList(30L, 40L), Matrix.FACTORY.make(2, 2, 7, 8, 9, 10));
+        assertEquals(new IndexedDataset(Arrays.asList(0L, 10L, 20L, 30L, 40L), Matrix.FACTORY.make(5, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)), dataset.append(newData));
+    }
 }
