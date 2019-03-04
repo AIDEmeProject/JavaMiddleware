@@ -7,8 +7,10 @@ import machinelearning.active.learning.RandomSampler;
 import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.SubspatialActiveLearner;
 import machinelearning.active.learning.UncertaintySampler;
+import machinelearning.active.ranker.subspatial.ConnectionFunction;
 import machinelearning.classifier.CategoricalLearner;
 import machinelearning.classifier.Learner;
+import machinelearning.classifier.SubspatialLearner;
 import machinelearning.classifier.svm.SvmLearner;
 
 import java.lang.reflect.Type;
@@ -30,25 +32,26 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                 SvmLearner svmLearner = jsonDeserializationContext.deserialize(jsonObject.get("svmLearner"), SvmLearner.class);
                 return new SimpleMargin(svmLearner);
             case "SUBSPATIALSAMPLER":
-                ActiveLearner[] activeLearners;
+                Learner[] learners;
 
                 if (jsonObject.has("repeat")) {
                     int repeat = jsonObject.get("repeat").getAsInt();
 
-                    activeLearners = new ActiveLearner[repeat];
+                    learners = new Learner[repeat];
                     for (int i = 0; i < repeat; i++) {
-                        activeLearners[i] = jsonDeserializationContext.deserialize(jsonObject.get("activeLearners"), ActiveLearner.class);
+                        learners[i] = jsonDeserializationContext.deserialize(jsonObject.get("learners"), Learner.class);
                     }
                 } else {
-                    activeLearners = jsonDeserializationContext.deserialize(jsonObject.get("activeLearners"), ActiveLearner[].class);
+                    learners = jsonDeserializationContext.deserialize(jsonObject.get("learners"), Learner[].class);
                 }
 
                 int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
                 for (int index: categoricalIndexes) {
-                    activeLearners[index] = new UncertaintySampler(new CategoricalLearner());
+                    learners[index] = new CategoricalLearner();
                 }
 
-                return new SubspatialActiveLearner(activeLearners);
+                String connectionFunctionId = jsonObject.get("connectionFunctionId").getAsString();
+                return new SubspatialActiveLearner(new SubspatialLearner(learners), ConnectionFunction.fromStringId(connectionFunctionId));
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }

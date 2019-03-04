@@ -24,8 +24,8 @@ TASKS = [
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        #'01',
+        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
+        '01', #'03', '06', '07'
     ]]
 )
 
@@ -50,11 +50,15 @@ BUDGET = 50
 RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 #RUNS = [1]
 
+RUNS = []
+if 'EVAL' in MODES:
+    RUNS = [x + 1 for x in range(NUM_RUNS)]
+
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 mv = MajorityVote(
     num_samples=8,
-    warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    warmup=500, thin=100, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
@@ -136,7 +140,7 @@ INITIAL_SAMPLING = None
 #         # )),
 #     ]
 # )
-ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
+ACTIVE_LEARNER = SubspatialSampler(mv, connection="PROD")
 
 #############################
 # DO NOT CHANGE
@@ -241,7 +245,7 @@ if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
 for TASK in TASKS:
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
 
-    if isinstance(ACTIVE_LEARNER, SubspatialSampler):
+    if ACTIVE_LEARNER.is_factorized():
         ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
         ACTIVE_LEARNER.set_categorical(CATEGORIES.get(TASK, None))
 
