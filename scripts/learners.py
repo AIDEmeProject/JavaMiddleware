@@ -153,3 +153,7 @@ class SubspatialLearner(Learner):
     def set_repeat(self, repeat):
         if isinstance(self.subspaceLearners, Learner):
             self.repeat = repeat
+
+    def set_categorical(self, categorical):
+        if categorical:
+            self.categorical = categorical

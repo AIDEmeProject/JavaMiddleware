@@ -4,6 +4,13 @@ import data.IndexedDataset;
 import utils.Validator;
 import utils.linalg.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
+/**
+ * A classifier leveraging subspatial decomposition information.
+ */
 public class SubspatialClassifier implements Classifier {
     private final int[][] partitionIndexes;
     private final Classifier[] subspaceClassifiers;
@@ -15,6 +22,29 @@ public class SubspatialClassifier implements Classifier {
         this.partitionIndexes = partitionIndexes;
         this.subspaceClassifiers = subspaceClassifiers;
     }
+
+//    @Override
+//    public double probability(Vector vector) {
+//        double probability = 1.0;
+//
+//        for (int i=0; i < partitionIndexes.length; i++) {
+//            probability *= subspaceClassifiers[i].probability(vector.select(partitionIndexes[i]));
+//        }
+//
+//        return probability;
+//    }
+//
+//    @Override
+//    public Vector probability(IndexedDataset dataset) {
+//        Validator.assertEquals(partitionIndexes, dataset.getPartitionIndexes());
+//
+//        Vector probability = subspaceClassifiers[0].probability(dataset.getPartitionedData()[0]);
+//        for (int i=1; i < partitionIndexes.length; i++) {
+//            probability.iMultiply(subspaceClassifiers[i].probability(dataset.getPartitionedData()[i]));
+//        }
+//
+//        return probability;
+//    }
 
     @Override
     public double probability(Vector vector) {
@@ -29,52 +59,65 @@ public class SubspatialClassifier implements Classifier {
 
         return minProbability;
     }
-    
+
     @Override
     public Vector probability(IndexedDataset dataset) {
-        int size = dataset.partitionSize();
-        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
-        Vector proba = subspaceClassifiers[0].probability(partitionedDatasets[0]);
+        Validator.assertEquals(dataset.getPartitionIndexes(), partitionIndexes);
 
-        for (int i = 1; i < size; i++) {
-            Vector newProba = subspaceClassifiers[i].probability(partitionedDatasets[i]);
-            for (int j = 0; j < proba.dim(); j++) {
-                proba.set(j, Math.min(proba.get(j), newProba.get(j)));
+        Vector[] subspaceProbabilities = probabilityAllSubspaces(dataset);
+        Vector probability = subspaceProbabilities[0];
+
+        for (int i = 1; i < subspaceProbabilities.length; i++) {
+            for (int j = 0; j < probability.dim(); j++) {
+                probability.set(j, Math.min(probability.get(j), subspaceProbabilities[i].get(j)));
             }
         }
 
-        return proba;
+        return probability;
     }
 
-    @Override
-    public Label predict(Vector vector) {
-        for (int i=0; i < partitionIndexes.length; i++) {
-            if(subspaceClassifiers[i].predict(vector.select(partitionIndexes[i])).isNegative()) {
-                return Label.NEGATIVE;
-            }
+    public Vector[] probabilityAllSubspaces(IndexedDataset dataset) {
+        int size = subspaceClassifiers.length;
+        IndexedDataset[] partitionedData = dataset.getPartitionedData();
+
+        // create list of tasks to be run
+        List<Callable<Vector>> workers = new ArrayList<>();
+
+        for(int i = 0; i < size; i++){
+            workers.add(new ProbabilityWorker(subspaceClassifiers[i], partitionedData[i]));
         }
 
-        return Label.POSITIVE;
+        try {
+            // execute all tasks
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(size, Runtime.getRuntime().availableProcessors() - 1));
+            List<Future<Vector>> scores = executor.invokeAll(workers);
+            executor.shutdownNow();
+
+            Vector[] probabilities = new Vector[size];
+
+            for (int i=0; i < size; i++) {
+                probabilities[i] = scores.get(i).get();
+            }
+
+            return probabilities;
+
+        } catch (InterruptedException ex) {
+            throw new RuntimeException("Thread was abruptly interrupted.", ex);
+        } catch (ExecutionException ex) {
+            throw new RuntimeException("Exception thrown at running task.", ex);
+        }
     }
 
     @Override
     public Label[] predict(IndexedDataset dataset) {
-        int size = dataset.partitionSize();
-        Label[][] allLabels = predictAllSubspaces(dataset);
+        Vector proba = probability(dataset);
 
-        Label[] labels = new Label[dataset.length()];
-        for (int i = 0; i < labels.length; i++) {
-            labels[i] = Label.POSITIVE;
-
-            for (int j = 0; j < size; j++) {
-                if (allLabels[i][j].isNegative()){
-                    labels[i] = Label.NEGATIVE;
-                    break;
-                }
-            }
+        Label[] predictions = new Label[dataset.length()];
+        for (int i = 0; i < dataset.length(); i++) {
+            predictions[i] = proba.get(i) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
         }
 
-        return labels;
+        return predictions;
     }
 
     public Label[][] predictAllSubspaces(IndexedDataset dataset) {
@@ -89,4 +132,22 @@ public class SubspatialClassifier implements Classifier {
         return allLabels;
     }
 
+    /**
+     * Helper class for multi-threaded score() method
+     */
+    private static class ProbabilityWorker implements Callable<Vector> {
+
+        private final Classifier classifier;
+        private final IndexedDataset unlabeledData;
+
+        ProbabilityWorker(Classifier classifier, IndexedDataset unlabeledData) {
+            this.classifier = classifier;
+            this.unlabeledData = unlabeledData;
+        }
+
+        @Override
+        public Vector call() {
+            return classifier.probability(unlabeledData);
+        }
+    }
 }

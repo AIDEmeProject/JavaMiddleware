@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -88,6 +89,18 @@ public class Validator {
     public static void assertEquals(int val1, int val2){
         if(val1 != val2) {
             throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
+     * Throws exception is arrays are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(int[][] val1, int[][] val2){
+        if(!Arrays.deepEquals(val1, val2)) {
+            throw new IllegalArgumentException("Values " + Arrays.toString(val1) + " and " + Arrays.toString(val2) + " are not equal.");
         }
     }
 

@@ -8,7 +8,7 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    "sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
@@ -24,18 +24,19 @@ TASKS = [
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'
-        #'03'
+        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
+        #'01',  #'03', '06', '07'
+        '17'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000   #float('inf')
+SUBSAMPLE_SIZE = float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
     'NEW',  # run new exploration
-    # 'RESUME',    # resume a previous exploration
+    #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
     'AVERAGE'    # average all evaluation file for a given metric
 ]
@@ -44,30 +45,74 @@ MODES = [
 NUM_RUNS = 10
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 100
+BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-if 'NEW' in MODES and 'EVAL' in MODES:
-    RUNS = [i+1 for i in range(NUM_RUNS)]
+RUNS = []
+if 'RESUME' in MODES or 'EVAL' in MODES:
+    RUNS = [x + 1 for x in range(NUM_RUNS)]
 
-#RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-#RUNS = [1]
 
-# Evaluation metrics. Necessary for EVAL and AVERAGE modes.
-# Check the scripts/metrics.py file for all possibilities
+# Probability of sampling from the uncertain set instead of the entire unlabeled set.
+SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
+
+# Multiple TSM configuration. Set as None if you do now want it to be used.
+mTSM = None
+#mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
+
+# INITIAL SAMPLING
+# Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
+# You can override the default behavior below by choosing the method yourself
+INITIAL_SAMPLING = None
+# INITIAL_SAMPLING = StratifiedSampler(pos=5, neg=1)
+# INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
+
+
+# Active Learning algorithm to run. Necessary for NEW and RESUME modes.
+# Check the scripts/active_learners.py file for all possibilities
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+#ACTIVE_LEARNER = RandomSampler()
+#ACTIVE_LEARNER = SubspatialSampler(
+#     [
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.5,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.05,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.001,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#     ]
+#)
+
 mv = MajorityVote(
     num_samples=8,
-    warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    warmup=500, thin=100, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
+#ACTIVE_LEARNER = UncertaintySampler(mv)
+ACTIVE_LEARNER = SubspatialSampler(mv, connection="PROD")
 
-C = 1e6
-sample_size = 100
-sample_weight = 1e-5
-
+# Evaluation metrics. Necessary for EVAL and AVERAGE modes.
+# Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SVM(C=C, kernel='gaussian', gamma=0)),
+    ConfusionMatrix(SubspatialLearner(mv)),
+    #SubspatialConfusionMatrix(SubspatialLearner(mv))
+    #ConfusionMatrix(SVM(C=1024, kernel='gaussian', gamma=0)),
     #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     #ThreeSetMetric(),
     #ConfusionMatrix(mv),
@@ -92,58 +137,8 @@ METRICS = [
     #             add_intercept=True, solver="gurobi"  # extra
     #         ),
     #     ]
-    # ))
-    #ConfusionMatrix(SubspatialLearner(mv)),
-    #SubspatialConfusionMatrix(SubspatialLearner(mv))
+    # )),
 ]
-
-# Probability of sampling from the uncertain set instead of the entire unlabeled set.
-SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
-
-# Multiple TSM configuration. Set as None if you do now want it to be used.
-mTSM = None
-#mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
-
-# INITIAL SAMPLING
-# Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
-# You can override the default behavior below by choosing the method yourself
-INITIAL_SAMPLING = None
-# INITIAL_SAMPLING = StratifiedSampler(pos=5, neg=1)
-# INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
-
-# Active Learning algorithm to run. Necessary for NEW and RESUME modes.
-# Check the scripts/active_learners.py file for all possibilities
-#ACTIVE_LEARNER = RandomSampler()
-ACTIVE_LEARNER = QueryByDisagreement(SVM(C=C, gamma=0), sample_size, sample_weight)
-#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
-#ACTIVE_LEARNER = UncertaintySampler(mv)
-# ACTIVE_LEARNER = SubspatialSampler(
-#     [
-#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
-#         # UncertaintySampler(MajorityVote(
-#         #     num_samples=8,
-#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-#         #     kernel='gaussian', gamma=0.5,  # kernel
-#         #     add_intercept=True, solver="gurobi"  # extra
-#         # )),
-#         # UncertaintySampler(MajorityVote(
-#         #     num_samples=8,
-#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-#         #     kernel='gaussian', gamma=0.05,  # kernel
-#         #     add_intercept=True, solver="gurobi"  # extra
-#         # )),
-#         # UncertaintySampler(MajorityVote(
-#         #     num_samples=8,
-#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
-#         #     kernel='gaussian', gamma=0.001,  # kernel
-#         #     add_intercept=True, solver="gurobi"  # extra
-#         # )),
-#     ]
-# )
-#ACTIVE_LEARNER = SubspatialSampler(UncertaintySampler(mv))
-
 
 #############################
 # DO NOT CHANGE
@@ -209,10 +204,6 @@ print("SUBSAMPLE_SIZE =", SUBSAMPLE_SIZE)
 print("MODES =", MODES)
 if 'NEW' in MODES:
     print("NUM_RUNS =", NUM_RUNS)
-if 'NEW' in MODES or 'RESUME' in MODES:
-    if isinstance(ACTIVE_LEARNER, (SubspatialSampler,)):
-        FACTORIZED = True
-
     print("BUDGET =", BUDGET)
     print('ACTIVE LEARNER =', ACTIVE_LEARNER)
 if 'RESUME' in MODES or 'EVAL' in MODES:
@@ -248,7 +239,7 @@ if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
 for TASK in TASKS:
     experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
 
-    if isinstance(ACTIVE_LEARNER, SubspatialSampler):
+    if ACTIVE_LEARNER.is_factorized():
         ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
         ACTIVE_LEARNER.set_categorical(CATEGORIES.get(TASK, None))
 

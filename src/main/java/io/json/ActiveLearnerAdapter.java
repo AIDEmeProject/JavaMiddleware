@@ -4,7 +4,10 @@ import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.*;
+import machinelearning.active.ranker.subspatial.ConnectionFunction;
+import machinelearning.classifier.CategoricalLearner;
 import machinelearning.classifier.Learner;
+import machinelearning.classifier.SubspatialLearner;
 import machinelearning.classifier.svm.SvmLearner;
 
 import java.lang.reflect.Type;
@@ -26,20 +29,27 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                 SvmLearner svmLearner = jsonDeserializationContext.deserialize(jsonObject.get("svmLearner"), SvmLearner.class);
                 return new SimpleMargin(svmLearner);
             case "SUBSPATIALSAMPLER":
-                ActiveLearner[] activeLearners;
+                Learner[] learners;
 
                 if (jsonObject.has("repeat")) {
                     int repeat = jsonObject.get("repeat").getAsInt();
 
-                    activeLearners = new ActiveLearner[repeat];
+                    learners = new Learner[repeat];
                     for (int i = 0; i < repeat; i++) {
-                        activeLearners[i] = jsonDeserializationContext.deserialize(jsonObject.get("activeLearners"), ActiveLearner.class);
+                        learners[i] = jsonDeserializationContext.deserialize(jsonObject.get("learners"), Learner.class);
                     }
                 } else {
-                    activeLearners = jsonDeserializationContext.deserialize(jsonObject.get("activeLearners"), ActiveLearner[].class);
+                    learners = jsonDeserializationContext.deserialize(jsonObject.get("learners"), Learner[].class);
                 }
 
-                return new SubspatialActiveLearner(activeLearners);
+                int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
+                for (int index: categoricalIndexes) {
+                    learners[index] = new CategoricalLearner();
+                }
+
+                String connectionFunctionId = jsonObject.get("connectionFunctionId").getAsString();
+                return new SubspatialActiveLearner(new SubspatialLearner(learners), ConnectionFunction.fromStringId(connectionFunctionId));
+
             case "QUERYBYDISAGREEMENT":
                 learner = jsonDeserializationContext.deserialize(jsonObject.get("learner"), Learner.class);
                 int backgroundSampleSize = jsonObject.get("backgroundSampleSize").getAsInt();
@@ -49,5 +59,14 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }
+    }
+
+    private static int[] convertJsonArray(JsonArray array) {
+        int size = array.size();
+        int[] values = new int[size];
+        for (int i = 0; i < size; i++) {
+            values[i] = array.get(i).getAsInt();
+        }
+        return values;
     }
 }

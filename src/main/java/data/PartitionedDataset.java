@@ -168,7 +168,7 @@ public final class PartitionedDataset {
             predictedLabels[i] = labels[i].toLabel();
         }
 
-        Label[] classifierLabels = classifier.predict(getUnknownPoints().getData());
+        Label[] classifierLabels = classifier.predict(getUnknownPoints());
         System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
 
         return predictedLabels;
