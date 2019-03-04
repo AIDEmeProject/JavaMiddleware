@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+/**
+ * A classifier leveraging subspatial decomposition information.
+ */
 public class SubspatialClassifier implements Classifier {
     private final int[][] partitionIndexes;
     private final Classifier[] subspaceClassifiers;

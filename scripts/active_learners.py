@@ -56,7 +56,7 @@ class SubspatialSampler(ActiveLearner):
             self.repeat = repeat
 
     def set_categorical(self, categorical):
-        if categorical:
+        if categorical is not None:
             self.categorical = categorical
 
     def is_factorized(self):

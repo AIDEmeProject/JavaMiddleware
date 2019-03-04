@@ -67,7 +67,9 @@ class Printable:
             return value.as_dict(flag)
 
         if isinstance(value, list):
-            if all([x is value[0] for x in value]):
+            if not value:
+                return value
+            if all((x is value[0] for x in value)):
                 value = [value[0]]
             if flag:
                 return [cls.__resolve_value(v, flag) for v in value]
