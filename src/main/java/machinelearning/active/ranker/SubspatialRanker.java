@@ -2,14 +2,14 @@ package machinelearning.active.ranker;
 
 import data.IndexedDataset;
 import machinelearning.active.Ranker;
-import machinelearning.active.ranker.subspatial.ConnectionFunction;
+import machinelearning.active.ranker.subspatial.LossFunction;
 import machinelearning.classifier.SubspatialClassifier;
 import utils.linalg.Vector;
 
 /**
  * A Subspatial Ranker contains {@link SubspatialClassifier} object, containing the fitted classifiers over each data
  * subspace. The informative score is computed by first computing the subspatial probabilities, and finally piecing together
- * these values through a {@link ConnectionFunction}, such as L1 score, PRODUCT, ENTROPY, ...
+ * these values through a {@link LossFunction}, such as L1 score, PRODUCT, ENTROPY, ...
  */
 public class SubspatialRanker implements Ranker {
     /**
@@ -20,15 +20,15 @@ public class SubspatialRanker implements Ranker {
     /**
      * Function computing the final score from each subspace probability
      */
-    private final ConnectionFunction connectionFunction;
+    private final LossFunction lossFunction;
 
-    public SubspatialRanker(SubspatialClassifier classifiers, ConnectionFunction connectionFunction) {
+    public SubspatialRanker(SubspatialClassifier classifiers, LossFunction lossFunction) {
         this.classifier = classifiers;
-        this.connectionFunction = connectionFunction;
+        this.lossFunction = lossFunction;
     }
 
     @Override
     public Vector score(IndexedDataset unlabeledData) {
-        return connectionFunction.apply(classifier.probabilityAllSubspaces(unlabeledData));
+        return lossFunction.apply(classifier.probabilityAllSubspaces(unlabeledData));
     }
 }

@@ -3,7 +3,7 @@ package machinelearning.active.ranker.subspatial;
 import org.apache.commons.math3.util.FastMath;
 import utils.linalg.Vector;
 
-public class EntropyConnectionFunction implements ConnectionFunction {
+public class EntropyLossFunction implements LossFunction {
     private static double LOWER_TOL = 1e-12;
     private static double UPPER_TOL = 1 - LOWER_TOL;
 
@@ -23,7 +23,7 @@ public class EntropyConnectionFunction implements ConnectionFunction {
     }
 
     private static Vector entropy(Vector p) {
-        return p.iApplyMap(EntropyConnectionFunction::entropy);
+        return p.iApplyMap(EntropyLossFunction::entropy);
     }
 
     private static double entropy(double x) {

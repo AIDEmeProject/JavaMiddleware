@@ -4,7 +4,7 @@ import data.LabeledDataset;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.Ranker;
 import machinelearning.active.ranker.SubspatialRanker;
-import machinelearning.active.ranker.subspatial.ConnectionFunction;
+import machinelearning.active.ranker.subspatial.LossFunction;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.SubspatialLearner;
 
@@ -23,15 +23,15 @@ public class SubspatialActiveLearner implements ActiveLearner {
     /**
      * Function connecting the subspace probabilities into a final informativeness score
      */
-    private final ConnectionFunction connectionFunction;
+    private final LossFunction lossFunction;
 
-    public SubspatialActiveLearner(SubspatialLearner subspatialLearner, ConnectionFunction connectionFunction) {
+    public SubspatialActiveLearner(SubspatialLearner subspatialLearner, LossFunction lossFunction) {
         this.subspatialLearner = subspatialLearner;
-        this.connectionFunction = connectionFunction;
+        this.lossFunction = lossFunction;
     }
 
     @Override
     public Ranker fit(LabeledDataset labeledPoints) {
-        return new SubspatialRanker(subspatialLearner.fit(labeledPoints), connectionFunction);
+        return new SubspatialRanker(subspatialLearner.fit(labeledPoints), lossFunction);
     }
 }

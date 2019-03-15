@@ -2,7 +2,7 @@ package machinelearning.active.ranker.subspatial;
 
 import utils.linalg.Vector;
 
-public class ProdConnectionFunction implements ConnectionFunction {
+public class ProdLossFunction implements LossFunction {
 
     /**
      * @param subspatialProbabilities positive class probabilities {p_1, ..., p_k} for each subspace

@@ -105,7 +105,7 @@ mv = MajorityVote(
     add_intercept=True, solver="gurobi"  # extra
 )
 #ACTIVE_LEARNER = UncertaintySampler(mv)
-ACTIVE_LEARNER = SubspatialSampler(mv, connection="PROD")
+ACTIVE_LEARNER = SubspatialSampler(mv, loss="PROD")
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

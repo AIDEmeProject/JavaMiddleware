@@ -2,7 +2,7 @@ package machinelearning.active.ranker.subspatial;
 
 import utils.linalg.Vector;
 
-public class L1ConnectionFunction implements ConnectionFunction {
+public class L1LossFunction implements LossFunction {
 
     /**
      * @param subspatialProbabilities positive class probabilities {p_1, ..., p_k} for each subspace
@@ -20,7 +20,7 @@ public class L1ConnectionFunction implements ConnectionFunction {
     }
 
     private static Vector l1Norm(Vector proba) {
-        return proba.iApplyMap(L1ConnectionFunction::l1Norm);
+        return proba.iApplyMap(L1LossFunction::l1Norm);
     }
 
     private static double l1Norm(double p) {

@@ -43,13 +43,13 @@ class UncertaintySampler(ActiveLearner):
 
 
 class SubspatialSampler(ActiveLearner):
-    def __init__(self, learners, connection):
+    def __init__(self, learners, loss):
         super().__init__()
 
-        assert_in_list(connection.upper(), ['L1', 'L2', 'PROD', 'ENTROPY'])
+        assert_in_list(loss.upper(), ['L1', 'L2', 'PROD', 'ENTROPY'])
 
         self.learners = learners
-        self.connectionFunctionId = connection
+        self.lossFunctionId = loss
 
     def set_repeat(self, repeat):
         if isinstance(self.learners, Learner):

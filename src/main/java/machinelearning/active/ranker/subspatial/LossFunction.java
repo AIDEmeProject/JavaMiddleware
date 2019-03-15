@@ -2,19 +2,19 @@ package machinelearning.active.ranker.subspatial;
 
 import utils.linalg.Vector;
 
-public interface ConnectionFunction {
-    static ConnectionFunction fromStringId(String id) {
+public interface LossFunction {
+    static LossFunction fromStringId(String id) {
         switch (id.toUpperCase()) {
             case "L1":
-                return new L1ConnectionFunction();
+                return new L1LossFunction();
             case "L2":
-                return new L2ConnectionFunction();
+                return new L2LossFunction();
             case "PROD":
-                return new ProdConnectionFunction();
+                return new ProdLossFunction();
             case "ENTROPY":
-                return new EntropyConnectionFunction();
+                return new EntropyLossFunction();
             default:
-                throw new RuntimeException("Unknown connection function: " + id.toUpperCase());
+                throw new RuntimeException("Unknown loss function: " + id.toUpperCase());
         }
     }
 

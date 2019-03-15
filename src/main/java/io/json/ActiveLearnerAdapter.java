@@ -4,7 +4,7 @@ import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.*;
-import machinelearning.active.ranker.subspatial.ConnectionFunction;
+import machinelearning.active.ranker.subspatial.LossFunction;
 import machinelearning.classifier.CategoricalLearner;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.SubspatialLearner;
@@ -47,8 +47,8 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                     learners[index] = new CategoricalLearner();
                 }
 
-                String connectionFunctionId = jsonObject.get("connectionFunctionId").getAsString();
-                return new SubspatialActiveLearner(new SubspatialLearner(learners), ConnectionFunction.fromStringId(connectionFunctionId));
+                String connectionFunctionId = jsonObject.get("lossFunctionId").getAsString();
+                return new SubspatialActiveLearner(new SubspatialLearner(learners), LossFunction.fromStringId(connectionFunctionId));
 
             case "QUERYBYDISAGREEMENT":
                 learner = jsonDeserializationContext.deserialize(jsonObject.get("learner"), Learner.class);
