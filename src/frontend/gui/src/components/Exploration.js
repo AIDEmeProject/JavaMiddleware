@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import $ from "jquery";
-import {backend} from '../constants/constants'
+import {backend, webplatformApi} from '../constants/constants'
 
 import ModelVisualization from './ModelVisualization'
 import ExplorationActions from './ExplorationActions'
@@ -21,6 +21,7 @@ function getWholedatasetLabeled(){
         link.download = "labeled_dataset.csv";
         link.click();
     })
+
 }
 
 function getVisualizationData(dataWasReceived){
@@ -28,10 +29,26 @@ function getVisualizationData(dataWasReceived){
     var url = backend + "/get-visualization-data"
 
     $.get(url, dataWasReceived)
-
-
     
 }
+
+function notifyLabel(tokens){
+    
+    var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
+
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: wasAskedToLabelDatasetUrl,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data:{
+            clicked_on_label_dataset: true
+        }        
+    })
+}
+
 
 class Exploration extends Component{
 
@@ -53,6 +70,9 @@ class Exploration extends Component{
     
     onLabelWholeDatasetClick(){
         getWholedatasetLabeled()
+
+        notifyLabel(this.props.tokens)
+
     }
 
     onVisualizeClick(){
@@ -60,14 +80,12 @@ class Exploration extends Component{
     }
 
     dataWasReceived(data){
-        console.log('cou')
+        
         this.setState({
             showModelVisualisation: true,
             visualizationData: data
         })
     }
-
-
 
     render(){
 
@@ -93,10 +111,18 @@ class Exploration extends Component{
 
             FirstPhase = () => {
                 return (
-                <p>
+                <div>
                     The first phase of labeling continues until we obtain 
-                    a positive example and a negative example.                    
-                </p>
+                    a positive example and a negative example. <br />
+
+                    
+                    <SpecificPointToLabel 
+                        onNewPointsToLabel={this.props.onNewPointsToLabel}
+                        show={this.props.initialLabelingSession}
+                    />
+
+
+                </div>
             )}
         }
         else {            
@@ -189,10 +215,7 @@ class Exploration extends Component{
                 </table>
 
 
-                <SpecificPointToLabel 
-                    onNewPointsToLabel={this.props.onNewPointsToLabel}
-                    show={this.props.initialLabelingSession}
-                />
+               
 
 
                 <ExplorationActions

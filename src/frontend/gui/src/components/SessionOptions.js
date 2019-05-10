@@ -9,8 +9,8 @@ function sendChosenColumns(tokens, state, onSuccess){
     var endPoint = backend + "/choose-options"    
     var configuration = defaultConfiguration
               
-    var hasTSM = state.finalGroups || state.availableVariables.length == 2
-
+    var hasTSM = !! state.finalGroups || state.availableVariables.length == 2
+    console.log(hasTSM)
     if (state.finalGroups){
 
         var tsmJson = {
@@ -73,7 +73,7 @@ function sendChosenColumns(tokens, state, onSuccess){
 
 
     if (hasTSM){
-        statisticData['number_of_variable_groups'] = tsmJson.featureGroups.length       
+        statisticData['number_of_variable_groups'] = tsmJson.multiTSM.featureGroups.length       
     }
     
     $.ajax({
@@ -312,7 +312,7 @@ class SessionOptions extends Component{
 
                                     </label>
 
-                                    <input />
+                                   
 
                                 </div>                                                          
                         ))

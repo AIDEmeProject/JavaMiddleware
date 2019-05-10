@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
 import ExplorationActions from './ExplorationActions'
-import ModelVisualization from './ModelVisualization'
+import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from './SpecificPointToLabel'
 
 import $ from 'jquery'
-import {backend} from '../constants/constants'
+import {backend, webplatformApi} from '../constants/constants'
 
 
 function getWholedatasetLabeled(){
@@ -34,6 +34,41 @@ function getVisualizationData(dataWasReceived){
 }
 
 
+function dataWasLabeledNotification(tokens, data){
+    var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
+    
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: updateLabelData,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data: {
+            number_of_labeled_points: data.data.length
+        }
+    })
+}
+
+
+function notifyLabelWholeDataset(tokens){
+    
+    var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
+
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: wasAskedToLabelDatasetUrl,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data:{
+            clicked_on_label_dataset: true
+        }        
+    })
+}
+
+
 function sendLabels(labeledPoints, onSuccess){
     
     var labeledPoints = labeledPoints.map(e => {
@@ -54,9 +89,7 @@ function sendLabels(labeledPoints, onSuccess){
         data: {
             labeledPoints: JSON.stringify(labeledPoints)
         },
-        header: {
-            "Content-Type":"applications/json"
-        },
+       
         success: onSuccess
     })
 }
@@ -199,6 +232,8 @@ class TSMExploration extends Component{
 
     onLabelWholeDatasetClick(){
         getWholedatasetLabeled()
+
+        notifyLabelWholeDataset(this.props.tokens)
     }
 
     explorationActions(){
@@ -217,7 +252,7 @@ class TSMExploration extends Component{
         if (this.state.showModelVisualisation){
             Viz = () => {
                 return (
-                    <ModelVisualization 
+                    <TSMModelVisualization 
                         {...this.props}
                         {...this.state}
                         TSM={true}
@@ -234,10 +269,15 @@ class TSMExploration extends Component{
 
             FirstPhase = () => {
                 return (
-                <p>
+                <div>
                     The first phase of labeling continues until we obtain 
-                    a positive example and a negative example.                    
-                </p>
+                    a positive example and a negative example.        
+
+                        <SpecificPointToLabel 
+                    onNewPointsToLabel={this.newPointsToLabel.bind(this)}
+                    show={this.props.initialLabelingSession}
+                />            
+                </div>
             )}
         }
         else {            
@@ -369,10 +409,7 @@ class TSMExploration extends Component{
 
                 </table>
 
-                 <SpecificPointToLabel 
-                    onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-                    show={this.props.initialLabelingSession}
-                />
+             
 
                 {this.explorationActions()}
 

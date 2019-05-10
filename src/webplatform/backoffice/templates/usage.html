@@ -32,6 +32,10 @@
                 <th>
                     Number of labeled points
                 </th>
+
+                <th>
+                    User asked for whole dataset
+                </th>
             </tr>
         </thead>
 
@@ -61,6 +65,10 @@
 
             <td>
                 {{ session.number_of_labeled_points }}
+            </td>
+
+            <td>
+                {{ session.clicked_on_label_dataset }}
             </td>
         </tr>
         {% endfor %}

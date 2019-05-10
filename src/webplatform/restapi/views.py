@@ -92,3 +92,37 @@ class NewLabel(APIView):
             return Response(serializer.data)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class LabelWholeDatasetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Session
+        fields = ('clicked_on_label_dataset',)
+
+
+
+@authentication_classes((TokenAuthentication,))
+@permission_classes((permissions.IsAuthenticated,))
+class LabelWholeDataset(APIView):
+
+    def get_object(self, token):
+        try:
+            return Session.objects.get(token=token)
+        except Session.DoesNotExist:
+            raise Http404
+
+    def put(self, request, token, format=None):
+
+
+        session = self.get_object(token)
+        serializer = LabelWholeDatasetSerializer(session, data=request.data)
+
+        if (serializer.is_valid()):
+            serializer.save()
+            return Response(serializer.data)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

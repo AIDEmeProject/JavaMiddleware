@@ -59,8 +59,8 @@ class Authentication extends Component{
 
                         <div className="input-group ">
                         
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="">Enter your token</span>
+                            <div className="input-group-prepend">
+                                <span className="input-group-text" id="">Enter your token</span>
                             </div>
                             <input
                                 id="token"
