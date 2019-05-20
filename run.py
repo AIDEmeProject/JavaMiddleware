@@ -17,7 +17,7 @@ TASKS = [
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
     #"sdss_overlapping_1.5%",
-    #"sdss_overlapping_0.5%",
+    "sdss_overlapping_0.5%",
     #"sdss_overlapping_0.1%",
     #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
@@ -26,12 +26,12 @@ TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
         #'01',  #'03', '06', '07'
-        '17'
+        #'06', '07'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = float('inf')
+SUBSAMPLE_SIZE = 50000  # float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -42,7 +42,7 @@ MODES = [
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 10
+NUM_RUNS = 1
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
 BUDGET = 50
@@ -100,12 +100,12 @@ INITIAL_SAMPLING = None
 
 mv = MajorityVote(
     num_samples=8,
-    warmup=500, thin=100, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
 #ACTIVE_LEARNER = UncertaintySampler(mv)
-ACTIVE_LEARNER = SubspatialSampler(mv, loss="PROD")
+ACTIVE_LEARNER = SubspatialSampler(mv, loss="GREEDY")
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

@@ -46,7 +46,7 @@ class SubspatialSampler(ActiveLearner):
     def __init__(self, learners, loss):
         super().__init__()
 
-        assert_in_list(loss.upper(), ['L1', 'L2', 'PROD', 'ENTROPY'])
+        assert_in_list(loss.upper(), ['L1', 'L2', 'PROD', 'ENTROPY', 'GREEDY'])
 
         self.learners = learners
         self.lossFunctionId = loss
