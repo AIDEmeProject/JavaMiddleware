@@ -15,6 +15,8 @@ public interface LossFunction {
                 return new EntropyLossFunction();
             case "GREEDY":
                 return new GreedyLossFunction();
+            case "MARGIN":
+                return new MarginLossFunction();
             default:
                 throw new RuntimeException("Unknown loss function: " + id.toUpperCase());
         }

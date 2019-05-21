@@ -40,6 +40,10 @@ public class SvmLearner implements Learner {
         this.kernel = kernel;
     }
 
+    public SvmLearner(SvmLearner learner) {
+        this(learner.C, learner.kernel);
+    }
+
     @Override
     public KernelClassifier fit(LabeledDataset labeledPoints) {
         return fit(labeledPoints, null);

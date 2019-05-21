@@ -110,14 +110,21 @@ public class SubspatialClassifier implements Classifier {
 
     @Override
     public Label[] predict(IndexedDataset dataset) {
-        Vector proba = probability(dataset);
+        Label[][] allPredictions = predictAllSubspaces(dataset);
 
-        Label[] predictions = new Label[dataset.length()];
+        Label[] finalPredictions = new Label[dataset.length()];
         for (int i = 0; i < dataset.length(); i++) {
-            predictions[i] = proba.get(i) > 0.5 ? Label.POSITIVE : Label.NEGATIVE;
+            finalPredictions[i] = Label.POSITIVE;
+
+            for (int j = 0; j < dataset.partitionSize(); j++) {
+                if (allPredictions[j][i].isNegative()) {
+                    finalPredictions[i] = Label.NEGATIVE;
+                    break;
+                }
+            }
         }
 
-        return predictions;
+        return finalPredictions;
     }
 
     public Label[][] predictAllSubspaces(IndexedDataset dataset) {

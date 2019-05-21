@@ -13,6 +13,11 @@ public class CategoricalClassifier implements Classifier {
         this.negative = negative;
     }
 
+    public CategoricalClassifier(CategoricalClassifier clf) {
+        this.positive = clf.positive;
+        this.negative = clf.negative;
+    }
+
     @Override
     public double probability(Vector vector) {
         int index = CategoricalLearner.findCategoryIndex(vector);

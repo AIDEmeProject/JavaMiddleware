@@ -24,6 +24,7 @@ public class LearnerAdapter implements JsonDeserializer<Learner> {
                 double C = jsonObject.get("C").getAsDouble();
                 Kernel kernel = jsonDeserializationContext.deserialize(jsonObject.get("kernel"), Kernel.class);
                 return new SvmLearner(C, kernel);
+
             case "MAJORITYVOTE":
                 int sampleSize = jsonObject.get("sampleSize").getAsInt();
                 VersionSpace versionSpace = jsonDeserializationContext.deserialize(jsonObject.get("versionSpace"), VersionSpace.class);
@@ -38,14 +39,12 @@ public class LearnerAdapter implements JsonDeserializer<Learner> {
                     for (int i = 0; i < repeat; i++) {
                         learners[i] = jsonDeserializationContext.deserialize(jsonObject.get("subspaceLearners"), Learner.class);
                     }
-                }
-
-                else {
+                } else {
                     learners = jsonDeserializationContext.deserialize(jsonObject.get("subspaceLearners"), Learner[].class);
                 }
 
                 int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
-                for (int index: categoricalIndexes) {
+                for (int index : categoricalIndexes) {
                     learners[index] = new CategoricalLearner();
                 }
 

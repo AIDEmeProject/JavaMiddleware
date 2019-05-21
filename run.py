@@ -7,7 +7,7 @@ from scripts import *
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    "sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
     #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
@@ -25,13 +25,13 @@ TASKS = [
 TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
-        #'01',  #'03', '06', '07'
+        '01',  #'03', '06', '07'
         #'06', '07'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000  # float('inf')
+SUBSAMPLE_SIZE = float('inf')
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
@@ -104,8 +104,11 @@ mv = MajorityVote(
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
+
+#mv = SVM(C=1024, kernel='gaussian', gamma=0)
+
 #ACTIVE_LEARNER = UncertaintySampler(mv)
-ACTIVE_LEARNER = SubspatialSampler(mv, loss="GREEDY")
+ACTIVE_LEARNER = SubspatialSampler(mv, loss="L2")
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

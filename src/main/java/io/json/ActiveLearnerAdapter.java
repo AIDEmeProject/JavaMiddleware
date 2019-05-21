@@ -6,8 +6,10 @@ import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.*;
 import machinelearning.active.ranker.subspatial.LossFunction;
 import machinelearning.classifier.CategoricalLearner;
+import machinelearning.classifier.FakeCategoricalLearner;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.SubspatialLearner;
+import machinelearning.classifier.svm.FakeSvmLearner;
 import machinelearning.classifier.svm.SvmLearner;
 
 import java.lang.reflect.Type;
@@ -43,11 +45,23 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                 }
 
                 int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
-                for (int index: categoricalIndexes) {
+                for (int index : categoricalIndexes) {
                     learners[index] = new CategoricalLearner();
                 }
 
                 String connectionFunctionId = jsonObject.get("lossFunctionId").getAsString();
+
+                if (connectionFunctionId.toUpperCase().equals("MARGIN")) {
+                    for (int i = 0; i < learners.length; i++) {
+                        if (learners[i] instanceof SvmLearner)
+                            learners[i] = new FakeSvmLearner((SvmLearner) learners[i]);
+                        else if (learners[i] instanceof CategoricalLearner)
+                            learners[i] = new FakeCategoricalLearner();
+                        else
+                            throw new RuntimeException("MARGIN loss function can only accept SvmLearners");
+                    }
+                }
+
                 return new SubspatialActiveLearner(new SubspatialLearner(learners), LossFunction.fromStringId(connectionFunctionId));
 
             case "QUERYBYDISAGREEMENT":

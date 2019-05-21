@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class CategoricalLearner implements Learner {
     @Override
-    public Classifier fit(LabeledDataset labeledPoints) {
+    public CategoricalClassifier fit(LabeledDataset labeledPoints) {
         Matrix data = labeledPoints.getData();
         UserLabel[] labels = labeledPoints.getLabels();
 
