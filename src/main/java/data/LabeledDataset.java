@@ -59,6 +59,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
                 }
             }
         }
+
     }
 
     public List<Long> getIndexes() {
@@ -146,6 +147,10 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     }
 
     public LabeledDataset[] getPartitionedData() {
+        if (!dataset.hasFactorizationStructure()) {
+            return new LabeledDataset[]{this}; //new LabeledDataset(dataset, labels)
+        }
+
         IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
 
         LabeledDataset[] labeledDatasets = new LabeledDataset[dataset.partitionSize()];

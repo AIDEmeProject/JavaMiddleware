@@ -7,7 +7,7 @@ from scripts import *
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    "sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
     #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
@@ -17,7 +17,7 @@ TASKS = [
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
     #"sdss_overlapping_1.5%",
-    "sdss_overlapping_0.5%",
+    #"sdss_overlapping_0.5%",
     #"sdss_overlapping_0.1%",
     #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
