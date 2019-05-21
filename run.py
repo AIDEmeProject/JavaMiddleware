@@ -42,14 +42,14 @@ MODES = [
 ]
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 10
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
 BUDGET = 50
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = []
-if 'RESUME' in MODES or 'EVAL' in MODES:
+if len(RUNS) == 0 and ('RESUME' in MODES or 'EVAL' in MODES):
     RUNS = [x + 1 for x in range(NUM_RUNS)]
 
 
@@ -105,10 +105,10 @@ mv = MajorityVote(
     add_intercept=True, solver="gurobi"  # extra
 )
 
-#mv = SVM(C=1024, kernel='gaussian', gamma=0)
+mv = SVM(C=1e7, kernel='gaussian', gamma=0)
 
 #ACTIVE_LEARNER = UncertaintySampler(mv)
-ACTIVE_LEARNER = SubspatialSampler(mv, loss="L2")
+ACTIVE_LEARNER = SubspatialSampler(mv, loss="MARGIN")
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities

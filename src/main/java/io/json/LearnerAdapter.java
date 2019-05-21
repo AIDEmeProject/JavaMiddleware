@@ -29,6 +29,7 @@ public class LearnerAdapter implements JsonDeserializer<Learner> {
                 int sampleSize = jsonObject.get("sampleSize").getAsInt();
                 VersionSpace versionSpace = jsonDeserializationContext.deserialize(jsonObject.get("versionSpace"), VersionSpace.class);
                 return new MajorityVoteLearner(versionSpace, sampleSize);
+
             case "SUBSPATIALLEARNER":
                 Learner[] learners;
 

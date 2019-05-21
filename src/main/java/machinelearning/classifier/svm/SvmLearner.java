@@ -77,6 +77,12 @@ public class SvmLearner implements Learner {
         svm.finish();
 
         List<SVM<double[]>.SupportVector> supportVectors = svm.getSupportVectors();
+
+        // happens when all labels are identical. In this case, we set a single support vector with alpha = 0.
+        if (supportVectors.isEmpty()) {
+            supportVectors.add(svm.new SupportVector(new double[labeledPoints.dim()], 0, 0));
+        }
+
         int size = supportVectors.size();
 
         Vector alpha = Vector.FACTORY.zeros(size);
@@ -88,6 +94,10 @@ public class SvmLearner implements Learner {
             sv.setRow(i, supportVector.x);
         }
 
+        return new KernelClassifier(getBias(svm), alpha, sv, kernel);
+    }
+
+    private double getBias(SVM<double[]> svm) {
         double bias;
         try {
             Field f = svm.getClass().getDeclaredField("svm");
@@ -98,7 +108,6 @@ public class SvmLearner implements Learner {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
-        return new KernelClassifier(bias, alpha, sv, kernel);
+        return bias;
     }
 }
