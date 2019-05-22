@@ -33,19 +33,23 @@ TASKS.extend(
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
 SUBSAMPLE_SIZE = float('inf')
 
+
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
     'NEW',  # run new exploration
     #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    'AVERAGE'    # average all evaluation file for a given metric
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
+
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 10
+NUM_RUNS = 1
+
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
 BUDGET = 50
+
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
 RUNS = []
@@ -56,16 +60,22 @@ if len(RUNS) == 0 and ('RESUME' in MODES or 'EVAL' in MODES):
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
 SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
+
 # Multiple TSM configuration. Set as None if you do now want it to be used.
 mTSM = None
 #mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
+
 
 # INITIAL SAMPLING
 # Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
 # You can override the default behavior below by choosing the method yourself
 INITIAL_SAMPLING = None
-# INITIAL_SAMPLING = StratifiedSampler(pos=5, neg=1)
-# INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
+#INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1)
+#INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
+
+
+# Whether to use categorical variables information (if the algorithm supports)
+USE_CATEGORICAL = True
 
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
@@ -107,14 +117,14 @@ mv = MajorityVote(
 
 mv = SVM(C=1e7, kernel='gaussian', gamma=0)
 
-#ACTIVE_LEARNER = UncertaintySampler(mv)
 ACTIVE_LEARNER = SubspatialSampler(mv, loss="MARGIN")
+#ACTIVE_LEARNER = UncertaintySampler(mv)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
     ConfusionMatrix(SubspatialLearner(mv)),
-    #SubspatialConfusionMatrix(SubspatialLearner(mv))
+    #SubspatialConfusionMatrix(SubspatialLearner(mv, use_categorical=False))
     #ConfusionMatrix(SVM(C=1024, kernel='gaussian', gamma=0)),
     #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
     #ThreeSetMetric(),
@@ -159,7 +169,6 @@ CATEGORIES = {
     'user_study_09': [3],
     'user_study_10': [4, 5, 6, 7],
     'user_study_11': [3, 4, 5],
-    'user_study_12': [],
     'user_study_13': [7, 8, 9],
     'user_study_14': [3, 4],
     'user_study_15': [4, 5],
@@ -240,11 +249,13 @@ if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
-    experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
+    cat_indexes = CATEGORIES.get(TASK, None) if USE_CATEGORICAL else None
+    cat_suffix = "" if TASK not in CATEGORIES else "_cat=true" if USE_CATEGORICAL else "_cat=false"
+    experiment_dir = os.path.join('experiment', TASK, folder + cat_suffix, str(ACTIVE_LEARNER))
 
     if ACTIVE_LEARNER.is_factorized():
         ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
-        ACTIVE_LEARNER.set_categorical(CATEGORIES.get(TASK, None))
+        ACTIVE_LEARNER.set_categorical(cat_indexes)
 
     experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM,
                             initial_sampler=INITIAL_SAMPLING)
@@ -270,11 +281,11 @@ for TASK in TASKS:
 
             if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
                 m.learner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
-                m.learner.set_categorical(CATEGORIES.get(TASK, None))
+                m.learner.set_categorical(cat_indexes)
 
             if hasattr(m, 'subspatialLearner') and isinstance(m.subspatialLearner, SubspatialLearner):
                 m.subspatialLearner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
-                m.subspatialLearner.set_categorical(CATEGORIES.get(TASK, None))
+                m.subspatialLearner.set_categorical(cat_indexes)
 
             command_line.append(str(m))
             m.dump_to_config_file(experiment_dir, add_name=True)
