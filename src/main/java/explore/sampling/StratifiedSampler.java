@@ -7,6 +7,8 @@ import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class StratifiedSampler implements InitialSampler{
@@ -20,15 +22,26 @@ public class StratifiedSampler implements InitialSampler{
      */
     private final int negativeSamples;
 
+    private final boolean negativeInAllSubspaces;
+
     /**
+     * NegativeInAllSubspaces defaults to false.
      * @throws IllegalArgumentException if either positiveSamples or negativeSamples are negative
      */
     public StratifiedSampler(int positiveSamples, int negativeSamples) {
+        this(positiveSamples, negativeSamples, false);
+    }
+
+    /**
+     * @throws IllegalArgumentException if either positiveSamples or negativeSamples are negative
+     */
+    public StratifiedSampler(int positiveSamples, int negativeSamples, boolean negativeInAllSubspaces) {
         Validator.assertPositive(positiveSamples);
         Validator.assertPositive(negativeSamples);
 
         this.positiveSamples = positiveSamples;
         this.negativeSamples = negativeSamples;
+        this.negativeInAllSubspaces = negativeInAllSubspaces;
     }
 
     /**
@@ -52,8 +65,10 @@ public class StratifiedSampler implements InitialSampler{
         }
 
         if (negativeSamples > 0){
+            Predicate<DataPoint> filter = negativeInAllSubspaces ? x -> user.getLabel(x).isAllNegative() : x -> user.getLabel(x).isNegative();
+
             List<DataPoint> negativePoints = unlabeledSet.stream()
-                    .filter(x -> user.getLabel(x).isNegative())
+                    .filter(filter)
                     .collect(Collectors.toList());
 
             if (negativePoints.size() < negativeSamples) {

@@ -69,8 +69,8 @@ mTSM = None
 # INITIAL SAMPLING
 # Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
 # You can override the default behavior below by choosing the method yourself
-INITIAL_SAMPLING = None
-#INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1)
+#INITIAL_SAMPLING = None
+INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1, negative_in_all_subspaces=True)
 #INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
 
 
