@@ -30,7 +30,7 @@ class StandardScalerTest {
 
     @Test
     void transform_validInput_inputCorrectlyNormalized() {
-        Matrix expected = Matrix.FACTORY.make(3, 2, -1. , -1.120897076, 0. ,  0.320256307, 1. ,  0.800640769);
+        Matrix expected = Matrix.FACTORY.make(3, 2, -1.2247448714 , -1.372812946, 0. ,  0.3922322703, 1.2247448714 ,  0.9805806757);
         assertTrue(expected.equals(scaler.transform(points), 1e-8));
     }
 }

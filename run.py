@@ -17,7 +17,7 @@ TASKS = [
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
     #"sdss_overlapping_1.5%",
-    #"sdss_overlapping_0.5%",
+    "sdss_overlapping_0.5%",
     #"sdss_overlapping_0.1%",
     #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
@@ -25,13 +25,13 @@ TASKS = [
 TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
-        '01',  #'03', '06', '07'
+        #'01',  #'03', '06', '07'
         #'06', '07'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = float('inf')
+SUBSAMPLE_SIZE = 50000  #float('inf')
 
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
@@ -39,12 +39,12 @@ MODES = [
     'NEW',  # run new exploration
     #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    #'AVERAGE'    # average all evaluation file for a given metric
+    'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 5
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
@@ -108,27 +108,29 @@ USE_CATEGORICAL = True
 #     ]
 #)
 
-mv = MajorityVote(
+
+lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
 
-mv = SVM(C=1e7, kernel='gaussian', gamma=0)
+lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
-ACTIVE_LEARNER = SubspatialSampler(mv, loss="MARGIN")
-#ACTIVE_LEARNER = UncertaintySampler(mv)
+ACTIVE_LEARNER = SubspatialSampler(lnr, loss="MARGIN")
+#ACTIVE_LEARNER = UncertaintySampler(lnr)
+#ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SubspatialLearner(mv)),
-    #SubspatialConfusionMatrix(SubspatialLearner(mv, use_categorical=False))
-    #ConfusionMatrix(SVM(C=1024, kernel='gaussian', gamma=0)),
-    #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
+    ConfusionMatrix(SubspatialLearner(lnr)),
+    #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
+    #ConfusionMatrix(lnr),
+    #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),
-    #ConfusionMatrix(mv),
+    #ConfusionMatrix(lnr),
     # ConfusionMatrix(SubspatialLearner(
     #     [
     #         MajorityVote(
