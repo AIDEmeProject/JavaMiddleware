@@ -1,90 +1,9 @@
 import React, { Component } from 'react';
 import $ from "jquery";
 
-import {backend, webplatformApi, defaultConfiguration} from '../constants/constants'
-import GroupVariables from './GroupVariables'
-
-function sendChosenColumns(tokens, state, onSuccess){
-
-    var endPoint = backend + "/choose-options"    
-    var configuration = defaultConfiguration
-              
-    var hasTSM = !! state.finalGroups || state.availableVariables.length == 2
-    console.log(hasTSM)
-    if (state.finalGroups){
-
-        var tsmJson = {
-            multiTSM: {
-                hasTSM: true,
-                searchUnknownRegionProbability: 0.5,
-                featureGroups: state.finalGroups.map( g => { return g.map(v => v.name)}),
-                columns: state.finalVariables.map( e => e.name),
-                flags: state.finalGroups.map(g => {return [true, false]})                    
-            },
-        }
-
-        configuration = Object.assign(configuration, tsmJson)
-    }
-    else if (state.availableVariables.length == 2){
-        var tsmJson = {
-            multiTSM: {
-                hasTSM: true,
-                searchUnknownRegionProbability: 0.5,
-                featureGroups: state.availableVariables.map( v => { return [v.name]}),
-                columns: state.availableVariables.map( e => {return e.name}),
-                flags: state.availableVariables.map(g => {return [true, false]}) 
-            },
-        }
-
-        configuration = Object.assign(configuration, tsmJson)
-    }
-    
-    var json = JSON.stringify(configuration)
-
-    $('#conf').val(json)
-    
-    
-    var variableData = {
-        availableVariables: state.availableVariables.map((v, i) => {
-            return {name: v.name, i:i}
-        }),
-        finalGroups: state.finalGroups,
-        finalVariables: state.finalVariables
-    }
-
-
-    $.ajax({
-
-        type: "POST",
-        url: endPoint,
-        data: $('#choose-columns').serialize(),        
-        success: (response) =>  {onSuccess(response, variableData)},
-        
-      });    
-          
-    var sessionOptionsUrl = webplatformApi + "/session/" + tokens.sessionToken + "/options"
-
-    var statisticData = {
-        column_number: variableData.availableVariables.length,
-        has_tsm: hasTSM,
-        learner: state.learner,
-        classifier: state.classifier
-    }
-
-
-    if (hasTSM){
-        statisticData['number_of_variable_groups'] = tsmJson.multiTSM.featureGroups.length       
-    }
-    
-    $.ajax({
-        type: "PUT",
-        url: sessionOptionsUrl,
-        data: statisticData,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        }
-    })
-}
+import {backend, webplatformApi, defaultConfiguration} from '../../constants/constants'
+import GroupVariables from '../GroupVariables'
+import AdvancedOptions from './AdvancedOptions'
 
 
 class SessionOptions extends Component{
@@ -158,6 +77,7 @@ class SessionOptions extends Component{
 
         this.props.sessionOptionsWereChosen({
             
+            useFakePoint: this.state.useFakePoint,
             chosenColumns: this.state.chosenColumns.map( (c, i) => {
                 return {
                     name: c.name,
@@ -214,80 +134,32 @@ class SessionOptions extends Component{
             usedVariables.splice(target.value, 1)
         }
         
-
         this.setState({
             usedVariables: usedVariables,
             
         })        
     }
    
+    onFakePointClick(e){
+         
+        this.setState({
+            useFakePoint: e.target.checked
+        })
+    }
 
     render(){
-
-        var AdvancedOptions
-
-        if (this.state.showAdvancedOptions){
-
-            AdvancedOptions = () => {
-                return (
-
-                    <div>                      
-                        <div className="form-group">
-                            <label htmlFor="algorithm-selection">Learner</label>
-                            <select 
-                                className="form-control" 
-                                id="algorithm-selection"
-                                name="active-learner"
-                            >
-                                <option 
-                                    value="UncertaintySampler"
-                                    defaultValue
-                                >
-                                    Uncertainty Sampling
-                                </option>
-                                <option value="versionSpace">
-                                    Version Space
-                                </option>                             
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="classifier">Classifier</label>
-                            <select 
-                                className="form-control" 
-                                id="classfier-selection"
-                                name="classifier"
-                            >
-                                <option 
-                                    value="SVM"
-                                    defaultValue
-                                >
-                                    SVM
-                                </option>
-                                <option value="Majority Vote">
-                                    Majority Vote
-                                </option>                             
-                            </select>
-                        </div>                        
-                    </div>
-            )}            
-        }
-        else{
-            AdvancedOptions = () => { return(<div></div>)}
-        }
 
         return (
             <div>        
 
-                 <p>
-                        The following columns were found. Pick the one you want to use for this session.
-                    </p>
+                <p>
+                    The following columns were found. Pick the one you want to use for this session.
+                </p>
 
                 <form                 
                     id="choose-columns"
                     onSubmit={this.onChosenColumns.bind(this)}
                 >
-
             
                     {                
                         this.props.columns.map((column, key) => (
@@ -301,12 +173,9 @@ class SessionOptions extends Component{
                                         <input        
                                             id={"column-" + column }  
                                             name={"column" + key }
-
                                             type="checkbox"
-                                            className="form-control"                                        
-                                                                                        
-                                            value={key} 
-                                            
+                                            className="form-control"                                                                                                                                
+                                            value={key}                                             
                                             onChange={this.onCheckedColumn.bind(this)}
                                         /> {column}
 
@@ -324,7 +193,11 @@ class SessionOptions extends Component{
                     </p>
 
 
-                    <input id="conf" name="configuration" type="text" style={{visibility: "hidden"}}/>
+                    <input 
+                        id="conf" 
+                        name="configuration"
+                        type="text"
+                        style={{visibility: "hidden"}}/>
 
 
                     <input 
@@ -332,6 +205,13 @@ class SessionOptions extends Component{
                         type="submit" value="Start session" 
                     />        
 
+                    <div>
+                        <label>Use fake point sampler</label>
+                        <input 
+                            type="checkbox"
+                            onClick={this.onFakePointClick.bind(this)}
+                        />
+                    </div>
 
                     <button 
                         type="button"
@@ -373,6 +253,93 @@ class SessionOptions extends Component{
   
     
 }
+
+
+function sendChosenColumns(tokens, state, onSuccess){
+
+    var endPoint = backend + "/choose-options"    
+    var configuration = defaultConfiguration
+    configuration['useFakePoint'] = state.useFakePoint || false
+    
+              
+    var hasTSM = !! state.finalGroups || state.availableVariables.length == 2
+    
+    if (state.finalGroups){
+
+        var tsmJson = {
+            multiTSM: {
+                hasTSM: true,                
+                searchUnknownRegionProbability: 0.5,
+                featureGroups: state.finalGroups.map( g => { return g.map(v => v.name)}),
+                columns: state.finalVariables.map( e => e.name),
+                flags: state.finalGroups.map(g => {return [true, false]})                    
+            },
+        }
+
+        configuration = Object.assign(configuration, tsmJson)
+    }
+    else if (state.availableVariables.length == 2){
+        var tsmJson = {
+            multiTSM: {
+                hasTSM: true,
+                searchUnknownRegionProbability: 0.5,
+                featureGroups: state.availableVariables.map( v => { return [v.name]}),
+                columns: state.availableVariables.map( e => {return e.name}),
+                flags: state.availableVariables.map(g => {return [true, false]}) 
+            },
+        }
+
+        configuration = Object.assign(configuration, tsmJson)
+    }
+    
+    var json = JSON.stringify(configuration)
+
+    $('#conf').val(json)
+    
+    
+    var variableData = {
+        availableVariables: state.availableVariables.map((v, i) => {
+            return {name: v.name, i:i}
+        }),
+        finalGroups: state.finalGroups,
+        finalVariables: state.finalVariables
+    }
+
+
+    $.ajax({
+
+        type: "POST",
+        url: endPoint,
+        data: $('#choose-columns').serialize(),        
+        success: (response) =>  {onSuccess(response, variableData)},
+        
+      });    
+          
+    var sessionOptionsUrl = webplatformApi + "/session/" + tokens.sessionToken + "/options"
+
+    var statisticData = {
+        column_number: variableData.availableVariables.length,
+        has_tsm: hasTSM,
+        learner: state.learner,
+        classifier: state.classifier
+    }
+
+
+    if (hasTSM){
+        statisticData['number_of_variable_groups'] = tsmJson.multiTSM.featureGroups.length       
+    }
+    
+    $.ajax({
+        type: "PUT",
+        url: sessionOptionsUrl,
+        data: statisticData,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        }
+    })
+}
+
+
 
 SessionOptions.defaultProps = {
     "classifiers": [

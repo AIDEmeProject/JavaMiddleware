@@ -1,98 +1,12 @@
 import React, { Component } from 'react';
 
-import ExplorationActions from './ExplorationActions'
+import ExplorationActions from '../ExplorationActions'
 import TSMModelVisualization from './TSMModelVisualization'
-import SpecificPointToLabel from './SpecificPointToLabel'
+import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 
 import $ from 'jquery'
-import {backend, webplatformApi} from '../constants/constants'
+import {backend, webplatformApi} from '../../constants/constants'
 
-
-function getWholedatasetLabeled(){
-
-    var url = backend + "/get-labeled-dataset"
-
-    $.get(url, response => {
-
-        var blob = new Blob([response]);
-        var link = document.createElement('a');
-        
-        link.href = window.URL.createObjectURL(blob);
-        document.body.appendChild(link);
-        link.download = "labeled_dataset.csv";
-        link.click();
-    })
-}
-
-
-function getVisualizationData(dataWasReceived){
-
-    var url = backend + "/get-visualization-data"
-
-    $.get(url, dataWasReceived)
-    
-}
-
-
-function dataWasLabeledNotification(tokens, data){
-    var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
-    
-    $.ajax({
-        type: "PUT", 
-        dataType: "JSON",
-        url: updateLabelData,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        },
-        data: {
-            number_of_labeled_points: data.data.length
-        }
-    })
-}
-
-
-function notifyLabelWholeDataset(tokens){
-    
-    var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
-
-    $.ajax({
-        type: "PUT", 
-        dataType: "JSON",
-        url: wasAskedToLabelDatasetUrl,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        },
-        data:{
-            clicked_on_label_dataset: true
-        }        
-    })
-}
-
-
-function sendLabels(labeledPoints, onSuccess){
-    
-    var labeledPoints = labeledPoints.map(e => {
-        return {
-            id: e.id,
-            labels: e.labels,
-            data: {
-                array: e.data
-            }
-        }
-    })
-    
-    var endPoint = backend + "/tsm-data-point-were-labeled"
-    $.ajax({
-        type: "POST",
-        dataType: 'JSON',
-        url: endPoint,
-        data: {
-            labeledPoints: JSON.stringify(labeledPoints)
-        },
-       
-        success: onSuccess
-    })
-}
 
 class TSMExploration extends Component{
 
@@ -108,6 +22,179 @@ class TSMExploration extends Component{
             hasYes: false,
             hasNo: false     
         }        
+    }
+
+    render(){
+
+        var Viz
+        if (this.state.showModelVisualisation){
+            Viz = () => {
+                return (
+                    <TSMModelVisualization 
+                        {...this.props}
+                        {...this.state}
+                        TSM={true}
+                    />
+                )
+            }
+        }
+        else {
+            Viz = () => { return (<div></div>) }
+        }        
+        
+        var FirstPhase
+        if (this.state.initialLabelingSession){
+
+            FirstPhase = () => {
+                return (
+                <div>
+                    The first phase of labeling continues until we obtain 
+                    a positive example and a negative example.        
+
+                        <SpecificPointToLabel 
+                    onNewPointsToLabel={this.newPointsToLabel.bind(this)}
+                    show={this.props.initialLabelingSession}
+                />            
+                </div>
+            )}
+        }
+        else {            
+            FirstPhase = () => {return(<div></div>)}                       
+        }
+
+        return (
+            
+            <div>
+
+                <p>
+                    Grouped variable exploration. If you chose no, you will be asked to label each subgroups
+                    independantly                    
+                </p>
+
+                <h4>
+                    Labeleling phase
+                </h4>
+                            
+                <FirstPhase />
+                
+                <p>Please label the following samples</p>
+
+                <table className="group-variable">
+                    <thead>
+                        <tr>
+
+                            <td>Row id</td>
+                            {
+                                this.props.finalGroups.map((g, i) => {
+                                    
+                                    return (
+                                        <th 
+                                            key ={i}
+                                            colSpan={g.length}
+                                        >
+                                            {g.map(e => e.name).join(", ")}
+                                        </th>
+                                    )
+                                })
+                            }
+                            <th>
+                                Label    
+                            </th>                
+                        </tr>
+                    </thead>
+
+                    <tbody>                
+                    {
+                    this.state.pointsToLabel.map((point, i) => {
+                        
+                        return (
+
+                            <tr 
+                                key={i}
+                                className="variable-group">
+
+                                <td>
+                                    {point.id}
+                                </td>
+                                {
+                                    this.props.finalGroups.map((g, iGroup) => {
+                                        
+                                        var values = g.map( variable => {
+                                            
+                                            return point.data[variable.i]
+
+                                        }).join(", ")
+                                                                                                                         
+                                        if ( typeof point.labels !== "undefined"){
+                                            var L = () => {
+                                                return <button
+                                                            data-point={i}
+                                                            data-subgroup={iGroup}
+                                                            className="btn btn-primary btn-raised"
+                                                            onClick = {this.onSubGroupNo.bind(this)}
+                                                        >
+                                                            No
+                                                        </button>
+                                            }
+                                        }
+                                        else{
+                                            var L = () => {return <span></span>}
+                                        }                                
+                                        
+                                        return (
+                                            <td 
+                                                colSpan={g.length}
+                                                key={iGroup}
+                                            >
+                                                {values} <L />
+                                            </td>
+                                        )
+                                    })
+                                }
+                                <td>
+                                
+                                    <button 
+                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
+                                        className="btn btn-primary btn-raised"
+                                        data-point={i}
+                                        onClick={this.groupWasLabeledAsYes.bind(this)}
+                                    >
+                                        Yes
+                                    </button>
+                                                        
+                                    <button 
+                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
+                                        className="btn btn-primary btn-raised"
+                                        data-point={i}
+                                        onClick={this.groupWasLabeledAsNo.bind(this)}
+                                    >
+                                        No
+                                    </button>
+
+                                    <button
+                                        className="btn btn-primary btn-raised"
+                                        style={{display: typeof point.labels === "undefined" ? "none": "inherit"}}
+                                        data-point={i}
+                                        onClick={this.groupSubLabelisationFinished.bind(this)}
+                                    >
+                                        Validate Subgroup labels
+                                    </button>
+                                </td>
+                            </tr>
+                        )
+                    })
+                }
+                </tbody>
+
+                </table>
+
+             
+
+                {this.explorationActions()}
+
+                <Viz />
+            </div>
+        )
     }
 
     newPointsToLabel(points){
@@ -245,179 +332,96 @@ class TSMExploration extends Component{
             />
         )
     }
+}
 
-    render(){
 
-        var Viz
-        if (this.state.showModelVisualisation){
-            Viz = () => {
-                return (
-                    <TSMModelVisualization 
-                        {...this.props}
-                        {...this.state}
-                        TSM={true}
-                    />
-                )
+function getWholedatasetLabeled(){
+
+    var url = backend + "/get-labeled-dataset"
+
+    $.get(url, response => {
+
+        var blob = new Blob([response]);
+        var link = document.createElement('a');
+        
+        link.href = window.URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.download = "labeled_dataset.csv";
+        link.click();
+    })
+}
+
+
+function getVisualizationData(dataWasReceived){
+
+    var url = backend + "/get-visualization-data"
+
+    $.get(url, dataWasReceived)
+    
+}
+
+
+function dataWasLabeledNotification(tokens, data){
+    var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
+    
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: updateLabelData,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data: {
+            number_of_labeled_points: data.data.length
+        }
+    })
+}
+
+
+function notifyLabelWholeDataset(tokens){
+    
+    var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
+
+    $.ajax({
+        type: "PUT", 
+        dataType: "JSON",
+        url: wasAskedToLabelDatasetUrl,
+        headers: {
+            Authorization: "Token " + tokens.authorizationToken
+        },
+        data:{
+            clicked_on_label_dataset: true
+        }        
+    })
+}
+
+
+function sendLabels(labeledPoints, onSuccess){
+    
+    var labeledPoints = labeledPoints.map(e => {
+        return {
+            id: e.id,
+            labels: e.labels,
+            data: {
+                array: e.data
             }
         }
-        else {
-            Viz = () => { return (<div></div>) }
-        }        
-        
-        var FirstPhase
-        if (this.state.initialLabelingSession){
-
-            FirstPhase = () => {
-                return (
-                <div>
-                    The first phase of labeling continues until we obtain 
-                    a positive example and a negative example.        
-
-                        <SpecificPointToLabel 
-                    onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-                    show={this.props.initialLabelingSession}
-                />            
-                </div>
-            )}
-        }
-        else {            
-            FirstPhase = () => {return(<div></div>)}                       
-        }
-
-        return (
-            <div>
-
-                <p>
-                    Grouped variable exploration. If you chose no, you will be asked to label each subgroups
-                    independantly                    
-                </p>
-
-                <h4>
-                    Labeleling phase
-                </h4>
-                            
-                <FirstPhase />
-                
-                <p>Please label the following samples</p>
-
-                <table className="group-variable">
-                    <thead>
-                        <tr>
-
-                            <td>Row id</td>
-                            {
-                                this.props.finalGroups.map((g, i) => {
-                                    
-                                    return (
-                                        <th 
-                                            key ={i}
-                                            colSpan={g.length}
-                                        >
-                                            {g.map(e => e.name).join(", ")}
-                                        </th>
-                                    )
-                                })
-                            }
-                            <th>
-                                Label    
-                            </th>                
-                        </tr>
-                    </thead>
-
-                    <tbody>                
-                    {
-                    this.state.pointsToLabel.map((point, i) => {
-                        
-                        return (
-
-                            <tr 
-                                key={i}
-                                className="variable-group">
-
-                                <td>
-                                    {point.id}
-                                </td>
-                                {
-                                    this.props.finalGroups.map((g, iGroup) => {
-                                        
-                                        var values = g.map( variable => {
-                                            
-                                            return point.data[variable.i]
-
-                                        }).join(", ")
-                                                                                                                         
-                                        if ( typeof point.labels !== "undefined"){
-                                            var L = () => {
-                                                return <button
-                                                            data-point={i}
-                                                            data-subgroup={iGroup}
-                                                            className="btn btn-primary btn-raised"
-                                                            onClick = {this.onSubGroupNo.bind(this)}
-                                                        >
-                                                            No
-                                                        </button>
-                                            }
-                                        }
-                                        else{
-                                            var L = () => {return <span></span>}
-                                        }                                
-                                        
-                                        return (
-                                            <td 
-                                                colSpan={g.length}
-                                                key={iGroup}
-                                            >
-                                                {values} <L />
-                                            </td>
-                                        )
-                                    })
-                                }
-                                <td>
-                                
-                                    <button 
-                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
-                                        className="btn btn-primary btn-raised"
-                                        data-point={i}
-                                        onClick={this.groupWasLabeledAsYes.bind(this)}
-                                    >
-                                        Yes
-                                    </button>
-                                                        
-                                    <button 
-                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
-                                        className="btn btn-primary btn-raised"
-                                        data-point={i}
-                                        onClick={this.groupWasLabeledAsNo.bind(this)}
-                                    >
-                                        No
-                                    </button>
-
-                                    <button
-                                        className="btn btn-primary btn-raised"
-                                        style={{display: typeof point.labels === "undefined" ? "none": "inherit"}}
-                                        data-point={i}
-                                        onClick={this.groupSubLabelisationFinished.bind(this)}
-                                    >
-                                        Validate Subgroup labels
-                                    </button>
-                                </td>
-                            </tr>
-                        )
-                    })
-                }
-                </tbody>
-
-                </table>
-
-             
-
-                {this.explorationActions()}
-
-                <Viz />
-            </div>
-        )
-    }
+    })
+    
+    var endPoint = backend + "/tsm-data-point-were-labeled"
+    $.ajax({
+        type: "POST",
+        dataType: 'JSON',
+        url: endPoint,
+        data: {
+            labeledPoints: JSON.stringify(labeledPoints)
+        },
+       
+        success: onSuccess
+    })
 }
+
+
 
 TSMExploration.defaultProps = {
 

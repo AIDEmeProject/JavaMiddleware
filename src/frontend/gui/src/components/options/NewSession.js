@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import axios from "axios" ;
 
-import {backend} from '../constants/constants'
+import {backend} from '../../constants/constants'
 
 
 function uploadFile(event, onSuccess){

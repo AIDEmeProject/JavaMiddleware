@@ -5,27 +5,6 @@ import $ from 'jquery'
 
 import {webplatformApi} from '../constants/constants'
 
-
-function uploadFile(data, onSuccess){
-
-    var endPoint = webplatformApi + "/session/new"
-    var formData = new FormData();
-               
-    axios.post(endPoint,
-               formData,     
-               {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': 'Token ' + data.token
-                        
-                }}).then( response  => {
-        
-        onSuccess(response.data)
-     }).catch(e => {
-         alert(e)
-     })    
-}
-
 class Authentication extends Component{
 
   handleSubmit(event){
@@ -48,9 +27,8 @@ class Authentication extends Component{
                 </h1>
 
                 <p>
-                    Please enter your token in order to you use
+                    Please enter your token in order to you use the application.
                 </p>
-
 
                 <div>                
                     <form 
@@ -76,4 +54,27 @@ class Authentication extends Component{
         )
     }
 }
+
+
+function uploadFile(data, onSuccess){
+
+    var endPoint = webplatformApi + "/session/new"
+    var formData = new FormData();
+               
+    var data = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': 'Token ' + data.token                
+        }
+    }
+
+    axios.post(endPoint, formData, data)
+         .then(response  => {        
+            onSuccess(response.data)
+        })
+        .catch(e => {
+            alert(e)
+        })    
+}
+
 export default Authentication

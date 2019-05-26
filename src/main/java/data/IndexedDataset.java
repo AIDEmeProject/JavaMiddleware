@@ -70,6 +70,7 @@ public class IndexedDataset implements Iterable<DataPoint> {
             double[][] matrix = points.toArray(new double[0][]);
             return new IndexedDataset(indexes, Matrix.FACTORY.make(matrix));
         }
+
     }
 
     /**
@@ -82,6 +83,13 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
         this.indexes = indexes;
         this.data = data;
+    }
+
+
+
+
+    public DataPoint getFakeData(){
+        return this.get(1);
     }
 
     public List<Long> getIndexes() {

@@ -41,6 +41,7 @@ public class ApplicationServerMain {
         handler.addServlet(TSMDataPointsWereLabeledServlet.class, "/tsm-data-point-were-labeled");
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
+        handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
 
         FilterHolder cors = handler.addFilter(CrossOriginFilter.class,"/*",EnumSet.allOf(DispatcherType.class));
         //FilterHolder cors = handler.addFilter(FilterHolder.class,"/*", EnumSet.of(DispatcherType.REQUEST));

@@ -3,9 +3,77 @@ import React, { Component } from 'react';
 import $ from "jquery";
 import {backend, webplatformApi} from '../constants/constants'
 
-import ModelVisualization from './ModelVisualization'
+import ModelVisualization from './visualisation/ModelVisualization'
 import ExplorationActions from './ExplorationActions'
-import SpecificPointToLabel from './SpecificPointToLabel'
+import PointLabelisation from './PointLabelisation'
+import InitialSampling from './InitialSampling/InitialSampling'
+
+class Exploration extends Component{
+
+    constructor(props){
+
+        super(props)
+        this.state = {
+            showModelVisualisation: false
+            
+        }
+    }
+
+    render(){
+            
+        if (this.props.initialLabelingSession){
+            return (<InitialSampling {...this.state} {...this.props} />)
+        }
+        
+        return (
+
+            <div>
+                <h4>
+                    Labeleling phase
+                </h4>
+                            
+                                                            
+                <PointLabelisation 
+                    {...this.props} 
+                    {...this.state}
+                />
+    
+                <ExplorationActions
+                    show={ ! this.props.initialLabelingSession}
+                    onLabelWholeDatasetClick={this.onLabelWholeDatasetClick.bind(this)}
+                    onVisualizeClick={this.onVisualizeClick.bind(this)}
+                />
+                
+                <ModelVisualization 
+                    {...this.props}
+                    {...this.state}
+                />
+                
+            </div>
+        )
+    }
+
+   
+    onLabelWholeDatasetClick(){
+        getWholedatasetLabeled()
+
+        notifyLabel(this.props.tokens)
+
+    }
+
+    onVisualizeClick(){
+        getVisualizationData(this.dataWasReceived.bind(this))        
+    }
+
+    dataWasReceived(data){
+        
+        this.setState({
+            showModelVisualisation: true,
+            visualizationData: data
+        })
+    }
+}
+
 
 function getWholedatasetLabeled(){
 
@@ -50,186 +118,5 @@ function notifyLabel(tokens){
 }
 
 
-class Exploration extends Component{
-
-    constructor(props){
-        super(props)
-        this.state = {
-            showModelVisualisation: false
-            
-        }
-    }
-
-    onPositiveLabel(e){        
-        this.props.onPositiveLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
-    }
-
-    onNegativeLabel(e){
-        this.props.onNegativeLabel(e.target.dataset.key, this.props.onNewPointsToLabel)
-    }
-    
-    onLabelWholeDatasetClick(){
-        getWholedatasetLabeled()
-
-        notifyLabel(this.props.tokens)
-
-    }
-
-    onVisualizeClick(){
-        getVisualizationData(this.dataWasReceived.bind(this))        
-    }
-
-    dataWasReceived(data){
-        
-        this.setState({
-            showModelVisualisation: true,
-            visualizationData: data
-        })
-    }
-
-    render(){
-
-        var FirstPhase,
-            Bottom,
-            Viz
-        
-        if (this.state.showModelVisualisation){
-            Viz = () => {
-                return (
-                    <ModelVisualization 
-                        {...this.props}
-                        {...this.state}
-                    />
-                )
-            }
-        }
-        else {
-            Viz = () => { return (<div></div>) }
-        }        
-        
-        if (this.props.initialLabelingSession){
-
-            FirstPhase = () => {
-                return (
-                <div>
-                    The first phase of labeling continues until we obtain 
-                    a positive example and a negative example. <br />
-
-                    
-                    <SpecificPointToLabel 
-                        onNewPointsToLabel={this.props.onNewPointsToLabel}
-                        show={this.props.initialLabelingSession}
-                    />
-
-
-                </div>
-            )}
-        }
-        else {            
-            FirstPhase = () => {return(<div></div>)}                       
-        }
-
-        return (
-
-            <div>
-                <h4>
-                    Labeleling phase
-                </h4>
-                            
-                <FirstPhase />
-                
-                <p>Please label the following examples</p>
-            
-                <table className="table-label">
-                    <thead>                        
-                        <tr>
-                        
-                            <th>
-                                Row id
-                            </th>
-
-                            {
-                                this.props.availableVariables.map((column, key) => {
-                                    
-                                    return (
-                                        <th key={key} >
-                                        {column.name} 
-                                        </th>
-                                    )
-                                })
-                            }
-
-                            <th>
-                                Label 
-                            </th>                                                    
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                    
-                {
-                    this.props.pointsToLabel.map((point, key) => {
-                        
-                        return (
-
-                            <tr key={key}>
-
-                                <td >
-                                        {point.id}
-                                </td>
-                      
-                                {
-
-                                    point.data.map((value, valueKey) => {
-                                        return (
-                                            
-                                            <td  key={valueKey}>
-                                                {value}
-                                            </td>
-                                        )
-                                    })
-                                }
-
-                                <td>
-                                    <button
-                                        className="btn btn-raised btn-primary" 
-                                        data-key={key} 
-                                        onClick={this.onPositiveLabel.bind(this)}>
-                                        Yes
-                                    </button>
-
-                                    <button 
-                                        className="btn btn-raised btn-primary"  
-                                        data-key={key} 
-                                        onClick={this.onNegativeLabel.bind(this)}
-                                    >
-                                        No
-                                    </button>
-                                </td>
-                            </tr>
-                        )
-                    })                    
-                }
-                </tbody>
-
-                </table>
-
-
-               
-
-
-                <ExplorationActions
-                    show={ ! this.props.initialLabelingSession}
-                    onLabelWholeDatasetClick={this.onLabelWholeDatasetClick.bind(this)}
-                    onVisualizeClick={this.onVisualizeClick.bind(this)}
-                />
-                
-
-                <Viz />
-                
-            </div>
-        )
-    }
-}
 
 export default Exploration

@@ -5,6 +5,9 @@ import explore.sampling.StratifiedSampler;
 import machinelearning.active.ActiveLearner;
 
 public final class ExperimentConfiguration {
+
+    private boolean useFakePoint;
+
     private String task;
     private ActiveLearner activeLearner;
 
@@ -35,6 +38,10 @@ public final class ExperimentConfiguration {
 
     public TsmConfiguration getTsmConfiguration() {
         return multiTSM;
+    }
+
+    public boolean getUseFakePoint(){
+        return this.useFakePoint;
     }
 
 }

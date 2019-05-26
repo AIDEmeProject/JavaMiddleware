@@ -3,21 +3,7 @@ import React, { Component } from 'react';
 
 import  HeatMap from './HeatMap'
 
-function getVisualizationData(){
 
-}
-
-class ModelBoundaries extends Component{
-
-    render(){
-
-        return (
-            <div>
-
-            </div>
-        )
-    }
-}
 
 class ModelVisualization extends Component{
 
@@ -26,6 +12,10 @@ class ModelVisualization extends Component{
     }
 
     render(){
+
+        if (! this.props.showModelVisualisation){
+            return (<div></div>)
+        }
 
         var predictions = this.props.visualizationData.predictions.map(e => {
             return {

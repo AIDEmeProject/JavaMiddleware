@@ -99,6 +99,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
         TsmConfiguration tsmConf = configuration.getTsmConfiguration();
         System.out.println(tsmConf.hasTsm());
         System.out.println(tsmConf.getSearchUnknownRegionProbability());
+        System.out.print(configuration.getUseFakePoint());
 
         Gson gson = new Gson();
 

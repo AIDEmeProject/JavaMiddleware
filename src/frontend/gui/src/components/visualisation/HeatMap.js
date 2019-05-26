@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
 import $ from "jquery";
-import {backend} from '../constants/constants'
+import {backend} from '../../constants/constants'
 
-import init from '../lib/sample_heatmap'
+import init from '../../lib/sample_heatmap'
 
 class HeatMap extends Component{
 

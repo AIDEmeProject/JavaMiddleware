@@ -1,10 +1,7 @@
 package application;
 
 import config.ExperimentConfiguration;
-import data.DataPoint;
-import data.IndexedDataset;
-import data.LabeledPoint;
-import data.PartitionedDataset;
+import data.*;
 
 import config.ExperimentConfiguration;
 import explore.metrics.MetricStorage;
@@ -75,10 +72,16 @@ public class ExplorationManager {
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
     }
 
+
     /**
      * @return an initial selection of points to be labeled by the user
      */
     public List<DataPoint> runInitialSampling(int sampleSize) {
+
+        if (this.configuration.getUseFakePoint()){
+            FakePointInitialSamplingGenerator generator = new FakePointInitialSamplingGenerator();
+            return generator.getFakePoint(this.rawDataset);
+        }
         return rawDataset.sample(sampleSize).toList();
     }
 
@@ -88,6 +91,14 @@ public class ExplorationManager {
         ArrayList<DataPoint> points = new ArrayList();
         points.add(point);
         return points;
+    }
+
+    public List<DataPoint> getNextFakePoint(){
+
+
+        ArrayList<DataPoint> fakePoints = new ArrayList();
+        fakePoints.add(this.rawDataset.getFakeData());
+        return fakePoints;
     }
 
     public List<DataPoint> getNextPointsToLabel(List<LabeledPoint> labeledPoints){
