@@ -7,7 +7,8 @@ cp target/$targetFile build
 echo "building javascript frontend"
 cd src/frontend/gui
 yarn build
-cp -r build ../../../build/frontend
+mkdir ../../../build/static
+cp -r build/* ../../../build/static
 
 echo "packaging the application and copying to the web application download folder"
 cd ../../../build

@@ -2,8 +2,11 @@ package application;
 
 import org.eclipse.jetty.io.SelectChannelEndPoint;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -42,6 +45,16 @@ public class ApplicationServerMain {
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
         handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
+
+
+        ResourceHandler resource_handler = new ResourceHandler();
+        resource_handler.setDirectoriesListed(true);
+        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
+        resource_handler.setResourceBase("./static");
+
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] { resource_handler, handler });
+        server.setHandler(handlers);
 
         FilterHolder cors = handler.addFilter(CrossOriginFilter.class,"/*",EnumSet.allOf(DispatcherType.class));
         //FilterHolder cors = handler.addFilter(FilterHolder.class,"/*", EnumSet.of(DispatcherType.REQUEST));
