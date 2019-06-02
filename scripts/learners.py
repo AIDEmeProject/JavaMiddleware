@@ -67,11 +67,13 @@ class SampleSelector(Printable):
 
 
 class HitAndRun(Printable):
-    def __init__(self, selector, rounding=True, cache=True):
+    def __init__(self, selector, rounding=True, max_iter=0, cache=True):
         super().__init__(add_name=False)
         self.cache = cache
         self.rounding = rounding
         self.selector = selector
+        if max_iter > 0:
+            self.maxIter = max_iter
 
 
 class BayesianSampler(Printable):
@@ -111,18 +113,20 @@ class BayesianVersionSpace(Printable):
 
 class MajorityVote(Learner):
     def __init__(self, num_samples=8,
-                 warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=False,
+                 warmup=100, thin=10, chain_length=64, selector="single",
+                 rounding=True, max_iter=0, cache=False,
                  kernel='linear', gamma=0, diagonal=(),
                  add_intercept=True, solver="ojalgo"):
         super().__init__()
 
         assert_positive('num_samples', num_samples)
+        assert_positive("max_iter", max_iter, True)
 
         self.sampleSize = num_samples
         self.versionSpace = VersionSpace(
             hit_and_run=HitAndRun(
                 selector=SampleSelector(name=selector, warmup=warmup, thin=thin, chain_length=chain_length),
-                rounding=rounding, cache=cache
+                rounding=rounding, max_iter=max_iter, cache=cache
             ),
             kernel=kernel, gamma=gamma, diagonal=diagonal,
             add_intercept=add_intercept, solver=solver

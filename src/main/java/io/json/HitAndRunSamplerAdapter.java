@@ -20,7 +20,8 @@ class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAnd
         JsonObject jsonObject = json.getAsJsonObject();
 
         boolean useRounding = jsonObject.getAsJsonPrimitive("rounding").getAsBoolean();
-        DirectionSamplingAlgorithm direction = deserializeDirectionSampler(useRounding);
+        int maxIter = jsonObject.has("maxIter") ? jsonObject.getAsJsonPrimitive("maxIter").getAsInt() : Integer.MAX_VALUE;
+        DirectionSamplingAlgorithm direction = deserializeDirectionSampler(useRounding, maxIter);
 
         SampleSelector selector = context.deserialize(jsonObject.get("selector"), SampleSelector.class);
 
@@ -30,8 +31,8 @@ class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAnd
         return new HitAndRunSampler.Builder(direction, selector).cache(cache).build();
     }
 
-    private DirectionSamplingAlgorithm deserializeDirectionSampler(boolean useRounding) {
-        return useRounding ? new RoundingAlgorithm() : new RandomDirectionAlgorithm();
+    private DirectionSamplingAlgorithm deserializeDirectionSampler(boolean useRounding, int maxIter) {
+        return useRounding ? new RoundingAlgorithm(maxIter) : new RandomDirectionAlgorithm();
     }
 
     private SampleCache deserializeSampleCaching(boolean addCaching) {

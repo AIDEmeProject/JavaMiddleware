@@ -8,16 +8,16 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    #"sdss_Q2_circle_0.1%", #"sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    "sdss_Q2_circle_0.1%",  # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
-    #"sdss_Q2_circle_10%_Q3_rect_1%", # "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
+    #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
     #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
     #'sdss_log_7.8%',
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
     #"sdss_overlapping_1.5%",
-    "sdss_overlapping_0.5%",
+    #"sdss_overlapping_0.5%",
     #"sdss_overlapping_0.1%",
     #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
@@ -26,12 +26,12 @@ TASKS.extend(
     ['user_study_' + s for s in [
         #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
         #'01',  #'03', '06', '07'
-        #'06', '07'
+        #'06','07'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000  #float('inf')
+SUBSAMPLE_SIZE = 50000 #float('inf')
 
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
@@ -39,16 +39,16 @@ MODES = [
     'NEW',  # run new exploration
     #'RESUME',    # resume a previous exploration
     'EVAL',      # run evaluation procedure over finished runs
-    'AVERAGE'    # average all evaluation file for a given metric
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 5
+NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 100
 
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
@@ -69,8 +69,8 @@ mTSM = None
 # INITIAL SAMPLING
 # Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
 # You can override the default behavior below by choosing the method yourself
-#INITIAL_SAMPLING = None
-INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1, negative_in_all_subspaces=True)
+INITIAL_SAMPLING = None
+#INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1, negative_in_all_subspaces=True)
 #INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
 
 
@@ -111,23 +111,25 @@ USE_CATEGORICAL = True
 
 lnr = MajorityVote(
     num_samples=8,
-    warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    warmup=100, thin=10, chain_length=100, selector="single",
+    rounding=True, max_iter=100, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
 
-lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
+#lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
-ACTIVE_LEARNER = SubspatialSampler(lnr, loss="MARGIN")
-#ACTIVE_LEARNER = UncertaintySampler(lnr)
+#ACTIVE_LEARNER = SubspatialSampler(lnr, loss="MARGIN")
+ACTIVE_LEARNER = UncertaintySampler(lnr)
 #ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SubspatialLearner(lnr)),
+    #ConfusionMatrix(SubspatialLearner(lnr)),
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
-    #ConfusionMatrix(lnr),
+    ConfusionMatrix(lnr),
     #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),
     #ConfusionMatrix(lnr),

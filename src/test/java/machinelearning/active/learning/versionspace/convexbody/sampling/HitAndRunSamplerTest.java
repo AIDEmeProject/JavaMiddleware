@@ -87,7 +87,7 @@ class HitAndRunSamplerTest {
     }
 
     @Test
-    void sample_roundingAlgorithmUsedForSamplingDirections_ellipsoidCenterPutInCache() {
+    void sample_usingRoundingAndCenterFallsInsideBody_ellipsoidCenterPutInCache() {
         RoundingAlgorithm algorithm = mock(RoundingAlgorithm.class);
         when(algorithm.fit(any())).thenReturn(new RandomDirectionSampler(1));
 
@@ -100,9 +100,31 @@ class HitAndRunSamplerTest {
                 .build();
 
         ConvexBody body = mock(ConvexBody.class);
+        when(body.isInside(any())).thenReturn(true);
 
         sampler.sample(body, 3);
 
         verify(cache).updateCache(new Vector[] {center});
+    }
+
+    @Test
+    void sample_usingRoundingAndCenterFallsOutsideBody_cacheNotUpdated() {
+        RoundingAlgorithm algorithm = mock(RoundingAlgorithm.class);
+        when(algorithm.fit(any())).thenReturn(new RandomDirectionSampler(1));
+
+        Vector center = Vector.FACTORY.make(10);
+        when(algorithm.getCenter()).thenReturn(center);
+
+        sampler = new HitAndRunSampler
+                .Builder(algorithm, selector)
+                .cache(cache)
+                .build();
+
+        ConvexBody body = mock(ConvexBody.class);
+        when(body.isInside(any())).thenReturn(false);
+
+        sampler.sample(body, 3);
+
+        verify(cache, never()).updateCache(new Vector[] {center});
     }
 }

@@ -82,9 +82,11 @@ public class HitAndRunSampler {
         // in the special case of RoundingAlgorithm, it is guaranteed that the fitted ellipsoid's center is contained in
         // the convex body. Thus, it can be used as starting point to the Hit-and-Run algorithm.
         if (directionSamplingAlgorithm instanceof RoundingAlgorithm) {
-            sampleCache.updateCache(new Vector[] {
-                    ((RoundingAlgorithm) directionSamplingAlgorithm).getCenter()
-            });
+            Vector center = ((RoundingAlgorithm) directionSamplingAlgorithm).getCenter();
+
+            if (body.isInside(center)) {
+                sampleCache.updateCache(new Vector[] {center});
+            }
         }
 
         body = sampleCache.attemptToSetDefaultInteriorPoint(body);
