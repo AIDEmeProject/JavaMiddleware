@@ -72,7 +72,7 @@ class HitAndRun(Printable):
         self.cache = cache
         self.rounding = rounding
         self.selector = selector
-        if max_iter > 0:
+        if rounding and max_iter > 0:
             self.maxIter = max_iter
 
 
