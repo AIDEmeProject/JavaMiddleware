@@ -41,9 +41,10 @@ class ThreeSetMetric(Metric):
 
 
 class VersionSpaceThreeSetMetric(Metric):
-    def __init__(self, mv):
+    def __init__(self, mv, margin=0):
         super().__init__()
 
         assert_is_instance(mv, MajorityVote)
 
         self.learner = mv
+        self.margin = margin

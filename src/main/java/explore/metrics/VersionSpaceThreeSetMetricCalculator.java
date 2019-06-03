@@ -9,6 +9,7 @@ import utils.linalg.Vector;
 public class VersionSpaceThreeSetMetricCalculator implements MetricCalculator {
 
     private MajorityVoteLearner learner;
+    private double margin;
 
     @Override
     public MetricStorage compute(PartitionedDataset data, User user) {
@@ -20,9 +21,9 @@ public class VersionSpaceThreeSetMetricCalculator implements MetricCalculator {
         for (int i = 0; i < cutProbabilities.dim(); i++) {
             double p = cutProbabilities.get(i);
 
-            if (p == 1) {
+            if (p >= 1 - margin) {
                 positiveCount++;
-            } else if (p != 0) {
+            } else if (p > margin) {
                 uncertainCount++;
             }
         }
