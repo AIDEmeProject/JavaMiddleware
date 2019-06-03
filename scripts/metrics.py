@@ -38,3 +38,12 @@ class SubspatialConfusionMatrix(Metric):
 
 class ThreeSetMetric(Metric):
     pass
+
+
+class VersionSpaceThreeSetMetric(Metric):
+    def __init__(self, mv):
+        super().__init__()
+
+        assert_is_instance(mv, MajorityVote)
+
+        self.learner = mv

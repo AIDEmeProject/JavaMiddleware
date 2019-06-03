@@ -117,6 +117,14 @@ lnr = MajorityVote(
     add_intercept=True, solver="gurobi"  # extra
 )
 
+lower_bound_mv = MajorityVote(
+    num_samples=32,
+    warmup=1000, thin=100, chain_length=100, selector="single",
+    rounding=True, max_iter=0, cache=True,  # hit-and-run
+    kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
+    add_intercept=True, solver="gurobi"  # extra
+)
+
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
 #ACTIVE_LEARNER = SubspatialSampler(lnr, loss="MARGIN")
@@ -129,7 +137,8 @@ ACTIVE_LEARNER = UncertaintySampler(lnr)
 METRICS = [
     #ConfusionMatrix(SubspatialLearner(lnr)),
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
-    ConfusionMatrix(lnr),
+    #ConfusionMatrix(lnr),
+    VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),
     #ConfusionMatrix(lnr),
