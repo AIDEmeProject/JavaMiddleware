@@ -6,7 +6,7 @@ import machinelearning.classifier.Classifier;
 import machinelearning.classifier.MajorityVoteLearner;
 import utils.linalg.Vector;
 
-public class VersionSpaceThreeSetMetricCalculator implements MetricCalculator {
+public class VersionSpaceLowerBoundCalculator implements MetricCalculator {
 
     private MajorityVoteLearner learner;
     private double margin;
@@ -17,17 +17,20 @@ public class VersionSpaceThreeSetMetricCalculator implements MetricCalculator {
 
         Vector cutProbabilities = majorityVoteClassifier.probability(data.getAllPoints());
 
-        double positiveCount = 0D, uncertainCount = 0D;
-        for (int i = 0; i < cutProbabilities.dim(); i++) {
+        int size = cutProbabilities.dim();
+        int positiveCount = 0, negativeCount = 0, predictedPositives = 0;
+        for (int i = 0; i < size; i++) {
             double p = cutProbabilities.get(i);
 
             if (p >= 1 - margin) {
                 positiveCount++;
-            } else if (p > margin) {
-                uncertainCount++;
+            } else if (p <= margin) {
+                negativeCount++;
             }
+
+            if (p >= 0.5) predictedPositives++;
         }
-        System.out.println("lower bound: " + positiveCount / (positiveCount + uncertainCount));
-        return new ThreeSetMetric(positiveCount, uncertainCount);
+
+        return new VersionSpaceLowerBound(positiveCount, negativeCount, predictedPositives, size);
     }
 }

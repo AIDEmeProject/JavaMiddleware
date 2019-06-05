@@ -45,6 +45,7 @@ class VersionSpaceThreeSetMetric(Metric):
         super().__init__()
 
         assert_is_instance(mv, MajorityVote)
+        assert_in_range('margin', margin, 0, 0.5)
 
         self.learner = mv
         self.margin = margin

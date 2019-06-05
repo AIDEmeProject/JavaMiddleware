@@ -21,7 +21,7 @@ public class MetricCalculatorAdapter extends JsonDeserializedAdapter<MetricCalcu
             case "SUBSPATIALCONFUSIONMATRIX":
                 return "SubspatialConfusionMatrixCalculator";
             case "VERSIONSPACETHREESETMETRIC":
-                return "VersionSpaceThreeSetMetricCalculator";
+                return "VersionSpaceLowerBoundCalculator";
             default:
                 throw new UnknownClassIdentifierException("MetricCalculator", identifier);
         }
