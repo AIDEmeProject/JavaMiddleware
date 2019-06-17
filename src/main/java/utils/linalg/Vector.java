@@ -116,6 +116,15 @@ public class Vector extends Tensor<Vector> {
      * @throws IllegalArgumentException if newNorm is not positive, or {@code this} is the zero vector
      */
     public Vector normalize(double newNorm) {
+        return copy().iNormalize(newNorm);
+    }
+
+    /**
+     * @param newNorm norm of output vector
+     * @return a Vector parallel to the original one, but of specified norm
+     * @throws IllegalArgumentException if newNorm is not positive, or {@code this} is the zero vector
+     */
+    public Vector iNormalize(double newNorm) {
         Validator.assertPositive(newNorm);
 
         double norm = norm();
@@ -123,7 +132,7 @@ public class Vector extends Tensor<Vector> {
             throw new IllegalStateException("Cannot normalize zero vector");
         }
 
-        return copy().iScalarMultiply(newNorm / norm);
+        return this.iScalarMultiply(newNorm / norm);
     }
 
     /**

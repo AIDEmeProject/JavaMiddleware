@@ -25,7 +25,7 @@ public interface ConvexBody {
     /**
      * @param x: a point in the euclidean space
      * @return whether the point x is inside or outside the convex body
-     * @throws IllegalArgumentException if x.length and getDim() are different
+     * @throws IllegalArgumentException if x.length and dim() are different
      */
     boolean isInside(Vector x);
 
@@ -38,7 +38,7 @@ public interface ConvexBody {
      * @param line: straight line intersecting the convex body
      * @return the line segment representing the intersection between this convex body and a straight line
      * @throws RuntimeException if the line does not intersect this body, or the intersection is a single point
-     * @throws IllegalArgumentException if line dimension is different from getDim()
+     * @throws IllegalArgumentException if line dimension is different from dim()
      */
     LineSegment computeLineIntersection(Line line);
 
@@ -60,7 +60,7 @@ public interface ConvexBody {
      * @param x: a data point
      * @return a LinearClassifier instance which separates the point x from the convex body. If x is on the interior of
      * the convex body, Optional.empty() is returned instead.
-     * @throws IllegalArgumentException if x.dim() and getDim() are different
+     * @throws IllegalArgumentException if x.dim() and dim() are different
      */
     Optional<LinearClassifier> getSeparatingHyperplane(Vector x);
 }

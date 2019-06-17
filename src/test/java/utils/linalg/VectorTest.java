@@ -536,6 +536,19 @@ public class VectorTest {
     }
 
     @Test
+    void iNormalize_newNormEqualToOne_originalVectorModified() {
+        Vector vector = Vector.FACTORY.make(3, 4);
+        vector.iNormalize(1.0);
+        assertEquals(Vector.FACTORY.make(0.6, 0.8), vector);
+    }
+
+    @Test
+    void iNormalize_positiveNewNorm_returnsTheSameObject() {
+        Vector vector = Vector.FACTORY.make(3, 4);
+        assertSame(vector.iNormalize(1.0), vector);
+    }
+
+    @Test
     void squaredDistanceTo_vectorOfDifferentDimensions_throwsException() {
         assertThrows(RuntimeException.class, () -> vector1.squaredDistanceTo(Vector.FACTORY.zeros(3)));
     }

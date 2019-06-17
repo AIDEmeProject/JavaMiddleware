@@ -6,9 +6,9 @@ import utils.linalg.Vector;
 /**
  * A line segment is a compact, connected subset of a straight line. In mathematical terms, let a straight line be defined
  * by a point X0 and its direction V. A line segment is on the form:
- *
- *                 \( X(t) = X0 + t * V, for L \leq t \leq R \)
- *
+ * <p>
+ * \( X(t) = X0 + t * V, for L \leq t \leq R \)
+ * <p>
  * where L and R are the left and right bounds on the segment respectively.
  *
  * @see Line
@@ -30,16 +30,16 @@ public class LineSegment {
     private double rightBound;
 
     /**
-     * @param line: straight line the segment is a subset of
-     * @param leftBound: left bound L in the line segment definition
+     * @param line:       straight line the segment is a subset of
+     * @param leftBound:  left bound L in the line segment definition
      * @param rightBound: right bound R in the line segment definition
      * @throws IllegalArgumentException if leftBound is not smaller than rightBound
      */
-     LineSegment(Line line, double leftBound, double rightBound) {
+    LineSegment(Line line, double leftBound, double rightBound) {
         Validator.assertIsFinite(leftBound);
         Validator.assertIsFinite(rightBound);
 
-        if (leftBound >= rightBound){
+        if (leftBound >= rightBound) {
             throw new IllegalArgumentException("Left bound must be smaller than right bound.");
         }
 
@@ -62,7 +62,7 @@ public class LineSegment {
      * @throws IllegalArgumentException if proportion is negative or larger than 1
      */
     public Vector getPoint(double proportion) {
-         Validator.assertInRange(proportion, 0, 1);
+        Validator.assertInRange(proportion, 0, 1);
         return line.getPoint(leftBound + proportion * (rightBound - leftBound));
     }
 }
