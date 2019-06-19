@@ -41,6 +41,10 @@ public class PolyhedralCone implements EuclideanConvexBody {
         return A.cols();
     }
 
+    public Matrix getMatrix() {
+        return A;
+    }
+
     @Override
     public boolean isInside(Vector x) {
         for (int i = 0; i < A.rows(); i++) {
