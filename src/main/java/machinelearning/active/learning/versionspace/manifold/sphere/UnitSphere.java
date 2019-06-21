@@ -8,19 +8,30 @@ import java.util.Random;
 
 public class UnitSphere implements Manifold {
 
+    private static UnitSphere unitSphere = null;
+
+    private UnitSphere() {
+    }
+
+    public static UnitSphere getInstance() {
+        if (unitSphere == null) {
+            unitSphere = new UnitSphere();
+        }
+
+        return unitSphere;
+    }
+    
     @Override
     public Geodesic getGeodesic(Vector center, Vector velocity) {
         return new GreatCircle(center, velocity);
     }
 
     /**
-     * This class is responsible for generating random vectors X whose direction is uniformly distributed over the unit sphere.
-     * In order to do this, we employ the well-known Marsaglia method:
+     * Generates a random tangent vector at the specified point on the unit sphere. This is accomplished by:
      *
-     *      1) Generate X1, ..., Xd from the standard normal distribution
-     *      2) The vector (X1, ..., Xd) / norm((X1, ..., Xd)) is uniformly distributed over the sphere
+     *      1) Generate Z = (Z1, ..., Zd) from the standard normal distribution
+     *      2) The vector Z - (Z^T p) p is a random tangent vector at point p
      *
-     * In this particular implementation we do not bother with the normalizing step 2, since it not relevant our applications.
      */
     @Override
     public Vector sampleVelocity(Vector point, Random random) {
@@ -33,6 +44,6 @@ public class UnitSphere implements Manifold {
         double prod = direction.dot(point);
         direction.iSubtract(direction.scalarMultiply(prod));
 
-        return direction.iNormalize(1.0);
+        return direction.iNormalize(1.0);  // TODO: can we avoid normalizing?
     }
 }

@@ -18,7 +18,7 @@ public abstract class Geodesic {
         Validator.assertPositive(velocity.squaredNorm());
     }
 
-    public final int getDim() {
+    public final int dim() {
         return center.dim();
     }
 

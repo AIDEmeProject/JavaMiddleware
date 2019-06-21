@@ -10,7 +10,6 @@ import utils.linalg.Vector;
 
 public class UnitSpherePolyhedralCone implements ConvexBody {
 
-    private final static Manifold sphere = new UnitSphere();
     private PolyhedralCone cone;
 
     public UnitSpherePolyhedralCone(PolyhedralCone cone) {
@@ -24,7 +23,7 @@ public class UnitSpherePolyhedralCone implements ConvexBody {
 
     @Override
     public boolean isInside(Vector point) {
-        return point.squaredNorm() == 1 && cone.isInside(point);
+        return cone.isInside(point) && Math.abs(point.squaredNorm() - 1) < 1e-12;
     }
 
     @Override
@@ -58,6 +57,6 @@ public class UnitSpherePolyhedralCone implements ConvexBody {
 
     @Override
     public Manifold getManifold() {
-        return sphere;
+        return UnitSphere.getInstance();
     }
 }

@@ -105,10 +105,11 @@ public class PolyhedralCone implements EuclideanConvexBody {
      */
     @Override
     public GeodesicSegment computeIntersection(Geodesic line) {
-        Validator.assertEquals(dim(), line.getDim());
+        return computeIntersection(line, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+    }
 
-        double leftBound = Double.NEGATIVE_INFINITY;
-        double rightBound = Double.POSITIVE_INFINITY;
+    GeodesicSegment computeIntersection(Geodesic line, double leftBound, double rightBound) {
+        Validator.assertEquals(dim(), line.dim());
 
         Vector numerator = A.multiply(line.getCenter());
         Vector denominator = A.multiply(line.getVelocity());

@@ -13,7 +13,6 @@ public class GreatCircle extends Geodesic {
 
     @Override
     protected final void validateCenterAndVelocity(Vector center, Vector velocity) {
-        Validator.assertEquals(center.dim(), velocity.dim());
         Validator.assertEquals(center.dot(velocity), 0.0);
     }
 

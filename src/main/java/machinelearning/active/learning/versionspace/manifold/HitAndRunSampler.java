@@ -2,9 +2,12 @@ package machinelearning.active.learning.versionspace.manifold;
 
 
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCache;
+import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import utils.Validator;
 import utils.linalg.Vector;
+
+import java.util.Objects;
 
 /**
  * This class is responsible for configuring a sampling strategy for the Hit-and-Run algorithm. We can configure 4 sampling
@@ -15,15 +18,14 @@ import utils.linalg.Vector;
  *      3) The random state of the sampler
  */
 public class HitAndRunSampler {
-//    private final DirectionSamplingAlgorithm samplingAlgorithm;
+    private final DirectionSamplingAlgorithm samplingAlgorithm;
     private final SampleSelector selector;
     private final SampleCache cache;
 
-//    public HitAndRunSampler(DirectionSamplingAlgorithm samplingAlgorithm, SampleSelector selector, SampleCache cache) {
-    public HitAndRunSampler(SampleSelector selector, SampleCache cache) {
-//        this.samplingAlgorithm = samplingAlgorithm;
-        this.selector = selector;
-        this.cache = cache;
+    public HitAndRunSampler(DirectionSamplingAlgorithm samplingAlgorithm, SampleSelector selector, SampleCache cache) {
+        this.samplingAlgorithm = Objects.requireNonNull(samplingAlgorithm);
+        this.selector = Objects.requireNonNull(selector);
+        this.cache = Objects.requireNonNull(cache);
     }
 
     /**
@@ -36,8 +38,7 @@ public class HitAndRunSampler {
 
         body = cache.attemptToSetDefaultInteriorPoint(body);
 
-//        HitAndRun chain = new HitAndRun(body, samplingAlgorithm.fit(body));
-        HitAndRun chain = new HitAndRun(body);
+        HitAndRun chain = new HitAndRun(body, samplingAlgorithm.fit(body));
         Vector[] samples = selector.select(chain, numSamples);
 
         cache.updateCache(samples);

@@ -8,6 +8,19 @@ import java.util.Random;
 
 public class EuclideanSpace implements Manifold {
 
+    private static EuclideanSpace euclideanSpace = null;
+
+    private EuclideanSpace() {
+    }
+
+    public static EuclideanSpace getInstance() {
+        if (euclideanSpace == null) {
+            euclideanSpace = new EuclideanSpace();
+        }
+
+        return euclideanSpace;
+    }
+
     @Override
     public Geodesic getGeodesic(Vector center, Vector velocity) {
         return new Line(center, velocity);

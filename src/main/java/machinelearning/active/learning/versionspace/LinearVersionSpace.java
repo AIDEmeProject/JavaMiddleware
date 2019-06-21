@@ -1,15 +1,20 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
-import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import explore.user.UserLabel;
+import machinelearning.active.learning.versionspace.manifold.ConvexBody;
+import machinelearning.active.learning.versionspace.manifold.euclidean.PolyhedralCone;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.euclidean.UnitBallPolyhedralCone;
+import machinelearning.active.learning.versionspace.manifold.sphere.UnitSpherePolyhedralCone;
 import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -40,6 +45,11 @@ public class LinearVersionSpace implements VersionSpace {
     private final LinearProgramSolver.FACTORY solverFactory;
 
     /**
+     * Whether to sample from sphere
+     */
+    private final boolean useSphericalSampling = false;
+
+    /**
      * By default, no intercept and no sample caching is performed.
      *
      * @param hitAndRunSampler: Hit-and-Run sampler instance
@@ -68,29 +78,37 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
-        ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
+        PolyhedralCone cone = buildPolyhedralCone(labeledPoints);
+        ConvexBody body = useSphericalSampling ? new UnitSpherePolyhedralCone(cone) : new UnitBallPolyhedralCone(cone);
 
-        Vector[] samples = hitAndRunSampler.sample(cone, numSamples);
+        Vector[] samples = hitAndRunSampler.sample(body, numSamples);
 
-        return new LinearMajorityVote(getLinearClassifiers(samples));
+        return buildMajorityVoteClassifier(samples);
     }
 
-    private LabeledDataset addIntercept(LabeledDataset labeledPoints) {
-        if (!addIntercept){
-            return labeledPoints;
-        }
+    private PolyhedralCone buildPolyhedralCone(LabeledDataset labeledPoints) {
+        Matrix X = labeledPoints.getData();
+        X = addIntercept ? X.addBiasColumn() : X;
 
-        return labeledPoints.copyWithSameIndexesAndLabels(labeledPoints.getData().addBiasColumn());
+        Vector y = Vector.FACTORY.make(
+                Arrays.stream(labeledPoints.getLabels())
+                        .mapToDouble(UserLabel::asSign)
+                        .toArray()
+        );
+
+        return new PolyhedralCone(X.multiplyColumn(y), solverFactory);
     }
 
-    private LinearClassifier[] getLinearClassifiers(Vector[] samples) {
-        LinearClassifier[] classifiers = new LinearClassifier[samples.length];
+    private LinearMajorityVote buildMajorityVoteClassifier(Vector[] samples) {
+        Vector bias = Vector.FACTORY.zeros(samples.length);
+        Matrix weights = Matrix.FACTORY.make(samples);
 
-        for (int i = 0; i < samples.length; i++) {
-            classifiers[i] = new LinearClassifier(samples[i], addIntercept);
+        if (addIntercept) {
+            bias = weights.getCol(0);
+            weights = weights.getColSlice(1, weights.cols());
         }
 
-        return classifiers;
+        return new LinearMajorityVote(bias, weights);
     }
 }
 

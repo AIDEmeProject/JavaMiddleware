@@ -122,7 +122,8 @@ public class Vector extends Tensor<Vector> {
     /**
      * @param newNorm norm of output vector
      * @return a Vector parallel to the original one, but of specified norm
-     * @throws IllegalArgumentException if newNorm is not positive, or {@code this} is the zero vector
+     * @throws IllegalArgumentException if newNorm is not positive
+     * @throws IllegalStateException if {@code this} is the zero vector
      */
     public Vector iNormalize(double newNorm) {
         Validator.assertPositive(newNorm);

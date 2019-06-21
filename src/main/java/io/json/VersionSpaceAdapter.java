@@ -8,7 +8,7 @@ import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
 import machinelearning.bayesian.BayesianLinearVersionSpace;
 import machinelearning.classifier.svm.Kernel;
 import machinelearning.classifier.svm.LinearKernel;

@@ -1,7 +1,7 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
 import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import org.junit.jupiter.api.BeforeEach;

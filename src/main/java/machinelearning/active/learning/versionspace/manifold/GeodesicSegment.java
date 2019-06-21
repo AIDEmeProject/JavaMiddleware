@@ -3,13 +3,17 @@ package machinelearning.active.learning.versionspace.manifold;
 import utils.Validator;
 import utils.linalg.Vector;
 
+import java.util.Objects;
+
 public class GeodesicSegment {
     private final double lowerBound, upperBound;
     private final Geodesic geodesic;
 
     GeodesicSegment(Geodesic geodesic, double lowerBound, double upperBound) {
+
         Validator.assertIsFinite(lowerBound);
         Validator.assertIsFinite(upperBound);
+
 
         if (lowerBound >= upperBound) {
             throw new IllegalArgumentException("Lower bound must be smaller than upper bound.");
@@ -41,5 +45,15 @@ public class GeodesicSegment {
                 Math.max(lowerBound, segment.lowerBound),
                 Math.min(upperBound, segment.upperBound)
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GeodesicSegment that = (GeodesicSegment) o;
+        return Double.compare(that.lowerBound, lowerBound) == 0 &&
+                Double.compare(that.upperBound, upperBound) == 0 &&
+                Objects.equals(geodesic, that.geodesic);
     }
 }

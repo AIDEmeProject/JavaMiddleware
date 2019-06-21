@@ -36,9 +36,7 @@ public class UnitBallPolyhedralCone implements ConvexBody {
         double c = line.getCenter().squaredNorm() - 1;
         SecondDegreeEquationSolver.SecondDegreeEquationSolution solution = SecondDegreeEquationSolver.solve(a, b, c);
 
-        GeodesicSegment ballSegment = line.getSegment(solution.getFirst(), solution.getSecond());
-
-        return ballSegment.intersect(cone.computeIntersection(line));
+        return cone.computeIntersection(line, solution.getFirst(), solution.getSecond());
     }
 
     @Override
