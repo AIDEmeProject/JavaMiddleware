@@ -267,6 +267,24 @@ public class MatrixTest {
     }
 
     @Test
+    void getCol_negativeIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.getCol(-1));
+    }
+
+    @Test
+    void getCol_indexEqualsNumCols_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.getCol(matrix1.cols()));
+    }
+
+    @Test
+    void getCol_runOverAllValidIndexes_correctVectorsReturned() {
+        assertEquals(Vector.FACTORY.make(1, 4), matrix1.getCol(0));
+        assertEquals(Vector.FACTORY.make(2, 5), matrix1.getCol(1));
+        assertEquals(Vector.FACTORY.make(3, 6), matrix1.getCol(2));
+    }
+
+
+    @Test
     void getCols_emtpyArray_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> matrix1.getCols());
     }
@@ -280,6 +298,31 @@ public class MatrixTest {
     @Test
     void getCols_compatibleIndexes_returnsExpectedMatrix() {
         assertEquals(Matrix.FACTORY.make(2, 2, 3, 1, 6, 4), matrix1.getCols(2, 0));
+    }
+
+    @Test
+    void getColSlice_negativeFromIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(-1, 0));
+    }
+
+    @Test
+    void getColSlice_ToIndexLargerThanNumberOfCols_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(0, matrix1.cols()+1));
+    }
+
+    @Test
+    void getColSlice_FromZeroToNumberOfCols_returnsCopyOfDataset() {
+        assertEquals(matrix1, matrix1.getColSlice(0, matrix1.cols()));
+    }
+
+    @Test
+    void getColSlice_FromIndexEqualsToIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(0, 0));
+    }
+
+    @Test
+    void getColSlice_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 2, 2, 3, 5, 6), matrix1.getColSlice(1, 3));
     }
 
     /* *************************************

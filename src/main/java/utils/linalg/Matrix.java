@@ -40,6 +40,25 @@ public class Matrix extends Tensor<Matrix> {
             return new Matrix(rows, cols, array);
         }
 
+        public static Matrix make(Vector[] rows) {
+            Validator.assertNotEmpty(rows);
+
+            int nrows = rows.length;
+            int ncols = rows[0].dim();
+            double[] values = new double[nrows * ncols];
+
+            int p = 0;
+            for (Vector row : rows) {
+                Validator.assertEquals(ncols, row.dim());
+
+                for (int j = 0; j < ncols; j++) {
+                    values[p++] = row.get(j);
+                }
+            }
+
+            return new Matrix(nrows, ncols, values);
+        }
+
         /**
          * @param rows: number of rows()
          * @param cols: number of columns
@@ -199,6 +218,23 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     /**
+     * @param i column index
+     * @return a Vector containing the elements of the i-th column
+     * @throws IllegalArgumentException if column index is out of bounds
+     */
+    public Vector getCol(int i) {
+        Validator.assertIndexInBounds(i, 0, cols());
+        double[] col = new double[rows()];
+
+        for (int j = 0; j < col.length; j++) {
+            col[j] = array[i];
+            i += cols();
+        }
+
+        return new Vector(col);
+    }
+
+    /**
      * @param cols: columns to retrieve
      * @return a new matrix containing only the specified columns
      * @throws IllegalArgumentException if column index is out-of-bounds
@@ -216,6 +252,31 @@ public class Matrix extends Tensor<Matrix> {
         }
 
         return new Matrix(rows(), cols.length, result);
+    }
+
+    /**
+     * @param from: start index (inclusive)
+     * @param to: end index (exclusive)
+     * @return a copy of a slice of columns from the original matrix
+     * @throws IllegalArgumentException if indexes are out-of-bounds, or {@code from} is not smaller than {@code to}
+     */
+    public Matrix getColSlice(int from, int to) {
+        if (from < 0 || from >= to || to > cols()) {
+            throw new IllegalArgumentException("Invalid indexes " + from + " and " + to + " for matrix of " + cols() + " columns");
+        }
+
+        int size = to - from;
+        double[] slice = new double[size * rows()];
+
+        int start = from;
+        int pos = 0;
+        for (int i = 0; i < rows(); i++) {
+            System.arraycopy(array, start, slice, pos, size);
+            start += cols();
+            pos += size;
+        }
+
+        return new Matrix(rows(), size, slice);
     }
     
     /* ROW-WISE OPERATIONS */
