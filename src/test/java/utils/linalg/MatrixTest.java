@@ -86,6 +86,21 @@ public class MatrixTest {
     }
 
     @Test
+    void identity_negativeDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.identity(-1));
+    }
+
+    @Test
+    void identity_zeroDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.identity(0));
+    }
+
+    @Test
+    void identity_positiveDimension_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(3, 3, 1, 0, 0, 0, 1, 0, 0, 0, 1), Matrix.FACTORY.identity(3));
+    }
+
+    @Test
     void numRows_matrixWithTwoRows_returnsTwo() {
         assertEquals(2, matrix1.rows());
     }
@@ -323,6 +338,29 @@ public class MatrixTest {
     @Test
     void getColSlice_compatibleIndexes_returnsExpectedMatrix() {
         assertEquals(Matrix.FACTORY.make(2, 2, 2, 3, 5, 6), matrix1.getColSlice(1, 3));
+    }
+
+    /* *************************************
+     *              DIAGONAL
+     * ************************************
+     */
+
+    @Test
+    void fillDiagonal_anyMatrix_ownMatrixReturned() {
+        assertSame(matrix1, matrix1.fillDiagonal(1.0));
+    }
+
+    @Test
+    void fillDiagonal_squareMatrix_diagonalCorrectlyFilled() {
+        Matrix mat = Matrix.FACTORY.make(2, 2, 1, 2, -3, -4);
+        mat.fillDiagonal(-10);
+        assertEquals(Matrix.FACTORY.make(2, 2, -10, 2, -3, -10), mat);
+    }
+
+    @Test
+    void fillDiagonal_rectangularMatrix_diagonalCorrectlyFilled() {
+        matrix1.fillDiagonal(-1);
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 2, 3, 4, -1, 6), matrix1);
     }
 
     /* *************************************

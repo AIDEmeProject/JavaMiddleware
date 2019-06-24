@@ -278,6 +278,18 @@ public class Matrix extends Tensor<Matrix> {
 
         return new Matrix(rows(), size, slice);
     }
+
+    /* DIAGONAL OPERATIONS */
+    public Matrix fillDiagonal(double value) {
+        int size = Math.min(rows(), cols());
+        int step = cols() + 1;
+
+        for (int i = 0; i < size; i++) {
+            array[i * step] = value;
+        }
+
+        return this;
+    }
     
     /* ROW-WISE OPERATIONS */
     
