@@ -39,6 +39,14 @@ public interface LinearProgramSolver {
         public LinearProgramSolver getSolver(int dim) {
             return LinearProgramSolver.getSolver(library, dim);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            FACTORY factory = (FACTORY) o;
+            return library == factory.library;
+        }
     }
 
     /**

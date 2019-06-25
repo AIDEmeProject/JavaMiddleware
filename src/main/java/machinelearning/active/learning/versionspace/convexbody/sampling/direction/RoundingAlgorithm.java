@@ -1,7 +1,7 @@
 package machinelearning.active.learning.versionspace.convexbody.sampling.direction;
 
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.classifier.margin.LinearClassifier;
+import machinelearning.classifier.margin.HyperPlane;
 import utils.linalg.EigenvalueDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -105,14 +105,13 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         boolean converged = false;
 
         int count = 0;
-        long start = System.nanoTime();
 
         while (!converged && count < maxIter) {
             converged = true;
 
             AxisIterator iterator = new AxisIterator();
             while (converged && iterator.hasNext()) {
-                Optional<LinearClassifier> separatingHyperplane = body.getSeparatingHyperplane(iterator.next());
+                Optional<HyperPlane> separatingHyperplane = body.getSeparatingHyperplane(iterator.next());
 
                 // if a separating hyperplane exists, it means E_k / sqrt(n) (n+1) is not contained in K, and E_k must be updated
                 if (separatingHyperplane.isPresent()) {
@@ -135,7 +134,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
      *
      * @return true if cut succeeded (i.e. was not shallow)
      */
-    private boolean ellipsoidMethodUpdate(LinearClassifier hyperplane) {
+    private boolean ellipsoidMethodUpdate(HyperPlane hyperplane) {
         int n = center.dim();
         Vector g = hyperplane.getWeights();
 

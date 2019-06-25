@@ -24,23 +24,6 @@ public class LinearMajorityVote implements Classifier {
         this.weights = weights;
     }
 
-    public LinearMajorityVote(LinearClassifier[] linearClassifiers) {
-        double[] bias = new double[linearClassifiers.length];
-        double[][] weights = new double[linearClassifiers.length][];
-
-        for (int i = 0; i < linearClassifiers.length; i++) {
-            bias[i] = linearClassifiers[i].getBias();
-            weights[i] = linearClassifiers[i].getWeights().toArray();
-        }
-
-        this.bias = Vector.FACTORY.make(bias);
-        this.weights = Matrix.FACTORY.make(weights);
-    }
-
-    public int getDim() {
-        return weights.cols();
-    }
-
     @Override
     public Label predict(Vector vector) {
         return margin(vector).iApplyMap(x -> x > 0 ? 1D : -1D).sum() > 0 ? Label.POSITIVE : Label.NEGATIVE;

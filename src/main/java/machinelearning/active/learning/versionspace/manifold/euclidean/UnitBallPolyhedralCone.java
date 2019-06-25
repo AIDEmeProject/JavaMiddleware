@@ -1,17 +1,26 @@
 package machinelearning.active.learning.versionspace.manifold.euclidean;
 
-import machinelearning.active.learning.versionspace.manifold.ConvexBody;
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
 import machinelearning.active.learning.versionspace.manifold.Manifold;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
+import machinelearning.classifier.margin.HyperPlane;
 import utils.SecondDegreeEquationSolver;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
+import utils.linprog.LinearProgramSolver;
 
-public class UnitBallPolyhedralCone implements ConvexBody {
+import java.util.Objects;
+
+public class UnitBallPolyhedralCone implements EuclideanConvexBody {
     private PolyhedralCone cone;
 
     public UnitBallPolyhedralCone(PolyhedralCone cone) {
         this.cone = cone;
+    }
+
+    public UnitBallPolyhedralCone(Matrix A, LinearProgramSolver.FACTORY solver) {
+        this.cone = new PolyhedralCone(A, solver);
     }
 
     @Override
@@ -40,7 +49,30 @@ public class UnitBallPolyhedralCone implements ConvexBody {
     }
 
     @Override
+    public double getRadius() {
+        return 1.0;
+    }
+
+    @Override
+    public double findInteriorEllipsoidParallelTo(Ellipsoid ellipsoid) {
+        return 0;
+    }
+
+    @Override
+    public HyperPlane getSeparatingHyperplane(Vector point) {
+        return null;
+    }
+
+    @Override
     public Manifold getManifold() {
         return cone.getManifold();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnitBallPolyhedralCone that = (UnitBallPolyhedralCone) o;
+        return Objects.equals(cone, that.cone);
     }
 }

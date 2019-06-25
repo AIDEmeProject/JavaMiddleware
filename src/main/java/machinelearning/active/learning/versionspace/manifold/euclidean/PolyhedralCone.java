@@ -2,6 +2,8 @@ package machinelearning.active.learning.versionspace.manifold.euclidean;
 
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
+import machinelearning.classifier.margin.HyperPlane;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -9,6 +11,7 @@ import utils.linprog.InequalitySign;
 import utils.linprog.LinearProgramSolver;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A polyhedral cone is a convex body defined by a set of homogeneous linear equations:
@@ -158,5 +161,14 @@ public class PolyhedralCone implements EuclideanConvexBody {
 //
 //        return Optional.empty();
 //    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PolyhedralCone that = (PolyhedralCone) o;
+        return Objects.equals(A, that.A) &&
+                Objects.equals(solverFactory, that.solverFactory);
+    }
 }
 

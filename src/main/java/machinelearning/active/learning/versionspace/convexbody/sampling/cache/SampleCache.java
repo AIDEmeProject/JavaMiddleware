@@ -3,7 +3,7 @@ package machinelearning.active.learning.versionspace.convexbody.sampling.cache;
 import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
 import machinelearning.active.learning.versionspace.convexbody.Line;
 import machinelearning.active.learning.versionspace.convexbody.LineSegment;
-import machinelearning.classifier.margin.LinearClassifier;
+import machinelearning.classifier.margin.HyperPlane;
 import utils.linalg.Vector;
 
 import java.util.Optional;
@@ -90,7 +90,7 @@ public class SampleCache {
         }
 
         @Override
-        public Optional<LinearClassifier> getSeparatingHyperplane(Vector x) {
+        public Optional<HyperPlane> getSeparatingHyperplane(Vector x) {
             return convexBody.getSeparatingHyperplane(x);
         }
     }

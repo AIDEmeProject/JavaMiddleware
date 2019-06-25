@@ -65,10 +65,14 @@ public class BayesianLinearVersionSpace implements VersionSpace {
 
         double[][] samples = sampler.run(numSamples, data.toArray(), ys, RandomState.newInstance().nextInt());
 
-        return new LinearMajorityVote(Arrays.stream(samples)
-                .map(Vector.FACTORY::make)
-                .map(x -> new LinearClassifier(x, addIntercept))
-                .toArray(LinearClassifier[]::new)
-        );
+        Vector bias = Vector.FACTORY.zeros(samples.length);
+        Matrix weights = Matrix.FACTORY.make(samples);
+
+        if (addIntercept) {
+            bias = weights.getCol(0);
+            weights = weights.getColSlice(1, weights.cols());
+        }
+
+        return new LinearMajorityVote(bias, weights);
     }
 }

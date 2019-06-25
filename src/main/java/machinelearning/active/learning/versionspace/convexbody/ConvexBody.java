@@ -1,6 +1,6 @@
 package machinelearning.active.learning.versionspace.convexbody;
 
-import machinelearning.classifier.margin.LinearClassifier;
+import machinelearning.classifier.margin.HyperPlane;
 import utils.linalg.Vector;
 
 import java.util.Optional;
@@ -62,5 +62,5 @@ public interface ConvexBody {
      * the convex body, Optional.empty() is returned instead.
      * @throws IllegalArgumentException if x.dim() and dim() are different
      */
-    Optional<LinearClassifier> getSeparatingHyperplane(Vector x);
+    Optional<HyperPlane> getSeparatingHyperplane(Vector x);
 }

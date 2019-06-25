@@ -25,23 +25,23 @@ class KernelClassifierTest {
     }
 
     @Test
-    void linearClassifierConstructor_NullLinearClassifier_throwsException() {
+    void hyperPlaneConstructor_NullLinearClassifier_throwsException() {
         assertThrows(NullPointerException.class, () -> new KernelClassifier(null, support, kernel));
     }
 
     @Test
-    void linearClassifierConstructor_nullKernel_throwsException() {
+    void hyperPlaneConstructor_nullKernel_throwsException() {
         assertThrows(NullPointerException.class,
-                () -> new KernelClassifier(mock(LinearClassifier.class), support, null));
+                () -> new KernelClassifier(mock(HyperPlane.class), support, null));
     }
 
     @Test
-    void linearClassifierConstructor_differentLinearClassifierDimensionAndSupportVector_throwsException() {
-        LinearClassifier linearClassifier = mock(LinearClassifier.class);
-        when(linearClassifier.getDim()).thenReturn(2);
+    void hyperPlaneConstructor_differentLinearClassifierDimensionAndSupportVector_throwsException() {
+        HyperPlane hyperPlane = mock(HyperPlane.class);
+        when(hyperPlane.dim()).thenReturn(2);
 
         assertThrows(IllegalArgumentException.class,
-                () -> new KernelClassifier(linearClassifier, mock(Matrix.class), kernel));
+                () -> new KernelClassifier(hyperPlane, mock(Matrix.class), kernel));
     }
 
     @Test
