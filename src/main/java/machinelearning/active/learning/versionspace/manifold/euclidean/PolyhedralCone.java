@@ -2,7 +2,7 @@ package machinelearning.active.learning.versionspace.manifold.euclidean;
 
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
-import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
+import machinelearning.classifier.margin.CenteredHyperPlane;
 import machinelearning.classifier.margin.HyperPlane;
 import utils.Validator;
 import utils.linalg.Matrix;
@@ -135,32 +135,27 @@ public class PolyhedralCone implements EuclideanConvexBody {
         return line.getSegment(leftBound, rightBound);
     }
 
+    @Override
+    public double getRadius() {
+        return Double.POSITIVE_INFINITY;
+    }
+
     /**
-     * For a point x outside the polyhedral cone, we compute an separating hyperplane by using the following rule:
+     * We simply look for any violated constrain, i.e. any "a" satisfying a^T x < 0
      *
-     *      - if point is outside the unit ball, just return x itself
-     *      - else, we look for a unsatisfying constraint \( y_i \langle x_i, x \rangle < 0 \), where we return \( -y_i x_i \)
-     *
-     * @param x: a data point
-     * @return the separating hyperplane vector (if it exists)
+     * @param x: a point
+     * @return separating hyperplane
      */
-//    @Override
-//    public Optional<LinearClassifier> getSeparatingHyperplane(Vector x) {
-//        Validator.assertEquals(x.dim(), dim());
-//
-//        if (x.squaredNorm() > 1) {
-//            return Optional.of(new LinearClassifier(-1, x.normalize(1.0)));  // return -1 for bias?
-//        }
-//
-//        for (LabeledPoint point : A) {
-//            if (point.getLabel().asSign() * point.getData().dot(x) < 0){
-//                Vector weights = point.getData().scalarMultiply(-point.getLabel().asSign());
-//                return Optional.of(new LinearClassifier(0, weights));
-//            }
-//        }
-//
-//        return Optional.empty();
-//    }
+    @Override
+    public HyperPlane getSeparatingHyperplane(Vector x) {
+        Vector Ax = A.multiply(x);
+
+        for (int i = 0; i < Ax.dim(); i++) {
+            if (Ax.get(i) < 0) return new CenteredHyperPlane(A.getRow(i).iScalarMultiply(-1.0));  //TODO: can we avoid this -1 multiplication ?
+        }
+
+        throw new RuntimeException("Point is inside polytope.");
+    }
 
     @Override
     public boolean equals(Object o) {

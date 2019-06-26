@@ -3,9 +3,9 @@ package machinelearning.active.learning.versionspace.manifold.euclidean;
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
 import machinelearning.active.learning.versionspace.manifold.Manifold;
-import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import machinelearning.classifier.margin.HyperPlane;
 import utils.SecondDegreeEquationSolver;
+import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
@@ -49,23 +49,33 @@ public class UnitBallPolyhedralCone implements EuclideanConvexBody {
     }
 
     @Override
+    public Manifold getManifold() {
+        return cone.getManifold();
+    }
+
+    @Override
     public double getRadius() {
         return 1.0;
     }
 
+    /**
+     * For a exterior point x, we compute an separating hyperplane by using the following rule:
+     *
+     *      - if point is outside the unit ball, just return x itself
+     *      - else, we look for a any violated linear constraint
+     *
+     * @param x: a data point
+     * @return the separating hyperplane
+     */
     @Override
-    public double findInteriorEllipsoidParallelTo(Ellipsoid ellipsoid) {
-        return 0;
-    }
+    public HyperPlane getSeparatingHyperplane(Vector x) {
+        Validator.assertEquals(x.dim(), dim());
 
-    @Override
-    public HyperPlane getSeparatingHyperplane(Vector point) {
-        return null;
-    }
+        if (x.squaredNorm() > 1) {
+            return new HyperPlane(-1, x.normalize(1.0));
+        }
 
-    @Override
-    public Manifold getManifold() {
-        return cone.getManifold();
+        return cone.getSeparatingHyperplane(x);
     }
 
     @Override
