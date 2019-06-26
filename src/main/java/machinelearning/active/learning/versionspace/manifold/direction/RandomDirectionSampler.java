@@ -10,7 +10,7 @@ import java.util.Random;
  * This class is a wrapper over the {@link Manifold#sampleVelocity(Vector, Random)} method for sampling random velocities.
  * No further processing is done over this vector.
  */
-class RandomDirectionSampler implements DirectionSampler {
+public class RandomDirectionSampler implements DirectionSampler {
     private final Manifold manifold;
 
     /**

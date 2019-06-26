@@ -4,6 +4,7 @@ import machinelearning.active.learning.versionspace.manifold.ConvexBody;
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
 import machinelearning.active.learning.versionspace.manifold.Manifold;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import machinelearning.active.learning.versionspace.manifold.euclidean.PolyhedralCone;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -58,5 +59,17 @@ public class UnitSpherePolyhedralCone implements ConvexBody {
     @Override
     public Manifold getManifold() {
         return UnitSphere.getInstance();
+    }
+
+    @Override
+    public boolean attemptToReduceEllipsoid(Ellipsoid ellipsoid) {
+        //TODO: implement this
+        return false;
+    }
+
+    @Override
+    public Ellipsoid getContainingEllipsoid() {
+        //TODO: implement this
+        return null;
     }
 }

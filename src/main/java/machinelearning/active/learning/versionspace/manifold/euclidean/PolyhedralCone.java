@@ -117,7 +117,6 @@ public class PolyhedralCone implements EuclideanConvexBody {
         Vector numerator = A.multiply(line.getCenter());
         Vector denominator = A.multiply(line.getVelocity());
 
-        // polytope intersection
         for (int i = 0; i < numerator.dim(); i++) {
             double num = numerator.get(i);
             double den = denominator.get(i);

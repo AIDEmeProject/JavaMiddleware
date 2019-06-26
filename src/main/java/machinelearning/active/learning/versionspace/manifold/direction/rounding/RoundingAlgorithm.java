@@ -1,9 +1,11 @@
 package machinelearning.active.learning.versionspace.manifold.direction.rounding;
 
-import machinelearning.active.learning.versionspace.manifold.euclidean.EuclideanConvexBody;
+import machinelearning.active.learning.versionspace.manifold.ConvexBody;
+import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
+import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
 import utils.Validator;
 
-public class RoundingAlgorithm {
+public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
     private final long maxIter;
 
     public RoundingAlgorithm(long maxIter) {
@@ -15,8 +17,13 @@ public class RoundingAlgorithm {
         this(Long.MAX_VALUE);
     }
 
-    public Ellipsoid fit(EuclideanConvexBody body) {
-        Ellipsoid ellipsoid = new Ellipsoid(body.dim(), body.getRadius());
+    @Override
+    public DirectionSampler fit(ConvexBody body) {
+        return new EllipsoidSampler(fitEllipsoid(body), body.getManifold());
+    }
+
+    private Ellipsoid fitEllipsoid(ConvexBody body) {
+        Ellipsoid ellipsoid = body.getContainingEllipsoid();
 
         for (int i = 0; i < maxIter; i++) {
             if (!body.attemptToReduceEllipsoid(ellipsoid))

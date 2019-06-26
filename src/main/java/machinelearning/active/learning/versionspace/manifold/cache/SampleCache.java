@@ -5,6 +5,7 @@ import machinelearning.active.learning.versionspace.manifold.ConvexBody;
 import machinelearning.active.learning.versionspace.manifold.Geodesic;
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
 import machinelearning.active.learning.versionspace.manifold.Manifold;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import utils.linalg.Vector;
 
 /**
@@ -93,5 +94,14 @@ public class SampleCache {
             return convexBody.getManifold();
         }
 
+        @Override
+        public boolean attemptToReduceEllipsoid(Ellipsoid ellipsoid) {
+            return convexBody.attemptToReduceEllipsoid(ellipsoid);
+        }
+
+        @Override
+        public Ellipsoid getContainingEllipsoid() {
+            return convexBody.getContainingEllipsoid();
+        }
     }
 }
