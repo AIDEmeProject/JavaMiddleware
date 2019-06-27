@@ -1,6 +1,7 @@
 package machinelearning.active.learning.versionspace.manifold.euclidean;
 
 import machinelearning.active.learning.versionspace.manifold.GeodesicSegment;
+import machinelearning.classifier.margin.HyperPlane;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.linalg.Matrix;
@@ -90,41 +91,24 @@ class UnitBallPolyhedralConeTest {
         assertEquals(Math.sqrt(0.75) - 0.5, segment.getUpperBound());
     }
 
-//    @Test
-//    void getSeparatingHyperplane_InputNormLargerThanOne_returnsHyperplanePerpendicularToInput() {
-//        Vector x = Vector.FACTORY.make(1, 1);
-//        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
-//        assertTrue(hyperplane.isPresent());
-//        assertEquals(new LinearClassifier(-1, x.normalize(1.0)), hyperplane.get());
-//    }
-//
-//    @Test
-//    void getSeparatingHyperplane_InputOnInteriorOfCone_returnsEmptyOption() {
-//        Vector x = Vector.FACTORY.make(0.5, -0.5);
-//        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
-//        assertFalse(hyperplane.isPresent());
-//    }
-//
-//    @Test
-//    void getSeparatingHyperplane_InputOnBoundaryOfCone_returnsEmptyOption() {
-//        Vector x = Vector.FACTORY.make(0.5, 0);
-//        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
-//        assertFalse(hyperplane.isPresent());
-//    }
-//
-//    @Test
-//    void getSeparatingHyperplane_InputWithNegativeFirstCoordinateButInsideUnitBall_returnsConesXAxisConstraint() {
-//        Vector x = Vector.FACTORY.make(-0.5, -0.5);
-//        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
-//        assertTrue(hyperplane.isPresent());
-//        assertEquals(new LinearClassifier(0, Vector.FACTORY.make(-1, 0)), hyperplane.get());
-//    }
-//
-//    @Test
-//    void getSeparatingHyperplane_InputWithPositiveFirstAndSecondCoordinatesButInsideUnitBall_returnsConesYAxisConstraint() {
-//        Vector x = Vector.FACTORY.make(0.5, 0.5);
-//        Optional<LinearClassifier> hyperplane = cone.getSeparatingHyperplane(x);
-//        assertTrue(hyperplane.isPresent());
-//        assertEquals(new LinearClassifier(0, Vector.FACTORY.make(0, 1)), hyperplane.get());
-//    }
+    @Test
+    void getSeparatingHyperplane_InputNormLargerThanOne_returnsHyperplanePerpendicularToInput() {
+        Vector x = Vector.FACTORY.make(1, 1);
+        HyperPlane hyperplane = body.getSeparatingHyperplane(x);
+        assertEquals(new HyperPlane(-1, x.normalize(1.0)), hyperplane);
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputWithNegativeFirstCoordinateAndInsideUnitBall_returnsConesXAxisConstraint() {
+        Vector x = Vector.FACTORY.make(-0.5, -0.5);
+        HyperPlane hyperplane = body.getSeparatingHyperplane(x);
+        assertEquals(new HyperPlane(0, Vector.FACTORY.make(-1, 0)), hyperplane);
+    }
+
+    @Test
+    void getSeparatingHyperplane_InputWithPositiveFirstAndSecondCoordinatesAndInsideUnitBall_returnsConesYAxisConstraint() {
+        Vector x = Vector.FACTORY.make(0.5, 0.5);
+        HyperPlane hyperplane = body.getSeparatingHyperplane(x);
+        assertEquals(new HyperPlane(0, Vector.FACTORY.make(0, 1)), hyperplane);
+    }
 }

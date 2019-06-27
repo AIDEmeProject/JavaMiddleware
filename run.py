@@ -48,7 +48,7 @@ NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 100
+BUDGET = 50
 
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
@@ -112,7 +112,7 @@ USE_CATEGORICAL = True
 lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=100, selector="single",
-    rounding=True, max_iter=100, cache=True,  # hit-and-run
+    rounding=True, max_iter=0, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     add_intercept=True, solver="gurobi"  # extra
 )
@@ -137,8 +137,8 @@ ACTIVE_LEARNER = UncertaintySampler(lnr)
 METRICS = [
     #ConfusionMatrix(SubspatialLearner(lnr)),
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
-    #ConfusionMatrix(lnr),
-    VersionSpaceThreeSetMetric(lower_bound_mv),
+    ConfusionMatrix(lnr),
+    #VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),
     #ConfusionMatrix(lnr),

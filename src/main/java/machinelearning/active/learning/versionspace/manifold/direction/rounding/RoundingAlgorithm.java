@@ -13,16 +13,12 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         this.maxIter = maxIter;
     }
 
-    public RoundingAlgorithm() {
-        this(Long.MAX_VALUE);
-    }
-
     @Override
     public DirectionSampler fit(ConvexBody body) {
         return new EllipsoidSampler(fitEllipsoid(body), body.getManifold());
     }
 
-    public Ellipsoid fitEllipsoid(ConvexBody body) {
+    private Ellipsoid fitEllipsoid(ConvexBody body) {
         Ellipsoid ellipsoid = body.getContainingEllipsoid();
 
         for (int i = 0; i < maxIter; i++) {
