@@ -28,7 +28,8 @@ public class SampleCacheStub extends SampleCache {
     }
 
     @Override
-    public String toString() {
-        return "SampleCacheStub";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o != null && getClass() == o.getClass();
     }
 }

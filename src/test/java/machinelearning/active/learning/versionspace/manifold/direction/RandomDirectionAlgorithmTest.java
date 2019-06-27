@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 class RandomDirectionAlgorithmTest {
 
     @Test
-    void fit_twoDimensionalConvexBodyStub_returnsTwoDimensionalRandomDirectionSampler() {
+    void fit_ConvexBodyStub_returnsRandomDirectionSamplerBuiltOnConvexBodysManifold() {
         Manifold manifold = mock(Manifold.class);
         ConvexBody body = mock(ConvexBody.class);
         when(body.getManifold()).thenReturn(manifold);

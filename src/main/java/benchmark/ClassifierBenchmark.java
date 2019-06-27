@@ -43,11 +43,9 @@ public class ClassifierBenchmark extends AbstractBenchmark {
         Learner learner = new MajorityVoteLearner(
                 new KernelVersionSpace(
                         new LinearVersionSpace(
-                                new HitAndRunSampler(
-                                        new RandomDirectionAlgorithm(),
-                                        new WarmUpAndThinSelector(64, 1),
-                                        new SampleCache()
-                                ),
+                                new HitAndRunSampler.Builder(new WarmUpAndThinSelector(64, 1))
+                                        .addCache()
+                                        .build(),
                                 LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO)
                         ),
                         new GaussianKernel()

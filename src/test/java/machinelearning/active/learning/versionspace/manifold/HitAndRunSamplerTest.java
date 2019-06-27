@@ -5,12 +5,15 @@ import machinelearning.active.learning.versionspace.manifold.cache.SampleCache;
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCacheStub;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
+import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionAlgorithm;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.RoundingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import utils.linalg.Vector;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,18 +42,50 @@ class HitAndRunSamplerTest {
     }
 
     @Test
-    void constructor_nullDirectionSamplingAlgorithm_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunSampler(null, selector, cache));
+    void builder_noCacheNoRounding_HitAndRunSamplerCorrectlyConfigured() {
+        assertEquals(
+                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCacheStub()),
+                new HitAndRunSampler.Builder(selector).build()
+        );
     }
 
     @Test
-    void constructor_nullSampleSelector_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunSampler(directionSamplingAlgorithm, null, cache));
+    void builder_AddCacheNoRounding_HitAndRunSamplerCorrectlyConfigured() {
+        assertEquals(
+                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCache()),
+                new HitAndRunSampler.Builder(selector).addCache().build()
+        );
     }
 
     @Test
-    void constructor_nullSampleCache_throwsException() {
-        assertThrows(NullPointerException.class, () -> new HitAndRunSampler(directionSamplingAlgorithm, selector, null));
+    void builder_NoCacheAddRounding_HitAndRunSamplerCorrectlyConfigured() {
+        assertEquals(
+                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCacheStub()),
+                new HitAndRunSampler.Builder(selector).addRounding(100).build()
+        );
+    }
+
+    @Test
+    void builder_AddCacheAddRounding_HitAndRunSamplerCorrectlyConfigured() {
+        assertEquals(
+                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCache()),
+                new HitAndRunSampler.Builder(selector).addCache().addRounding(100).build()
+        );
+    }
+
+    @Test
+    void builder_nullSampleSelector_throwsException() {
+        assertThrows(NullPointerException.class, () -> new HitAndRunSampler.Builder(null));
+    }
+
+    @Test
+    void builder_negativeMaxIters_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new HitAndRunSampler.Builder(selector).addRounding(-1));
+    }
+
+    @Test
+    void builder_zeroMaxIters_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> new HitAndRunSampler.Builder(selector).addRounding(0));
     }
 
     @Test

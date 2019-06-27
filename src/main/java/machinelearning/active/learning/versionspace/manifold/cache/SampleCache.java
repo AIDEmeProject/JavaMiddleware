@@ -8,6 +8,8 @@ import machinelearning.active.learning.versionspace.manifold.Manifold;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import utils.linalg.Vector;
 
+import java.util.Arrays;
+
 /**
  * The SampleCache is a module for caching samples from the {@link machinelearning.active.learning.versionspace.LinearVersionSpace}
  * object. One of the inherent problems with the LinearVersionSpace sampling algorithm is in the computation of a first
@@ -103,5 +105,13 @@ public class SampleCache {
         public Ellipsoid getContainingEllipsoid() {
             return convexBody.getContainingEllipsoid();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SampleCache that = (SampleCache) o;
+        return Arrays.equals(cachedSamples, that.cachedSamples);
     }
 }

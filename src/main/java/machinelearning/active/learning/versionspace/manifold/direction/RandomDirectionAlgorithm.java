@@ -20,4 +20,10 @@ public class RandomDirectionAlgorithm implements DirectionSamplingAlgorithm {
     public DirectionSampler fit(ConvexBody body) {
         return new RandomDirectionSampler(body.getManifold());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o != null && getClass() == o.getClass();
+    }
 }

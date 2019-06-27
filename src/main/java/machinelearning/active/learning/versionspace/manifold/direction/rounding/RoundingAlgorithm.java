@@ -32,4 +32,12 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
 
         return ellipsoid;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoundingAlgorithm that = (RoundingAlgorithm) o;
+        return maxIter == that.maxIter;
+    }
 }
