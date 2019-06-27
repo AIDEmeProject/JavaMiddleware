@@ -3,8 +3,11 @@ package machinelearning.active.learning.versionspace.manifold;
 
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCache;
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCacheStub;
+import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionAlgorithm;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.EllipsoidSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.RoundingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import utils.Validator;
@@ -24,6 +27,7 @@ public class HitAndRunSampler {
     private final DirectionSamplingAlgorithm samplingAlgorithm;
     private final SampleSelector selector;
     private final SampleCache cache;
+    private final boolean isRounding;
 
     public static class Builder {
         private SampleSelector selector;
@@ -50,15 +54,14 @@ public class HitAndRunSampler {
     }
 
     private HitAndRunSampler(Builder builder) {
-        this.samplingAlgorithm = builder.samplingAlgorithm;
-        this.selector = builder.selector;
-        this.cache = builder.cache;
+        this(builder.samplingAlgorithm, builder.selector, builder.cache);
     }
 
     HitAndRunSampler(DirectionSamplingAlgorithm samplingAlgorithm, SampleSelector selector, SampleCache cache) {
         this.samplingAlgorithm = samplingAlgorithm;
         this.selector = selector;
         this.cache = cache;
+        this.isRounding = this.samplingAlgorithm instanceof RoundingAlgorithm;
     }
 
     /**
@@ -69,9 +72,20 @@ public class HitAndRunSampler {
     public Vector[] sample(ConvexBody body, int numSamples) {
         Validator.assertPositive(numSamples);
 
+        final DirectionSampler directionSampler = samplingAlgorithm.fit(body);
+
+        // When using rounding, the fitted ellipsoid's center can be used as starting point for hit-and-run
+        if (isRounding) {
+            Ellipsoid ellipsoid = ((EllipsoidSampler) directionSampler).getEllipsoid();
+
+            if (body.isInside(ellipsoid.getCenter())) {
+                cache.updateCache(new Vector[]{ellipsoid.getCenter()});
+            }
+        }
+
         body = cache.attemptToSetDefaultInteriorPoint(body);
 
-        HitAndRun chain = new HitAndRun(body, samplingAlgorithm.fit(body));
+        HitAndRun chain = new HitAndRun(body, directionSampler);
         Vector[] samples = selector.select(chain, numSamples);
 
         cache.updateCache(samples);

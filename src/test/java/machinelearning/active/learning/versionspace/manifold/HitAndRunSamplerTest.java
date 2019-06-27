@@ -6,7 +6,11 @@ import machinelearning.active.learning.versionspace.manifold.cache.SampleCacheSt
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionAlgorithm;
+import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionSampler;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
+import machinelearning.active.learning.versionspace.manifold.direction.rounding.EllipsoidSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.RoundingAlgorithm;
+import machinelearning.active.learning.versionspace.manifold.euclidean.EuclideanSpace;
 import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,45 +120,47 @@ class HitAndRunSamplerTest {
         verify(selector).select(any(), eq(3));
     }
 
-//    @Test
-//    void sample_usingRoundingAndCenterFallsInsideBody_ellipsoidCenterPutInCache() {
-//        RoundingAlgorithm algorithm = mock(RoundingAlgorithm.class);
-//        when(algorithm.fit(any())).thenReturn(new RandomDirectionSampler(1));
-//
-//        Vector center = Vector.FACTORY.make(10);
-//        when(algorithm.getCenter()).thenReturn(center);
-//
-//        sampler = new HitAndRunSampler
-//                .Builder(algorithm, selector)
-//                .cache(cache)
-//                .build();
-//
-//        ConvexBody body = mock(ConvexBody.class);
-//        when(body.isInside(any())).thenReturn(true);
-//
-//        sampler.sample(body, 3);
-//
-//        verify(cache).updateCache(new Vector[] {center});
-//    }
-//
-//    @Test
-//    void sample_usingRoundingAndCenterFallsOutsideBody_cacheNotUpdated() {
-//        RoundingAlgorithm algorithm = mock(RoundingAlgorithm.class);
-//        when(algorithm.fit(any())).thenReturn(new RandomDirectionSampler(1));
-//
-//        Vector center = Vector.FACTORY.make(10);
-//        when(algorithm.getCenter()).thenReturn(center);
-//
-//        sampler = new HitAndRunSampler
-//                .Builder(algorithm, selector)
-//                .cache(cache)
-//                .build();
-//
-//        ConvexBody body = mock(ConvexBody.class);
-//        when(body.isInside(any())).thenReturn(false);
-//
-//        sampler.sample(body, 3);
-//
-//        verify(cache, never()).updateCache(new Vector[] {center});
-//    }
+    @Test
+    void sample_usingRoundingAndCenterFallsInsideBody_ellipsoidCenterPutInCache() {
+        ConvexBody body = mock(ConvexBody.class);
+        when(body.isInside(any())).thenReturn(true);
+
+        Vector center = mock(Vector.class);
+        Ellipsoid ellipsoidStub = mock(Ellipsoid.class);
+        when(ellipsoidStub.getCenter()).thenReturn(center);
+
+        EllipsoidSampler ellipsoidSamplerStub = mock(EllipsoidSampler.class);
+        when(ellipsoidSamplerStub.getEllipsoid()).thenReturn(ellipsoidStub);
+
+        RoundingAlgorithm roundingStub = mock(RoundingAlgorithm.class);
+        when(roundingStub.fit(body)).thenReturn(ellipsoidSamplerStub);
+
+        sampler = new HitAndRunSampler(roundingStub, selector, cache);
+
+        sampler.sample(body, 3);
+
+        verify(cache).updateCache(new Vector[] {center});
+    }
+
+    @Test
+    void sample_usingRoundingAndCenterFallsOutsideBody_ellipsoidCenterPutInCache() {
+        ConvexBody body = mock(ConvexBody.class);
+        when(body.isInside(any())).thenReturn(false);
+
+        Vector center = mock(Vector.class);
+        Ellipsoid ellipsoidStub = mock(Ellipsoid.class);
+        when(ellipsoidStub.getCenter()).thenReturn(center);
+
+        EllipsoidSampler ellipsoidSamplerStub = mock(EllipsoidSampler.class);
+        when(ellipsoidSamplerStub.getEllipsoid()).thenReturn(ellipsoidStub);
+
+        RoundingAlgorithm roundingStub = mock(RoundingAlgorithm.class);
+        when(roundingStub.fit(body)).thenReturn(ellipsoidSamplerStub);
+
+        sampler = new HitAndRunSampler(roundingStub, selector, cache);
+
+        sampler.sample(body, 3);
+
+        verify(cache, never()).updateCache(new Vector[] {center});
+    }
 }

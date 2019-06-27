@@ -22,7 +22,7 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         return new EllipsoidSampler(fitEllipsoid(body), body.getManifold());
     }
 
-    private Ellipsoid fitEllipsoid(ConvexBody body) {
+    public Ellipsoid fitEllipsoid(ConvexBody body) {
         Ellipsoid ellipsoid = body.getContainingEllipsoid();
 
         for (int i = 0; i < maxIter; i++) {
