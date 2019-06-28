@@ -11,22 +11,24 @@ class FakePointSampling extends Component{
 
         this.state = {
             
-            pointToLabel: this.props.pointToLabel
+            fakePoint: this.props.pointToLabel
         }        
     }
     
     render(){
-        console.log(this.props)
+        
         return (
             <div>
                
                 <h4>
-                    Fake point sampling
+                    Fake point initial sampling
                 </h4>
                 <p>
-                    Here is a fake point. Would you class it as the positive class ? If yes click on
-                    validate
-                    Otherwise change its features until it would belong to the positive class                    
+                    We have created a fake point. It was created by taking the median value of t
+                    the numerical columns and the the most common category.
+
+                    Please change the attribute of the point until you reach a point which
+                    would belong to the positive class
                 </p>
 
                 <table>
@@ -44,58 +46,58 @@ class FakePointSampling extends Component{
                         </tr>
                     </thead>
                     <tbody>
-                <tr>
-                    {
-                        this.state.pointToLabel.map((col, i) => {
-                            
-                            return (
-                                <td
-                                    key={i}
-                                >
-                                    
-                                    <button
-                                        data-col={i}
-                                        className="btn"
-                                        onClick={this.increaseValue.bind(this)}                            
+                        <tr>
+                            {
+                                this.state.fakePoint.map((col, i) => {
+                                
+                                return (
+                                    <td
+                                        key={i}
                                     >
-                                        <i 
-                                            className="material-icons"
-                                            data-col={i}
-                                        >
-                                            keyboard_arrow_up
-                                        </i> 
-                                    </button>                                        
-
-                                    <span>
-                                        { col }
-                                    </span>
-
-                                    <button 
                                         
-                                        className="btn"
-                                        onClick={this.decreaseValue.bind(this)}                                        
-                                    >
-                                        <i 
-                                            className="material-icons"
+                                        <button
                                             data-col={i}
+                                            className="btn"
+                                            onClick={this.increaseValue.bind(this)}                            
                                         >
-                                            keyboard_arrow_down</i>          
-                                    </button>
-                                </td>
-                            )
-                        })
-                    }
+                                            <i 
+                                                className="material-icons"
+                                                data-col={i}
+                                            >
+                                                keyboard_arrow_up
+                                            </i> 
+                                        </button>                                        
 
-                    <td>
+                                        <span>
+                                            { col }
+                                        </span>
 
-                        <button 
-                            onClick={this.onValidatePoint.bind(this)}
-                            className="btn"
-                        >
-                            Validate
-                        </button>
-                    </td>
-                </tr>        
+                                        <button 
+                                            
+                                            className="btn"
+                                            onClick={this.decreaseValue.bind(this)}                                        
+                                        >
+                                            <i 
+                                                className="material-icons"
+                                                data-col={i}
+                                            >
+                                                keyboard_arrow_down</i>          
+                                        </button>
+                                    </td>
+                                )
+                            })
+                        }
+
+                        <td>
+
+                            <button 
+                                onClick={this.onValidatePoint.bind(this)}
+                                className="btn"
+                            >
+                                Validate
+                            </button>
+                        </td>
+                    </tr>        
                 </tbody>
                 </table>                                
             </div>
@@ -106,9 +108,9 @@ class FakePointSampling extends Component{
 
         var i = e.target.dataset.col
         
-        var pointToLabel = this.state.pointToLabel.map(e => e)
+        var pointToLabel = this.state.fakePoint.map(e => e)
         
-        var colType = this.props.availableVariables[i].type
+        var colType = this.props.variableTypes[i]
 
         if (colType == "numerical"){
             pointToLabel[i] += pointToLabel[i] * 0.1
@@ -118,7 +120,7 @@ class FakePointSampling extends Component{
         }
 
         this.setState({
-            pointToLabel: pointToLabel
+            fakePoint: pointToLabel
         })
     }
 
@@ -126,25 +128,26 @@ class FakePointSampling extends Component{
         
         var i = e.target.dataset.col
         
-        var pointToLabel = this.state.pointToLabel.map(e => e)
-        var colType = this.props.availableVariables[i].type
+      
+        var pointToLabel = this.state.fakePoint.map(e => e)
+        
+        var colType = this.props.variableTypes[i]
 
         if (colType == "numerical"){
             pointToLabel[i] -= pointToLabel[i] * 0.1
         }
         else{
-            pointToLabel[i] -= 1
+            pointToLabel[i] = Math.max(0, pointToLabel[i] - 1)
         }
 
         this.setState({
-            pointToLabel: pointToLabel
+            fakePoint: pointToLabel
         })
     }
 
     onValidatePoint(){
         sendPoint(this.state.pointToLabel, this.props.fakePointWasValidated)
     }
-
 }
 
 function sendPoint(point, onSuccess){
@@ -158,8 +161,10 @@ function sendPoint(point, onSuccess){
 }
 
 FakePointSampling.defaultProps = {
-    
-    fakePointWasValidated: (response) => {console.log('lal')}
+    availableVariables: ['age', 'sex'],
+    variableTypes: ["numerical", 'categorical'],
+    pointToLabel: [22, 1],
+        
 }
 
 export default FakePointSampling

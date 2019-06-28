@@ -8,7 +8,7 @@ import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSM/TSMExploration'
 import DataPoints from './components/DataPoints'
-
+import FakePointSampling from './components/InitialSampling/FakePointSampling'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
@@ -87,6 +87,12 @@ class App extends Component {
 
                     <div className="col col-lg-10 offset-lg-1">
             
+
+
+                        <FakePointSampling />
+
+
+
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                             fileUploaded={this.fileUploaded.bind(this)} 
