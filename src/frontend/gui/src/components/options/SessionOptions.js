@@ -101,8 +101,9 @@ class SessionOptions extends Component{
 
                                                 </label>
                                             </div>      
-                                            <div className="col s4">
+                                            <div className="col s1">
                                                 <select 
+                                                    className="form-control"
                                                     data-key={key}
                                                     onChange={this.onColumnTypeChange.bind(this)}
                                                     ref={"column-type-" + key}
@@ -115,11 +116,6 @@ class SessionOptions extends Component{
                                     ))
                                 }
                         
-                                <label>Use fake point sampler</label>
-                                <input 
-                                    type="checkbox"
-                                    onClick={this.onFakePointClick.bind(this)}
-                                />
 
                                 <input 
                                     id="conf" 
@@ -216,10 +212,11 @@ class SessionOptions extends Component{
                 availableVariables.push({
                     name: c,
                     i: i,
-                    type: this.refs["column-type-" + i].value
+                   
                 })
             }
         })
+        
         
                 
         this.setState({
@@ -231,29 +228,49 @@ class SessionOptions extends Component{
     }
 
     onColumnTypeChange(e){
-        var iColumn = e.target.dataset.key
+        var iColumn = e.target.dataset.key - 1
         var variable = Object.assign({}, this.state.availableVariables[iColumn])
         variable.type = e.target.value
 
+        
+
         var availableVariables = this.state.availableVariables.map(e=>e)
         availableVariables[iColumn] = variable
-        this.setState({availableVariables: availableVariables})                
+
+        
+        this.setState({
+            availableVariables: availableVariables,
+            variableTypes: availableVariables.map(e => e.type)
+        })                
     }
     
     onSessionStartClick(e){
         
         e.preventDefault()
         
-        sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
-
-        this.props.sessionOptionsWereChosen({
-            
-            useFakePoint: this.state.useFakePoint,
-            chosenColumns: this.state.availableVariables
+        var availableVariables = this.state.availableVariables.map(e => {
+            return Object.assign(e, {
+                type: this.refs["column-type-" + e.i].value
+            })
         })
+        
+        this.setState({
+            availableVariables: availableVariables
+        }, () => {
+            sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
+
+            this.props.sessionOptionsWereChosen({
+                
+                useFakePoint: this.state.useFakePoint,
+                chosenColumns: this.state.availableVariables,
+                variableTypes: this.state.variableTypes
+            })
+        })
+        
     }
 
     variableGroupsChanged(groups){
+        
         this.setState({
             variableGroups: groups
         })

@@ -16,6 +16,7 @@ class FakePointSampling extends Component{
     }
     
     render(){
+        console.log(this.props)
         
         return (
             <div>
@@ -35,9 +36,9 @@ class FakePointSampling extends Component{
                     <thead>
                         <tr>
                             {
-                                this.props.availableVariables.map(v => {
+                                this.props.availableVariables.map((v, i) => {
                                     return (
-                                        <th>
+                                        <th key={i}>
                                             { v.name }
                                         </th>
                                     )
@@ -75,11 +76,12 @@ class FakePointSampling extends Component{
                                         <button 
                                             
                                             className="btn"
-                                            onClick={this.decreaseValue.bind(this)}                                        
+                                            onClick={this.decreaseValue.bind(this)}     
+                                            data-col={i}                                   
                                         >
                                             <i 
-                                                className="material-icons"
-                                                data-col={i}
+                                                className="material-icons"         
+                                                data-col={i}                                       
                                             >
                                                 keyboard_arrow_down</i>          
                                         </button>
@@ -107,10 +109,11 @@ class FakePointSampling extends Component{
     increaseValue(e){
 
         var i = e.target.dataset.col
+        console.log(i)
         
         var pointToLabel = this.state.fakePoint.map(e => e)
         
-        var colType = this.props.variableTypes[i]
+        var colType = this.props.availableVariables[i].type
 
         if (colType == "numerical"){
             pointToLabel[i] += pointToLabel[i] * 0.1
@@ -128,10 +131,11 @@ class FakePointSampling extends Component{
         
         var i = e.target.dataset.col
         
+        console.log(i)
       
         var pointToLabel = this.state.fakePoint.map(e => e)
         
-        var colType = this.props.variableTypes[i]
+        var colType = this.props.availableVariables[i].type
 
         if (colType == "numerical"){
             pointToLabel[i] -= pointToLabel[i] * 0.1

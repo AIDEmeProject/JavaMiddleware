@@ -87,12 +87,6 @@ class App extends Component {
 
                     <div className="col col-lg-10 offset-lg-1">
             
-
-
-                        <FakePointSampling />
-
-
-
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                             fileUploaded={this.fileUploaded.bind(this)} 
@@ -204,7 +198,7 @@ class App extends Component {
     }
 
     onPositiveLabel(e){
-        console.log(e.target)
+        
         var dataIndex = e.target.dataset.key
         this.dataWasLabeled(dataIndex, 1)
     }

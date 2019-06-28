@@ -19,7 +19,7 @@ class InitialSampling extends Component{
     }
     
     render(){
-
+        console.log(this.props)
         return (
             <div>
                 <div>
@@ -72,6 +72,7 @@ class InitialSampling extends Component{
                             <FakePointSampling 
                             pointToLabel={this.props.pointsToLabel[0].data}
                             {...this.props}
+                            variableTypes={this.props.options.variableTypes}
                             />
                        </div>
                
@@ -83,10 +84,6 @@ class InitialSampling extends Component{
             </div>
         )
     }
-
-
-
-
 }
 
 export default InitialSampling
