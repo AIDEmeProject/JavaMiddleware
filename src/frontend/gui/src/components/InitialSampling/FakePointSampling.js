@@ -16,7 +16,7 @@ class FakePointSampling extends Component{
     }
     
     render(){
-            
+        console.log(this.props)
         return (
             <div>
                
@@ -28,6 +28,22 @@ class FakePointSampling extends Component{
                     validate
                     Otherwise change its features until it would belong to the positive class                    
                 </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            {
+                                this.props.availableVariables.map(v => {
+                                    return (
+                                        <th>
+                                            { v.name }
+                                        </th>
+                                    )
+                                })
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
                 <tr>
                     {
                         this.state.pointToLabel.map((col, i) => {
@@ -79,16 +95,27 @@ class FakePointSampling extends Component{
                             Validate
                         </button>
                     </td>
-                </tr>                                        
+                </tr>        
+                </tbody>
+                </table>                                
             </div>
         )
     }
 
     increaseValue(e){
+
         var i = e.target.dataset.col
         
         var pointToLabel = this.state.pointToLabel.map(e => e)
-        pointToLabel[i] += pointToLabel[i] * 0.1
+        
+        var colType = this.props.availableVariables[i].type
+
+        if (colType == "numerical"){
+            pointToLabel[i] += pointToLabel[i] * 0.1
+        }
+        else{
+            pointToLabel[i] += 1
+        }
 
         this.setState({
             pointToLabel: pointToLabel
@@ -100,7 +127,14 @@ class FakePointSampling extends Component{
         var i = e.target.dataset.col
         
         var pointToLabel = this.state.pointToLabel.map(e => e)
-        pointToLabel[i] -= pointToLabel[i] * 0.1
+        var colType = this.props.availableVariables[i].type
+
+        if (colType == "numerical"){
+            pointToLabel[i] -= pointToLabel[i] * 0.1
+        }
+        else{
+            pointToLabel[i] -= 1
+        }
 
         this.setState({
             pointToLabel: pointToLabel

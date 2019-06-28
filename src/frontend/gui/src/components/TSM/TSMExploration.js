@@ -25,7 +25,7 @@ class TSMExploration extends Component{
     }
 
     render(){
-
+        console.log(this.props)     
         var Viz
         if (this.state.showModelVisualisation){
             Viz = () => {
@@ -52,8 +52,8 @@ class TSMExploration extends Component{
                     a positive example and a negative example.        
 
                         <SpecificPointToLabel 
-                    onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-                    show={this.props.initialLabelingSession}
+                         onNewPointsToLabel={this.newPointsToLabel.bind(this)}
+                        show={this.props.initialLabelingSession}
                 />            
                 </div>
             )}
@@ -92,7 +92,7 @@ class TSMExploration extends Component{
                                             key ={i}
                                             colSpan={g.length}
                                         >
-                                            {g.map(e => e.name).join(", ")}
+                                            {g.join(", ")}
                                         </th>
                                     )
                                 })

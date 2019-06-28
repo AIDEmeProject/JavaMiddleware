@@ -12,49 +12,80 @@ class InitialSampling extends Component{
     constructor(props){
         
         super(props)       
+
+        this.state = {
+            labelingInitialSampling: true
+        }
     }
     
     render(){
 
-        console.log(this.props.options)
-    
-        if ( ! this.props.initialLabelingSession){
-            return (<div></div>)
-        }
-
-
-        if (this.props.options.useFakePoint){
-            return (
-                <div>
-                     <FakePointSampling 
-                        pointToLabel={this.props.pointsToLabel[0].data}
-                     />
-                </div>
-            )
-        }
-
         return (
             <div>
                 <div>
+
+                    <ul className="nav nav-tabs">
+                        <li className="nav-item">
+                            <a 
+                            className="nav-link active" 
+                            href="#"
+                            onClick={() => this.setState({labelingInitialSampling: true})}
+                            >
+                                Labeling initial sampling
+                            </a>
+                        </li>
+
+                        <li className="nav-item">
+                            <a 
+                            className="nav-link active" 
+                            href="#"
+                            onClick={() => this.setState({labelingInitialSampling: false})}
+                            >
+                                Fake point initial sampling
+                            </a>
+                        </li>                     
+                    </ul>
+
                     The first phase of labeling continues until we obtain 
                     a positive example and a negative example. <br />
 
-                    
-                    <SpecificPointToLabel 
-                        onNewPointsToLabel={this.props.onNewPointsToLabel}
-                        
-                    />
-                   
-                   <PointLabelisation
-                        {...this.props}   
-                        {...this.state}
-                    />
+                    {
+                        this.state.labelingInitialSampling && 
+
+                        <div>
+                            <SpecificPointToLabel 
+                                onNewPointsToLabel={this.props.onNewPointsToLabel}                        
+                            />
+                
+                            <PointLabelisation
+                                {...this.props}   
+                                {...this.state}
+                            />
+                        </div>
+                    }
+                 
+
+                    {
+                        ! this.state.labelingInitialSampling && 
+
+                        <div>
+                            <FakePointSampling 
+                            pointToLabel={this.props.pointsToLabel[0].data}
+                            {...this.props}
+                            />
+                       </div>
+               
+                    }
+
 
                 </div>
                                                   
             </div>
         )
     }
+
+
+
 
 }
 

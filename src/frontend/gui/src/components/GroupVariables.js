@@ -55,6 +55,10 @@ class GroupVariables extends Component {
                     Variable subgroups
                 </h4>
 
+                 <p>
+                    By grouping variable in formal subgroups, the convergence
+                    speed can be improved. 
+                </p>
                 <p>
                     Please put the variable in subgroups (at least 2). Left out variables 
                     will be put in their own subgroups
@@ -146,8 +150,6 @@ class GroupVariables extends Component {
     componentWillReceiveProps(nextProps){
         
         //merge stuff
-
-
         this.setState({
             availableVariables: nextProps.availableVariables.map (e => e)
         }, this.forceUpdate)
@@ -180,7 +182,6 @@ class GroupVariables extends Component {
             
             usedVariables.push(variable)
             groups[iGroup].push(variable)
-
         }
         else{
 
@@ -199,6 +200,8 @@ class GroupVariables extends Component {
             usedVariables: usedVariables,
             groups: groups
         })                
+
+        this.props.variableGroupsChanged(groups)
     }
 
 

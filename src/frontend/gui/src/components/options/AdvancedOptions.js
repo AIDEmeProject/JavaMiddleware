@@ -7,7 +7,6 @@ class AdvancedOptions extends Component{
 
     render(){
 
-
         if ( ! this.props.showAdvancedOptions){
             return (<div></div>)
         }

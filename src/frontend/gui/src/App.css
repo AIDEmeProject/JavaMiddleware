@@ -22,3 +22,8 @@
 .navbar{
     margin-bottom: 40px;
 }
+
+
+.col-selector > * {
+    display: inline-block;
+}

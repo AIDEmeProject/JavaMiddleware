@@ -26,7 +26,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            step : AUTHENTICATION,
+            step : NEW_SESSION,
             columns: [],
             labeledPoints: [],
             pointsToLabel: [],
@@ -36,11 +36,8 @@ class App extends Component {
             hasFalse: false,
             availableVariables: [],
             finalVariables: []
-
         }
     }
-
-   
 
   render() {
 
@@ -69,7 +66,7 @@ class App extends Component {
             break
         
         default: 
-            View = Authentication
+            View = NEW_SESSION
     }
 
     return (
@@ -126,12 +123,19 @@ class App extends Component {
 
 
 
-  onAuthenticationSuccess(response){
+    onAuthenticationSuccess(response){
         
         this.setState({
             authorizationToken: response.authorizationToken,
             sessionToken: response.sessionToken,
             step: NEW_SESSION
+        })
+    }
+
+    sessionOptionsWereChosen(options){
+
+        this.setState({
+            options: options
         })
     }
 
@@ -154,6 +158,7 @@ class App extends Component {
             })    
         }
         else{
+            
             this.setState({
                 step: EXPLORATION,
                 pointsToLabel: pointsToLabel,
@@ -163,12 +168,6 @@ class App extends Component {
         }        
     }
 
-    sessionOptionsWereChosen(options){
-
-        this.setState({
-            options: options
-        })
-    }
 
     fileUploaded(response){
 
