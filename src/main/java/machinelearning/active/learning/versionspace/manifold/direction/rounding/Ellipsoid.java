@@ -6,6 +6,8 @@ import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 public interface Ellipsoid {
+    int dim();
+
     Vector getCenter();
 
     Matrix getScale();

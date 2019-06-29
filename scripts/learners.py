@@ -91,7 +91,7 @@ class BayesianSampler(Printable):
 class VersionSpace(Printable):
     def __init__(self, hit_and_run,
                  kernel='linear', gamma=0, diagonal=(),
-                 add_intercept=True, solver="ojalgo"):
+                 decompose=False, add_intercept=True, solver="ojalgo"):
         super().__init__(add_name=False)
 
         assert_in_list(solver, LINPROG_SOLVERS)
@@ -100,6 +100,7 @@ class VersionSpace(Printable):
         self.solver = solver
         self.kernel = Kernel(kernel, gamma, diagonal)
         self.hitAndRunSampler = hit_and_run
+        self.decompose = decompose
 
 
 class BayesianVersionSpace(Printable):
@@ -116,7 +117,7 @@ class MajorityVote(Learner):
                  warmup=100, thin=10, chain_length=64, selector="single",
                  rounding=True, max_iter=0, cache=False,
                  kernel='linear', gamma=0, diagonal=(),
-                 add_intercept=True, solver="ojalgo"):
+                 decompose=False, add_intercept=True, solver="ojalgo"):
         super().__init__()
 
         assert_positive('num_samples', num_samples)
@@ -129,7 +130,7 @@ class MajorityVote(Learner):
                 rounding=rounding, max_iter=max_iter, cache=cache
             ),
             kernel=kernel, gamma=gamma, diagonal=diagonal,
-            add_intercept=add_intercept, solver=solver
+            decompose=decompose, add_intercept=add_intercept, solver=solver
         )
 
 

@@ -22,6 +22,7 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         boolean addIntercept = jsonObject.getAsJsonPrimitive("addIntercept").getAsBoolean();
+        boolean decompose = jsonObject.getAsJsonPrimitive("decompose").getAsBoolean();
 
         VersionSpace linearVersionSpace;
 
@@ -35,6 +36,10 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
 
             if (addIntercept) {
                 ((LinearVersionSpace) linearVersionSpace).addIntercept();
+            }
+
+            if (decompose) {
+                ((LinearVersionSpace) linearVersionSpace).useDecomposition();
             }
         }
         else if (jsonObject.has("bayesianSampler")) {

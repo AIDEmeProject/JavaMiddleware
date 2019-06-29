@@ -114,7 +114,7 @@ lnr = MajorityVote(
     warmup=100, thin=10, chain_length=100, selector="single",
     rounding=True, max_iter=0, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    add_intercept=True, solver="gurobi"  # extra
+    decompose=True, add_intercept=True, solver="gurobi"  # extra
 )
 
 lower_bound_mv = MajorityVote(
@@ -122,7 +122,7 @@ lower_bound_mv = MajorityVote(
     warmup=1000, thin=100, chain_length=100, selector="single",
     rounding=True, max_iter=0, cache=True,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    add_intercept=True, solver="gurobi"  # extra
+    decompose=False, add_intercept=True, solver="gurobi"  # extra
 )
 
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)

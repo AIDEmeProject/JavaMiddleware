@@ -49,8 +49,8 @@ public class KernelVersionSpace implements VersionSpace {
     @Override
     public KernelMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Matrix kernelMatrix = kernel.compute(labeledPoints.getData());
-        LabeledDataset kernelLabeledPoints =  labeledPoints.copyWithSameIndexesAndLabels(kernelMatrix);
-        Classifier linearClassifiers = versionSpace.sample(kernelLabeledPoints, numSamples);
-        return new KernelMajorityVote(linearClassifiers, labeledPoints.getData(), kernel);
+        LabeledDataset kernelLabeledPoints = labeledPoints.copyWithSameIndexesAndLabels(kernelMatrix);
+        Classifier linearMajorityVote = versionSpace.sample(kernelLabeledPoints, numSamples);
+        return new KernelMajorityVote(linearMajorityVote, labeledPoints.getData(), kernel);
     }
 }

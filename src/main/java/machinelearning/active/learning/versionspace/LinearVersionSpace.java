@@ -10,6 +10,7 @@ import machinelearning.active.learning.versionspace.manifold.sphere.UnitSpherePo
 import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
+import utils.linalg.CholeskyDecomposition;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
@@ -29,10 +30,6 @@ import java.util.Objects;
  * @see PolyhedralCone
  */
 public class LinearVersionSpace implements VersionSpace {
-    /**
-     * Whether to add intercept to data points
-     */
-    private boolean addIntercept;
 
     /**
      * {@link HitAndRunSampler} instance for sampling from this version space
@@ -43,6 +40,18 @@ public class LinearVersionSpace implements VersionSpace {
      * {@link LinearProgramSolver} factory
      */
     private final LinearProgramSolver.FACTORY solverFactory;
+
+    /**
+     * Whether to add intercept to data points
+     */
+    private boolean addIntercept = false;
+
+    /**
+     * Whether to add intercept to data points
+     */
+    private boolean decompose = false;
+
+    private Matrix decompositionStore;
 
     /**
      * Whether to sample from sphere
@@ -59,7 +68,6 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, LinearProgramSolver.FACTORY solverFactory) {
         this.hitAndRunSampler = Objects.requireNonNull(hitAndRunSampler);
         this.solverFactory = Objects.requireNonNull(solverFactory);
-        this.addIntercept = false;
     }
 
     /**
@@ -67,6 +75,10 @@ public class LinearVersionSpace implements VersionSpace {
      */
     public void addIntercept() {
         this.addIntercept = true;
+    }
+
+    public void useDecomposition() {
+        this.decompose = true;
     }
 
     /**
@@ -88,6 +100,11 @@ public class LinearVersionSpace implements VersionSpace {
 
     private PolyhedralCone buildPolyhedralCone(LabeledDataset labeledPoints) {
         Matrix X = labeledPoints.getData();
+
+        if (decompose) {
+            X = decompositionStore = new CholeskyDecomposition(X.addScalarToDiagonal(1e-10)).getL();
+        }
+
         X = addIntercept ? X.addBiasColumn() : X;
 
         Vector y = Vector.FACTORY.make(
@@ -108,7 +125,31 @@ public class LinearVersionSpace implements VersionSpace {
             weights = weights.getColSlice(1, weights.cols());
         }
 
+        if (decompose) {
+            weights = weights.matrixMultiply(invertDecomposition());
+        }
+
         return new LinearMajorityVote(bias, weights);
+    }
+
+    private Matrix invertDecomposition() {
+        int n = decompositionStore.rows();
+
+        for (int j = 0; j < n; j++) {
+            decompositionStore.set(j, j, 1 / decompositionStore.get(j, j));
+
+            for (int i = j + 1; i < n; i++) {
+                double sum = 0;
+
+                for (int r = j; r < i; r++) {
+                    sum += decompositionStore.get(i, r) * decompositionStore.get(r, j);
+                }
+
+                decompositionStore.set(i, j, -sum / decompositionStore.get(i, i));
+            }
+        }
+
+        return decompositionStore;
     }
 }
 

@@ -92,4 +92,31 @@ class LinearVersionSpaceTest {
                 versionSpace.sample(trainingData, hitAndRunSamples.length)
         );
     }
+
+    @Test
+    void name() {
+        Matrix decompositionStore = Matrix.FACTORY.make(3, 3, 10, 0, 0, 5, -10, 0, -3, 5, 1);
+
+        Matrix inverse = decompositionStore.copy();
+
+        int n = decompositionStore.rows();
+        for (int j = 0; j < n; j++) {
+            inverse.set(j, j, 1 / inverse.get(j, j));
+
+            for (int i = j + 1; i < n; i++) {
+                double sum = 0;
+
+                for (int r = j; r < i; r++) {
+                    sum += inverse.get(i, r) * inverse.get(r, j);
+                }
+
+                inverse.set(i, j, -sum / inverse.get(i, i));
+            }
+        }
+
+        System.out.println(decompositionStore);
+        System.out.println(inverse);
+        System.out.println(decompositionStore.matrixMultiply(inverse));
+        System.out.println(inverse.matrixMultiply(decompositionStore));
+    }
 }
