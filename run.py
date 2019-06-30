@@ -44,7 +44,7 @@ MODES = [
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 2
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
