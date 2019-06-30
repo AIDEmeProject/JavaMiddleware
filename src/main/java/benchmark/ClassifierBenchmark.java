@@ -5,8 +5,6 @@ import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
-import machinelearning.active.learning.versionspace.manifold.cache.SampleCache;
-import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.selector.WarmUpAndThinSelector;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
@@ -44,7 +42,7 @@ public class ClassifierBenchmark extends AbstractBenchmark {
                 new KernelVersionSpace(
                         new LinearVersionSpace(
                                 new HitAndRunSampler.Builder(new WarmUpAndThinSelector(64, 1))
-                                        .addCache()
+                                        .addSampleCache()
                                         .build(),
                                 LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO)
                         ),

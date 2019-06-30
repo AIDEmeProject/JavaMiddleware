@@ -22,8 +22,10 @@ public class RoundingAlgorithm implements DirectionSamplingAlgorithm {
         Ellipsoid ellipsoid = body.getContainingEllipsoid();
 
         for (int i = 0; i < maxIter; i++) {
-            if (!body.attemptToReduceEllipsoid(ellipsoid))
+            if (!body.attemptToReduceEllipsoid(ellipsoid)) {
+                System.out.println("n_iter: " + i);
                 return ellipsoid;
+            }
         }
 
         return ellipsoid;

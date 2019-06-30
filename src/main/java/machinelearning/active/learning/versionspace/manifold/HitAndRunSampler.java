@@ -1,6 +1,8 @@
 package machinelearning.active.learning.versionspace.manifold;
 
 
+import machinelearning.active.learning.versionspace.manifold.cache.ConvexBodyCache;
+import machinelearning.active.learning.versionspace.manifold.cache.EllipsoidCache;
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCache;
 import machinelearning.active.learning.versionspace.manifold.cache.SampleCacheStub;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
@@ -26,20 +28,27 @@ import java.util.Objects;
 public class HitAndRunSampler {
     private final DirectionSamplingAlgorithm samplingAlgorithm;
     private final SampleSelector selector;
-    private final SampleCache cache;
+    private final ConvexBodyCache<Vector[]> cache;
+    private ConvexBodyCache<Ellipsoid> ellipsoidCache;
     private final boolean isRounding;
 
     public static class Builder {
         private SampleSelector selector;
-        private SampleCache cache = new SampleCacheStub();
+        private ConvexBodyCache<Vector[]> cache = new SampleCacheStub<>();
+        private ConvexBodyCache<Ellipsoid> ellipsoidCache = new SampleCacheStub<>();
         private DirectionSamplingAlgorithm samplingAlgorithm = new RandomDirectionAlgorithm();
 
         public Builder(SampleSelector selector) {
             this.selector = Objects.requireNonNull(selector);
         }
 
-        public Builder addCache() {
+        public Builder addSampleCache() {
             cache = new SampleCache();
+            return this;
+        }
+
+        public Builder addRoundingCache(double expansionFactor) {
+            ellipsoidCache = new EllipsoidCache(expansionFactor);
             return this;
         }
 
@@ -54,13 +63,14 @@ public class HitAndRunSampler {
     }
 
     private HitAndRunSampler(Builder builder) {
-        this(builder.samplingAlgorithm, builder.selector, builder.cache);
+        this(builder.samplingAlgorithm, builder.selector, builder.cache, builder.ellipsoidCache);
     }
 
-    HitAndRunSampler(DirectionSamplingAlgorithm samplingAlgorithm, SampleSelector selector, SampleCache cache) {
+    HitAndRunSampler(DirectionSamplingAlgorithm samplingAlgorithm, SampleSelector selector, ConvexBodyCache<Vector[]> cache, ConvexBodyCache<Ellipsoid> ellipsoidCache) {
         this.samplingAlgorithm = samplingAlgorithm;
         this.selector = selector;
         this.cache = cache;
+        this.ellipsoidCache = ellipsoidCache;
         this.isRounding = this.samplingAlgorithm instanceof RoundingAlgorithm;
     }
 
@@ -72,7 +82,7 @@ public class HitAndRunSampler {
     public Vector[] sample(ConvexBody body, int numSamples) {
         Validator.assertPositive(numSamples);
 
-        final DirectionSampler directionSampler = samplingAlgorithm.fit(body);
+        final DirectionSampler directionSampler = samplingAlgorithm.fit(ellipsoidCache.attemptToSetCache(body));
 
         // When using rounding, the fitted ellipsoid's center can be used as starting point for hit-and-run
         if (isRounding) {
@@ -81,11 +91,11 @@ public class HitAndRunSampler {
             if (body.isInside(ellipsoid.getCenter())) {
                 cache.updateCache(new Vector[]{ellipsoid.getCenter()});
             }
+
+            ellipsoidCache.updateCache(ellipsoid);
         }
 
-        body = cache.attemptToSetDefaultInteriorPoint(body);
-
-        HitAndRun chain = new HitAndRun(body, directionSampler);
+        HitAndRun chain = new HitAndRun(cache.attemptToSetCache(body), directionSampler);
         Vector[] samples = selector.select(chain, numSamples);
 
         cache.updateCache(samples);
@@ -98,8 +108,10 @@ public class HitAndRunSampler {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HitAndRunSampler that = (HitAndRunSampler) o;
-        return Objects.equals(samplingAlgorithm, that.samplingAlgorithm) &&
+        return isRounding == that.isRounding &&
+                Objects.equals(samplingAlgorithm, that.samplingAlgorithm) &&
                 Objects.equals(selector, that.selector) &&
-                Objects.equals(cache, that.cache);
+                Objects.equals(cache, that.cache) &&
+                Objects.equals(ellipsoidCache, that.ellipsoidCache);
     }
 }

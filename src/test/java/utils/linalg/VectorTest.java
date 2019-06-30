@@ -685,4 +685,15 @@ public class VectorTest {
         clone.iScalarAdd(10);
         assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
     }
+
+    @Test
+    void hasNaN_noNaN_returnsFalse() {
+        assertFalse(vector1.hasNaN());
+    }
+
+    @Test
+    void hasNaN_hasNaN_returnsFalse() {
+        vector1 = Vector.FACTORY.make(1, 2, Double.NaN, 4);
+        assertTrue(vector1.hasNaN());
+    }
 }

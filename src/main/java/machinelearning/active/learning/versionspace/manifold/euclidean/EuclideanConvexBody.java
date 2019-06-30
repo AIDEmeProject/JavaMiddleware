@@ -26,6 +26,10 @@ public interface EuclideanConvexBody extends ConvexBody {
         EigenvalueDecomposition decomposition = new EigenvalueDecomposition(ellipsoid.getScale());
 
         for (int i = 0; i < dim(); i++) {
+            if (decomposition.getEigenvalue(i) <= 0) {
+                throw new RuntimeException("Found negative eigenvalue: " + decomposition.getEigenvalue(i));
+            }
+
             double factor = Math.sqrt(decomposition.getEigenvalue(i)) / (dim() + 1.);
             Vector direction = decomposition.getEigenvector(i).iScalarMultiply(factor);
 

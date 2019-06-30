@@ -24,14 +24,14 @@ class SampleCacheTest {
 
     @Test
     void attemptToSetDefaultInteriorPoint_emptyCache_theInputConvexBodyIsReturnedWithoutModification() {
-        assertSame(body, cache.attemptToSetDefaultInteriorPoint(body));
+        assertSame(body, cache.attemptToSetCache(body));
     }
 
     @Test
     void attemptToSetDefaultInteriorPoint_noCachedSamplesInsideConvexBody_theInputConvexBodyIsReturnedWithoutModification() {
         cache.updateCache(new Vector[] {Vector.FACTORY.make(1), Vector.FACTORY.make(2)});
         when(body.isInside(any())).thenReturn(false);
-        assertSame(body, cache.attemptToSetDefaultInteriorPoint(body));
+        assertSame(body, cache.attemptToSetCache(body));
     }
 
     @Test
@@ -41,7 +41,7 @@ class SampleCacheTest {
         when(body.dim()).thenReturn(1);
         when(body.isInside(any())).thenReturn(true);
 
-        ConvexBody result = cache.attemptToSetDefaultInteriorPoint(body);
+        ConvexBody result = cache.attemptToSetCache(body);
 
         assertEquals(toCache[0], result.getInteriorPoint());
     }
@@ -53,7 +53,7 @@ class SampleCacheTest {
         when(body.dim()).thenReturn(1);
         when(body.isInside(any())).thenReturn(false, true, false, true);
 
-        ConvexBody result = cache.attemptToSetDefaultInteriorPoint(body);
+        ConvexBody result = cache.attemptToSetCache(body);
 
         assertEquals(toCache[1], result.getInteriorPoint());
     }
@@ -64,7 +64,7 @@ class SampleCacheTest {
         when(body.dim()).thenReturn(1);
         when(body.isInside(any())).thenReturn(true);
 
-        ConvexBody result = cache.attemptToSetDefaultInteriorPoint(body);
+        ConvexBody result = cache.attemptToSetCache(body);
         reset(body);
 
 //        result.getSeparatingHyperplane(any());

@@ -642,6 +642,34 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     /**
+     * Resizes {@code this} matrix. Smaller number of rows or cols cause a truncation; for larger values, entries are
+     * padded with zeros.
+     * @param newRows: desired number of rows
+     * @param newCols: desired number of columns
+     * @return the current matrix resized
+     */
+    public Matrix resize(int newRows, int newCols) {
+        Validator.assertPositive(newRows);
+        Validator.assertPositive(newCols);
+
+        // no change in dimensions
+        if (newRows == rows() && newCols == cols())
+            return this;
+
+        double[] values = new double[newRows * newCols];
+        int start = 0, startNew = 0;
+        int step = Math.min(cols(), newCols), loopLimit = Math.min(rows(), newRows);
+
+        for (int i = 0; i < loopLimit; i++) {
+            System.arraycopy(array, start, values, startNew, step);
+            start += cols();
+            startNew += newCols;
+        }
+
+        return new Matrix(newRows, newCols, values);
+    }
+
+    /**
      * @return the transpose of {@code this}
      */
     public Matrix transpose() {

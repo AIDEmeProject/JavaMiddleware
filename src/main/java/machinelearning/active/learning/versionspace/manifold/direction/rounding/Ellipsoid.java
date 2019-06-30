@@ -12,6 +12,10 @@ public interface Ellipsoid {
 
     Matrix getScale();
 
+    Matrix getL();
+
+    Vector getD();
+
     default Matrix getCholeskyFactor() {
         return new CholeskyDecomposition(getScale()).getL();
     }

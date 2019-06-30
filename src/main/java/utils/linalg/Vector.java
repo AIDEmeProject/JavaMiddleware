@@ -207,6 +207,14 @@ public class Vector extends Tensor<Vector> {
         return Arrays.copyOf(array, dim());
     }
 
+    public boolean hasNaN() {
+        for (double x : array) {
+            if (Double.isNaN(x)) return true;
+        }
+
+        return false;
+    }
+
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ", "[", "]");

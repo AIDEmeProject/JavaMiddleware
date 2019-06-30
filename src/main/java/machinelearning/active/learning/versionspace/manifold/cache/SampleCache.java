@@ -19,7 +19,7 @@ import java.util.Arrays;
  * already inside the current version space, avoid the Linear Programming step most of time. This method works well in
  * practice since the Version Space does not tend to reduce abruptly from on iteration to another.
  */
-public class SampleCache {
+public class SampleCache implements ConvexBodyCache<Vector[]> {
     /**
      * cache samples
      */
@@ -49,62 +49,20 @@ public class SampleCache {
      * @param convexBody: a convex body object
      * @return the wrapped convex body
      */
-    public ConvexBody attemptToSetDefaultInteriorPoint(ConvexBody convexBody) {
+    @Override
+    public ConvexBody attemptToSetCache(ConvexBody convexBody) {
         for (Vector cachedSample : cachedSamples){
             // TODO: make this line testable / push this dependency logic to KernelVersionSpace somehow ?
             cachedSample = cachedSample.resize(convexBody.dim());
 
             if (convexBody.isInside(cachedSample)) {
-                return new ConvexBodyWrapper(convexBody, cachedSample);
+                ConvexBodyWrapper wrap = new ConvexBodyWrapper(convexBody);
+                wrap.setInteriorPointCache(cachedSample);
+                return wrap;
             }
         }
 
         return convexBody;
-    }
-
-    private static class ConvexBodyWrapper implements ConvexBody {
-        private ConvexBody convexBody;
-        private Vector interiorPointCache;
-
-        public ConvexBodyWrapper(ConvexBody convexBody, Vector interiorPointCache) {
-            this.convexBody = convexBody;
-            this.interiorPointCache = interiorPointCache;
-        }
-
-        @Override
-        public int dim() {
-            return convexBody.dim();
-        }
-
-        @Override
-        public boolean isInside(Vector x) {
-            return convexBody.isInside(x);
-        }
-
-        @Override
-        public Vector getInteriorPoint() {
-            return interiorPointCache;
-        }
-
-        @Override
-        public GeodesicSegment computeIntersection(Geodesic geodesic) {
-            return convexBody.computeIntersection(geodesic);
-        }
-
-        @Override
-        public Manifold getManifold() {
-            return convexBody.getManifold();
-        }
-
-        @Override
-        public boolean attemptToReduceEllipsoid(Ellipsoid ellipsoid) {
-            return convexBody.attemptToReduceEllipsoid(ellipsoid);
-        }
-
-        @Override
-        public Ellipsoid getContainingEllipsoid() {
-            return convexBody.getContainingEllipsoid();
-        }
     }
 
     @Override

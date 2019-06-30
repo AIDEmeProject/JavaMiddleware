@@ -5,6 +5,8 @@ import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
+import java.util.Objects;
+
 public class EuclideanEllipsoid implements Ellipsoid {
     private final Vector center;
     private final Matrix scale;
@@ -25,6 +27,13 @@ public class EuclideanEllipsoid implements Ellipsoid {
         this.D = Vector.FACTORY.fill(dim, 1.0 / radius);
     }
 
+    public EuclideanEllipsoid(Vector center, Matrix scale, Matrix l, Vector d) {
+        this.center = center;
+        this.scale = scale;
+        L = l;
+        D = d;
+    }
+
     public int dim() {
         return center.dim();
     }
@@ -35,6 +44,14 @@ public class EuclideanEllipsoid implements Ellipsoid {
 
     public Matrix getScale() {
         return scale;
+    }
+
+    public Matrix getL() {
+        return L;
+    }
+
+    public Vector getD() {
+        return D;
     }
 
     public Matrix getCholeskyFactor() {
@@ -120,5 +137,16 @@ public class EuclideanEllipsoid implements Ellipsoid {
                 v += val * p.get(j);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ellipsoid)) return false;
+        Ellipsoid that = (Ellipsoid) o;
+        return Objects.equals(center, that.getCenter()) &&
+                Objects.equals(scale, that.getScale()) &&
+                Objects.equals(L, that.getL()) &&
+                Objects.equals(D, that.getD());
     }
 }

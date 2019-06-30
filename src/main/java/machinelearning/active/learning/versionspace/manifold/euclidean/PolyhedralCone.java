@@ -54,7 +54,7 @@ public class PolyhedralCone implements EuclideanConvexBody {
             if (A.getRow(i).dot(x) < 0) return false;
         }
 
-        return true; //!getSeparatingHyperplane(x).isPresent();
+        return true;
     }
 
     /**
@@ -150,8 +150,14 @@ public class PolyhedralCone implements EuclideanConvexBody {
         Vector Ax = A.multiply(x);
 
         for (int i = 0; i < Ax.dim(); i++) {
-            if (Ax.get(i) < 0) return new CenteredHyperPlane(A.getRow(i).iScalarMultiply(-1.0));  //TODO: can we avoid this -1 multiplication ?
+            if (Ax.get(i) < 0) return new CenteredHyperPlane(A.getRow(i).iScalarMultiply(-1.0));
         }
+
+        System.out.println("A: " + A);
+        System.out.println("x: " + x);
+        System.out.println("Ax: " + Ax);
+        System.out.println("min: " + Ax.get(Ax.argmin()));
+        System.out.println("norm: " + x.norm());
 
         throw new RuntimeException("Point is inside polytope.");
     }

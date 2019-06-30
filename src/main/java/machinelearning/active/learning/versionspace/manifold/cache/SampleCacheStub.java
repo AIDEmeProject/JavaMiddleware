@@ -4,18 +4,18 @@ import machinelearning.active.learning.versionspace.manifold.ConvexBody;
 import utils.linalg.Vector;
 
 /**
- * This is a dummy {@link SampleCache} object, which performs no caching operation. This is used when caching behavior
+ * This is a dummy {@link ConvexBodyCache} object, which performs no caching operation. This is used when caching behavior
  * needs to be disabled.
  *
  * @see SampleCache
  */
-public class SampleCacheStub extends SampleCache {
+public class SampleCacheStub<T> implements ConvexBodyCache<T> {
 
     /**
      * A pass-through method, no operation is performed
      */
     @Override
-    public void updateCache(Vector[] samples) {
+    public void updateCache(T samples) {
         // do nothing
     }
 
@@ -23,7 +23,7 @@ public class SampleCacheStub extends SampleCache {
      * @return the input without changes
      */
     @Override
-    public ConvexBody attemptToSetDefaultInteriorPoint(ConvexBody convexBody) {
+    public ConvexBody attemptToSetCache(ConvexBody convexBody) {
         return convexBody;
     }
 

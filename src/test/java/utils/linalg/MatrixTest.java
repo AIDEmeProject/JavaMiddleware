@@ -1093,6 +1093,41 @@ public class MatrixTest {
     }
 
     @Test
+    void resize_negativeRowSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(-1, 1));
+    }
+
+    @Test
+    void resize_zeroRowSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(0, 1));
+    }
+
+    @Test
+    void resize_negativeColSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(1, -1));
+    }
+
+    @Test
+    void resize_zeroColSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(1, 0));
+    }
+
+    @Test
+    void resize_newDimensionsAreSmaller_returnsCorrectTruncatedMatrix() {
+        assertEquals(Matrix.FACTORY.make(1, 2, 1, 2), matrix1.resize(1, 2));
+    }
+
+    @Test
+    void resize_sameDimensions_inputIsReturnedWithoutCopying() {
+        assertSame(matrix1, matrix1.resize(2, 3));
+    }
+
+    @Test
+    void resize_sizeLargerThanArraySize_returnsOriginalMatrixPaddedWithZeros() {
+        assertEquals(Matrix.FACTORY.make(3, 4, 1, 2, 3, 0, 4, 5, 6, 0, 0, 0, 0, 0), matrix1.resize(3, 4));
+    }
+
+    @Test
     void transpose_nonSquareMatrix_returnsCorrectTranspose() {
         assertEquals(Matrix.FACTORY.make(3, 2, 1, 4, 2, 5, 3, 6), matrix1.transpose());
     }

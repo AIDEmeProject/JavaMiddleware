@@ -10,8 +10,8 @@ class SampleCacheStubTest {
 
     @Test
     void attemptToSetDefaultInteriorPoint_anyConvexBody_returnsTheInputWithoutChanges() {
-        SampleCache sampleCache = new SampleCacheStub();
+        ConvexBodyCache<Object> sampleCache = new SampleCacheStub<>();
         ConvexBody body = mock(ConvexBody.class);
-        assertSame(body, sampleCache.attemptToSetDefaultInteriorPoint(body));
+        assertSame(body, sampleCache.attemptToSetCache(body));
     }
 }

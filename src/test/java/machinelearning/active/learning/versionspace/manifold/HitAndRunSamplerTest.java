@@ -6,11 +6,9 @@ import machinelearning.active.learning.versionspace.manifold.cache.SampleCacheSt
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.DirectionSamplingAlgorithm;
 import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionAlgorithm;
-import machinelearning.active.learning.versionspace.manifold.direction.RandomDirectionSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.EllipsoidSampler;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.RoundingAlgorithm;
-import machinelearning.active.learning.versionspace.manifold.euclidean.EuclideanSpace;
 import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +24,8 @@ import static org.mockito.Mockito.*;
 class HitAndRunSamplerTest {
     private DirectionSamplingAlgorithm directionSamplingAlgorithm;
     private SampleSelector selector;
-    private SampleCache cache;
+    private SampleCacheStub<Vector[]> cache;
+    private SampleCacheStub<Ellipsoid> ellipsoidCache;
     private HitAndRunSampler sampler;
 
     @BeforeEach
@@ -41,14 +40,15 @@ class HitAndRunSamplerTest {
                 Vector.FACTORY.make(2)
         });
 
-        cache = Mockito.spy(SampleCacheStub.class);
-        sampler = new HitAndRunSampler(directionSamplingAlgorithm, selector, cache);
+        cache = (SampleCacheStub<Vector[]>) Mockito.spy(SampleCacheStub.class);
+        ellipsoidCache = (SampleCacheStub<Ellipsoid>) Mockito.spy(SampleCacheStub.class);
+        sampler = new HitAndRunSampler(directionSamplingAlgorithm, selector, cache, ellipsoidCache);
     }
 
     @Test
     void builder_noCacheNoRounding_HitAndRunSamplerCorrectlyConfigured() {
         assertEquals(
-                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCacheStub()),
+                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCacheStub<>(), new SampleCacheStub<>()),
                 new HitAndRunSampler.Builder(selector).build()
         );
     }
@@ -56,15 +56,15 @@ class HitAndRunSamplerTest {
     @Test
     void builder_AddCacheNoRounding_HitAndRunSamplerCorrectlyConfigured() {
         assertEquals(
-                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCache()),
-                new HitAndRunSampler.Builder(selector).addCache().build()
+                new HitAndRunSampler(new RandomDirectionAlgorithm(), selector, new SampleCache(), new SampleCacheStub<>()),
+                new HitAndRunSampler.Builder(selector).addSampleCache().build()
         );
     }
 
     @Test
     void builder_NoCacheAddRounding_HitAndRunSamplerCorrectlyConfigured() {
         assertEquals(
-                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCacheStub()),
+                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCacheStub<>(), new SampleCacheStub<>()),
                 new HitAndRunSampler.Builder(selector).addRounding(100).build()
         );
     }
@@ -72,8 +72,8 @@ class HitAndRunSamplerTest {
     @Test
     void builder_AddCacheAddRounding_HitAndRunSamplerCorrectlyConfigured() {
         assertEquals(
-                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCache()),
-                new HitAndRunSampler.Builder(selector).addCache().addRounding(100).build()
+                new HitAndRunSampler(new RoundingAlgorithm(100), selector, new SampleCache(), new SampleCacheStub<>()),
+                new HitAndRunSampler.Builder(selector).addSampleCache().addRounding(100).build()
         );
     }
 
@@ -107,7 +107,7 @@ class HitAndRunSamplerTest {
 
         Vector[] result = sampler.sample(body, 3);
 
-        verify(cache).attemptToSetDefaultInteriorPoint(body);
+        verify(cache).attemptToSetCache(body);
         verify(cache).updateCache(result);
     }
 
@@ -135,7 +135,7 @@ class HitAndRunSamplerTest {
         RoundingAlgorithm roundingStub = mock(RoundingAlgorithm.class);
         when(roundingStub.fit(body)).thenReturn(ellipsoidSamplerStub);
 
-        sampler = new HitAndRunSampler(roundingStub, selector, cache);
+        sampler = new HitAndRunSampler(roundingStub, selector, cache, ellipsoidCache);
 
         sampler.sample(body, 3);
 
@@ -157,7 +157,7 @@ class HitAndRunSamplerTest {
         RoundingAlgorithm roundingStub = mock(RoundingAlgorithm.class);
         when(roundingStub.fit(body)).thenReturn(ellipsoidSamplerStub);
 
-        sampler = new HitAndRunSampler(roundingStub, selector, cache);
+        sampler = new HitAndRunSampler(roundingStub, selector, cache, ellipsoidCache);
 
         sampler.sample(body, 3);
 

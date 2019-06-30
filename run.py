@@ -44,7 +44,7 @@ MODES = [
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 2
+NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
@@ -112,7 +112,7 @@ USE_CATEGORICAL = True
 lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True,  # hit-and-run
+    rounding=True, max_iter=0, cache=True, rounding_cache=True, expansion_factor=1e1,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     decompose=True, add_intercept=True, solver="gurobi"  # extra
 )
@@ -120,7 +120,7 @@ lnr = MajorityVote(
 lower_bound_mv = MajorityVote(
     num_samples=32,
     warmup=1000, thin=100, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True,  # hit-and-run
+    rounding=True, max_iter=0, cache=True, rounding_cache=False, expansion_factor=1e3,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     decompose=False, add_intercept=True, solver="gurobi"  # extra
 )
