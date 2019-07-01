@@ -49,9 +49,9 @@ class UnitBallPolyhedralConeTest {
     }
 
     @Test
-    void isInside_pointOnBoundary_returnsTrue() {
-        assertTrue(body.isInside(Vector.FACTORY.make(1, 0)));
-        assertTrue(body.isInside(Vector.FACTORY.make(0, -1)));
+    void isInside_pointOnBoundary_returnsFalse() {
+        assertFalse(body.isInside(Vector.FACTORY.make(1, 0)));
+        assertFalse(body.isInside(Vector.FACTORY.make(0, -1)));
     }
 
     @Test

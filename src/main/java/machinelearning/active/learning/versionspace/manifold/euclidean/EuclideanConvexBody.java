@@ -27,7 +27,7 @@ public interface EuclideanConvexBody extends ConvexBody {
 
         for (int i = 0; i < dim(); i++) {
             if (decomposition.getEigenvalue(i) <= 0) {
-                throw new RuntimeException("Found negative eigenvalue: " + decomposition.getEigenvalue(i));
+                throw new RuntimeException("Found non-positive eigenvalue: " + decomposition.getEigenvalue(i));
             }
 
             double factor = Math.sqrt(decomposition.getEigenvalue(i)) / (dim() + 1.);

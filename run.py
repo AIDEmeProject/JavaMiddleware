@@ -8,11 +8,11 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    "sdss_Q2_circle_0.1%",  # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q2_circle_0.1%",  # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
-    #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
     #'sdss_log_7.8%',
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
@@ -112,32 +112,24 @@ USE_CATEGORICAL = True
 lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True, rounding_cache=True, expansion_factor=1e1,  # hit-and-run
+    rounding=True, max_iter=0, cache=True, rounding_cache=True, expansion_factor=1e2,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
     decompose=True, add_intercept=True, solver="gurobi"  # extra
 )
 
-lower_bound_mv = MajorityVote(
-    num_samples=32,
-    warmup=1000, thin=100, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True, rounding_cache=False, expansion_factor=1e3,  # hit-and-run
-    kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    decompose=False, add_intercept=True, solver="gurobi"  # extra
-)
-
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
-#ACTIVE_LEARNER = SubspatialSampler(lnr, loss="MARGIN")
-ACTIVE_LEARNER = UncertaintySampler(lnr)
+ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY")
+#ACTIVE_LEARNER = UncertaintySampler(lnr)
 #ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
 #ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    #ConfusionMatrix(SubspatialLearner(lnr)),
+    ConfusionMatrix(SubspatialLearner(lnr)),
+    #ConfusionMatrix(lnr),
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
-    ConfusionMatrix(lnr),
     #VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),

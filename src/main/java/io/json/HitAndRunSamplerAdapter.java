@@ -17,17 +17,22 @@ class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAnd
         SampleSelector selector = context.deserialize(jsonObject.get("selector"), SampleSelector.class);
 
         boolean addCaching = jsonObject.getAsJsonPrimitive("cache").getAsBoolean();
-
-        boolean addRoundingCache = jsonObject.getAsJsonPrimitive("roundingCache").getAsBoolean();
-        double expansionFactor = jsonObject.getAsJsonPrimitive("expansionFactor").getAsDouble();
-
         boolean addRounding = jsonObject.getAsJsonPrimitive("rounding").getAsBoolean();
-        long maxIter = jsonObject.has("maxIter") ? jsonObject.getAsJsonPrimitive("maxIter").getAsLong() : Long.MAX_VALUE;
+        boolean addRoundingCache = jsonObject.getAsJsonPrimitive("roundingCache").getAsBoolean();
 
         HitAndRunSampler.Builder builder = new HitAndRunSampler.Builder(selector);
+
         if (addCaching) builder.addSampleCache();
-        if (addRoundingCache) builder.addRoundingCache(expansionFactor);
-        if (addRounding) builder.addRounding(maxIter);
+
+        if (addRoundingCache) {
+            double expansionFactor = jsonObject.getAsJsonPrimitive("expansionFactor").getAsDouble();
+            builder.addRoundingCache(expansionFactor);
+        }
+
+        if (addRounding){
+            long maxIter = jsonObject.has("maxIter") ? jsonObject.getAsJsonPrimitive("maxIter").getAsLong() : Long.MAX_VALUE;
+            builder.addRounding(maxIter);
+        }
 
         return builder.build();
     }

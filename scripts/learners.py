@@ -70,11 +70,16 @@ class HitAndRun(Printable):
     def __init__(self, selector, rounding=True, max_iter=0, cache=True, rounding_cache=False, expansion_factor=1e5):
         super().__init__(add_name=False)
 
+        assert_positive("expansion_factor", expansion_factor)
+
         self.cache = cache
         self.rounding = rounding
         self.selector = selector
         self.roundingCache = rounding_cache
-        self.expansionFactor = expansion_factor
+
+        if rounding_cache:
+            self.expansionFactor = expansion_factor
+
         if rounding and max_iter > 0:
             self.maxIter = max_iter
 

@@ -46,9 +46,9 @@ class PolyhedralConeTest {
     }
 
     @Test
-    void isInside_pointOnBoundaryOfCone_returnsTrue() {
-        assertTrue(cone.isInside(Vector.FACTORY.make(1, 0)));
-        assertTrue(cone.isInside(Vector.FACTORY.make(0, -1)));
+    void isInside_pointOnBoundaryOfCone_returnsFalse() {
+        assertFalse(cone.isInside(Vector.FACTORY.make(1, 0)));
+        assertFalse(cone.isInside(Vector.FACTORY.make(0, -1)));
     }
 
     @Test
@@ -139,7 +139,7 @@ class PolyhedralConeTest {
     @Test
     void getSeparatingHyperplane_PointOnBoundaryOfCone_throwsException() {
         Vector x = Vector.FACTORY.make(1, 0);
-        assertThrows(RuntimeException.class, () -> cone.getSeparatingHyperplane(x));
+        assertEquals(new CenteredHyperPlane(Vector.FACTORY.make(0, 1)), cone.getSeparatingHyperplane(x));
     }
 
     @Test

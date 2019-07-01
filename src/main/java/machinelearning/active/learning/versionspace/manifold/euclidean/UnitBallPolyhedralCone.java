@@ -30,7 +30,7 @@ public class UnitBallPolyhedralCone implements EuclideanConvexBody {
 
     @Override
     public boolean isInside(Vector point) {
-        return point.squaredNorm() <= 1 && cone.isInside(point);
+        return point.squaredNorm() < 1 && cone.isInside(point);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class UnitBallPolyhedralCone implements EuclideanConvexBody {
     public HyperPlane getSeparatingHyperplane(Vector x) {
         Validator.assertEquals(x.dim(), dim());
 
-        if (x.squaredNorm() > 1) {
+        if (x.squaredNorm() >= 1) {
             return new HyperPlane(-1, x.normalize(1.0));
         }
 
