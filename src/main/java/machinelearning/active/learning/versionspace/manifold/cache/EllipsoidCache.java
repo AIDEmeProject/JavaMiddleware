@@ -18,19 +18,16 @@ public class EllipsoidCache implements ConvexBodyCache<Ellipsoid> {
 
     @Override
     public ConvexBody attemptToSetCache(ConvexBody body) {
-        if (cache == null) {
+        if (cache == null || body.dim() <= cache.dim()) {
+            cache = null;
             return body;
         }
 
-        ConvexBodyWrapper wrapper = new ConvexBodyWrapper(body);
-
-        if (body.dim() == cache.dim()) {
-            wrapper.setEllipsoidCache(cache);
-            return wrapper;
+        if (body.dim() != cache.dim() + 1) {
+            throw new RuntimeException("Only +1 dimensionality difference supported");
         }
 
-        if (body.dim() != cache.dim() + 1)
-            throw new RuntimeException("Only +1 dimensionality difference supported");
+        ConvexBodyWrapper wrapper = new ConvexBodyWrapper(body);
 
         int curDim = cache.dim();
         int newDim = body.dim();
