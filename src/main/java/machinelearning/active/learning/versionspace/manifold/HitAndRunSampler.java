@@ -47,8 +47,8 @@ public class HitAndRunSampler {
             return this;
         }
 
-        public Builder addRoundingCache(double expansionFactor) {
-            ellipsoidCache = new EllipsoidCache(expansionFactor);
+        public Builder addRoundingCache() {
+            ellipsoidCache = new EllipsoidCache();
             return this;
         }
 

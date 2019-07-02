@@ -3,20 +3,13 @@ package machinelearning.active.learning.versionspace.manifold.cache;
 import machinelearning.active.learning.versionspace.manifold.ConvexBody;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.Ellipsoid;
 import machinelearning.active.learning.versionspace.manifold.direction.rounding.EuclideanEllipsoid;
-import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
 import java.util.Objects;
 
 public class EllipsoidCache implements ConvexBodyCache<Ellipsoid> {
-    private double expansionFactor;
     private Ellipsoid cache = null;
-
-    public EllipsoidCache(double expansionFactor) {
-        Validator.assertPositive(expansionFactor);
-        this.expansionFactor = expansionFactor;
-    }
 
     @Override
     public void updateCache(Ellipsoid toCache) {
@@ -42,18 +35,18 @@ public class EllipsoidCache implements ConvexBodyCache<Ellipsoid> {
         int curDim = cache.dim();
         int newDim = body.dim();
 
-        Vector center = cache.getCenter().resize(newDim);  // append zero to center
+        Vector center = cache.getCenter().resize(newDim);
 
         Matrix scale = cache.getScale().resize(newDim, newDim);
-        scale.set(curDim, curDim, expansionFactor);
-        scale.iScalarMultiply(1 + 1 / expansionFactor);
+        scale.set(curDim, curDim, curDim);
+        scale.iScalarMultiply(1.0 + 1.0 / curDim);
 
         Matrix L = cache.getL().resize(newDim, newDim);
         L.set(curDim, curDim, 1.0);
 
         Vector D = cache.getD().resize(newDim);
-        D.set(curDim, expansionFactor);
-        D.iScalarMultiply(1 + 1 / expansionFactor);
+        D.set(curDim, curDim);
+        D.iScalarMultiply(1.0 + 1.0 / curDim);
 
         wrapper.setEllipsoidCache(new EuclideanEllipsoid(center, scale, L, D));
 

@@ -8,8 +8,8 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    #"sdss_Q2_circle_0.1%",  # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
-    #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
+    #"sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q3_0.1%",  #sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
     "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
@@ -44,7 +44,7 @@ MODES = [
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 1
+NUM_RUNS = 2
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
@@ -108,13 +108,13 @@ USE_CATEGORICAL = True
 #     ]
 #)
 
-
+# TODO: using one single thread solver the problem?
 lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True, rounding_cache=True, expansion_factor=1e2,  # hit-and-run
+    rounding=True, max_iter=0, cache=True, rounding_cache=False,  # hit-and-run
     kernel='gaussian', gamma=0, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    decompose=True, add_intercept=True, solver="gurobi"  # extra
+    decompose=False, add_intercept=True, solver="gurobi"  # extra
 )
 
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)

@@ -67,18 +67,13 @@ class SampleSelector(Printable):
 
 
 class HitAndRun(Printable):
-    def __init__(self, selector, rounding=True, max_iter=0, cache=True, rounding_cache=False, expansion_factor=1e5):
+    def __init__(self, selector, rounding=True, max_iter=0, cache=True, rounding_cache=False):
         super().__init__(add_name=False)
-
-        assert_positive("expansion_factor", expansion_factor)
 
         self.cache = cache
         self.rounding = rounding
         self.selector = selector
         self.roundingCache = rounding_cache
-
-        if rounding_cache:
-            self.expansionFactor = expansion_factor
 
         if rounding and max_iter > 0:
             self.maxIter = max_iter
@@ -123,7 +118,7 @@ class BayesianVersionSpace(Printable):
 class MajorityVote(Learner):
     def __init__(self, num_samples=8,
                  warmup=100, thin=10, chain_length=64, selector="single",
-                 rounding=True, max_iter=0, cache=False, rounding_cache=False, expansion_factor=1e3,
+                 rounding=True, max_iter=0, cache=False, rounding_cache=False,
                  kernel='linear', gamma=0, diagonal=(),
                  decompose=False, add_intercept=True, solver="ojalgo"):
         super().__init__()
@@ -139,7 +134,7 @@ class MajorityVote(Learner):
             hit_and_run=HitAndRun(
                 selector=SampleSelector(name=selector, warmup=warmup, thin=thin, chain_length=chain_length),
                 rounding=rounding, max_iter=max_iter, cache=cache,
-                rounding_cache=rounding_cache, expansion_factor=expansion_factor
+                rounding_cache=rounding_cache,
             ),
             kernel=kernel, gamma=gamma, diagonal=diagonal,
             decompose=decompose, add_intercept=add_intercept, solver=solver
