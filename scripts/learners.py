@@ -157,10 +157,15 @@ class BayesianMajorityVote(Learner):
 
 
 class SubspatialLearner(Learner):
-    def __init__(self, learners):
+    def __init__(self, learners, threads=0):
         super().__init__()
 
+        assert_positive('threads', threads, allow_zero=True)
+
         self.subspaceLearners = learners
+
+        if threads > 0:
+            self.numThreads = threads
 
     def set_repeat(self, repeat):
         if isinstance(self.subspaceLearners, Learner):

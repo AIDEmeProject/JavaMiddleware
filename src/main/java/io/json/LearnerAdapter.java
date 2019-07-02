@@ -3,10 +3,7 @@ package io.json;
 import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.learning.versionspace.VersionSpace;
-import machinelearning.classifier.CategoricalLearner;
-import machinelearning.classifier.Learner;
-import machinelearning.classifier.MajorityVoteLearner;
-import machinelearning.classifier.SubspatialLearner;
+import machinelearning.classifier.*;
 import machinelearning.classifier.svm.Kernel;
 import machinelearning.classifier.svm.SvmLearner;
 
@@ -49,7 +46,9 @@ public class LearnerAdapter implements JsonDeserializer<Learner> {
                     learners[index] = new CategoricalLearner();
                 }
 
-                return new SubspatialLearner(learners);
+                SubspatialWorker worker = jsonObject.has("numThreads") ? new SubspatialWorker(jsonObject.get("numThreads").getAsInt()) : new SubspatialWorker();
+
+                return new SubspatialLearner(learners, worker);
             default:
                 throw new UnknownClassIdentifierException("ActiveLearner", identifier);
         }

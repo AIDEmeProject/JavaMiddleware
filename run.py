@@ -44,7 +44,7 @@ MODES = [
 
 
 # Number of new explorations to run. Necessary for the NEW mode only
-NUM_RUNS = 2
+NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
@@ -108,7 +108,9 @@ USE_CATEGORICAL = True
 #     ]
 #)
 
-# TODO: using one single thread solver the problem?
+THREADS = 0  # how many threads to use in subspatial algorithms
+
+# TODO: using one single thread solves the problem?
 lnr = MajorityVote(
     num_samples=8,
     warmup=100, thin=10, chain_length=100, selector="single",
@@ -119,7 +121,7 @@ lnr = MajorityVote(
 
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
-ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY")
+ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY", threads=THREADS)
 #ACTIVE_LEARNER = UncertaintySampler(lnr)
 #ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
 #ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
@@ -127,9 +129,9 @@ ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY")
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SubspatialLearner(lnr)),
+    ConfusionMatrix(SubspatialLearner(lnr, threads=THREADS)),
     #ConfusionMatrix(lnr),
-    #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False))
+    #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False, threads=THREADS))
     #VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),
     #ThreeSetMetric(),
@@ -154,7 +156,7 @@ METRICS = [
     #             kernel='gaussian', gamma=0.001,  # kernel
     #             add_intercept=True, solver="gurobi"  # extra
     #         ),
-    #     ]
+    #     ],
     # )),
 ]
 

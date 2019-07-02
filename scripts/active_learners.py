@@ -43,15 +43,21 @@ class UncertaintySampler(ActiveLearner):
 
 
 class SubspatialSampler(ActiveLearner):
-    def __init__(self, learners, loss):
+    def __init__(self, learners, loss, threads=0):
         super().__init__()
 
         assert_in_list(loss.upper(), ['L1', 'L2', 'PROD', 'ENTROPY', 'GREEDY', 'MARGIN'])
+
         if loss.upper() == 'MARGIN':
             assert isinstance(learners, SVM) or all((isinstance(l, SVM) for l in learners))
 
+        assert_positive('threads', threads, allow_zero=True)
+
         self.learners = learners
         self.lossFunctionId = loss
+
+        if threads > 0:
+            self.numThreads = threads
 
     def set_repeat(self, repeat):
         if isinstance(self.learners, Learner):

@@ -5,7 +5,9 @@ import utils.Validator;
 import utils.linalg.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 /**
@@ -14,37 +16,16 @@ import java.util.concurrent.*;
 public class SubspatialClassifier implements Classifier {
     private final int[][] partitionIndexes;
     private final Classifier[] subspaceClassifiers;
+    private final SubspatialWorker worker;
 
-    public SubspatialClassifier(int[][] partitionIndexes, Classifier[] subspaceClassifiers) {
+    public SubspatialClassifier(int[][] partitionIndexes, Classifier[] subspaceClassifiers, SubspatialWorker worker) {
         Validator.assertNotEmpty(partitionIndexes);
         Validator.assertEqualLengths(partitionIndexes, subspaceClassifiers);
 
         this.partitionIndexes = partitionIndexes;
         this.subspaceClassifiers = subspaceClassifiers;
+        this.worker = worker;
     }
-
-//    @Override
-//    public double probability(Vector vector) {
-//        double probability = 1.0;
-//
-//        for (int i=0; i < partitionIndexes.length; i++) {
-//            probability *= subspaceClassifiers[i].probability(vector.select(partitionIndexes[i]));
-//        }
-//
-//        return probability;
-//    }
-//
-//    @Override
-//    public Vector probability(IndexedDataset dataset) {
-//        Validator.assertEquals(partitionIndexes, dataset.getPartitionIndexes());
-//
-//        Vector probability = subspaceClassifiers[0].probability(dataset.getPartitionedData()[0]);
-//        for (int i=1; i < partitionIndexes.length; i++) {
-//            probability.iMultiply(subspaceClassifiers[i].probability(dataset.getPartitionedData()[i]));
-//        }
-//
-//        return probability;
-//    }
 
     @Override
     public double probability(Vector vector) {
@@ -77,35 +58,16 @@ public class SubspatialClassifier implements Classifier {
     }
 
     public Vector[] probabilityAllSubspaces(IndexedDataset dataset) {
-        int size = subspaceClassifiers.length;
         IndexedDataset[] partitionedData = dataset.getPartitionedData();
 
         // create list of tasks to be run
         List<Callable<Vector>> workers = new ArrayList<>();
 
-        for(int i = 0; i < size; i++){
+        for(int i = 0; i < subspaceClassifiers.length; i++){
             workers.add(new ProbabilityWorker(subspaceClassifiers[i], partitionedData[i]));
         }
 
-        try {
-            // execute all tasks
-            ExecutorService executor = Executors.newFixedThreadPool(Math.min(size, Runtime.getRuntime().availableProcessors() - 1));
-            List<Future<Vector>> scores = executor.invokeAll(workers);
-            executor.shutdownNow();
-
-            Vector[] probabilities = new Vector[size];
-
-            for (int i=0; i < size; i++) {
-                probabilities[i] = scores.get(i).get();
-            }
-
-            return probabilities;
-
-        } catch (InterruptedException ex) {
-            throw new RuntimeException("Thread was abruptly interrupted.", ex);
-        } catch (ExecutionException ex) {
-            throw new RuntimeException("Exception thrown at running task.", ex);
-        }
+        return worker.run(workers).toArray(new Vector[0]);
     }
 
     @Override
@@ -137,6 +99,24 @@ public class SubspatialClassifier implements Classifier {
         }
 
         return allLabels;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubspatialClassifier that = (SubspatialClassifier) o;
+
+        if (partitionIndexes.length != that.partitionIndexes.length)
+            return false;
+
+        for (int i = 0; i < partitionIndexes.length; i++) {
+            if (!Arrays.equals(partitionIndexes[i], that.partitionIndexes[i]))
+                return false;
+        }
+
+        return Arrays.equals(subspaceClassifiers, that.subspaceClassifiers) &&
+                Objects.equals(worker, that.worker);
     }
 
     /**

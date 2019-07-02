@@ -5,10 +5,7 @@ import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.*;
 import machinelearning.active.ranker.subspatial.LossFunction;
-import machinelearning.classifier.CategoricalLearner;
-import machinelearning.classifier.FakeCategoricalLearner;
-import machinelearning.classifier.Learner;
-import machinelearning.classifier.SubspatialLearner;
+import machinelearning.classifier.*;
 import machinelearning.classifier.svm.FakeSvmLearner;
 import machinelearning.classifier.svm.SvmLearner;
 
@@ -62,7 +59,9 @@ public class ActiveLearnerAdapter implements JsonDeserializer<ActiveLearner> {
                     }
                 }
 
-                return new SubspatialActiveLearner(new SubspatialLearner(learners), LossFunction.fromStringId(connectionFunctionId));
+                SubspatialWorker worker = jsonObject.has("numThreads") ? new SubspatialWorker(jsonObject.get("numThreads").getAsInt()) : new SubspatialWorker();
+
+                return new SubspatialActiveLearner(new SubspatialLearner(learners, worker), LossFunction.fromStringId(connectionFunctionId));
 
             case "QUERYBYDISAGREEMENT":
                 learner = jsonDeserializationContext.deserialize(jsonObject.get("learner"), Learner.class);

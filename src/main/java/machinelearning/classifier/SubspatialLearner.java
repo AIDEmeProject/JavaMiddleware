@@ -5,15 +5,30 @@ import utils.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
+
+/**
+ * Trains a learner object per subspace, returning a {@link SubspatialClassifier}. Training for each subspace is done
+ * concurrently.
+ */
 public class SubspatialLearner implements Learner {
+    /**
+     * Learners to train on each subspace
+     */
     private final Learner[] subspaceLearners;
 
-    public SubspatialLearner(Learner[] subspaceLearners) {
+    /**
+     * Multi-threaded runner
+     */
+    private final SubspatialWorker worker;
+
+    public SubspatialLearner(Learner[] subspaceLearners, SubspatialWorker worker) {
         Validator.assertNotEmpty(subspaceLearners);
 
         this.subspaceLearners = subspaceLearners;
+        this.worker = Objects.requireNonNull(worker);
     }
 
     @Override
@@ -30,25 +45,11 @@ public class SubspatialLearner implements Learner {
             workers.add(new LearnerWorker(partitionedData[i], subspaceLearners[i]));
         }
 
-        try {
-            // execute all tasks
-            ExecutorService executor = Executors.newFixedThreadPool(Math.min(size, Runtime.getRuntime().availableProcessors() - 1));
-            List<Future<Classifier>> subspaceClassifiersFuture = executor.invokeAll(workers);
-            executor.shutdownNow();
-
-            // parse result
-            Classifier[] subspaceClassifiers = new Classifier[size];
-
-            for (int i = 0; i < size; i++) {
-                subspaceClassifiers[i] = subspaceClassifiersFuture.get(i).get();
-            }
-
-            return new SubspatialClassifier(labeledPoints.getPartitionIndexes(), subspaceClassifiers);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException("Thread was abruptly interrupted.", ex);
-        } catch (ExecutionException ex) {
-            throw new RuntimeException("Exception thrown at running task.", ex);
-        }
+        return new SubspatialClassifier(
+                labeledPoints.getPartitionIndexes(),
+                worker.run(workers).toArray(new Classifier[0]),
+                worker
+        );
     }
 
     /**
@@ -59,7 +60,7 @@ public class SubspatialLearner implements Learner {
         private final LabeledDataset labeledData;
         private final Learner learner;
 
-        public LearnerWorker(LabeledDataset labeledData, Learner learner) {
+        LearnerWorker(LabeledDataset labeledData, Learner learner) {
             this.labeledData = labeledData;
             this.learner = learner;
         }

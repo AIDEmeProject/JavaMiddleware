@@ -8,6 +8,7 @@ import explore.user.User;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.SubspatialLearner;
+import machinelearning.classifier.SubspatialWorker;
 import machinelearning.threesetmetric.LabelGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class SubspatialConfusionMatrixCalculatorTest {
 
         user = new FactoredUser(Arrays.asList(buildSet(0, 1), buildSet(1, 2)));
 
-        learner = new SubspatialLearner(new Learner[] {mock(Learner.class), mock(Learner.class)});
+        learner = new SubspatialLearner(new Learner[] {mock(Learner.class), mock(Learner.class)}, mock(SubspatialWorker.class));
         calculator = new SubspatialConfusionMatrixCalculator(learner);
     }
 
@@ -54,7 +55,7 @@ class SubspatialConfusionMatrixCalculatorTest {
     @Test
     void compute_dataAndLearnerHaveIncompatibleNumberOfPartitions_throwsException() {
         Learner lr = mock(Learner.class);
-        learner = new SubspatialLearner(new Learner[]{lr});
+        learner = new SubspatialLearner(new Learner[]{lr}, mock(SubspatialWorker.class));
         calculator = new SubspatialConfusionMatrixCalculator(learner);
         assertThrows(IllegalArgumentException.class, () -> calculator.compute(data, user));
     }
