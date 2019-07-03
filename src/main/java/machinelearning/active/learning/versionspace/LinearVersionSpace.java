@@ -53,6 +53,8 @@ public class LinearVersionSpace implements VersionSpace {
 
     private IncrementalCholesky decomposition;
 
+    private double jitter = 0;
+
     /**
      * Whether to sample from sphere
      */
@@ -68,6 +70,11 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, LinearProgramSolver.FACTORY solverFactory) {
         this.hitAndRunSampler = Objects.requireNonNull(hitAndRunSampler);
         this.solverFactory = Objects.requireNonNull(solverFactory);
+    }
+
+    public void setJitter(double jitter) {
+        Validator.assertNonNegative(jitter);
+        this.jitter = jitter;
     }
 
     /**
@@ -103,7 +110,7 @@ public class LinearVersionSpace implements VersionSpace {
         Matrix X = labeledPoints.getData().copy();
 
         if (decompose) {
-            X.iAddScalarToDiagonal(1e-10);
+            X.iAddScalarToDiagonal(jitter);
 
             int lower = decomposition.getCurrentDim(), upper = X.rows();
 

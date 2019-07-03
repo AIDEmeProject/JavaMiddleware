@@ -50,7 +50,7 @@ public class IncrementalCholesky {
         double value = point.get(col) - row.squaredNorm();
 
         if (value <= 0) {
-            throw new RuntimeException("Matrix is not positive definite");
+            throw new RuntimeException("Matrix is not positive definite: value = " + value);
         }
 
         row.set(col, Math.sqrt(value));

@@ -22,6 +22,7 @@ class Kernel(Printable):
 
         if self.name == 'gaussian':
             self.gamma = gamma
+
         if self.name == 'diagonal':
             self.diagonal = diagonal
 
@@ -93,17 +94,20 @@ class BayesianSampler(Printable):
 
 class VersionSpace(Printable):
     def __init__(self, hit_and_run,
-                 kernel='linear', gamma=0, diagonal=(),
+                 kernel='linear', gamma=0, jitter=0, diagonal=(),
                  decompose=False, add_intercept=True, solver="ojalgo"):
         super().__init__(add_name=False)
 
         assert_in_list(solver, LINPROG_SOLVERS)
+        assert_positive("jitter", jitter, allow_zero=True)
 
         self.addIntercept = add_intercept
         self.solver = solver
         self.kernel = Kernel(kernel, gamma, diagonal)
         self.hitAndRunSampler = hit_and_run
         self.decompose = decompose
+        if decompose and jitter > 0:
+            self.jitter = jitter
 
 
 class BayesianVersionSpace(Printable):
@@ -119,7 +123,7 @@ class MajorityVote(Learner):
     def __init__(self, num_samples=8,
                  warmup=100, thin=10, chain_length=64, selector="single",
                  rounding=True, max_iter=0, cache=False, rounding_cache=False,
-                 kernel='linear', gamma=0, diagonal=(),
+                 kernel='linear', gamma=0, jitter=0, diagonal=(),
                  decompose=False, add_intercept=True, solver="ojalgo"):
         super().__init__()
 
@@ -136,7 +140,7 @@ class MajorityVote(Learner):
                 rounding=rounding, max_iter=max_iter, cache=cache,
                 rounding_cache=rounding_cache,
             ),
-            kernel=kernel, gamma=gamma, diagonal=diagonal,
+            kernel=kernel, gamma=gamma, diagonal=diagonal, jitter=jitter,
             decompose=decompose, add_intercept=add_intercept, solver=solver
         )
 

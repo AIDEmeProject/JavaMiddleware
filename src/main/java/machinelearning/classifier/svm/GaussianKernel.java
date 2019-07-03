@@ -42,8 +42,8 @@ public class GaussianKernel extends Kernel {
         return this.gamma > 0 ? this.gamma : (1.0 / dim);
     }
 
-    private double gaussianMap(double distance, double gamma) {
-        return FastMath.exp(-gamma * distance);
+    private double gaussianMap(double sqDistance, double gamma) {
+        return FastMath.exp(-gamma * sqDistance);
     }
 
     @Override

@@ -292,18 +292,16 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     public Matrix iAddScalarToDiagonal(double value) {
-        int size = Math.min(rows(), cols());
-        int step = cols() + 1;
+        if (value !=  0) {
+            int size = Math.min(rows(), cols());
+            int step = cols() + 1;
 
-        for (int i = 0; i < size; i++) {
-            array[i * step] += value;
+            for (int i = 0; i < size; i++) {
+                array[i * step] += value;
+            }
         }
 
         return this;
-    }
-
-    public Matrix addScalarToDiagonal(double value) {
-        return copy().iAddScalarToDiagonal(value);
     }
     
     /* ROW-WISE OPERATIONS */
