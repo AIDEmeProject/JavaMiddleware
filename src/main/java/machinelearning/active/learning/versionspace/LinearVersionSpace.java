@@ -58,7 +58,7 @@ public class LinearVersionSpace implements VersionSpace {
     /**
      * Whether to sample from sphere
      */
-    private final boolean useSphericalSampling = false;
+    private boolean useSphericalSampling = false;
 
     /**
      * By default, no intercept and no sample caching is performed.
@@ -75,6 +75,10 @@ public class LinearVersionSpace implements VersionSpace {
     public void setJitter(double jitter) {
         Validator.assertNonNegative(jitter);
         this.jitter = jitter;
+    }
+
+    public void useSphericalSampling() {
+        this.useSphericalSampling = true;
     }
 
     /**

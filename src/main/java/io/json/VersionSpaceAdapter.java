@@ -44,6 +44,9 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
                 double jitter = jsonObject.has("jitter") ? jsonObject.get("jitter").getAsDouble() : 0;
                 ((LinearVersionSpace) linearVersionSpace).setJitter(jitter);
             }
+
+            if (jsonObject.has("sphere") && jsonObject.get("sphere").getAsBoolean())
+                ((LinearVersionSpace) linearVersionSpace).useSphericalSampling();
         }
         else if (jsonObject.has("bayesianSampler")) {
             JsonObject sampler = jsonObject.get("bayesianSampler").getAsJsonObject();

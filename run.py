@@ -8,11 +8,11 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    #"sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    "sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%",  #sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", #"sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
-    "sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
     #'sdss_log_7.8%',
     #'sdss_log_squared',
     #"sdss_overlapping_5.5%",
@@ -38,7 +38,7 @@ SUBSAMPLE_SIZE = 50000 #float('inf')
 MODES = [
     'NEW',  # run new exploration
     #'RESUME',    # resume a previous exploration
-    #'EVAL',      # run evaluation procedure over finished runs
+    'EVAL',      # run evaluation procedure over finished runs
     #'AVERAGE'    # average all evaluation file for a given metric
 ]
 
@@ -48,7 +48,7 @@ NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 200
+BUDGET = 80
 
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
@@ -111,25 +111,25 @@ USE_CATEGORICAL = True
 THREADS = 0  # how many threads to use in subspatial algorithms
 
 lnr = MajorityVote(
-    num_samples=8,
+    num_samples=32,
     warmup=1000, thin=100, chain_length=100, selector="single",
-    rounding=True, max_iter=0, cache=True, rounding_cache=True,  # hit-and-run
+    rounding=False, max_iter=0, cache=True, rounding_cache=False,  # hit-and-run
     kernel='gaussian', gamma=0, jitter=1e-9, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    decompose=True, add_intercept=True, solver="gurobi"  # extra
+    decompose=False, sphere=True, add_intercept=True, solver="gurobi"  # extra
 )
 
 #lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
 
-ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY", threads=THREADS)
-#ACTIVE_LEARNER = UncertaintySampler(lnr)
+#ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY", threads=THREADS)
+ACTIVE_LEARNER = UncertaintySampler(lnr)
 #ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
 #ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
 METRICS = [
-    ConfusionMatrix(SubspatialLearner(lnr, threads=THREADS)),
-    #ConfusionMatrix(lnr),
+    #ConfusionMatrix(SubspatialLearner(lnr, threads=THREADS)),
+    ConfusionMatrix(lnr),
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False, threads=THREADS))
     #VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),

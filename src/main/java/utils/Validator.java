@@ -93,6 +93,28 @@ public class Validator {
     }
 
     /**
+     * Throws exception is values are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(double val1, double val2){
+        assertEquals(val1, val2, 1e-15);
+    }
+
+    /**
+     * Throws exception is values are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(double val1, double val2, double eps){
+        if(Math.abs(val1 - val2) > eps) {
+            throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
      * Throws exception is arrays are different.
      * @param val1: first value
      * @param val2: second value

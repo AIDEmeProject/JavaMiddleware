@@ -42,7 +42,7 @@ public class UnitSphere implements Manifold {
         }
 
         double prod = direction.dot(point);
-        direction.iSubtract(direction.scalarMultiply(prod));
+        direction.iSubtract(point.scalarMultiply(prod));
 
         return direction.iNormalize(1.0);  // TODO: can we avoid normalizing?
     }
