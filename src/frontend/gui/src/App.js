@@ -8,10 +8,13 @@ import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSM/TSMExploration'
 import DataPoints from './components/DataPoints'
+import GroupVariables from './components/GroupVariables'
 import FakePointSampling from './components/InitialSampling/FakePointSampling'
+import ModelVisualization from './components/visualisation/ModelVisualization'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
+import HeatMap from './components/visualisation/HeatMap';
 
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
@@ -44,7 +47,6 @@ class App extends Component {
     var View;
     switch(this.state.step){
         
-
         case AUTHENTICATION: 
             View = Authentication
             break
@@ -67,26 +69,46 @@ class App extends Component {
         
         default: 
             View = NEW_SESSION
+                   
     }
 
     return (
 
-        <div>            
-        
-            <nav className="navbar navbar-dark bg-dark box-shadow ">
+        <div>       
+            
                  
+        
+            <nav className="navbar navbar-dark bg-dark box-shadow ">                 
                 <a className="navbar-brand" href="/">
                     CEDAR - Active learning labeler
-                </a>
-         
-
+                </a>         
             </nav>
+
+
             <div className="App container">
                     
+                
+                <div className="row">
+                    <div className="col col-lg-8 offset-lg-2">                    
+                        <HeatMap />
+                    </div>
+
+                </div>
+            </div>
+
+            <div className="App container">
+                    
+                
                 <div className="row">
 
                     <div className="col col-lg-10 offset-lg-1">
-            
+
+                       
+
+
+
+
+
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                             fileUploaded={this.fileUploaded.bind(this)} 
@@ -100,6 +122,7 @@ class App extends Component {
                                 authorizationToken: this.state.authorizationToken, 
                                 sessionToken: this.state.sessionToken
                             }}
+                            groupsWereValidated={this.groupsWereValidated.bind(this)}
                         />            
                     </div>
                 </div>
@@ -108,22 +131,23 @@ class App extends Component {
 
                     <div className="col col-lg-10 offset-lg-1">
 
+                        
 
-                        <DataPoints 
-                            show={this.state.step == "Exploration" || this.state.step == "TSMExploration" }
-                            availableVariables={this.state.finalVariables}
-                            points={this.state.labeledPoints}
-                        />
                     </div>
+                </div>
+
+
+                <div id="pandas-profiling">
+
+
+
                 </div>
             </div>
       </div>
     );
   }
-
-
-
-    onAuthenticationSuccess(response){
+   
+  onAuthenticationSuccess(response){
         
         this.setState({
             authorizationToken: response.authorizationToken,
@@ -132,16 +156,41 @@ class App extends Component {
         })
     }
 
-    sessionOptionsWereChosen(options){
+    fileUploaded(response){
 
+  
         this.setState({
-            options: options
+            step: SESSION_OPTIONS,
+            datasetInfos: response
         })
     }
 
-    sessionWasStarted(response, variableData){
+    sessionOptionsWereChosen(options){
+        
+        var newOptions = Object.assign({}, this.state.options, options)
+        this.setState({
+            options: newOptions
+        })
+    }
+
+    groupsWereValidated(chosenColumns, groups, callback){
+
+        var options = {
+            chosenColumns: chosenColumns,
+            groups: groups
+        }
+        var newOptions = Object.assign({}, this.state.options, options)
+        
+        this.setState({options: newOptions}, callback)
+    }
+
+    sessionWasStarted(response){
         
 
+        
+
+        var options = this.state.options
+                
         var pointsToLabel = response.map( pointToLabel => {
             return {
                 id: pointToLabel.id,
@@ -149,34 +198,35 @@ class App extends Component {
             }
         })
         
-        if (variableData.finalGroups){
+        var finalVariables =  options.chosenColumns
+        var onlyTwoVariables = finalVariables.length == 2
+        var hasTSM = options.groups || onlyTwoVariables
+                
+        if (hasTSM){
+
+            if (onlyTwoVariables){
+                var groups = [[finalVariables[0]], [finalVariables[1]]]
+            }
+            else{
+                var groups = options.groups
+            }
+
             this.setState({
                 step: TSM_EXPLORATION,
                 pointsToLabel: pointsToLabel,     
-                finalGroups: variableData.finalGroups,
-                finalVariables: variableData.finalVariables   
+                groups: groups,
+                chosenColumns: finalVariables   
             })    
         }
-        else{
-            
+        else{            
             this.setState({
                 step: EXPLORATION,
                 pointsToLabel: pointsToLabel,
-                finalVariables: variableData.availableVariables,
-                availableVariables: variableData.availableVariables
+                chosenColumns: this.state.options.chosenColumns                
             })
         }        
     }
-
-
-    fileUploaded(response){
-
-        this.setState({
-            step: SESSION_OPTIONS,
-            columns: response
-        })
-    }
-
+    
     onNewPointsToLabel(points){
         
         var pointsToLabel = this.state.pointsToLabel.map(e=>e)
@@ -208,8 +258,8 @@ class App extends Component {
         this.dataWasLabeled(dataIndex, 0)                      
     }
 
-
     getTokens(){
+
         return {
             authorizationToken: this.state.authorizationToken, 
             sessionToken: this.state.sessionToken
@@ -218,9 +268,7 @@ class App extends Component {
 
     dataWasLabeled(dataIndex, label){
 
-
         var tokens = this.getTokens()
-
         var point = this.state.pointsToLabel[dataIndex]
 
         point.label = label

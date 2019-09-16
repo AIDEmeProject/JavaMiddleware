@@ -93,6 +93,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
 
         String clientJson = req.getParameter("configuration");
+        System.out.println(clientJson);
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
 

@@ -27,3 +27,12 @@
 .col-selector > * {
     display: inline-block;
 }
+
+
+.center{
+    text-align: center;
+}
+
+.vertical-center{
+    vertical-align: middle;
+}

@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 
-
-import  HeatMap from './HeatMap'
-
-
+import HeatMap from './HeatMap'
 
 class ModelVisualization extends Component{
 
-    beforeMounted(){
-        
+    constructor(props){
+
+        super(props)
+        this.state = {
+            confirmedPredictions: this.props.visualizationData.predictions.map(e => null)
+        }
     }
 
     render(){
-
-        if (! this.props.showModelVisualisation){
+        
+        if ( ! this.props.showModelVisualisation){
             return (<div></div>)
         }
 
@@ -24,30 +25,7 @@ class ModelVisualization extends Component{
                 data: e.dataPoint.data.array
             }
         })
-        
-        var TSMBound
-
-        if (this.props.visualizationData.TSMBound){
-            TSMBound = () => {
-                return (
-                    <p>                    
-                        Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
-                    </p>
-                )
-            }
-        }
-        else{
-            TSMBound = () => {
-                return (
-                    <span></span>
-                )
-            }
-        }
-
-        if( this.props.TSM){
-            return (<TSMBound />)
-        }
-
+               
         return (
             <div>
                 <p>
@@ -55,7 +33,18 @@ class ModelVisualization extends Component{
                     if the model     
                 </p>
 
-                <TSMBound />
+                {
+                    this.props.visualizationData.TSMBound &&  
+                
+                    <p>                    
+                        Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
+                    </p>
+
+                }
+                
+                <p>
+                    Estimated accuracy : {this.state.estimatedRate}
+                </p>
 
                 <table className='predicted'>
                     <thead>
@@ -65,24 +54,22 @@ class ModelVisualization extends Component{
                                 Id
                             </th>
                             
-                        {
-                            
-                            this.props.availableVariables.map((c, i) => {
-                                return (
-                                    <th
-                                        key={i}
-                                    >
-                                        {c.name}
-                                    </th>
-                                )
-                            })
-                            
-                        }
-                        <th>
-                            Predicted Label
-                        </th>
-                            
+                            {                                
+                                this.props.chosenColumns.map((c, i) => {
+                                    return (
+                                        <th
+                                            key={i}
+                                        >
+                                            {c.name}
+                                        </th>
+                                    )
+                                })                                
+                            }
+                            <th>
+                                Predicted Label
+                            </th>                            
                         </tr>
+
                     </thead>
                 
                     {
@@ -110,21 +97,145 @@ class ModelVisualization extends Component{
                                     <td>
                                         {data.label}
                                     </td>
+
+                                    <td>
+                                        <button 
+                                            data-i={i}
+                                            onClick={this.onValidatePrediction.bind(this)}
+                                            className="btn ">
+                                            Yes
+                                        </button>
+
+                                                                                <button 
+                                            data-i={i}
+                                            onClick={this.onRefusePrediction.bind(this)}
+                                            className="btn ">
+                                            No
+                                        </button>
+
+                                    </td>
                                 </tr>
                             )
                         })
                     }
                     
                     </table>
+
                     
-                    <HeatMap />
             </div>
         )
+    }
+
+    onValidatePrediction(e){
+        var i = e.target.dataset.i
+
+        var predictions = this.state.confirmedPredictions.map(e => e)
+        predictions[i] = true
+        
+        var estimatedRate = predictions.reduce((acc, e, j) => {
+            
+            return acc + predictions[j] * 1
+        }, 0) 
+        
+        this.setState({
+            confirmedPredictions: predictions,
+            estimatedRate: estimatedRate / predictions.length
+        })
+    }
+
+    onRefusePrediction(e){
+        var i = e.target.dataset.i
+
+        var predictions = this.state.confirmedPredictions.map(e => e)
+        predictions[i] = false
+        
+        var estimatedRate = predictions.reduce((acc, e, j) => {
+            
+            return acc + predictions[j] * 1
+        }, 0) 
+        
+
+        this.setState({
+            confirmedPredictions: predictions,
+            estimatedRate: estimatedRate / predictions.length
+        })
     }
 }
 
 ModelVisualization.defaultProps = {
-    
+  
+    visualizationData: {
+        predictions: [
+            
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            },
+
+
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Negative"
+            },
+
+
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            },
+            {                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            },
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            },{
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            },
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Negative"
+            },
+            {
+                
+                dataPoint: {
+                    id: 13,
+                    data: {array: [20, 20]},
+                },
+                label: "Positive"
+            }
+        ]
+    },
+    showModelVisualisation: true
 }
 
 export default ModelVisualization

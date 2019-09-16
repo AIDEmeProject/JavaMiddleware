@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 import $ from 'jquery'
 
-var numPoints = 1500,
+var numPoints = 500,
 size = 300,
 numRows = 16,
 numCols = 16,
@@ -12,6 +12,15 @@ scatterDirty = false,
 data = null,
 cells = null,
 color = d3.interpolateRgb("#fff", "#c09");
+
+
+color = function(label){
+  console.log(label)
+  return label === 1 ? "green" : "black"
+}
+
+
+
 
 var getEmptyCells = function() {
   var emptyCells = [];
@@ -23,7 +32,8 @@ var getEmptyCells = function() {
         row: rowNum,
         col: colNum,
         density: 0,
-        points: []
+        points: [],
+        label: colNum < numCols / 2 ? 0 : 1
       });
     }
   }
@@ -51,6 +61,7 @@ var randomizeData = function() {
 
   var x, y, col, row;
   for (var i = 0; i < numPoints; i++) {
+    
     x = Math.random() * size;
     y = Math.random() * size;
     col = Math.min(Math.floor(x / size * numCols), numCols - 1);
@@ -62,7 +73,10 @@ var randomizeData = function() {
       col: col,
       row: row,
       cell: cells[row][col],
-      ind: i
+      ind: i,
+      label: 1,
+      xName: "age",
+      yName: "sex"
     });
 
     cells[row][col].points.push(data[data.length - 1]);
@@ -122,6 +136,8 @@ var createScatterplot = function() {
 
 var onCellOver = function(cell, data) {
   selectCell(cell);
+
+  
 
   if (showingScatter) {
     var pointEls = [];
@@ -200,20 +216,58 @@ var createHeatchart = function() {
     }
   }
 
+
+  
   var heatchart = d3.select("div#heatchart").append("svg:svg").attr("width", size).attr("height", size);
 
-  heatchart.selectAll("g").data(cells).enter().append("svg:g").selectAll("rect").data(function(d) {
-    return d;
-  }).enter().append("svg:rect").attr("x", function(d, i) {
-    return d.col * (size / numCols);
-  }).attr("y", function(d, i) {
-    return d.row * (size / numRows);
-  }).attr("width", size / numCols).attr("height", size / numRows).attr("fill", function(d, i) {
-    return color((d.points.length - min) / (max - min));
-  }).attr("stroke", "#fff").attr("cell", function(d) {
-    return "r" + d.row + "c" + d.col;
-  }).on("mouseover", function(d) {
+  var g = heatchart.selectAll("g")
+           .data(cells)
+           .enter()
+           .append("svg:g").selectAll("rect")
+           .data(function(d) {
+              return d;
+           })
+  g.enter().append("svg:rect")
+    .attr("x", function(d, i) {
+      return d.col * (size / numCols);
+    })
+    .attr("y", function(d, i) {
+      return d.row * (size / numRows);
+    })
+    .attr("width", size / numCols)
+    .attr("height", size / numRows)
+    .attr("fill", function(d, i) {
+      console.log(d)
+      return color(d.label);
+    })
+    .attr("stroke", "#fff")
+    .attr("cell", function(d) {
+      return "r" + d.row + "c" + d.col;
+    })
+    .on("mouseover", function(d) {
+    
     onCellOver(this, d);
+
+
+    var bar = heatchart.selectAll("g")
+                       .data([d])
+                       .enter().append("g")
+                       .attr("transform", function(d, i) { 
+                        console.log(d)   
+                        return "translate(0," + d.row * (size / numRows) + ")"; 
+                      });
+
+    bar.append("text")
+        
+        .attr("y", function(d) {return  d.row * (size / numRows) + 100 })
+        .attr("dy", ".35em")
+      
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "20px")
+        .attr("fill", "black")
+        .attr("color", "black")
+        .text(function(d) { return "coucou" });
+
   }).on("mouseout", function(d) {
     onCellOut(this, d);
   });

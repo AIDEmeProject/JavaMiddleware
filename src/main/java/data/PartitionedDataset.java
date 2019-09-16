@@ -1,5 +1,6 @@
 package data;
 
+import jdk.nashorn.internal.objects.NativeArray;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
@@ -68,6 +69,24 @@ public final class PartitionedDataset {
 
         this.indexToPosition = new HashMap<>(this.points.length());
         initializeIndexes();
+    }
+
+
+    /**
+     * Add a new point to the dataset. Needed for FakePoint sampling
+     * @param point
+     */
+    public void addLabeledPointToDataset(LabeledPoint point){
+
+        this.points.add(point.getData());
+
+        int nPoints = this.points.length();
+        ExtendedLabel[] newLabels = new ExtendedLabel[nPoints + 1];
+        for (int i = 0; i < nPoints; i++ ){
+            newLabels[i] = this.labels[i];
+        }
+        newLabels[nPoints] =  ExtendedLabel.fromLabel(point.getLabel());
+
     }
 
     /**

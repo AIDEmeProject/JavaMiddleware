@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
+import explore.user.GuiUserLabel;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.LabelGroup;
 import utils.linalg.Vector;
@@ -20,6 +21,20 @@ public class LabeledPointsDTO {
 
     public LabeledPointsDTO(){
 
+    }
+
+
+    public LabeledPoint getFakePoint(String json){
+        Gson gson = new Gson();
+
+        FakePointDTO dtoPoint = gson.fromJson(json, FakePointDTO.class);
+
+        DataPoint point = new DataPoint(-1, dtoPoint.data);
+
+        GuiUserLabel label = new GuiUserLabel(dtoPoint.label);
+        LabeledPoint fakePoint = new LabeledPoint(point, label);
+
+        return fakePoint;
     }
 
     public Collection<LabeledPoint> getLabeledPoints(String json){
@@ -106,6 +121,14 @@ public class LabeledPointsDTO {
     
 }
 
+
+class FakePointDTO{
+    public double[] data;
+
+    int label;
+
+
+}
 
 class TSMLabeledPointDTO{
 

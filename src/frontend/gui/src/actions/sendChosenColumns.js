@@ -4,14 +4,13 @@ import $ from "jquery";
 
 
 function sendChosenColumns(tokens, state, onSuccess){
-    console.log(state)
+    
     var endPoint = backend + "/choose-options"    
     var configuration = defaultConfiguration
     configuration['useFakePoint'] = state.useFakePoint || false
                   
     var hasTSM = state.availableVariables.length == 2 || !! state.variableGroups[0].length > 0
-    console.log(state.variableGroups)
-    console.log(hasTSM)
+    
     if (hasTSM){
     
         var tsmJson = {
@@ -41,40 +40,21 @@ function sendChosenColumns(tokens, state, onSuccess){
         configuration["multiTSM"] = tsmJson
 
     }
-    console.log(configuration)
-    
-    
+            
     $('#conf').val(JSON.stringify(configuration))
-    
-    var availableVariables = state.availableVariables
-    
-    var variableData = {
-        availableVariables: availableVariables.map((v, i) => {
-            return Object.assign(v, {i:i})
-        }),
-        
-        finalVariables: state.availableVariables
-    }
-
-    if (hasTSM){
-        variableData['finalGroups'] = configuration['multiTSM']['featureGroups']
-    }
-
+      
     var payload = $('#choose-columns').serialize()
-
 
     $.ajax({
 
         type: "POST",
         url: endPoint,
         data: payload,        
-        success: (response) =>  {onSuccess(response, variableData)},
+        success: (response) =>  {onSuccess(response)},
         
     });    
               
 }
-
-
 
 function sendDataToWebPlateform(availableVariables, options, hasTSM, featureGroups,  sessionOptionsUrl, tokens){
 

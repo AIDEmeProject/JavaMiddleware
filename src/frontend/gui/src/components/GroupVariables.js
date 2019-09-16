@@ -16,19 +16,94 @@ function variableIsUsed(variable, usedVariables){
     return containsObject(variable, usedVariables)
 }
 
+class Group extends Component {
+
+    constructor(props){
+
+        super(props)      
+        this.state = {}
+    }
+
+    render(){
+
+        
+        const availableVariables = this.props.availableVariables
+        const iGroup = this.props.iGroup
+        
+        return (
+
+            <div>
+
+            { 
+                this.props.chosenColumns.map((variable, iVariable) => {
+
+                var isAlreadyUsed = ! containsObject(variable, availableVariables)
+                var isInGroup = containsObject(variable, this.props.group)
+
+                if (isAlreadyUsed && ! isInGroup){
+                    return (<div key={iVariable}></div>)
+                }
+                return ( 
+                    <div                                    
+                        className="checkbox"
+                        key={iVariable}
+                    >
+                        <div>{/* required because bs theme removes inner div */}
+                        <div                                                            
+                            className="checkbox"
+                        >
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    className="form-control"
+                                    
+                                    data-groupid={iGroup}   
+                                    data-variableid={variable.idx}  
+                                    data-variableorder={iVariable}                                                                                                          
+                                                                                                                                          
+                                    onChange={this.onVariableCheckboxClick.bind(this)}
+                                /> {variable.name}
+                            </label>
+                            </div>        
+                        </div>      
+                    </div>                        
+                )
+                })
+            }
+            </div>
+        )
+    }
+
+    onVariableCheckboxClick(e){
+        var isChecked = e.target.checked
+        var iVariable = parseInt(e.target.dataset.variableorder)
+            
+        var iGroup = parseInt(e.target.dataset.groupid)
+        
+        if (isChecked){
+            this.props.onVariableAddedToGroup(iGroup, iVariable)
+        }
+        else{
+            this.props.onVariableRemovedFromGroup(iGroup, iVariable)
+        }        
+    }
+}
+
 class GroupVariables extends Component {
         
     constructor(props){
 
         super(props)        
 
+        
         this.state = {
             groups: [
                 [],
                 []
             ],            
             
-            usedVariables: []
+            variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
+            
         }
     }
 
@@ -38,18 +113,14 @@ class GroupVariables extends Component {
     
     render(){
 
-        if  (typeof this.state.availableVariables !== "undefined"){
-            var availableVariables = this.state.availableVariables
-        }
-        else {
-            var availableVariables = []
-        }
-
+        var availableVariables = this.state.variablesNotAlreadyInAGivenGroup
         
-        
+        if ( ! this.props.show){
+            return (<div></div>)
+        }
         return (
 
-            <div style={{ display: this.props.showVariableGroups ? "block": "none"}}>                
+            <div>                
 
                 <h4>
                     Variable subgroups
@@ -67,59 +138,20 @@ class GroupVariables extends Component {
                     this.state.groups.map((group, iGroup)=> {
 
                         return (
-                            <div
-                            
+                            <div                            
                                 key={iGroup}
+                                
                             >
                                 Group {iGroup}                        
-                                <div                                    
-                                    className="checkbox"
-                                >
-                                    {                                
-                                        availableVariables.map((variable, i) => {
-                                            
-                                            var isVariableInGroup = containsObject(variable, this.state.groups[iGroup])
-                                            
-                                            var showCheckbox = ( ! variableIsUsed(variable, this.state.usedVariables) || 
-                                            isVariableInGroup)
-
-                                            var Variable
-                                            
-                                            if ( showCheckbox)
-                                                {
-                                                Variable = () => {
-                                                        
-                                                    return (
-                                                        <div>{/* required because bs theme removes inner div */}
-                                                            <div                                                            
-                                                                className="checkbox"
-                                                            >
-                                                                <label>
-                                                                    <input
-                                                                        value={i}    
-                                                                        className="form-control"
-                                                                        data-group={iGroup}   
-                                                                        data-variableid={variable.i}                                                                                                            
-                                                                        type="checkbox"
-                                                                        defaultChecked={isVariableInGroup}                                                                    
-                                                                        onChange={this.onVariableCheckboxClick.bind(this)}
-                                                                    /> {variable.name}
-                                                                </label>
-                                                            </div>        
-                                                        </div>                                                
-                                                    )                                                    
-                                                }
-                                            }
-                                            else{
-                                                Variable = () => { return (<div></div>)}
-                                            }
-
-                                            return (
-                                                <Variable key={i} />
-                                            )                                           
-                                        })
-                                    }
-                                </div>                                
+                                
+                                <Group 
+                                    group={group} 
+                                    iGroup={iGroup}
+                                    chosenColumns={this.props.chosenColumns}
+                                    availableVariables={availableVariables}
+                                    onVariableAddedToGroup={this.onVariableAddedToGroup.bind(this)}
+                                    onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(this)}
+                                />
                             </div>
                         )
                     })
@@ -151,61 +183,56 @@ class GroupVariables extends Component {
         
         //merge stuff
         this.setState({
-            availableVariables: nextProps.availableVariables.map (e => e)
+            variablesNotAlreadyInAGivenGroup: nextProps.chosenColumns.filter(e => e.isUsed)
         }, this.forceUpdate)
 
     }
 
-    validateGroups(){
-        this.props.groupsWereValidated(this.state)
-    }
-
-    onVariableCheckboxClick(e){
+    onVariableAddedToGroup(groupId, variableId){
         
-        var target = e.target
-        var vId = parseInt(target.dataset.variableid)
+        var variable = this.props.chosenColumns[variableId]
         
-        var groups = this.state.groups.map(e=>e)
+        var newGroupsState = this.state.groups.map(e => e)
+
+        var modifiedGroup = newGroupsState[groupId]
         
-        var usedVariables = this.state.usedVariables.map(e => e)     
-
-        var variable = this.state.availableVariables.filter( v => {
-
-            return v.i === vId
-        })[0]
-
+        variable['realId'] = variableId
+        modifiedGroup.push(variable)
                 
-        var iGroup = e.target.dataset.group
-        
-
-        if (target.checked){
+        newGroupsState[groupId] = modifiedGroup
+                                
+        var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.filter(v => {
             
-            usedVariables.push(variable)
-            groups[iGroup].push(variable)
-        }
-        else{
+            return v.idx !== variable.idx
+        })
+    
+        this.setState({
+            groups: newGroupsState,
+            variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup
+        })
+    }
+    
+    onVariableRemovedFromGroup(groupId, removedColumnId){
+        
+        var variable = this.props.chosenColumns[removedColumnId]
+        var newGroupsState = this.state.groups.map(e => e)
+        var modifiedGroup = newGroupsState[groupId]
+        
+        modifiedGroup = modifiedGroup.filter(variable => {
+            return variable.idx !== removedColumnId
+        })
 
-            usedVariables = usedVariables.filter( v => {
-                return v.i !== vId
-            })
-
-            var groupVariables = groups[iGroup].filter( v => {
-                return v.i !== vId
-            })        
-
-            groups[iGroup] = groupVariables 
-        }
+        var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(e => e)
+        variablesNotAlreadyInAGivenGroup.push(variable)
         
         this.setState({
-            usedVariables: usedVariables,
-            groups: groups
-        })                
-
-        this.props.variableGroupsChanged(groups)
+            groups: newGroupsState,
+            variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup
+        })
     }
 
-
     addVariableGroup(){
+
         var groups = this.state.groups.map(e=>e)
 
         groups.push([])
@@ -213,21 +240,36 @@ class GroupVariables extends Component {
             groups: groups
         })
     }
+
+    validateGroups(){
+        
+        this.props.groupsWereValidated(this.state.groups)
+    }
 }
 
 GroupVariables.defaultProps = {
-    showVariableGroups: true,
-    availableVariables: [        
-      
-    ],
-    groups: [
-        [
-
-        ],
-        [
-
-        ]
-    ],
+    
+    chosenColumns: [
+        {
+            'idx': 0,
+            'isUsed': true,
+            'name': 'test1',
+            'type': 'numerical'
+        },
+        {
+            'idx': 1,
+            'isUsed': true,
+            'name': 'test2',
+            'type': 'numerical'
+        },
+     
+        {
+            'idx': 3,
+            'isUsed': true,
+            'name': 'test4',
+            'type': 'numerical'
+        },
+    ]
     
 }
 

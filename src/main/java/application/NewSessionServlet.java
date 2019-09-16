@@ -35,8 +35,8 @@ public class NewSessionServlet extends HttpServlet {
 
         String sessionId = "2323232323232323";
         String sessionPath = "./session/" + sessionId;
-        boolean success = (new File(sessionPath)).mkdirs();
 
+        boolean success = (new File(sessionPath)).mkdirs();
 
         req.getSession().setAttribute("sessionPath", sessionPath);
 
@@ -70,12 +70,14 @@ public class NewSessionServlet extends HttpServlet {
         try {
             List fileItems = upload.parseRequest(req);
             FileItem uploadedFile = (FileItem) fileItems.get(0);
+
+            /*
             String fieldName = uploadedFile.getFieldName();
             String fileName = uploadedFile.getName();
             String contentType = uploadedFile.getContentType();
             boolean isInMemory = uploadedFile.isInMemory();
             long sizeInBytes = uploadedFile.getSize();
-
+            */
             File file = new File( sessionPath + "/data.csv");
 
             uploadedFile.write(file);
@@ -83,12 +85,11 @@ public class NewSessionServlet extends HttpServlet {
             CsvDatasetReader csvDatasetReader = new CsvDatasetReader();
 
 
-
             FileItem separatorItem = (FileItem) fileItems.get(1);
             char separator = separatorItem.getString().charAt(0);
 
 
-            String columnNames = csvDatasetReader.getColumnNames(file, separator);
+            String columnNames = csvDatasetReader.getCsvInfos(file, separator);
 
             resp.setStatus(HttpStatus.OK_200);
 

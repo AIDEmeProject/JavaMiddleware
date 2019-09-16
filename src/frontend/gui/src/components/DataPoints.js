@@ -30,11 +30,11 @@ class DataPoints extends Component{
                             </th>
 
                             {
-                                this.props.availableVariables.map((column, key) => {
+                                this.props.chosenColumns.map((column, key) => {
                                     
                                     return (
                                         <th key={key} >
-                                        {column.name} 
+                                            {column.name} 
                                         </th>
                                     )
                                 })

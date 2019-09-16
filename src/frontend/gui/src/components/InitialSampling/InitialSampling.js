@@ -19,11 +19,10 @@ class InitialSampling extends Component{
     }
     
     render(){
-        console.log(this.props)
+        
         return (
             <div>
                 <div>
-
                     <ul className="nav nav-tabs">
                         <li className="nav-item">
                             <a 
@@ -64,15 +63,14 @@ class InitialSampling extends Component{
                         </div>
                     }
                  
-
                     {
                         ! this.state.labelingInitialSampling && 
 
                         <div>
                             <FakePointSampling 
-                            pointToLabel={this.props.pointsToLabel[0].data}
-                            {...this.props}
-                            variableTypes={this.props.options.variableTypes}
+                                pointToLabel={this.props.pointsToLabel[0].data}                            
+                                variableTypes={this.props.options.variableTypes}
+                                {...this.props}
                             />
                        </div>
                

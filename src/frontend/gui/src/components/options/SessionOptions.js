@@ -12,9 +12,24 @@ class SessionOptions extends Component{
 
         super(props)
 
+        var datasetInfos = this.props.datasetInfos
+       
+        const columnTypes = this.props.datasetInfos.uniqueValueNumbers.map(e => {
+            return e > 10 ? "numerical": "categorical"
+        })
+        
+        var chosenColumns = datasetInfos.columns.map( (col, idx) => {
+            return {
+                'name': col,
+                'idx': idx,
+                'isUsed': false,
+                'type': columnTypes[idx]
+            }
+        })            
+
         this.state = {
-            checkboxes: this.props.columns.map (c => false),
-            chosenColumns: [],
+            checkboxes: datasetInfos.columns.map (c => false),
+            chosenColumns: chosenColumns,
             showAdvancedOptions: false,
             showVariableGroups: false,
             availableVariables: [],            
@@ -22,7 +37,7 @@ class SessionOptions extends Component{
                 [],
                 []
             ],  
-            finalVariables: [],
+            finalVariables: [],            
 
             learner: "Uncertainty sampling",
             classifier: "SVM",
@@ -31,6 +46,10 @@ class SessionOptions extends Component{
     }
 
     render(){
+
+        const datasetInfos = this.props.datasetInfos
+        const columns = datasetInfos.columns
+               
 
         return (
             <div>        
@@ -67,87 +86,104 @@ class SessionOptions extends Component{
                     </li>                    
                 </ul>
 
-
                 <form                 
                     id="choose-columns"                    
-                    
                 >        
+
                 {
                     
                     <div style={{ "display": this.state.showColumns ? "initial": "none"}}>
 
                         <p>
-                            The following columns were found. Pick the one you want to use for this session.
+                            The following columns were found. 
+                            Pick the one you want to use for this session.
                         </p>
 
+                            <div className="row">
+                                <div                                     
+                                    className="col s4 vertical-center"
+                                >    
+                                    Name
+                                </div>
+
+                                <div                                     
+                                    className="col s2 center vertical-center"
+                                >    
+                                    Variable type
+                                </div>
+
+                                <div className="col s2 center vertical-center">
+                                    Minimum
+                                </div>
+
+                                <div className="col s2 center vertical-center">
+                                    Maximum
+                                </div>
+                            </div>
                                 {                
-                                    this.props.columns.map((column, key) => (
+                                    columns.map((column, key) => (
                                             
                                         <div key={key} className="row" >
                                             <div                                     
-                                                className="checkbox col s4"
-                                            >                                    
-                                                <label>
-                                                                                
-                                                    <input        
-                                                        id={"column-" + column }  
-                                                        name={"column" + key }
-                                                        type="checkbox"
-                                                        className="form-control"                                                                                                                                
-                                                        value={key}                                             
-                                                        onChange={this.onCheckedColumn.bind(this)}
-                                                        checked={this.state.checkboxes[key]}
-                                                    /> {column}
+                                                className="col s4 vertical-center"
+                                            >                     
+                                                <div className="checkbox inline vertical-center">
+                                                    <label>
+                                                                                    
+                                                        <input        
+                                                            id={"column-" + column }  
+                                                            name={"column" + key }
+                                                            type="checkbox"
+                                                            className="form-control"                                                                                                                                
+                                                            value={key}                                             
+                                                            onClick={this.onCheckedColumn.bind(this)}
+                                                            defaultChecked={this.state.checkboxes[key]}
+                                                        /> {column}
 
-                                                </label>
-                                            </div>      
-                                            <div className="col s1">
+                                                    </label>
+                                                </div> 
+                                            </div>
+                                            <div className="col s2 center vertical-center">
                                                 <select 
                                                     className="form-control"
                                                     data-key={key}
                                                     onChange={this.onColumnTypeChange.bind(this)}
                                                     ref={"column-type-" + key}
+                                                    value={this.state.chosenColumns[key].type}
                                                 >
                                                     <option value="numerical">Numerical</option>
                                                     <option value="categorical">Categorical</option>
                                                 </select>
                                             </div>
+
+                                            <div className="col s2 center vertical-center"> 
+                                                {datasetInfos.minimums[key]}
+                                            </div>
+
+                                            <div className="col s2 center vertical-center"> 
+                                                {datasetInfos.maximums[key]}
+                                            </div>
                                         </div>                                                    
                                     ))
                                 }
                         
-
                                 <input 
                                     id="conf" 
                                     name="configuration"
                                     type="text"
                                     style={{visibility: "hidden"}}
                                 />
-                                
-                                <button 
-                                    type="button"
-                                    className="btn btn-primary btn-raised"
-                                    onClick={() => this.setState({
-                                        showVariableGroups: ! this.state.showVariableGroups
-                                    })}    
-                                >
-                                    Group Variables
-                                </button>
-                                
+                                                                
                         </div>
                     }
-
                                             
                     <AdvancedOptions {...this.state} />
-
-                    <GroupVariables 
-                        
-                        showVariableGroups={this.state.showVariableGroups}
-                        availableVariables={this.state.availableVariables}
-                        groupWasAdded={this.groupWasAdded.bind(this)}
-                        variableWasAddedToGroup={this.variableWasAddedToGroup.bind(this)}
-                        groupsWereValidated={this.groupsWereValidated.bind(this)}
-                        variableGroupsChanged= {this.variableGroupsChanged.bind(this)}
+                    
+                    <GroupVariables                
+                        show={this.state.showVariableGroups}         
+                        chosenColumns={this.state.chosenColumns}                        
+                        groupWasAdded={this.groupWasAdded.bind(this)}                        
+                        groupsWereValidated={this.groupsWereValidated.bind(this)}                        
                     />
 
                     <button 
@@ -170,6 +206,7 @@ class SessionOptions extends Component{
     }
     
     onVariableGrouping(){
+
 
         this.setState({
             showAdvancedOptions: false,
@@ -197,110 +234,51 @@ class SessionOptions extends Component{
 
     onCheckedColumn(e){
                     
-        var checkboxes = this.state.checkboxes.map(e=>e);
-        checkboxes[e.target.value] = e.target.checked
+        var checkboxes = this.state.checkboxes.map (e => e)
+        var idx = e.target.value
 
-        var chosenColumns = this.props.columns.filter((e, k)=>{
+        var newChosenColumns = this.state.chosenColumns.map(e => e)
+        newChosenColumns[idx].isUsed = e.target.checked        
+        checkboxes[idx] = e.target.checked
 
-            return checkboxes[k]
-        })        
-
-        var availableVariables = []
-
-        this.props.columns.forEach((c, i) => {
-            if (checkboxes[i]){
-                availableVariables.push({
-                    name: c,
-                    i: i,
-                   
-                })
-            }
-        })
-        
-        
-                
+              
         this.setState({
-            chosenColumns: chosenColumns,
-            checkboxes: checkboxes,
-            availableVariables: availableVariables,
-            finalVariables: availableVariables
+            chosenColumns: newChosenColumns,
+            checkboxes: checkboxes,            
         })
     }
 
     onColumnTypeChange(e){
-        var iColumn = e.target.dataset.key - 1
-        var variable = Object.assign({}, this.state.availableVariables[iColumn])
-        variable.type = e.target.value
 
+        var iColumn = e.target.dataset.key
         
-
-        var availableVariables = this.state.availableVariables.map(e=>e)
-        availableVariables[iColumn] = variable
-
-        
+        var newChosenColumnState = this.state.chosenColumns.map(e => e)
+        newChosenColumnState[iColumn].type = e.target.value
+                
         this.setState({
-            availableVariables: availableVariables,
-            variableTypes: availableVariables.map(e => e.type)
+            chosenColumns: newChosenColumnState,            
         })                
     }
     
     onSessionStartClick(e){
         
         e.preventDefault()
-        
-        var availableVariables = this.state.availableVariables.map(e => {
-            return Object.assign(e, {
-                type: this.refs["column-type-" + e.i].value
-            })
-        })
-        
-        this.setState({
-            availableVariables: availableVariables
-        }, () => {
-            sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
+                       
+        sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
 
-            this.props.sessionOptionsWereChosen({
-                
-                useFakePoint: this.state.useFakePoint,
-                chosenColumns: this.state.availableVariables,
-                variableTypes: this.state.variableTypes
-            })
-        })
-        
+        this.props.sessionOptionsWereChosen({            
+            chosenColumns: this.state.chosenColumns.filter(e => e.isUsed),                
+        })                
     }
+   
+    groupsWereValidated(groups){
 
-    variableGroupsChanged(groups){
+        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
         
-        this.setState({
-            variableGroups: groups
-        })
-    }
-
-    groupsWereValidated(options){
-
-        var groups = options.groups
-        
-        var availableVariables = {}
-        options.availableVariables.forEach((e, i) => {
-            availableVariables[e.name] = i
-        })
-        
-
-        var finalGroups = groups.map(g => {
-            
-            return g.map((v, i) => {
-                return {name: v.name, i: availableVariables[v.name]}
-            })    
-        })
-        
-        var finalVariables = options.availableVariables.map ( (e,i) => {
-            return {name: e.name, i:i}
-        })
-        
-        this.setState({
-            finalGroups: finalGroups,
-            finalVariables: finalVariables
-        })
+        this.props.groupsWereValidated(chosenColumns, groups, ()=> {
+            sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)    
+        })                            
+                                  
     }
 
     groupWasAdded(){
@@ -314,25 +292,7 @@ class SessionOptions extends Component{
 
         this.forceUpdate()
     }
-
-    variableWasAddedToGroup(variable, target){
-        
-        var usedVariables = this.state.usedVariables.map(e => e)                
-        if (target.checked){
-
-            var value = target.value
-                        
-            usedVariables.push(variable)
-        }
-        else{
-            usedVariables.splice(target.value, 1)
-        }
-        
-        this.setState({
-            usedVariables: usedVariables,            
-        })        
-    }
-   
+       
     onFakePointClick(e){
          
         this.setState({
@@ -340,8 +300,6 @@ class SessionOptions extends Component{
         })
     }      
 }
-
-
 
 SessionOptions.defaultProps = {
     "classifiers": [

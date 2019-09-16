@@ -26,26 +26,18 @@ public class FakePointInitialSampling extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        String jsonLabeledPoints = req.getParameter("fakePoint");
+        String jsonFakePoint = req.getParameter("fakePoint");
+        System.out.println(jsonFakePoint);
         Gson json = new Gson();
         //stuff to get the data from the POST request
 
         LabeledPointsDTO converter = new LabeledPointsDTO();
-        /*
-        ArrayList<LabeledPoint> labeledPoints = (ArrayList<LabeledPoint>) converter.getTSMLabeledPoints(jsonLabeledPoints);
+        LabeledPoint labeledPoint = converter.getFakePoint(jsonFakePoint);
 
-        System.out.println(labeledPoints.size());
-        for (LabeledPoint point: labeledPoints
-             ) {
 
-            System.out.println(point.getId());
-            System.out.println(point.getLabel().isPositive());
+        manager.addLabeledPointToDataset(labeledPoint);
 
-        }
-        List<DataPoint> nextPointsToLabel = manager.getNextFakePoint();
-        */
-        //resp.getWriter().println(json.toJson(nextPointsToLabel));
-        resp.getWriter().println("yeah");
+        resp.getWriter().println("{'msg': 'ok'}");
     }
 }
 

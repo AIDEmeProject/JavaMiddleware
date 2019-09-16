@@ -18,6 +18,7 @@ import utils.RandomState;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -73,6 +74,7 @@ public class ExplorationManager {
     }
 
 
+
     /**
      * @return an initial selection of points to be labeled by the user
      */
@@ -91,6 +93,11 @@ public class ExplorationManager {
         ArrayList<DataPoint> points = new ArrayList();
         points.add(point);
         return points;
+    }
+
+
+    public void addLabeledPointToDataset(LabeledPoint point){
+        this.partitionedDataset.addLabeledPointToDataset(point);
     }
 
     public List<DataPoint> getNextFakePoint(){

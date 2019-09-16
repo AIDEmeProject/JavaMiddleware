@@ -1,3 +1,6 @@
+import $ from "jquery";
+import * as d3 from "d3";
+
 var global_sample_data = [];
 var global_marker = [];
 var new_samples = [];
@@ -441,10 +444,10 @@ function kemi_scatter_plot(data, svg, x_range, y_range, filter){
   var y_maxvalue = y_range.max_value;
 
   global_data_overlap = [];
-  var x = d3.scale.linear()
+  var x = d3.scaleLinear()
   .range([0, width]);
 
-  var y = d3.scale.linear()
+  var y = d3.scaleLinear()
   .range([height, 0]);
 
   //circle radius in the plot
@@ -1116,10 +1119,10 @@ var kemi_grid_points_plot = function(grid_point_data, svg, x_range, y_range){
 	//x_range:  {attr_name, min_value, max_value}
 	//y_range:  {attr_name, min_value, max_value}
 	
-    var x = d3.scale.linear()
+    var x = d3.scaleLinear()
     .range([0, width]);
 
-    var y = d3.scale.linear()
+    var y = d3.scaleLinear()
     .range([height, 0]);
 
     //circle radius in the plot
@@ -2576,4 +2579,7 @@ function all_relevant_objects_btn_clicked() {
         .post(post_str);
 }
 
-$(plot_init);
+//$(plot_init);
+
+
+export default plot_init

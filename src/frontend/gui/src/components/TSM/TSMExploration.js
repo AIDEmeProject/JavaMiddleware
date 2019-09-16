@@ -3,10 +3,11 @@ import React, { Component } from 'react';
 import ExplorationActions from '../ExplorationActions'
 import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
+import DataPoints from '../DataPoints'
+import HeatMap from '../visualisation/HeatMap'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../constants/constants'
-
 
 class TSMExploration extends Component{
 
@@ -15,68 +16,108 @@ class TSMExploration extends Component{
         super(props)
 
         this.state = {
-            pointsToLabel: this.props.pointsToLabel,
+            pointsToLabel: this.props.pointsToLabel.map(e => e),
             noPoints: [],
             labeledPoints: [],   
             initialLabelingSession: true,    
             hasYes: false,
-            hasNo: false     
+            hasNo: false,
+            showModelPerformance: false,
+            showLabelView: true,
+            showLabelHistory: false
+
         }        
     }
 
     render(){
-        console.log(this.props)     
-        var Viz
-        if (this.state.showModelVisualisation){
-            Viz = () => {
-                return (
-                    <TSMModelVisualization 
-                        {...this.props}
-                        {...this.state}
-                        TSM={true}
-                    />
-                )
-            }
-        }
-        else {
-            Viz = () => { return (<div></div>) }
-        }        
-        
-        var FirstPhase
-        if (this.state.initialLabelingSession){
-
-            FirstPhase = () => {
-                return (
-                <div>
-                    The first phase of labeling continues until we obtain 
-                    a positive example and a negative example.        
-
-                        <SpecificPointToLabel 
-                         onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-                        show={this.props.initialLabelingSession}
-                />            
-                </div>
-            )}
-        }
-        else {            
-            FirstPhase = () => {return(<div></div>)}                       
-        }
-
+                       
         return (
             
             <div>
-
                 <p>
-                    Grouped variable exploration. If you chose no, you will be asked to label each subgroups
+                    Grouped variable exploration. If you chose no, 
+                    you will be asked to label each subgroups
                     independantly                    
                 </p>
 
                 <h4>
                     Labeleling phase
                 </h4>
-                            
-                <FirstPhase />
+
+                <ul className="nav nav-tabs">
+                   
+                    <li className="nav-item">
+
+                        <a 
+                           className="nav-link" 
+                           href="#basic-options"
+                           onClick={() => this.setState({
+                               'showModelPerformance': false, 
+                               'showLabelView': true,
+                               'showLabelHistory': false
+                            })}
+                        >
+                            Label view
+                        </a>
+                    </li>
+
+                    <li className="nav-item">
+                        <a 
+                            className="nav-link" 
+                            href="#advanced-options"
+                            onClick={() => this.setState({
+                                'showModelPerformance': false, 
+                                'showLabelView': false,  
+                                'showLabelHistory': true
+                            })}
+                        >
+                            View labeled points
+                        </a>
+                    </li>   
+
+
+                    <li className="nav-item">
+                        <a 
+                            className="nav-link" 
+                            href="#advanced-options"
+                            onClick={() => this.setState({
+                                'showModelPerformance': true, 
+                                'showLabelView': false,  
+                                'showLabelHistory': false
+                            })}
+                        >
+                            Assess model Performance
+                        </a>
+                    </li>          
+
+                       
+
+                </ul>
+
+                { 
+                    this.state.initialLabelingSession && 
+                    
+                    <div>
+                        The first phase of labeling continues until we obtain 
+                        a positive example and a negative example.        
+ 
+                        <SpecificPointToLabel 
+                            onNewPointsToLabel={this.newPointsToLabel.bind(this)}
+                            show={this.props.initialLabelingSession}
+                        />            
+                    </div>                
+                }
+
+                {
+                    ! this.state.initialLabelingSession && 
+                    <HeatMap />
+                }
+
+                {
+                    this.state.showLabelView && 
                 
+                    <div>
+
                 <p>Please label the following samples</p>
 
                 <table className="group-variable">
@@ -85,14 +126,17 @@ class TSMExploration extends Component{
 
                             <td>Row id</td>
                             {
-                                this.props.finalGroups.map((g, i) => {
+                                
+                                this.props.groups.map((g, i) => {
                                     
+                                    const columnNames = g.map(v => v.name)
+
                                     return (
                                         <th 
                                             key ={i}
                                             colSpan={g.length}
                                         >
-                                            {g.join(", ")}
+                                            {columnNames.join(", ")}
                                         </th>
                                     )
                                 })
@@ -117,14 +161,20 @@ class TSMExploration extends Component{
                                     {point.id}
                                 </td>
                                 {
-                                    this.props.finalGroups.map((g, iGroup) => {
+                                    this.props.groups.map((g, iGroup) => {
                                         
-                                        var values = g.map( variable => {
-                                            
-                                            return point.data[variable.i]
+                                        var pointIds = g.map(e => e.realId)    
+                                        
+                                        var dataAsGroups = []
 
-                                        }).join(", ")
-                                                                                                                         
+                                        pointIds.forEach(realId => {
+                                            var value = point.data[realId]
+                                        
+                                            dataAsGroups.push(value)
+                                        })
+                                                                                                                        
+                                        var values = dataAsGroups.join(", ")
+                                                                                                                                                                 
                                         if ( typeof point.labels !== "undefined"){
                                             var L = () => {
                                                 return <button
@@ -184,15 +234,35 @@ class TSMExploration extends Component{
                         )
                     })
                 }
-                </tbody>
+                    </tbody>
 
-                </table>
-
+                    </table>
+                    </div>
+                }
              
+                {
+                    this.explorationActions()
+                }
 
-                {this.explorationActions()}
+                {
+                    this.state.showModelVisualisation && 
+                    <TSMModelVisualization 
+                        {...this.props}
+                        {...this.state}
+                        TSM={true}
+                    />
+                }
+                {
 
-                <Viz />
+                    this.state.showLabelHistory && 
+
+                    <DataPoints                             
+                        availableVariables={this.props.finalVariables}
+                        points={this.props.labeledPoints}
+                        chosenColumns={this.props.chosenColumns}
+                    />
+                }
+                
             </div>
         )
     }
@@ -212,9 +282,7 @@ class TSMExploration extends Component{
             pointsToLabel: pointsToLabel.concat(newPoints),
             labeledPoints: [],
             initialLabelingSession: ! (this.state.hasYes && this.state.hasNo)
-        })
-
-        
+        })        
     }
      
     groupWasLabeledAsYes(e){
@@ -224,7 +292,7 @@ class TSMExploration extends Component{
 
         var labeledPoint = this.state.pointsToLabel[pointId]
         
-        labeledPoint.labels = this.props.finalGroups.map( e => 1)
+        labeledPoint.labels = this.props.groups.map( e => 1)
         
         pointsToLabel.splice(pointId, 1)
         
@@ -251,7 +319,7 @@ class TSMExploration extends Component{
 
 
         var point = pointsToLabel[iPoint]
-        point.labels = this.props.finalGroups.map (e => 1)
+        point.labels = this.props.groups.map (e => 1)
 
         this.setState({
             pointsToLabel: pointsToLabel,  
@@ -318,6 +386,7 @@ class TSMExploration extends Component{
 
 
     onLabelWholeDatasetClick(){
+
         getWholedatasetLabeled()
 
         notifyLabelWholeDataset(this.props.tokens)
@@ -360,7 +429,6 @@ function getVisualizationData(dataWasReceived){
     
 }
 
-
 function dataWasLabeledNotification(tokens, data){
     var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
     
@@ -395,7 +463,6 @@ function notifyLabelWholeDataset(tokens){
     })
 }
 
-
 function sendLabels(labeledPoints, onSuccess){
     
     var labeledPoints = labeledPoints.map(e => {
@@ -424,7 +491,15 @@ function sendLabels(labeledPoints, onSuccess){
 
 
 TSMExploration.defaultProps = {
-
+    
+    pointsToLabel: [
+        {
+            'id': 4,
+            'data': {
+                'array': [1, 7, 2]
+            }
+        }
+    ]
 }
 
 export default TSMExploration

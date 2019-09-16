@@ -24,6 +24,7 @@ class FakePointSampling extends Component{
                 <h4>
                     Fake point initial sampling
                 </h4>
+
                 <p>
                     We have created a fake point. It was created by taking the median value of t
                     the numerical columns and the the most common category.
@@ -70,7 +71,7 @@ class FakePointSampling extends Component{
                                         </button>                                        
 
                                         <span>
-                                            { col }
+                                            <input value={col} />
                                         </span>
 
                                         <button 
@@ -109,7 +110,7 @@ class FakePointSampling extends Component{
     increaseValue(e){
 
         var i = e.target.dataset.col
-        console.log(i)
+        
         
         var pointToLabel = this.state.fakePoint.map(e => e)
         
@@ -130,9 +131,7 @@ class FakePointSampling extends Component{
     decreaseValue(e){
         
         var i = e.target.dataset.col
-        
-        console.log(i)
-      
+
         var pointToLabel = this.state.fakePoint.map(e => e)
         
         var colType = this.props.availableVariables[i].type
@@ -150,17 +149,32 @@ class FakePointSampling extends Component{
     }
 
     onValidatePoint(){
-        sendPoint(this.state.pointToLabel, this.props.fakePointWasValidated)
+
+
+        var data = {
+            'data': this.state.fakePoint,
+            'label': 0
+        }
+
+        sendPoint(data, this.props.fakePointWasValidated)
     }
 }
 
-function sendPoint(point, onSuccess){
+function sendPoint(dataPoint, onSuccess){
     var url = backend + "/fake-point-initial-sampling"
 
-    var data = {
-        fakePoint: point
-    }
-    $.post(url, data, onSuccess)
+
+    $.ajax({
+        type: "POST",
+        dataType: 'JSON',
+        url: url,
+        data: {
+            fakePoint: JSON.stringify(dataPoint)
+        },
+       
+        success: onSuccess
+    })
+  
 
 }
 

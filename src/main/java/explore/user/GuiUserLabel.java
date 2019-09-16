@@ -24,10 +24,17 @@ public class GuiUserLabel implements UserLabel {
         return new Label[0];
     }
 
-    GuiUserLabel(Integer label){
+    public GuiUserLabel(Integer label){
         boolean isPostive = (label == 1);
 
         this.isPositive = isPostive;
     }
+
+    public GuiUserLabel(int label){
+        boolean isPostive = (label == 1);
+
+        this.isPositive = isPostive;
+    }
+
 
 }

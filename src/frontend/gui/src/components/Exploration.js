@@ -4,9 +4,12 @@ import $ from "jquery";
 import {backend, webplatformApi} from '../constants/constants'
 
 import ModelVisualization from './visualisation/ModelVisualization'
-import ExplorationActions from './ExplorationActions'
+
 import PointLabelisation from './PointLabelisation'
 import InitialSampling from './InitialSampling/InitialSampling'
+import HeatMap from './visualisation/HeatMap'
+
+import DataPoints from './DataPoints'
 
 class Exploration extends Component{
 
@@ -14,13 +17,15 @@ class Exploration extends Component{
 
         super(props)
         this.state = {
-            showModelVisualisation: false
+            showModelVisualisation: false,
+            showLabelView: true,
+            showLabelHistory: false
             
         }
     }
 
     render(){
-            
+                    
         if (this.props.initialLabelingSession){
             return (<InitialSampling {...this.state} {...this.props} />)
         }
@@ -29,25 +34,94 @@ class Exploration extends Component{
 
             <div>
                 <h4>
-                    Labeleling phase
+                    Labeleling phase     <button
+                        className="btn btn-primary btn-raised pull-right"
+                    onClick={this.onLabelWholeDatasetClick.bind(this)}
+                >
+                    Get the whole dataset labeled
+                </button>
                 </h4>
                             
-                                                            
-                <PointLabelisation 
-                    {...this.props} 
-                    {...this.state}
-                />
-    
-                <ExplorationActions
-                    show={ ! this.props.initialLabelingSession}
-                    onLabelWholeDatasetClick={this.onLabelWholeDatasetClick.bind(this)}
-                    onVisualizeClick={this.onVisualizeClick.bind(this)}
-                />
-                
-                <ModelVisualization 
-                    {...this.props}
-                    {...this.state}
-                />
+                <ul className="nav nav-tabs">
+                   
+                    <li className="nav-item">
+
+                        <a 
+                           className={this.state.showLabelView ? "nav-link active": "nav-link"} 
+                           href="#basic-options"
+                           onClick={() => this.setState({
+                               'showModelVisualisation': false,
+                               'showLabelView': true,
+                               'showHeatmap': false,
+                               'showLabelHistory': false
+                            })}
+                        >
+                            Label view
+                        </a>
+                    </li>
+
+                    <li className="nav-item">
+                        <a 
+                            className={this.state.showLabelHistory ? "nav-link active": "nav-link"} 
+                            href="#advanced-options"
+                            onClick={() => this.setState({
+                                'showModelVisualisation': false, 
+                                'showLabelView': false, 
+                                'showHeatmap': false,
+                                'showLabelHistory': true
+                            })}
+                        >
+                            View labeled points
+                        </a>
+                    </li>         
+
+                    <li className="nav-item">
+                        <a 
+                            className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
+                            href="#advanced-options"
+                            onClick={() => this.setState({
+                                'showModelVisualisation': true, 
+                                'showLabelView': false,  
+                                'showHeatmap': false,
+                                'showLabelHistory': false
+                            })}
+                        >
+                            Assess model Performance
+                        </a>
+                    </li>    
+
+                   
+                               
+                </ul>
+
+
+                <HeatMap />
+
+                {                     
+                    this.state.showLabelView &&                                                             
+                        <PointLabelisation 
+                            {...this.props} 
+                            {...this.state}
+                        />
+                }
+                {
+                    this.state.showModelVisualisation && 
+                                    
+                    <ModelVisualization 
+                        {...this.props}
+                        {...this.state}
+                    />
+                }
+                {
+                    this.state.showLabelHistory && 
+
+                    <DataPoints                             
+                        availableVariables={this.props.finalVariables}
+                        points={this.props.labeledPoints}
+                        chosenColumns={this.props.chosenColumns}
+                        show={true}
+                    />
+                }
                 
             </div>
         )
@@ -55,6 +129,7 @@ class Exploration extends Component{
 
    
     onLabelWholeDatasetClick(){
+        
         getWholedatasetLabeled()
 
         notifyLabel(this.props.tokens)

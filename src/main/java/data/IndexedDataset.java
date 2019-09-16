@@ -3,6 +3,7 @@ package data;
 import explore.sampling.ReservoirSampler;
 import utils.Validator;
 import utils.linalg.Matrix;
+import utils.linalg.Vector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +27,8 @@ public class IndexedDataset implements Iterable<DataPoint> {
      * The underlying data (each row is a data point)
      */
     private Matrix data;
+
+
 
     /**
      * This Builder is a utility class for incrementally building an IndexedDataset object.
@@ -71,6 +74,10 @@ public class IndexedDataset implements Iterable<DataPoint> {
             return new IndexedDataset(indexes, Matrix.FACTORY.make(matrix));
         }
 
+        public Matrix buildMatrix(){
+            double[][] matrix = points.toArray(new double[0][]);
+            return Matrix.FACTORY.make(matrix);
+        }
     }
 
     /**
@@ -86,6 +93,31 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
 
+    /**
+     * Add datapoint to Matrix
+     * @param dataPoint
+     * @return
+     */
+    public void add(Vector dataPoint) {
+
+        long nPoint = this.indexes.size();
+        //indexes.add(nPoint + 1);
+        this.indexes.add((int) nPoint + 1, nPoint + 1);
+        Builder builder = new Builder();
+
+        Vector row;
+        DataPoint point;
+        for (int i =0 ; i < nPoint; i++){
+            row = this.data.getRow(i);
+
+            point = new DataPoint(i, row);
+            builder.add(point);
+
+        }
+
+        this.data = builder.buildMatrix();
+
+    }
 
 
     public DataPoint getFakeData(){

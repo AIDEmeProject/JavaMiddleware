@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class PointLabelisation extends Component{
     
     render(){
-        console.log(this.props)        
+        
         return (
             <div>
 
@@ -19,11 +19,11 @@ class PointLabelisation extends Component{
                             </th>
 
                             {
-                                this.props.availableVariables.map((column, key) => {
+                                this.props.chosenColumns.map((column, key) => {
                                     
                                     return (
                                         <th key={key} >
-                                        {column.name} 
+                                            {column.name} 
                                         </th>
                                     )
                                 })
