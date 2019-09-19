@@ -55,8 +55,7 @@ class FakePointSampling extends Component{
                                 return (
                                     <td
                                         key={i}
-                                    >
-                                        
+                                    >                                        
                                         <button
                                             data-col={i}
                                             className="btn"

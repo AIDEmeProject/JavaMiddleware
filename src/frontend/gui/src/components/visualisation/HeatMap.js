@@ -3,22 +3,17 @@ import React, { Component } from 'react';
 import $ from "jquery";
 import {backend} from '../../constants/constants'
 
-//import init from '../../lib/sample_heatmap'
 
 import * as  d3 from "d3"
 class HeatMap extends Component{
 
     constructor(props){
         super(props)    
-
+        console.log(props)
+            
         this.state = {
-
-            scale: {
-                xMin: 0,
-                xMax: 10,
-                yMin: 0,
-                yMax: 10
-            },
+            gridPoints: [],
+            scale: this.computeMinAndMaxScale(0, 1),
             firstVariable: 0,
             secondVariable: 1
         }
@@ -26,81 +21,198 @@ class HeatMap extends Component{
 
     render(){
         const scale = this.state.scale
-        console.log(scale)
+        
         return (
             <div >
-                <div id="scatterplot" style={{minWidth: 500, minHeight: 500}}>
+                <div id="scatterplot" style={{minWidth: 500, minHeight: 500, position:"relative"}}>
                     
                 </div>
 
-                <div>
+                <div className="form-inline">
 
-                    <select onChange={this.firstVariableChanged.bind(this) }>
-                        {
-                            this.props.availableVariables.map( (variable, i) => {
-                                return ( 
-                                    <option 
-                                        value={i}
-                                        data-value={i}                                        
-                                    >
-                                        {variable.name} {variable.realId}
-                                    </option>
-                                )
-                            })
-                        }
-                    </select>
+                    <div className="form-group" >
 
-                    <label>
-                    Minimum
-                    <input                         
-                        data-name="xMin"
-                        value={scale.xMin}
-                        onChange={this.onChangeScale.bind(this)} 
-                    />
+                        <select 
+                            value={this.state.firstVariable}
+                            className="form-control inline" 
+                            onChange={this.firstVariableChanged.bind(this) }
+                        >
+                            {
+                                this.props.availableVariables.map( (variable, i) => {
+                                    return ( 
+                                        <option 
+                                            key={i}
+                                            className="form-control"
+                                            value={i}
+                                            data-value={i}                                        
+                                        >
+                                            {variable.name}
+                                        </option>
+                                    )
+                                })
+                            }
+                        </select>
+
                     
-                    </label>
+                    </div>
 
-                    <label>
-                        Maximum                    
-                        <input                             
+                    <div className="form-group">
+                        <label htmlFor="xMin">
+                        Minimum
+                        </label>
+                        <input          
+                            id="xMin"               
+                            data-name="xMin"
+                            value={scale.xMin}
+                            onChange={this.onChangeScale.bind(this)} 
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+
+                        <label htmlFor="xMax">
+                            Maximum     
+                        </label>               
+                        <input     
+                            id="xMax"                        
                             data-name="xMax"
                             value={scale.xMax}
                             onChange={this.onChangeScale.bind(this)} 
                         />  
-                    </label>
+
+                    </div>
                 </div>
                 
-                <div>
-                    <select onChange={this.secondVariableChanged.bind(this) }>
-                        {
-                            this.props.availableVariables.map( (variable, i) => {
-                                return (
-                                    <option 
-                                        
-                                        data-value={variable.realId}
-                                        value={i}
-                                        key={i}
-                                    >
-                                        {variable.name} {variable.realId}
-                                    </option>)
-                            })
-                        }
-                    </select>
+                <div className="form-inline">
+                    <div className="form-group">
 
-                    <input                         
-                        data-name="yMin"
-                        value={scale.yMin}
-                        onChange={this.onChangeScale.bind(this)} 
-                    />  
-                    
-                    <input                         
-                        data-name="yMax"
-                        value={scale.yMax}
-                        onChange={this.onChangeScale.bind(this)} 
-                    />  
+                        <select 
+                            value={this.state.secondVariable}
+                            className="form-control"
+                            onChange={this.secondVariableChanged.bind(this) }
+                        >
+                            {
+                                this.props.availableVariables.map( (variable, i) => {
+                                    return (
+                                        <option 
+                                            className="form-control"
+                                            data-value={variable.realId}
+                                            value={i}
+                                            key={i}
+                                        >
+                                            {variable.name}
+                                        </option>)
+                                })
+                            }
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+
+                        <label htmlFor="yMin">
+                            Minimum
+                        </label>
+                        <input      
+                            id="yMin"                       
+                            data-name="yMin"
+                            value={scale.yMin}
+                            onChange={this.onChangeScale.bind(this)} 
+                        />  
+
+                    </div>
+
+                    <div className="form-group">                    
+                        <label htmlFor="yMax">
+                            Maximum
+                        </label>
+                        <input                         
+                            data-name="yMax"
+                            value={scale.yMax}
+                            onChange={this.onChangeScale.bind(this)} 
+                        />  
+                    </div>
                 </div>                          
             </div>
         )
+    }
+
+    componentDidMount(){
+    
+        this.createPlot()
+        this.plotData(this.svg, 
+            this.state.scale, 
+            this.width, 
+            this.height, 
+            this.props.labeledPoints, 
+            this.state.gridPoints, 
+            this.getChosenVariables())
+        //this.updatePlot()
+    }
+
+    getGridPoints(){
+
+        var url = 'http://localhost:7060/label-fake-points-for-grid'
+
+        $.ajax({
+            type: "POST",
+            dataType: 'JSON',
+            url: url,
+        }).then(response => {
+            
+            const gridPoints = response.map( e => {
+                return {
+                    data: e.dataPoint.data.array,
+                    label: e.dataPoint.label === "POSITIVE" ? 1: 0
+                }
+            })
+            
+            this.setState({
+                gridPoints: gridPoints
+            }, () => {
+                this.plotData(this.svg, 
+                    this.state.scale, 
+                    this.width, 
+                    this.height, 
+                    this.props.labeledPoints, 
+                    this.state.gridPoints, 
+                    this.getChosenVariables())
+            })
+        })
+    }
+
+
+    componentWillReceiveProps(nextProps){   
+        
+
+        const labeledPoints = nextProps.labeledPoints
+        
+        console.log(labeledPoints)
+        if (labeledPoints.length > 3){
+
+            //this.getGridPoints()
+            this.removeData(this.svg, labeledPoints, this.props.gridPoints)
+            this.plotData(this.svg, 
+                this.state.scale, 
+                this.width, 
+                this.height, 
+                labeledPoints, 
+                this.state.gridPoints, 
+                this.getChosenVariables())
+        }
+    }
+
+    computeMinAndMaxScale(iFirstVariable, iSecondVariable){
+
+        const realIdOne = this.props.availableVariables[iFirstVariable].idx
+        const realIdTwo = this.props.availableVariables[iSecondVariable].idx
+        const datasetInfos = this.props.datasetInfos
+        var scale = {
+            xMin: datasetInfos.minimums[realIdOne],
+            xMax: datasetInfos.maximums[realIdOne],
+            yMin:  datasetInfos.minimums[realIdTwo],
+            yMax: datasetInfos.maximums[realIdTwo]
+        }
+        return scale
     }
 
     getChosenVariables(){
@@ -108,25 +220,28 @@ class HeatMap extends Component{
     }
 
 
-    componentDidMount(){
-
-        this.createPlot()
-        this.plotData(this.svg, 
-            this.state.scale, 
-            this.width, 
-            this.height, 
-            this.props.labeledPoints, 
-            this.props.gridPoints, 
-            this.getChosenVariables())
-        //this.updatePlot()
-    }
-
     firstVariableChanged(e){
-        this.setState({firstVariable: parseInt(e.target.value)}, this.updatePlot) 
+        var firstVariable = parseInt(e.target.value) 
+        var secondVariable = this.state.secondVariable
+        
+        var newState = {
+            firstVariable: firstVariable,
+            scale: this.computeMinAndMaxScale(firstVariable, secondVariable)
+        }         
+        this.setState(newState, this.updatePlot) 
     }
 
     secondVariableChanged(e){
-        this.setState({secondVariable: parseInt(e.target.value)}, this.updatePlot) 
+            
+        var firstVariable = this.state.firstVariable
+        var secondVariable = parseInt(e.target.value) 
+        
+        var newState = {
+            secondVariable: secondVariable,
+            scale: this.computeMinAndMaxScale(firstVariable, secondVariable)
+        }         
+
+        this.setState(newState, this.updatePlot) 
     }
 
     onChangeScale(e){
@@ -148,9 +263,7 @@ class HeatMap extends Component{
             }, this.updatePlot)                   
         }                                          
     }
-
  
-
     createPlot(){
 
         // set the dimensions and margins of the graph
@@ -175,8 +288,8 @@ class HeatMap extends Component{
         return svg
     }
 
-
     removeData(svg, labeledPoints, gridPoints){
+        
         svg            
            .selectAll("g")
            .data(labeledPoints)
@@ -187,8 +300,7 @@ class HeatMap extends Component{
            .selectAll("g")
            .data(gridPoints)
            .exit()
-           .remove()        
-           
+           .remove()                   
            
         svg            
            .selectAll("dot")
@@ -201,7 +313,7 @@ class HeatMap extends Component{
     updatePlot(){
         
         var chosenVariables = this.getChosenVariables()
-        console.log(chosenVariables)
+        
         var x = this.x,
             y = this.y
 
@@ -262,12 +374,19 @@ class HeatMap extends Component{
         var mouseover = function(d) {
             tooltip.style("opacity", 1)
         }
-
+        
         var mousemove = function(d) {
+
+            //var x = d3.event.pageX - document.getElementById('scatterplot').getBoundingClientRect().x + 10
+            //var y = d3.event.pageY - document.getElementById('scatterplot').getBoundingClientRect().y + 10
+
+            var x = d3.mouse(this)[0] + 90
+            var y = d3.mouse(this)[1] //+ document.getElementById('scatterplot').getBoundingClientRect().y
+
         tooltip
-            .html("Label: " + d.label)
-            .style("left", (d3.mouse(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-            .style("top", (d3.mouse(this)[1]) + "px")
+            .html("Row id: " + d.id + ". Label: " + d.label)
+            .style("left", (x) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+            .style("top", (y)  + "px")
         }
 
         // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
@@ -277,11 +396,11 @@ class HeatMap extends Component{
             .duration(200)
             .style("opacity", 0)
         }
-        console.log(chosenVariables)
+        
 
         var iFirstVariable = chosenVariables[0]
         var iSecondVariable = chosenVariables[1]
-        console.log(labeledPoints)
+        
         // Add dots
         svg.append('g')
            .selectAll("dot")
@@ -320,8 +439,8 @@ class HeatMap extends Component{
     }
 }
 
-var xRange = d3.range(0, 10, (10 - 0) / 10),
-yRange = d3.range(0, 10, (10 - 0) / 10)
+var xRange = d3.range(0, 40, (40 - 0) / 10),
+yRange = d3.range(0, 40, (40 - 0) / 10)
 
 var gridPoints = []
 xRange.forEach(x => {

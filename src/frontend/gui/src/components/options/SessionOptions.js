@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
+import actions from '../../actions/sendChosenColumns'
 
-import {backend, webplatformApi, defaultConfiguration} from '../../constants/constants'
-import GroupVariables from '../GroupVariables'
+import GroupVariables from './GroupVariables'
 import AdvancedOptions from './AdvancedOptions'
-import sendChosenColumns from '../../actions/sendChosenColumns'
+
+
+
 
 class SessionOptions extends Component{
     
@@ -14,8 +16,8 @@ class SessionOptions extends Component{
 
         var datasetInfos = this.props.datasetInfos
        
-        const columnTypes = this.props.datasetInfos.uniqueValueNumbers.map(e => {
-            return e > 10 ? "numerical": "categorical"
+        const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
+            return e > 10 || datasetInfos.hasFloats[i] ? "numerical": "categorical"
         })
         
         var chosenColumns = datasetInfos.columns.map( (col, idx) => {
@@ -48,8 +50,7 @@ class SessionOptions extends Component{
     render(){
 
         const datasetInfos = this.props.datasetInfos
-        const columns = datasetInfos.columns
-               
+        const columns = datasetInfos.columns               
 
         return (
             <div>        
@@ -112,6 +113,10 @@ class SessionOptions extends Component{
                                     Variable type
                                 </div>
 
+                                <div>
+                                    Unique values
+                                </div>
+
                                 <div className="col s2 center vertical-center">
                                     Minimum
                                 </div>
@@ -157,6 +162,10 @@ class SessionOptions extends Component{
                                             </div>
 
                                             <div className="col s2 center vertical-center"> 
+                                                {datasetInfos.uniqueValueNumbers[key]}
+                                            </div>
+
+                                            <div className="col s2 center vertical-center"> 
                                                 {datasetInfos.minimums[key]}
                                             </div>
 
@@ -187,8 +196,7 @@ class SessionOptions extends Component{
                     />
 
                     <button 
-                        className="btn btn-success btn-raised"
-                        
+                        className="btn btn-success btn-raised"                        
                         onClick={this.onSessionStartClick.bind(this)}
                     >        
                         Start session
@@ -238,7 +246,18 @@ class SessionOptions extends Component{
         var idx = e.target.value
 
         var newChosenColumns = this.state.chosenColumns.map(e => e)
-        newChosenColumns[idx].isUsed = e.target.checked        
+        newChosenColumns[idx].isUsed = e.target.checked      
+        var idx = 0;
+        newChosenColumns.forEach((e, i) => {
+
+            if (e.isUsed){
+                newChosenColumns[i] =  Object.assign({}, e, {
+                    finalIdx: idx
+                })
+                idx++
+            }            
+        })
+
         checkboxes[idx] = e.target.checked
 
               
@@ -264,11 +283,24 @@ class SessionOptions extends Component{
         
         e.preventDefault()
                        
-        sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
+        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)
+        const enableTSM = chosenColumns.length == 2
 
-        this.props.sessionOptionsWereChosen({            
-            chosenColumns: this.state.chosenColumns.filter(e => e.isUsed),                
-        })                
+        if (enableTSM){
+            var groups = [
+                [chosenColumns[0]],
+                [chosenColumns[1]]
+            ]
+            this.groupsWereValidated(groups)
+        }
+        else{
+
+            actions.sendColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
+
+            this.props.sessionOptionsWereChosen({            
+                chosenColumns: this.state.chosenColumns.filter(e => e.isUsed),                
+            })                
+        }        
     }
    
     groupsWereValidated(groups){
@@ -276,9 +308,8 @@ class SessionOptions extends Component{
         var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
         
         this.props.groupsWereValidated(chosenColumns, groups, ()=> {
-            sendChosenColumns(this.props.tokens, this.state, this.props.sessionWasStarted)    
-        })                            
-                                  
+            actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, this.props.sessionWasStarted)    
+        })                                  
     }
 
     groupWasAdded(){

@@ -30,6 +30,7 @@ public class ModelVisualizationServlet extends HttpServlet {
         ArrayList<LabeledPoint> predictions = manager.labelWholeDataset(4);
 
         Double TSMBound = manager.getTSMBound();
+        System.out.println(TSMBound);
 
         VisualizationDataDTO dto = new VisualizationDataDTO(predictions, TSMBound);
         resp.getWriter().println(gson.toJson(dto));

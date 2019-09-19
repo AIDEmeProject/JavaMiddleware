@@ -19,6 +19,8 @@ public class CsvDatasetReader {
 
     protected String[] columns;
 
+    protected boolean[] hasFloats;
+
     protected ArrayList<HashSet<Double>> uniqueValues;
 
     static class Dataset{
@@ -30,6 +32,10 @@ public class CsvDatasetReader {
         protected double[] maximums;
 
         protected int[] uniqueValueNumbers;
+
+        protected boolean[] hasFloats;
+
+        int nRows;
     }
 
     public static void main(String[] args) throws IOException {
@@ -81,6 +87,7 @@ public class CsvDatasetReader {
 
         this.maximums = new double[columns.length];
         this.minimums = new double[columns.length];
+        this.hasFloats = new boolean[columns.length];
 
         String[] dataRow;
         int iRow = 1;
@@ -92,6 +99,8 @@ public class CsvDatasetReader {
         dataset.minimums = minimums;
         dataset.maximums = maximums;
         dataset.uniqueValueNumbers = this.computeUniqueValueNumbers();
+        dataset.hasFloats = this.hasFloats;
+        dataset.nRows = iRow;
 
         Gson json = new Gson();
 
@@ -127,6 +136,9 @@ public class CsvDatasetReader {
                 this.minimums[iCol] = val;
             }
 
+            if (val != (int) val){
+                this.hasFloats[iCol] = true;
+            }
 
             if (iRow < 100){
                 this.uniqueValues.get(iCol).add(val);

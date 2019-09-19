@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 
-import ExplorationActions from '../ExplorationActions'
 import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
-import DataPoints from '../DataPoints'
+import DataPoints from './DataPoints'
+import GroupedPointTableHead from './GroupedPointTableHead'
 import HeatMap from '../visualisation/HeatMap'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../constants/constants'
+
+
 
 class TSMExploration extends Component{
 
@@ -18,82 +20,81 @@ class TSMExploration extends Component{
         this.state = {
             pointsToLabel: this.props.pointsToLabel.map(e => e),
             noPoints: [],
+            allLabeledPoints: [],
             labeledPoints: [],   
             initialLabelingSession: true,    
             hasYes: false,
             hasNo: false,
             showModelPerformance: false,
             showLabelView: true,
-            showLabelHistory: false
-
+            showLabelHistory: false,
+            visualizationData: {
+                TSMBound: null
+            }
         }        
     }
 
     render(){
-                       
+        
         return (
             
             <div>
-                <p>
-                    Grouped variable exploration. If you chose no, 
-                    you will be asked to label each subgroups
-                    independantly                    
-                </p>
+                
 
                 <h4>
                     Labeleling phase
                 </h4>
 
-                <ul className="nav nav-tabs">
-                   
-                    <li className="nav-item">
+                {
+                    ! this.state.initialLabelingSession &&
+                
+                    <ul className="nav nav-tabs">
+                    
+                        <li className="nav-item">
 
-                        <a 
-                           className="nav-link" 
-                           href="#basic-options"
-                           onClick={() => this.setState({
-                               'showModelPerformance': false, 
-                               'showLabelView': true,
-                               'showLabelHistory': false
-                            })}
-                        >
-                            Label view
-                        </a>
-                    </li>
-
-                    <li className="nav-item">
-                        <a 
+                            <a 
                             className="nav-link" 
-                            href="#advanced-options"
+                            href="#basic-options"
                             onClick={() => this.setState({
                                 'showModelPerformance': false, 
-                                'showLabelView': false,  
-                                'showLabelHistory': true
-                            })}
-                        >
-                            View labeled points
-                        </a>
-                    </li>   
-
-
-                    <li className="nav-item">
-                        <a 
-                            className="nav-link" 
-                            href="#advanced-options"
-                            onClick={() => this.setState({
-                                'showModelPerformance': true, 
-                                'showLabelView': false,  
+                                'showLabelView': true,
                                 'showLabelHistory': false
-                            })}
-                        >
-                            Assess model Performance
-                        </a>
-                    </li>          
+                                })}
+                            >
+                                Label view
+                            </a>
+                        </li>
 
-                       
+                        <li className="nav-item">
+                            <a 
+                                className="nav-link" 
+                                href="#advanced-options"
+                                onClick={() => this.setState({
+                                    'showModelPerformance': false, 
+                                    'showLabelView': false,  
+                                    'showLabelHistory': true
+                                })}
+                            >
+                                View labeled points
+                            </a>
+                        </li>   
 
-                </ul>
 
+                        <li className="nav-item">
+                            <a 
+                                className="nav-link" 
+                                href="#advanced-options"
+                                onClick={() => this.setState({
+                                    'showModelPerformance': true, 
+                                    'showLabelView': false,  
+                                    'showLabelHistory': false
+                                })}
+                            >
+                                Assess model Performance
+                            </a>
+                        </li>                       
+                    </ul>
+                }
                 { 
                     this.state.initialLabelingSession && 
                     
@@ -101,168 +102,153 @@ class TSMExploration extends Component{
                         The first phase of labeling continues until we obtain 
                         a positive example and a negative example.        
  
+
+                        <p>
+                            Grouped variable exploration. If you chose no, 
+                            you will be asked to label each subgroups
+                            independantly                    
+                        </p>
+
                         <SpecificPointToLabel 
-                            onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-                            show={this.props.initialLabelingSession}
+                            onNewPointsToLabel={this.newPointsToLabel.bind(this)}                            
                         />            
                     </div>                
                 }
-
-                {
-                    ! this.state.initialLabelingSession && 
-                    <HeatMap />
-                }
-
+            
                 {
                     this.state.showLabelView && 
                 
                     <div>
 
-                <p>Please label the following samples</p>
+                       <p>
+                            Grouped variable exploration. If you chose no, 
+                            you will be asked to label each subgroups
+                            independantly                    
+                        </p>
 
-                <table className="group-variable">
-                    <thead>
-                        <tr>
+                    <table className="group-variable">
 
-                            <td>Row id</td>
+                        <GroupedPointTableHead 
+                            groups={this.props.groups}
+                        />
+
+                            <tbody>                
                             {
+                            this.state.pointsToLabel.map((point, i) => {
                                 
-                                this.props.groups.map((g, i) => {
-                                    
-                                    const columnNames = g.map(v => v.name)
+                                return (
 
-                                    return (
-                                        <th 
-                                            key ={i}
-                                            colSpan={g.length}
-                                        >
-                                            {columnNames.join(", ")}
-                                        </th>
-                                    )
-                                })
-                            }
-                            <th>
-                                Label    
-                            </th>                
-                        </tr>
-                    </thead>
+                                    <tr 
+                                        key={i}
+                                        className="variable-group">
 
-                    <tbody>                
-                    {
-                    this.state.pointsToLabel.map((point, i) => {
-                        
-                        return (
+                                        <td>
+                                            {point.id}
+                                        </td>
+                                        {
+                                            this.props.groups.map((g, iGroup) => {
+                                                
+                                                var pointIds = g.map(e => e.finalIdx)    
+                                                
+                                                var dataAsGroups = []
 
-                            <tr 
-                                key={i}
-                                className="variable-group">
-
-                                <td>
-                                    {point.id}
-                                </td>
-                                {
-                                    this.props.groups.map((g, iGroup) => {
-                                        
-                                        var pointIds = g.map(e => e.realId)    
-                                        
-                                        var dataAsGroups = []
-
-                                        pointIds.forEach(realId => {
-                                            var value = point.data[realId]
-                                        
-                                            dataAsGroups.push(value)
-                                        })
-                                                                                                                        
-                                        var values = dataAsGroups.join(", ")
-                                                                                                                                                                 
-                                        if ( typeof point.labels !== "undefined"){
-                                            var L = () => {
-                                                return <button
-                                                            data-point={i}
-                                                            data-subgroup={iGroup}
-                                                            className="btn btn-primary btn-raised"
-                                                            onClick = {this.onSubGroupNo.bind(this)}
-                                                        >
-                                                            No
-                                                        </button>
-                                            }
+                                                pointIds.forEach(realId => {
+                                                    var value = point.data[realId]
+                                                
+                                                    dataAsGroups.push(value)
+                                                })
+                                                                                                                                
+                                                var values = dataAsGroups.join(", ")
+                                                                                                                                                                         
+                                                if ( typeof point.labels !== "undefined"){
+                                                    var L = () => {
+                                                        return <button
+                                                                    data-point={i}
+                                                                    data-subgroup={iGroup}
+                                                                    className="btn btn-primary btn-raised"
+                                                                    onClick = {this.onSubGroupNo.bind(this)}
+                                                                >
+                                                                    No
+                                                                </button>
+                                                    }
+                                                }
+                                                else{
+                                                    var L = () => {return <span></span>}
+                                                }                                
+                                                
+                                                return (
+                                                    <td 
+                                                        colSpan={g.length}
+                                                        key={iGroup}
+                                                    >
+                                                        {values} <L />
+                                                    </td>
+                                                )
+                                            })
                                         }
-                                        else{
-                                            var L = () => {return <span></span>}
-                                        }                                
+                                        <td>
                                         
-                                        return (
-                                            <td 
-                                                colSpan={g.length}
-                                                key={iGroup}
+                                            <button 
+                                                style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
+                                                className="btn btn-primary btn-raised"
+                                                data-point={i}
+                                                onClick={this.groupWasLabeledAsYes.bind(this)}
                                             >
-                                                {values} <L />
-                                            </td>
-                                        )
-                                    })
-                                }
-                                <td>
-                                
-                                    <button 
-                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
-                                        className="btn btn-primary btn-raised"
-                                        data-point={i}
-                                        onClick={this.groupWasLabeledAsYes.bind(this)}
-                                    >
-                                        Yes
-                                    </button>
-                                                        
-                                    <button 
-                                        style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
-                                        className="btn btn-primary btn-raised"
-                                        data-point={i}
-                                        onClick={this.groupWasLabeledAsNo.bind(this)}
-                                    >
-                                        No
-                                    </button>
+                                                Yes
+                                            </button>
+                                                                
+                                            <button 
+                                                style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
+                                                className="btn btn-primary btn-raised"
+                                                data-point={i}
+                                                onClick={this.groupWasLabeledAsNo.bind(this)}
+                                            >
+                                                No
+                                            </button>
 
-                                    <button
-                                        className="btn btn-primary btn-raised"
-                                        style={{display: typeof point.labels === "undefined" ? "none": "inherit"}}
-                                        data-point={i}
-                                        onClick={this.groupSubLabelisationFinished.bind(this)}
-                                    >
-                                        Validate Subgroup labels
-                                    </button>
-                                </td>
-                            </tr>
-                        )
-                    })
-                }
-                    </tbody>
+                                            <button
+                                                className="btn btn-primary btn-raised"
+                                                style={{display: typeof point.labels === "undefined" ? "none": "inherit"}}
+                                                data-point={i}
+                                                onClick={this.groupSubLabelisationFinished.bind(this)}
+                                            >
+                                                Validate Subgroup labels
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        }
+                            </tbody>
+                        </table>
+                        { 
+                            ! this.state.initialLabelingSession && 
 
-                    </table>
+                            <HeatMap                    
+                                labeledPoints={this.state.allLabeledPoints}
+                                datasetInfos={this.props.datasetInfos}
+                                availableVariables={this.props.chosenColumns}
+                            />
+                        }                                            
                     </div>
-                }
-             
-                {
-                    this.explorationActions()
-                }
 
+                }                           
                 {
-                    this.state.showModelVisualisation && 
+                    this.state.showModelPerformance && 
                     <TSMModelVisualization 
-                        {...this.props}
-                        {...this.state}
-                        TSM={true}
+                        TSMBound={this.state.visualizationData.TSMBound}
                     />
                 }
                 {
-
                     this.state.showLabelHistory && 
 
                     <DataPoints                             
-                        availableVariables={this.props.finalVariables}
-                        points={this.props.labeledPoints}
+                        availableVariables={this.props.chosenColumns}
+                        labeledPoints={this.state.allLabeledPoints}
                         chosenColumns={this.props.chosenColumns}
+                        groups={this.props.groups}
                     />
-                }
-                
+                }                
             </div>
         )
     }
@@ -293,20 +279,27 @@ class TSMExploration extends Component{
         var labeledPoint = this.state.pointsToLabel[pointId]
         
         labeledPoint.labels = this.props.groups.map( e => 1)
+        labeledPoint.label= 1
         
         pointsToLabel.splice(pointId, 1)
         
         var labeledPoints = this.state.labeledPoints.map(e => e)
 
         labeledPoints.push(labeledPoint)
+
+        var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
+        allLabeledPoints = allLabeledPoints.concat(labeledPoints)
         
         this.setState({
+            allLabeledPoints: allLabeledPoints,
             pointsToLabel: pointsToLabel,
             labeledPoints: labeledPoints,
             hasYes: true
         },
         () => {
+            
             if (pointsToLabel.length == 0){
+                getVisualizationData(this.dataWasReceived.bind(this))
                 sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
             }
         })              
@@ -317,9 +310,9 @@ class TSMExploration extends Component{
         var iPoint = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
 
-
         var point = pointsToLabel[iPoint]
         point.labels = this.props.groups.map (e => 1)
+        point.label= 0
 
         this.setState({
             pointsToLabel: pointsToLabel,  
@@ -332,6 +325,7 @@ class TSMExploration extends Component{
         var iPoint = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         var point = pointsToLabel[iPoint]
+        
 
         if ( point.labels.reduce( (acc, v) => acc + v) == point.labels.length ){
             alert('please label at least one subgroup')
@@ -344,12 +338,18 @@ class TSMExploration extends Component{
         var labeledPoints = this.state.labeledPoints.map(e => e)
         labeledPoints.push(point)
 
+        var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
+        allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+        
         this.setState({
             pointsToLabel: pointsToLabel,
-            labeledPoints: labeledPoints
+            labeledPoints: labeledPoints,
+            allLabeledPoints: allLabeledPoints
         }, ()=> {
+            
             if (pointsToLabel.length == 0){
-                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
+                getVisualizationData(this.dataWasReceived.bind(this))
+                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))             
             }
         })       
     }
@@ -372,35 +372,20 @@ class TSMExploration extends Component{
         })
     }
     
-    onVisualizeClick(){
-        getVisualizationData(this.dataWasReceived.bind(this))
-    }
-    
     dataWasReceived(data){
         
         this.setState({
-            showModelVisualisation: true,
+            
             visualizationData: data
         })
     }
-
 
     onLabelWholeDatasetClick(){
 
         getWholedatasetLabeled()
 
         notifyLabelWholeDataset(this.props.tokens)
-    }
-
-    explorationActions(){
-        return (
-            <ExplorationActions 
-                show={ ! this.state.initialLabelingSession}
-                onVisualizeClick={this.onVisualizeClick.bind(this)}
-                onLabelWholeDatasetClick={this.onLabelWholeDatasetClick.bind(this)}
-            />
-        )
-    }
+    }    
 }
 
 
@@ -420,13 +405,11 @@ function getWholedatasetLabeled(){
     })
 }
 
-
 function getVisualizationData(dataWasReceived){
 
     var url = backend + "/get-visualization-data"
 
-    $.get(url, dataWasReceived)
-    
+    $.get(url, dataWasReceived)    
 }
 
 function dataWasLabeledNotification(tokens, data){

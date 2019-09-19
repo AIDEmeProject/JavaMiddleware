@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 
 
-import init from '../../lib/sample_heatmap'
-
 class AdvancedOptions extends Component{
 
     render(){
@@ -55,7 +53,7 @@ class AdvancedOptions extends Component{
     }
 
     componentDidMount(){
-        init()
+        
     }
 
 }

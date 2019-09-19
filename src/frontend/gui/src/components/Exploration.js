@@ -14,7 +14,7 @@ import DataPoints from './DataPoints'
 class Exploration extends Component{
 
     constructor(props){
-
+        
         super(props)
         this.state = {
             showModelVisualisation: false,
@@ -88,22 +88,26 @@ class Exploration extends Component{
                         >
                             Assess model Performance
                         </a>
-                    </li>    
-
-                   
-                               
+                    </li>                                                  
                 </ul>
-
-
-                <HeatMap />
-
+        
                 {                     
                     this.state.showLabelView &&                                                             
-                        <PointLabelisation 
-                            {...this.props} 
-                            {...this.state}
-                        />
+                    
+                        <div>
+                            <PointLabelisation 
+                                {...this.props} 
+                                {...this.state}
+                            />
+
+                            <HeatMap
+                                labeledPoints={this.props.labeledPoints}
+                                datasetInfos={this.props.datasetInfos}
+                                availableVariables={this.props.chosenColumns}
+                            />
+                        </div>
                 }
+
                 {
                     this.state.showModelVisualisation && 
                                     
@@ -112,6 +116,7 @@ class Exploration extends Component{
                         {...this.state}
                     />
                 }
+
                 {
                     this.state.showLabelHistory && 
 

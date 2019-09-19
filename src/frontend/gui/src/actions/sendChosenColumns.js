@@ -2,45 +2,63 @@ import {backend, webplatformApi, defaultConfiguration} from '../constants/consta
 
 import $ from "jquery";
 
+function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
 
-function sendChosenColumns(tokens, state, onSuccess){
+    var endPoint = backend + "/choose-options"    
+    var configuration = defaultConfiguration
+    configuration['useFakePoint'] = false
+
+    var tsmJson = {
+        hasTSM: true,                
+        searchUnknownRegionProbability: 0.5,                
+        columns: chosenVariables.map( e => e.name)
+    }
+     
+    if (chosenVariables == 2){
+            
+        var flags = chosenVariables.map(g => { return [true, false]}) 
+        var groups = chosenVariables.map( v => [v.name] ) //array because each variable is a group
+        
+    }
+    else{
+        
+        var flags =  groups.map(g => {return [true, false]})        
+        var groups = groups.map( g => { return g.map(v => v.name)})
+        
+    }
+   
+    Object.assign(tsmJson, {
+        flags: flags,
+        featureGroups: groups,                   
+    })
+
+    configuration["multiTSM"] = tsmJson
+
+
+    $('#conf').val(JSON.stringify(configuration))
+      
+    var payload = $('#choose-columns').serialize()
+
+    $.ajax({
+
+        type: "POST",
+        url: endPoint,
+        data: payload,        
+        success: (response) =>  {onSuccess(response)},
+        
+    });    
+
+}
+
+
+function sendColumns(tokens, state, onSuccess){
     
     var endPoint = backend + "/choose-options"    
     var configuration = defaultConfiguration
     configuration['useFakePoint'] = state.useFakePoint || false
+                      
+    var hasTSM = state.chosenColumns.length == 2 || !! state.variableGroups[0].length > 0
                   
-    var hasTSM = state.availableVariables.length == 2 || !! state.variableGroups[0].length > 0
-    
-    if (hasTSM){
-    
-        var tsmJson = {
-                hasTSM: true,                
-                searchUnknownRegionProbability: 0.5,                
-                columns: state.finalVariables.map( e => e.name)
-        }
-        if (state.availableVariables.length == 2){
-            
-            var flags = state.availableVariables.map(g => { return [true, false]}) 
-            var groups = state.availableVariables.map( v => [v.name] ) //array because each variable is a group
-            
-        }
-        else{
-            
-            var flags =  state.variableGroups.map(g => {return [true, false]})        
-            var groups = state.variableGroups.map( g => { return g.map(v => v.name)})
-            
-        }
-       
-        
-        Object.assign(tsmJson, {
-            flags: flags,
-            featureGroups: groups,                   
-        })
-
-        configuration["multiTSM"] = tsmJson
-
-    }
-            
     $('#conf').val(JSON.stringify(configuration))
       
     var payload = $('#choose-columns').serialize()
@@ -102,5 +120,8 @@ function sendDataToWebPlateform(availableVariables, options, hasTSM, featureGrou
 }
 
 
+export default {
+    sendColumns: sendColumns,
+    sendVariableGroups: sendVariableGroups    
+}
 
-export default sendChosenColumns

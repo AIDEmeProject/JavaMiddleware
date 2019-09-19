@@ -7,14 +7,11 @@ import NewSession from './components/options/NewSession'
 import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSM/TSMExploration'
-import DataPoints from './components/DataPoints'
-import GroupVariables from './components/GroupVariables'
-import FakePointSampling from './components/InitialSampling/FakePointSampling'
-import ModelVisualization from './components/visualisation/ModelVisualization'
+
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
-import HeatMap from './components/visualisation/HeatMap';
+
 
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
@@ -75,9 +72,7 @@ class App extends Component {
     return (
 
         <div>       
-            
-                 
-        
+                                     
             <nav className="navbar navbar-dark bg-dark box-shadow ">                 
                 <a className="navbar-brand" href="/">
                     CEDAR - Active learning labeler
@@ -90,7 +85,7 @@ class App extends Component {
                 
                 <div className="row">
                     <div className="col col-lg-8 offset-lg-2">                    
-                        <HeatMap />
+                   
                     </div>
 
                 </div>
@@ -102,13 +97,7 @@ class App extends Component {
                 <div className="row">
 
                     <div className="col col-lg-10 offset-lg-1">
-
-                       
-
-
-
-
-
+        
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                             fileUploaded={this.fileUploaded.bind(this)} 

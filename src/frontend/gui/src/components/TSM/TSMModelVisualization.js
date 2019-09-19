@@ -1,63 +1,8 @@
 import React, { Component } from 'react';
 
 
-
-
-function getVisualizationData(){
-
-}
-
-class ModelBoundaries extends Component{
-
+class TSMLabel extends Component{
     render(){
-
-        return (
-            <div>
-
-            </div>
-        )
-    }
-}
-
-class TSMModelVisualization extends Component{
-
-    beforeMounted(){
-        
-    }
-
-    render(){
-
-        var predictions = this.props.visualizationData.predictions.map(e => {
-            return {
-                id: e.dataPoint.id,
-                label: e.label,
-                data: e.dataPoint.data.array
-            }
-        })
-        
-        var TSMBound
-
-        if (this.props.visualizationData.TSMBound){
-            TSMBound = () => {
-                return (
-                    <p>                    
-                        Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
-                    </p>
-                )
-            }
-        }
-        else{
-            TSMBound = () => {
-                return (
-                    <span></span>
-                )
-            }
-        }
-
-        if( this.props.TSM){
-            return (<TSMBound />)
-        }
-
         return (
             <div>
                 <p>
@@ -65,15 +10,14 @@ class TSMModelVisualization extends Component{
                     if the model     
                 </p>
 
-                <TSMBound />
 
-                 <table className="group-variable">
+                <table className="group-variable">
                     <thead>
                         <tr>
 
                             <td>Row id</td>
                             {
-                                this.props.finalGroups.map((g, i) => {
+                                this.props.groups.map((g, i) => {
                                     
                                     return (
                                         <th 
@@ -105,7 +49,7 @@ class TSMModelVisualization extends Component{
                                     {point.id}
                                 </td>
                                 {
-                                    this.props.finalGroups.map((g, iGroup) => {
+                                    this.props.groups.map((g, iGroup) => {
                                         
                                         var values = g.map( variable => {
                                             
@@ -175,12 +119,32 @@ class TSMModelVisualization extends Component{
                 </tbody>
 
                 </table>
-                    
-                    
             </div>
         )
     }
 }
 
+class TSMModelVisualization extends Component{
+
+    render(){
+     
+        if ( ! this.props.TSMBound){
+            return (
+                <div>
+                    Please label more example to have an estimation of the model performance
+                </div>
+            )
+        }
+        return (
+            <div>
+                
+                <p>                    
+                    Estimated model performance >= { Math.round(this.props.TSMBound * 100) } %
+                </p>
+
+            </div>
+        )
+    }
+}
 
 export default TSMModelVisualization

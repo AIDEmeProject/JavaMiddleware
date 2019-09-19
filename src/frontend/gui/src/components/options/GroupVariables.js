@@ -25,7 +25,6 @@ class Group extends Component {
     }
 
     render(){
-
         
         const availableVariables = this.props.availableVariables
         const iGroup = this.props.iGroup

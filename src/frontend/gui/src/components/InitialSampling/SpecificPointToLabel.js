@@ -22,12 +22,23 @@ class SpecificPointToLabel extends Component{
                     You can help the search of the positive and the negative example by providing the row id of 
                     an example you know
                 </p>
-                
-                <input type="integer" onChange={e => this.setState({labelId: e.target.value})}/>
+                <div className="form-inline">
+                    <div className="form-group">
 
+                    
+                    <label htmlFor="rowid">
+                        Row id </label>
+                    <input 
+                        className="form-control"
+                        type="integer" onChange={e => this.setState({labelId: e.target.value})}
+                        id="rowid"
+                    />
+                
                 <input 
                     onClick={this.onSpecificPointRequest.bind(this)}
                     type="submit" value="get"/>
+                </div>
+                </div>
             </div>
         )        
     }            
