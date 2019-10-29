@@ -82,7 +82,7 @@ class DataPoints extends Component{
                 
                 </table>
             </div>
-            )     
+        )     
     }            
 }
 

@@ -7,7 +7,7 @@ import ModelVisualization from './visualisation/ModelVisualization'
 
 import PointLabelisation from './PointLabelisation'
 import InitialSampling from './InitialSampling/InitialSampling'
-import HeatMap from './visualisation/HeatMap'
+import ModelBehaviorPlotter from './visualisation/ModelBehaviorPlotter'
 
 import DataPoints from './DataPoints'
 
@@ -33,16 +33,13 @@ class Exploration extends Component{
         return (
 
             <div>
-                <h4>
-                    Labeleling phase     <button
-                        className="btn btn-primary btn-raised pull-right"
-                    onClick={this.onLabelWholeDatasetClick.bind(this)}
-                >
-                    Get the whole dataset labeled
-                </button>
-                </h4>
+               <div className="row">
+
+
+                    <div className="col col-lg-8 offset-lg-2">
+
                             
-                <ul className="nav nav-tabs">
+                <ul className="nav nav-tabs bg-primary">
                    
                     <li className="nav-item">
 
@@ -56,7 +53,7 @@ class Exploration extends Component{
                                'showLabelHistory': false
                             })}
                         >
-                            Label view
+                            Labeling
                         </a>
                     </li>
 
@@ -71,7 +68,7 @@ class Exploration extends Component{
                                 'showLabelHistory': true
                             })}
                         >
-                            View labeled points
+                            History
                         </a>
                     </li>         
 
@@ -86,10 +83,23 @@ class Exploration extends Component{
                                 'showLabelHistory': false
                             })}
                         >
-                            Assess model Performance
+                            Model Performance
                         </a>
-                    </li>                                                  
+                    </li>       
+
+                    <li className="nav-item">
+                        <a
+                            className="nav-link"
+                            onClick={this.onLabelWholeDatasetClick.bind(this)}
+                        >                        
+                            Auto-labeling           
+                        </a>
+                    </li>
                 </ul>
+
+                </div>
+                </div>
+                    
         
                 {                     
                     this.state.showLabelView &&                                                             
@@ -100,7 +110,7 @@ class Exploration extends Component{
                                 {...this.state}
                             />
 
-                            <HeatMap
+                            <ModelBehaviorPlotter
                                 labeledPoints={this.props.labeledPoints}
                                 datasetInfos={this.props.datasetInfos}
                                 availableVariables={this.props.chosenColumns}
@@ -126,19 +136,18 @@ class Exploration extends Component{
                         chosenColumns={this.props.chosenColumns}
                         show={true}
                     />
-                }
-                
+                }                
             </div>
         )
     }
 
-   
-    onLabelWholeDatasetClick(){
+    onLabelWholeDatasetClick(e){
+
+        e.preventDefault()
         
         getWholedatasetLabeled()
 
         notifyLabel(this.props.tokens)
-
     }
 
     onVisualizeClick(){

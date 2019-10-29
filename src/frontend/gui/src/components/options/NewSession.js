@@ -35,18 +35,24 @@ function uploadFile(event, onSuccess){
 
 class NewSession extends Component{
 
+  
   handleSubmit(event){
 
       event.preventDefault()
       uploadFile(event, this.props.fileUploaded)
+      var fileReader = new FileReader()
+      const file = document.getElementById("dataset")
+      fileReader.onload = this.props.onDatasetLoaded
+      fileReader.readAsText(file.files[0])
+      
   }
 
   render(){
 
         return (
 
-            <div>
-                
+            <div className="row">
+                <div className="col col-lg-6 offset-3 card">
                 <h1>
                     New Session
                 </h1>
@@ -55,8 +61,6 @@ class NewSession extends Component{
                     <form 
                         onSubmit={this.handleSubmit.bind(this)}     
                     >   
-
-
                         <div className="form-group ">
                         
                             <label htmlFor="dataset">
@@ -102,7 +106,9 @@ class NewSession extends Component{
                             />
                         </div>
                     </form> 
-                </div>        
+                </div>   
+                </div>
+                     
             </div>
         )
     }

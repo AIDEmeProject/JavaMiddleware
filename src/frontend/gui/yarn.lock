@@ -2833,6 +2833,11 @@ d3-geo@1:
   dependencies:
     d3-array "1"
 
+d3-hexbin@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/d3-hexbin/-/d3-hexbin-0.2.2.tgz#9c5837dacfd471ab05337a9e91ef10bfc4f98831"
+  integrity sha1-nFg32s/UcasFM3qeke8Qv8T5iDE=
+
 d3-hierarchy@1:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/d3-hierarchy/-/d3-hierarchy-1.1.8.tgz#7a6317bd3ed24e324641b6f1e76e978836b008cc"
@@ -6213,6 +6218,11 @@ micromatch@^3.1.10, micromatch@^3.1.4, micromatch@^3.1.8, micromatch@^3.1.9:
     regex-not "^1.0.0"
     snapdragon "^0.8.1"
     to-regex "^3.0.2"
+
+micromodal@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/micromodal/-/micromodal-0.4.2.tgz#8ca34f3d5b2f6f43df173bcdc98af20256a4f07a"
+  integrity sha512-tL8Z6Vi72haNUNlkhLjJJv1Q16eqUWMPAGT4RF7mwDM5DNyJXC67Yj8jw/yVgGYdhnCEBBf3X5JM3d/MpXSEKg==
 
 miller-rabin@^4.0.0:
   version "4.0.1"

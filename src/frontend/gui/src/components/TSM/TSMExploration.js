@@ -4,11 +4,10 @@ import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 import DataPoints from './DataPoints'
 import GroupedPointTableHead from './GroupedPointTableHead'
-import HeatMap from '../visualisation/HeatMap'
+import ModelBehaviorPlotter from '../visualisation/ModelBehaviorPlotter'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../constants/constants'
-
 
 
 class TSMExploration extends Component{
@@ -48,7 +47,7 @@ class TSMExploration extends Component{
                 {
                     ! this.state.initialLabelingSession &&
                 
-                    <ul className="nav nav-tabs">
+                    <ul className="nav nav-tabs bg-primary">
                     
                         <li className="nav-item">
 
@@ -224,7 +223,7 @@ class TSMExploration extends Component{
                         { 
                             ! this.state.initialLabelingSession && 
 
-                            <HeatMap                    
+                            <ModelBehaviorPlotter                    
                                 labeledPoints={this.state.allLabeledPoints}
                                 datasetInfos={this.props.datasetInfos}
                                 availableVariables={this.props.chosenColumns}

@@ -5,7 +5,7 @@ import actions from '../../actions/sendChosenColumns'
 import GroupVariables from './GroupVariables'
 import AdvancedOptions from './AdvancedOptions'
 
-
+import DataExploration from '../visualisation/DataExploration'
 
 
 class SessionOptions extends Component{
@@ -44,6 +44,7 @@ class SessionOptions extends Component{
             learner: "Uncertainty sampling",
             classifier: "SVM",
             showColumns: true,
+            showExploration: false
         }
     }
 
@@ -54,27 +55,26 @@ class SessionOptions extends Component{
 
         return (
             <div>        
-                <ul className="nav nav-tabs">
+                <ul className="nav nav-tabs bg-primary">
                     <li className="nav-item">
                         <a 
-                           className="nav-link active" 
+                           className="nav-link" 
                            href="#basic-options"
                            onClick={this.onBasicOptionClick.bind(this)}
                         >
-                            Basic Options
+                            Attribute selection
                         </a>
                     </li>
 
                     <li className="nav-item">
                         <a 
-                           className="nav-link active" 
+                           className="nav-link" 
                            href="#basic-options"
                            onClick={this.onVariableGrouping.bind(this)}
                         >
-                            Variable Grouping
+                            Factorization structure
                         </a>
                     </li>
-
 
                     <li className="nav-item">
                         <a 
@@ -82,109 +82,91 @@ class SessionOptions extends Component{
                             href="#advanced-options"
                             onClick={this.onAdvancedOptionClick.bind(this)}
                         >
-                            Advanced options
+                            Algorithm selection
                         </a>
                     </li>                    
                 </ul>
 
                 <form                 
-                    id="choose-columns"                    
-                >        
+                    id="choose-columns"  
+                    className="card"                  
+                >                        
+                    <div                         
+                         style={{ "display": this.state.showColumns ? "initial": "none"}}
+                    >
 
-                {
-                    
-                    <div style={{ "display": this.state.showColumns ? "initial": "none"}}>
-
-                        <p>
-                            The following columns were found. 
-                            Pick the one you want to use for this session.
-                        </p>
-
-                            <div className="row">
-                                <div                                     
-                                    className="col s4 vertical-center"
-                                >    
-                                    Name
-                                </div>
-
-                                <div                                     
-                                    className="col s2 center vertical-center"
-                                >    
-                                    Variable type
-                                </div>
-
-                                <div>
-                                    Unique values
-                                </div>
-
-                                <div className="col s2 center vertical-center">
-                                    Minimum
-                                </div>
-
-                                <div className="col s2 center vertical-center">
-                                    Maximum
-                                </div>
+                        <div className="row">
+                            <div className="col col-lg-12">
+                                <p>
+                                    Explore the dataset and pick the variables for the labeling phase
+                                </p>
                             </div>
-                                {                
-                                    columns.map((column, key) => (
+                        </div>
+
+                        <div className="row">
+                            <div className="col col-lg-3"  id="column-picker">
+                                <button 
+                                    className="btn btn-success btn-raised"                        
+                                    onClick={this.onSessionStartClick.bind(this)}
+                                >        
+                                    Start session
+                                </button>
+
+                                <p>
+                                    Column name
+                                </p>
+
+                            {                
+                                columns.map((column, key) => (
+                                        
+                                    <div key={key} className="">
+
+                                        <div className="form-check form-check-inline">
+                                                                            
+                                            <input        
+                                                id={"column-" + column }  
+                                                name={"column" + key }
+                                                type="checkbox"
+                                                value={key}
+                                                className="form-check-input"                                                                                             
+                                                onClick={this.onCheckedColumn.bind(this)}
+                                                defaultChecked={this.state.checkboxes[key]}
+                                            /> 
                                             
-                                        <div key={key} className="row" >
-                                            <div                                     
-                                                className="col s4 vertical-center"
-                                            >                     
-                                                <div className="checkbox inline vertical-center">
-                                                    <label>
-                                                                                    
-                                                        <input        
-                                                            id={"column-" + column }  
-                                                            name={"column" + key }
-                                                            type="checkbox"
-                                                            className="form-control"                                                                                                                                
-                                                            value={key}                                             
-                                                            onClick={this.onCheckedColumn.bind(this)}
-                                                            defaultChecked={this.state.checkboxes[key]}
-                                                        /> {column}
+                                            <label
+                                                className="column-name-label"
+                                                htmlFor={"column-" + column}>
+                                                {column || "Not available"}
+                                            </label>
+                                            
 
-                                                    </label>
-                                                </div> 
-                                            </div>
-                                            <div className="col s2 center vertical-center">
-                                                <select 
-                                                    className="form-control"
-                                                    data-key={key}
-                                                    onChange={this.onColumnTypeChange.bind(this)}
-                                                    ref={"column-type-" + key}
-                                                    value={this.state.chosenColumns[key].type}
-                                                >
-                                                    <option value="numerical">Numerical</option>
-                                                    <option value="categorical">Categorical</option>
-                                                </select>
-                                            </div>
+                                            <button
+                                                className="btn btn-primary btn-raised btn-explore"
+                                                role="button"
+                                                type="button"
+                                                data-key={key}
+                                                onClick={this.onExploreClick.bind(this)}>
+                                                Explore
+                                            </button>
+                                        </div>
 
-                                            <div className="col s2 center vertical-center"> 
-                                                {datasetInfos.uniqueValueNumbers[key]}
-                                            </div>
-
-                                            <div className="col s2 center vertical-center"> 
-                                                {datasetInfos.minimums[key]}
-                                            </div>
-
-                                            <div className="col s2 center vertical-center"> 
-                                                {datasetInfos.maximums[key]}
-                                            </div>
-                                        </div>                                                    
+                                    </div>                                                    
                                     ))
                                 }
-                        
-                                <input 
-                                    id="conf" 
-                                    name="configuration"
-                                    type="text"
-                                    style={{visibility: "hidden"}}
-                                />
-                                                                
                         </div>
-                    }
+                                    
+                        <div className="col col-lg-9">
+                                                                                           
+                            <DataExploration                                 
+                                dataset={this.props.dataset}
+                                firstVariable={this.state.firstVariable}
+                                secondVariable={this.state.secondVariable}
+                                show={this.state.showExploration}
+                            />
+                                                                                                                      
+                        </div>
+                        </div>
+                    </div>
                                             
                     <AdvancedOptions {...this.state} />
                     
@@ -195,12 +177,12 @@ class SessionOptions extends Component{
                         groupsWereValidated={this.groupsWereValidated.bind(this)}                        
                     />
 
-                    <button 
-                        className="btn btn-success btn-raised"                        
-                        onClick={this.onSessionStartClick.bind(this)}
-                    >        
-                        Start session
-                    </button>
+                    <input 
+                        id="conf" 
+                        name="configuration"
+                        type="text"
+                        style={{visibility: "hidden"}}
+                    />
                            
                 </form>
             </div>
@@ -238,6 +220,21 @@ class SessionOptions extends Component{
             showColumns: false,
             showVariableGroups: false
         })
+    }
+
+    onExploreClick(e){
+        
+        e.preventDefault()
+
+        var columnId = e.target.dataset.key
+        
+        this.setState({
+            firstVariable: columnId,
+            showExploration: true
+        })
+        
+        
+        return false
     }
 
     onCheckedColumn(e){

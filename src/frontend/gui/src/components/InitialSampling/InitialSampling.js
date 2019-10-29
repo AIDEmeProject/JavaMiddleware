@@ -21,47 +21,65 @@ class InitialSampling extends Component{
     render(){
         
         return (
-            <div>
+            <div className="card">
                 <div>
-                    <ul className="nav nav-tabs">
-                        <li className="nav-item">
-                            <a 
-                            className="nav-link active" 
-                            href="#"
-                            onClick={() => this.setState({labelingInitialSampling: true})}
-                            >
-                                Labeling initial sampling
-                            </a>
-                        </li>
+                    <div className="row">
+                        <div className="col col-lg-8 offset-lg-2">
 
-                        <li className="nav-item">
-                            <a 
-                            className="nav-link active" 
-                            href="#"
-                            onClick={() => this.setState({labelingInitialSampling: false})}
-                            >
-                                Fake point initial sampling
-                            </a>
-                        </li>                     
-                    </ul>
+                            
+                            <ul className="nav nav-tabs bg-primary">
+                                <li className="nav-item">
+                                    <a 
+                                    className="nav-link active" 
+                                    href="#"
+                                    onClick={() => this.setState({labelingInitialSampling: true})}
+                                    >
+                                        Labeling initial sampling
+                                    </a>
+                                </li>
 
-                    The first phase of labeling continues until we obtain 
-                    a positive example and a negative example. <br />
+                                <li className="nav-item">
+                                    <a 
+                                    className="nav-link active" 
+                                    href="#"
+                                    onClick={() => this.setState({labelingInitialSampling: false})}
+                                    >
+                                        Fake point initial sampling
+                                    </a>
+                                </li>                     
+                            </ul>
+                        
+
+                        <p>                            
+                            The first phase of labeling continues until we obtain 
+                            a positive example and a negative example. 
+                        </p>
+
+                        {
+                            this.state.labelingInitialSampling && 
+
+                            <SpecificPointToLabel 
+                                    onNewPointsToLabel={this.props.onNewPointsToLabel}                        
+                            />
+
+                        }
+                    
+                    </div>
+                    </div>
+                        
 
                     {
                         this.state.labelingInitialSampling && 
 
                         <div>
-                            <SpecificPointToLabel 
-                                onNewPointsToLabel={this.props.onNewPointsToLabel}                        
-                            />
-                
+                                            
                             <PointLabelisation
                                 {...this.props}   
                                 {...this.state}
                             />
                         </div>
                     }
+
                  
                     {
                         ! this.state.labelingInitialSampling && 

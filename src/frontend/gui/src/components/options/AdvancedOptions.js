@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 class AdvancedOptions extends Component{
 
     render(){
@@ -10,45 +9,49 @@ class AdvancedOptions extends Component{
         }
 
         return (
-            <div>                      
-                <div className="form-group">
-                    <label htmlFor="algorithm-selection">Learner</label>
-                    <select 
-                        className="form-control" 
-                        id="algorithm-selection"
-                        name="active-learner"
-                    >
-                        <option 
-                            value="UncertaintySampler"
-                            defaultValue
+            
+            <div className="row">                      
+                <div className="col col-lg-6 offset-lg-3">
+                    <div className="form-group">
+                        <label htmlFor="algorithm-selection">Learner</label>
+                        <select 
+                            className="form-control" 
+                            id="algorithm-selection"
+                            name="active-learner"
                         >
-                            Uncertainty Sampling
-                        </option>
-                        <option value="versionSpace">
-                            Version Space
-                        </option>                             
-                    </select>
-                </div>
+                            <option 
+                                value="UncertaintySampler"
+                                defaultValue
+                            >
+                                Uncertainty Sampling
+                            </option>
+                            <option value="versionSpace">
+                                Version Space
+                            </option>                             
+                        </select>
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="classifier">Classifier</label>
-                    <select 
-                        className="form-control" 
-                        id="classfier-selection"
-                        name="classifier"
-                    >
-                        <option 
-                            value="SVM"
-                            defaultValue
+                    <div className="form-group">
+                        <label htmlFor="classifier">Classifier</label>
+                        <select 
+                            className="form-control" 
+                            id="classfier-selection"
+                            name="classifier"
                         >
-                            SVM
-                        </option>
-                        <option value="Majority Vote">
-                            Majority Vote
-                        </option>                             
-                    </select>
-                </div>                        
+                            <option 
+                                value="SVM"
+                                defaultValue
+                            >
+                                SVM
+                            </option>
+                            <option value="Majority Vote">
+                                Majority Vote
+                            </option>                             
+                        </select>
+                    </div>                        
             </div>
+        </div>
+            
         )
     }
 

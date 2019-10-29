@@ -7,11 +7,18 @@ import NewSession from './components/options/NewSession'
 import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSM/TSMExploration'
+import BreadCrumb from './components/BreadCrumb'
+import DataExploration from './components/visualisation/DataExploration'
+import MicroModalComponent from './components/MicroModalComponent'
+import MicroModal from 'micromodal'
 
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
+import logo from './AIDEME.png'
 
+import * as d3 from "d3"
+import Dataset from './model/Dataset';
 
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
@@ -35,9 +42,64 @@ class App extends Component {
             hasYes: false,
             hasFalse: false,
             availableVariables: [],
-            finalVariables: []
+            finalVariables: [],
+            bread: this.getBreadCrum(NEW_SESSION)
         }
     }
+
+  getBreadCrum(step){
+      var breads = {
+          
+          [AUTHENTICATION]: [
+              {
+                name: 'Authentication'
+              }
+          ],
+
+          [NEW_SESSION]: [
+            {
+               name: 'Authentication'
+            },
+            {
+               name: 'New session',
+               active: true
+            }
+          ],
+
+          [SESSION_OPTIONS]: [
+            {
+                name: 'Authentication'
+            },
+            {
+                name: 'New session',            
+            },
+            {
+                name:'Setup',
+                active:true
+            }
+          ],
+          [EXPLORATION]: [
+            {
+                name: 'Authentication'
+            },
+            {
+                name: 'New session',            
+            },
+            {
+                name:'Session options',                
+            },
+            {
+                name:'Interactive labeling',
+                active: true
+            },
+            
+          ]
+
+      }
+      breads[TSM_EXPLORATION] = breads[EXPLORATION]
+
+      return breads[step] || []
+  }
 
   render() {
 
@@ -73,30 +135,28 @@ class App extends Component {
 
         <div>       
                                      
-            <nav className="navbar navbar-dark bg-dark box-shadow ">                 
-                <a className="navbar-brand" href="/">
-                    CEDAR - Active learning labeler
-                </a>         
-            </nav>
-
-
-            <div className="App container">
-                    
+            <ul className="navbar navbar-dark bg-dark box-shadow ">                 
                 
-                <div className="row">
-                    <div className="col col-lg-8 offset-lg-2">                    
-                   
-                    </div>
-
-                </div>
-            </div>
-
-            <div className="App container">
-                    
+                <li className="nav-item">
+                    <a className="navbar-brand" href="/">                    
+                        <img src={logo} height="50" alt="logo" /> AIDEme                    
+                    </a>             
+                </li>
                 
+                <li className="nav-item">
+                
+                <BreadCrumb                        
+                    items={this.state.bread}
+                />
+                </li>
+            </ul>
+           
+            <div className="App container-fluid">                                    
                 <div className="row">
 
-                    <div className="col col-lg-10 offset-lg-1">
+                    <div className="col col-lg-12">
+
+                        
         
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
@@ -112,28 +172,33 @@ class App extends Component {
                                 sessionToken: this.state.sessionToken
                             }}
                             groupsWereValidated={this.groupsWereValidated.bind(this)}
+                            onDatasetLoaded={this.onDatasetLoaded.bind(this)}
                         />            
                     </div>
                 </div>
             
                 <div className="row">
-
-                    <div className="col col-lg-10 offset-lg-1">
-
-                        
-
+                    <div className="col col-lg-10 offset-lg-1">                
                     </div>
                 </div>
 
-
                 <div id="pandas-profiling">
-
-
-
                 </div>
             </div>
       </div>
     );
+  }
+
+  onShowModalClick(e){
+      this.setState({
+          showModal: true
+      })
+  }
+
+  onCloseModal(e){
+      this.setState({
+          showModal: false
+      })
   }
    
   onAuthenticationSuccess(response){
@@ -145,12 +210,24 @@ class App extends Component {
         })
     }
 
+    onDatasetLoaded(event){
+        
+        var fileContent = event.target.result        
+        var csv = d3.csvParse(fileContent)        
+        var dataset = new Dataset(csv)
+        
+        this.setState({
+            dataset: dataset
+        })
+    }
+
     fileUploaded(response){
 
   
         this.setState({
             step: SESSION_OPTIONS,
-            datasetInfos: response
+            datasetInfos: response,
+            bread: this.getBreadCrum(SESSION_OPTIONS)
         })
     }
 
@@ -175,9 +252,6 @@ class App extends Component {
 
     sessionWasStarted(response){
         
-
-        
-
         var options = this.state.options
                 
         var pointsToLabel = response.map( pointToLabel => {
@@ -202,6 +276,7 @@ class App extends Component {
 
             this.setState({
                 step: TSM_EXPLORATION,
+                bread: this.getBreadCrum(TSM_EXPLORATION),
                 pointsToLabel: pointsToLabel,     
                 groups: groups,
                 chosenColumns: finalVariables   
@@ -210,6 +285,7 @@ class App extends Component {
         else{            
             this.setState({
                 step: EXPLORATION,
+                bread: this.getBreadCrum(EXPLORATION),
                 pointsToLabel: pointsToLabel,
                 chosenColumns: this.state.options.chosenColumns                
             })
@@ -288,15 +364,12 @@ class App extends Component {
                 }, () => {
                     this.labelForInitialSession(labeledPoints, pointsToLabel)
                 })
-            }
-            
-            
+            }                        
         }
         else{        
             sendPointLabel({
                 data: labeledPoints,
-            }, tokens, this.onNewPointsToLabel.bind(this))    
-
+            }, tokens, this.onNewPointsToLabel.bind(this))
         }
     }
 
@@ -326,9 +399,10 @@ class App extends Component {
         }
     }
 
-
+    componentDidMount(){
+        MicroModal.init()
+    }
 }
-
 
 function sendPointLabel(data, tokens, onSuccess){
     

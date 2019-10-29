@@ -5,11 +5,14 @@ class PointLabelisation extends Component{
     render(){
         
         return (
-            <div>
-
-                <p>
-                    Please label the following examples
-                </p>
+            <div className="">
+                <div className="row">
+                    <div className="col col-lg-8 offset-lg-2">
+                        <p>
+                            Please label the following examples
+                        </p>
+                    </div>
+                </div>
 
                 <table className="table-label">
                     <thead>                        

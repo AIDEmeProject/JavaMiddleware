@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import HeatMap from './HeatMap'
-
 class ModelVisualization extends Component{
 
     constructor(props){
@@ -28,28 +26,32 @@ class ModelVisualization extends Component{
                
         return (
             <div>
-                <p>
-                    We ran the current model of several example of the dataset so that you can check
-                    if the model     
-                </p>
+                <div className="row">
+                    <div className="col col-lg-6 offset-lg-3">
+        
+                        <p>
+                            We ran the current model of several example of the dataset so that you can check
+                            if the model     
+                        </p>
 
-                {
-                    this.props.visualizationData.TSMBound &&  
-                
-                    <p>                    
-                        Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
-                    </p>
+                        {
+                            this.props.visualizationData.TSMBound &&  
+                        
+                            <p>                    
+                                Estimated model performance >= {this.props.visualizationData.TSMBound * 100} %
+                            </p>
 
-                }
-                
-                <p>
-                    Estimated accuracy : {this.state.estimatedRate}
-                </p>
+                        }
+                        
+                        <p>
+                            Estimated accuracy : {this.state.estimatedRate}
+                        </p>
 
+                        </div>
+                    </div>
                 <table className='predicted'>
                     <thead>
                         <tr>
-
                             <th>
                                 Id
                             </th>
@@ -69,7 +71,6 @@ class ModelVisualization extends Component{
                                 Predicted Label
                             </th>                            
                         </tr>
-
                     </thead>
                 
                     {
@@ -117,11 +118,8 @@ class ModelVisualization extends Component{
                                 </tr>
                             )
                         })
-                    }
-                    
-                    </table>
-
-                    
+                    }                    
+                </table>
             </div>
         )
     }
