@@ -11,7 +11,7 @@ import BreadCrumb from './components/BreadCrumb'
 import DataExploration from './components/visualisation/DataExploration'
 import MicroModalComponent from './components/MicroModalComponent'
 import MicroModal from 'micromodal'
-
+import ModelBehaviorPlotter from './components/visualisation/ModelBehaviorPlotter'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
@@ -156,6 +156,7 @@ class App extends Component {
 
                     <div className="col col-lg-12">
 
+                        <ModelBehaviorPlotter />
                         
         
                         <View 
