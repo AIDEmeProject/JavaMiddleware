@@ -31,4 +31,11 @@ public interface UserLabel {
     default int asSign(){
         return isPositive() ? 1 : -1;
     }
+
+    default boolean isAllNegative() {
+        for (Label label : getLabelsForEachSubspace()) {
+            if (label.isPositive()) return false;
+        }
+        return true;
+    }
 }

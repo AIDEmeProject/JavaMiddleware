@@ -86,6 +86,21 @@ public class MatrixTest {
     }
 
     @Test
+    void identity_negativeDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.identity(-1));
+    }
+
+    @Test
+    void identity_zeroDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Matrix.FACTORY.identity(0));
+    }
+
+    @Test
+    void identity_positiveDimension_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(3, 3, 1, 0, 0, 0, 1, 0, 0, 0, 1), Matrix.FACTORY.identity(3));
+    }
+
+    @Test
     void numRows_matrixWithTwoRows_returnsTwo() {
         assertEquals(2, matrix1.rows());
     }
@@ -123,6 +138,65 @@ public class MatrixTest {
         assertEquals(4, matrix1.get(1,0));
         assertEquals(5, matrix1.get(1,1));
         assertEquals(6, matrix1.get(1,2));
+    }
+
+    @Test
+    void set_negativeRowIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(-1, 0, 0));
+    }
+
+    @Test
+    void set_rowIndexEqualsNumRows_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(matrix1.rows(), 0, 0));
+    }
+
+    @Test
+    void set_negativeColumnIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(0, -1, 0));
+    }
+
+    @Test
+    void set_columnIndexEqualsNumCols_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.set(0, matrix1.cols(), 0));
+    }
+
+    @Test
+    void set_runOverAllValidIndexes_ValuesAreCorrectlySet() {
+        matrix1.set(0, 0, -1);
+        assertEquals(-1, matrix1.get(0,0));
+        matrix1.set(0, 1, -2);
+        assertEquals(-2, matrix1.get(0,1));
+        matrix1.set(0, 2, -3);
+        assertEquals(-3, matrix1.get(0,2));
+        matrix1.set(1, 0, -4);
+        assertEquals(-4, matrix1.get(1,0));
+        matrix1.set(1, 1, -5);
+        assertEquals(-5, matrix1.get(1,1));
+        matrix1.set(1, 2, -6);
+        assertEquals(-6, matrix1.get(1,2));
+    }
+
+    @Test
+    void setRow_rowIndexEqualsNumRows_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(matrix1.rows(), new double[3]));
+    }
+
+    @Test
+    void setRow_negativeRowIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(-1, new double[3]));
+    }
+
+    @Test
+    void setRow_rowHas_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.setRow(0, new double[2]));
+    }
+
+    @Test
+    void setRow_runOverAllValidIndexes_ValuesAreCorrectlySet() {
+        matrix1.setRow(0, new double[] {-1, -2, -3});
+        assertEquals(Vector.FACTORY.make(-1, -2, -3), matrix1.getRow(0));
+        matrix1.setRow(1,  new double[] {-4, -5, -6});
+        assertEquals(Vector.FACTORY.make(-4, -5, -6), matrix1.getRow(1));
     }
 
     @Test
@@ -205,6 +279,88 @@ public class MatrixTest {
     void swapRows_differentRowIndexes_originalMatrixModifiedAsExpected() {
         matrix1.swapRows(0, 1);
         assertEquals(Matrix.FACTORY.make(2, 3, 4, 5, 6, 1, 2, 3), matrix1);
+    }
+
+    @Test
+    void getCol_negativeIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.getCol(-1));
+    }
+
+    @Test
+    void getCol_indexEqualsNumCols_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.getCol(matrix1.cols()));
+    }
+
+    @Test
+    void getCol_runOverAllValidIndexes_correctVectorsReturned() {
+        assertEquals(Vector.FACTORY.make(1, 4), matrix1.getCol(0));
+        assertEquals(Vector.FACTORY.make(2, 5), matrix1.getCol(1));
+        assertEquals(Vector.FACTORY.make(3, 6), matrix1.getCol(2));
+    }
+
+
+    @Test
+    void getCols_emtpyArray_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols());
+    }
+
+    @Test
+    void getCols_outOfBoundsIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols(-1));
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getCols(matrix1.cols()));
+    }
+
+    @Test
+    void getCols_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 2, 3, 1, 6, 4), matrix1.getCols(2, 0));
+    }
+
+    @Test
+    void getColSlice_negativeFromIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(-1, 0));
+    }
+
+    @Test
+    void getColSlice_ToIndexLargerThanNumberOfCols_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(0, matrix1.cols()+1));
+    }
+
+    @Test
+    void getColSlice_FromZeroToNumberOfCols_returnsCopyOfDataset() {
+        assertEquals(matrix1, matrix1.getColSlice(0, matrix1.cols()));
+    }
+
+    @Test
+    void getColSlice_FromIndexEqualsToIndex_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> matrix1.getColSlice(0, 0));
+    }
+
+    @Test
+    void getColSlice_compatibleIndexes_returnsExpectedMatrix() {
+        assertEquals(Matrix.FACTORY.make(2, 2, 2, 3, 5, 6), matrix1.getColSlice(1, 3));
+    }
+
+    /* *************************************
+     *              DIAGONAL
+     * ************************************
+     */
+
+    @Test
+    void fillDiagonal_anyMatrix_ownMatrixReturned() {
+        assertSame(matrix1, matrix1.fillDiagonal(1.0));
+    }
+
+    @Test
+    void fillDiagonal_squareMatrix_diagonalCorrectlyFilled() {
+        Matrix mat = Matrix.FACTORY.make(2, 2, 1, 2, -3, -4);
+        mat.fillDiagonal(-10);
+        assertEquals(Matrix.FACTORY.make(2, 2, -10, 2, -3, -10), mat);
+    }
+
+    @Test
+    void fillDiagonal_rectangularMatrix_diagonalCorrectlyFilled() {
+        matrix1.fillDiagonal(-1);
+        assertEquals(Matrix.FACTORY.make(2, 3, -1, 2, 3, 4, -1, 6), matrix1);
     }
 
     /* *************************************
@@ -934,6 +1090,41 @@ public class MatrixTest {
     @Test
     void getRowSquaredNorms_rectangularMatrix_returnsExpectedValues() {
         assertEquals(Vector.FACTORY.make(14, 77), matrix1.getRowSquaredNorms());
+    }
+
+    @Test
+    void resize_negativeRowSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(-1, 1));
+    }
+
+    @Test
+    void resize_zeroRowSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(0, 1));
+    }
+
+    @Test
+    void resize_negativeColSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(1, -1));
+    }
+
+    @Test
+    void resize_zeroColSize_throwsException() {
+        assertThrows(RuntimeException.class, () -> matrix1.resize(1, 0));
+    }
+
+    @Test
+    void resize_newDimensionsAreSmaller_returnsCorrectTruncatedMatrix() {
+        assertEquals(Matrix.FACTORY.make(1, 2, 1, 2), matrix1.resize(1, 2));
+    }
+
+    @Test
+    void resize_sameDimensions_inputIsReturnedWithoutCopying() {
+        assertSame(matrix1, matrix1.resize(2, 3));
+    }
+
+    @Test
+    void resize_sizeLargerThanArraySize_returnsOriginalMatrixPaddedWithZeros() {
+        assertEquals(Matrix.FACTORY.make(3, 4, 1, 2, 3, 0, 4, 5, 6, 0, 0, 0, 0, 0), matrix1.resize(3, 4));
     }
 
     @Test

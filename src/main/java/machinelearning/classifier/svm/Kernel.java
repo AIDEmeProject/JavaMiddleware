@@ -1,6 +1,6 @@
 package machinelearning.classifier.svm;
 
-import libsvm.svm_parameter;
+import smile.math.kernel.MercerKernel;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
@@ -60,8 +60,10 @@ public abstract class Kernel {
     }
 
     /**
-     * Utility method for setting the libsvm's training parameters
+     * Utility method for getting the Smile's equivalent kernel function
      * @see SvmLearner
      */
-     abstract void setSvmParameters(svm_parameter parameters);
+    MercerKernel<double[]> getSmileKernel(int dim) {
+        throw new RuntimeException("Kernel not supported");
+    }
 }

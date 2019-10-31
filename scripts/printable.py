@@ -12,16 +12,24 @@ class Printable:
         return self.__name
 
     def __repr__(self):
-        return '_'.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict()).items()])
+        return '_'.join(['{0}={1}'.format(k, v) for k, v in self.__flatten_dict(self.as_dict(flag=False)).items()])
 
-    def as_dict(self):
+    def as_dict(self, flag=True):
         result = {}
         if self.__add_name:
             result['name'] = self.__name
 
-        result.update({k: self.__resolve_value(v) for k, v in self.__dict__.items() if not k.startswith('_') and v is not None})
+        result.update({k: self.__resolve_value(v, flag) for k, v in self.__dict__.items() if self.__accept(k, v, flag)})
 
         return result
+
+    @staticmethod
+    def __accept(k, v, flag):
+        if k.startswith('_') or v is None:
+            return False
+        if not flag and k in ['repeat', 'categorical']:
+            return False
+        return True
 
     def to_json(self):
         return json.dumps(self.as_dict(), sort_keys=True, indent=4, separators=(',', ': '), allow_nan=False)
@@ -47,12 +55,23 @@ class Printable:
                 if 'name' in v:
                     flattened[k] = v.pop('name')
                 flattened.update(Printable.__flatten_dict(v))
+            elif isinstance(v, tuple) or isinstance(v, list):
+                flattened[k] = '+'.join([str(x) for x in v])
             elif k != 'name':
                 flattened[k] = v
         return flattened
 
-    @staticmethod
-    def __resolve_value(value):
+    @classmethod
+    def __resolve_value(cls, value, flag):
         if isinstance(value, Printable):
-            return value.as_dict()
+            return value.as_dict(flag)
+
+        if isinstance(value, list):
+            if not value:
+                return value
+            if all((x is value[0] for x in value)):
+                value = [value[0]]
+            if flag:
+                return [cls.__resolve_value(v, flag) for v in value]
+
         return value

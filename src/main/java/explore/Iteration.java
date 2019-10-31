@@ -1,6 +1,5 @@
 package explore;
 
-import config.ExperimentConfiguration;
 import data.DataPoint;
 import data.LabeledPoint;
 import data.PartitionedDataset;

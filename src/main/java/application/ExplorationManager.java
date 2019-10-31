@@ -1,9 +1,8 @@
 package application;
 
-import config.ExperimentConfiguration;
 import data.*;
 
-import config.ExperimentConfiguration;
+import explore.ExperimentConfiguration;
 import explore.metrics.MetricStorage;
 import explore.metrics.ThreeSetMetricCalculator;
 
@@ -18,7 +17,6 @@ import utils.RandomState;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**

@@ -40,6 +40,25 @@ public class Matrix extends Tensor<Matrix> {
             return new Matrix(rows, cols, array);
         }
 
+        public static Matrix make(Vector[] rows) {
+            Validator.assertNotEmpty(rows);
+
+            int nrows = rows.length;
+            int ncols = rows[0].dim();
+            double[] values = new double[nrows * ncols];
+
+            int p = 0;
+            for (Vector row : rows) {
+                Validator.assertEquals(ncols, row.dim());
+
+                for (int j = 0; j < ncols; j++) {
+                    values[p++] = row.get(j);
+                }
+            }
+
+            return new Matrix(nrows, ncols, values);
+        }
+
         /**
          * @param rows: number of rows()
          * @param cols: number of columns
@@ -118,6 +137,16 @@ public class Matrix extends Tensor<Matrix> {
     }
 
     /**
+     * @param i: row index
+     * @param j: column index
+     * @param value: value to set at position (i, j)
+     * @throws IllegalArgumentException if either i or j is out of bounds
+     */
+    public void set(int i, int j, double value) {
+        super.set(value, i, j);
+    }
+
+    /**
      * @param i row index
      * @return a Vector containing the elements of the i-th row
      * @throws IllegalArgumentException if row index is out of bounds
@@ -127,6 +156,13 @@ public class Matrix extends Tensor<Matrix> {
         double[] row = new double[cols()];
         System.arraycopy(array, i * cols(), row, 0, cols());
         return new Vector(row);
+    }
+
+    public void setRow(int row, double[] values) {
+        Validator.assertIndexInBounds(row, 0, rows());
+        Validator.assertEquals(cols(), values.length);
+
+        System.arraycopy(values, 0, array, row * cols(), values.length);
     }
 
     /**
@@ -179,6 +215,93 @@ public class Matrix extends Tensor<Matrix> {
                 array[offsetJ++] = tmp;
             }
         }
+    }
+
+    /**
+     * @param i column index
+     * @return a Vector containing the elements of the i-th column
+     * @throws IllegalArgumentException if column index is out of bounds
+     */
+    public Vector getCol(int i) {
+        Validator.assertIndexInBounds(i, 0, cols());
+        double[] col = new double[rows()];
+
+        for (int j = 0; j < col.length; j++) {
+            col[j] = array[i];
+            i += cols();
+        }
+
+        return new Vector(col);
+    }
+
+    /**
+     * @param cols: columns to retrieve
+     * @return a new matrix containing only the specified columns
+     * @throws IllegalArgumentException if column index is out-of-bounds
+     */
+    public Matrix getCols(int... cols) {
+        Validator.assertNotEmpty(cols);
+
+        double[] result = new double[rows() * cols.length];
+
+        int p = 0;
+        for (int i = 0; i < rows(); i++) {
+            for(int j : cols) {
+                result[p++] = get(i, j);
+            }
+        }
+
+        return new Matrix(rows(), cols.length, result);
+    }
+
+    /**
+     * @param from: start index (inclusive)
+     * @param to: end index (exclusive)
+     * @return a copy of a slice of columns from the original matrix
+     * @throws IllegalArgumentException if indexes are out-of-bounds, or {@code from} is not smaller than {@code to}
+     */
+    public Matrix getColSlice(int from, int to) {
+        if (from < 0 || from >= to || to > cols()) {
+            throw new IllegalArgumentException("Invalid indexes " + from + " and " + to + " for matrix of " + cols() + " columns");
+        }
+
+        int size = to - from;
+        double[] slice = new double[size * rows()];
+
+        int start = from;
+        int pos = 0;
+        for (int i = 0; i < rows(); i++) {
+            System.arraycopy(array, start, slice, pos, size);
+            start += cols();
+            pos += size;
+        }
+
+        return new Matrix(rows(), size, slice);
+    }
+
+    /* DIAGONAL OPERATIONS */
+    public Matrix fillDiagonal(double value) {
+        int size = Math.min(rows(), cols());
+        int step = cols() + 1;
+
+        for (int i = 0; i < size; i++) {
+            array[i * step] = value;
+        }
+
+        return this;
+    }
+
+    public Matrix iAddScalarToDiagonal(double value) {
+        if (value !=  0) {
+            int size = Math.min(rows(), cols());
+            int step = cols() + 1;
+
+            for (int i = 0; i < size; i++) {
+                array[i * step] += value;
+            }
+        }
+
+        return this;
     }
     
     /* ROW-WISE OPERATIONS */
@@ -514,6 +637,34 @@ public class Matrix extends Tensor<Matrix> {
             }
         }
         return new Vector(norms);
+    }
+
+    /**
+     * Resizes {@code this} matrix. Smaller number of rows or cols cause a truncation; for larger values, entries are
+     * padded with zeros.
+     * @param newRows: desired number of rows
+     * @param newCols: desired number of columns
+     * @return the current matrix resized
+     */
+    public Matrix resize(int newRows, int newCols) {
+        Validator.assertPositive(newRows);
+        Validator.assertPositive(newCols);
+
+        // no change in dimensions
+        if (newRows == rows() && newCols == cols())
+            return this;
+
+        double[] values = new double[newRows * newCols];
+        int start = 0, startNew = 0;
+        int step = Math.min(cols(), newCols), loopLimit = Math.min(rows(), newRows);
+
+        for (int i = 0; i < loopLimit; i++) {
+            System.arraycopy(array, start, values, startNew, step);
+            start += cols();
+            startNew += newCols;
+        }
+
+        return new Matrix(newRows, newCols, values);
     }
 
     /**

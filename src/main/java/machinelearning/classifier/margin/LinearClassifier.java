@@ -3,21 +3,16 @@ package machinelearning.classifier.margin;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
+import java.util.Objects;
+
 /**
  * A linear classifier. It is defined by two parameters: bias and weight. Predictions are made as in Logistic Regression:
  *
  *      P(y = 1 | x) = sigmoid(bias + weight^T x)
  */
 public class LinearClassifier extends MarginClassifier {
-    /**
-     * Bias parameter
-     */
-    private final double bias;
 
-    /**
-     * Weight vector
-     */
-    private final Vector weights;
+    private final HyperPlane hyperplane;
 
     /**
      * @param bias: bias parameters
@@ -25,55 +20,25 @@ public class LinearClassifier extends MarginClassifier {
      * @throws IllegalArgumentException if weights are empty
      */
     public LinearClassifier(double bias, Vector weights) {
-        this.bias = bias;
-        this.weights = weights;
-    }
-
-    /**
-     * Constructs the LinearClassifier from a single weight vector. The first element of this vector may contain the bias,
-     * as determined by the hasBias parameter.
-     * @param weights: collection of all weights, with the bias possibly being the first element
-     * @param hasBias: whether treat weights[0] as the bias
-     * @throws IllegalArgumentException if weights is an empty array, or if it contains a single element while hasBias is true
-     */
-    public LinearClassifier(Vector weights, boolean hasBias) {
-        if (weights.dim() <= (hasBias ? 1 : 0)){
-            throw new IllegalArgumentException("Weights array too small: expected at least " + (hasBias ? 1 : 0) + ", but received " + weights);
-        }
-        if (hasBias){
-            this.bias = weights.get(0);
-            this.weights = weights.slice(1, weights.dim());
-        }
-        else {
-            this.bias = 0;
-            this.weights = weights;
-        }
+        this.hyperplane = new HyperPlane(bias, weights);
     }
 
     /**
      * @return dimension of hyperplane
      */
-    public int getDim() { return weights.dim(); }
-
-    public double getBias() {
-        return bias;
-    }
-
-    public Vector getWeights() {
-        return weights;
-    }
+    public int dim() { return hyperplane.dim(); }
 
     /**
      * Compute bias + weight^T x
      */
     @Override
     public double margin(Vector x){
-        return bias + x.dot(weights);
+        return hyperplane.margin(x);
     }
 
     @Override
     public Vector margin(Matrix xs) {
-        return xs.multiply(weights).scalarAdd(bias);
+        return hyperplane.margin(xs);
     }
 
     @Override
@@ -81,6 +46,6 @@ public class LinearClassifier extends MarginClassifier {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LinearClassifier that = (LinearClassifier) o;
-        return Double.compare(that.bias, bias) == 0 && weights.equals(that.weights);
+        return Objects.equals(hyperplane, that.hyperplane);
     }
 }

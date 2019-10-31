@@ -1,5 +1,6 @@
 package data;
 
+import explore.user.UserLabel;
 import machinelearning.classifier.Label;
 import utils.Validator;
 import utils.linalg.Matrix;
@@ -19,12 +20,14 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     /**
      * Data points and their indexes
      */
-    private IndexedDataset dataset;
+    private final IndexedDataset dataset;
 
     /**
      * Label of each data point
      */
-    private Label[] labels;
+    private final UserLabel[] labels;
+
+    private Label[][] partialLabels;
 
     /**
      * @param indexes: indexes of each data point
@@ -32,7 +35,7 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      * @param labels: the label of each data point
      * @throws IllegalArgumentException if inputs do not have the same size or are empty
      */
-    public LabeledDataset(List<Long> indexes, Matrix data, Label[] labels) {
+    public LabeledDataset(List<Long> indexes, Matrix data, UserLabel[] labels) {
         this(new IndexedDataset(indexes, data), labels);
     }
 
@@ -41,10 +44,22 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
      * @param labels: the labels for each data point
      * @throws IllegalArgumentException if the dataset and the labels have incompatible sizes
      */
-    public LabeledDataset(IndexedDataset dataset, Label[] labels) {
+    public LabeledDataset(IndexedDataset dataset, UserLabel[] labels) {
         Validator.assertEquals(dataset.length(), labels.length);
         this.dataset = dataset;
         this.labels = labels;
+
+        if (dataset.hasFactorizationStructure()) {
+            Validator.assertEquals(dataset.partitionSize(), labels[0].getLabelsForEachSubspace().length);
+
+            this.partialLabels = new Label[dataset.partitionSize()][labels.length];
+            for (int i = 0; i < partialLabels.length; i++) {
+                for (int j = 0; j < labels.length; j++) {
+                    this.partialLabels[i][j] = labels[j].getLabelsForEachSubspace()[i];
+                }
+            }
+        }
+
     }
 
     public List<Long> getIndexes() {
@@ -55,7 +70,11 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
         return dataset.getData();
     }
 
-    public Label[] getLabels() {
+    public UserLabel getLabel(int index) {
+        return labels[index];
+    }
+
+    public UserLabel[] getLabels() {
         return labels;
     }
 
@@ -84,11 +103,21 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
 
     /**
      * @param data: new features matrix
-     * @return a new LabeledDataset object with same indexes and labells as {@code this}, but with the underlying data
+     * @return a new LabeledDataset object with same indexes and labels as {@code this}, but with the underlying data
      * matrix replaced by the input one
      */
     public LabeledDataset copyWithSameIndexesAndLabels(Matrix data) {
         return new LabeledDataset(dataset.getIndexes(), data, labels);
+    }
+
+    public LabeledDataset append(IndexedDataset data, UserLabel[] label) {
+        Validator.assertEquals(data.length(), label.length);
+        Validator.assertEquals(data.dim(), dim());
+
+        UserLabel[] stackedLabels = new Label[labels.length + label.length];
+        System.arraycopy(labels, 0, stackedLabels, 0, labels.length);
+        System.arraycopy(label, 0, stackedLabels, labels.length, label.length);
+        return new LabeledDataset(dataset.append(data), stackedLabels);
     }
 
     @Override
@@ -115,5 +144,28 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
         LabeledDataset that = (LabeledDataset) o;
         return Objects.equals(dataset, that.dataset) &&
                 Arrays.equals(labels, that.labels);
+    }
+
+    public LabeledDataset[] getPartitionedData() {
+        if (!dataset.hasFactorizationStructure()) {
+            return new LabeledDataset[]{this}; //new LabeledDataset(dataset, labels)
+        }
+
+        IndexedDataset[] partitionedDatasets = dataset.getPartitionedData();
+
+        LabeledDataset[] labeledDatasets = new LabeledDataset[dataset.partitionSize()];
+        for (int i = 0; i < labeledDatasets.length; i++) {
+            labeledDatasets[i] = new LabeledDataset(partitionedDatasets[i], partialLabels[i]);
+        }
+
+        return labeledDatasets;
+    }
+
+    public int partitionSize() {
+        return dataset.partitionSize();
+    }
+
+    public int[][] getPartitionIndexes() {
+        return dataset.getPartitionIndexes();
     }
 }

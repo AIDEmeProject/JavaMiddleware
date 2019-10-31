@@ -1,6 +1,5 @@
 package machinelearning.classifier.svm;
 
-import libsvm.svm_parameter;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -30,10 +29,5 @@ public class DistanceKernel extends Kernel {
         Vector squaredRowNormX = xs.getRowSquaredNorms();
         Matrix scalarProductMatrix = xs.multiplyTranspose(xs).iScalarMultiply(-2);
         return scalarProductMatrix.iAddColumn(squaredRowNormX).iAddRow(squaredRowNormX);
-    }
-
-    @Override
-    void setSvmParameters(svm_parameter parameters) {
-
     }
 }

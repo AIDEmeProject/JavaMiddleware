@@ -1,9 +1,9 @@
 package explore;
 
-import config.ExperimentConfiguration;
 import data.IndexedDataset;
 import data.LabeledPoint;
 import data.PartitionedDataset;
+import explore.sampling.FixedSampler;
 import explore.statistics.Statistics;
 import explore.statistics.StatisticsCollection;
 import explore.user.BudgetedUser;
@@ -34,11 +34,11 @@ public final class Explore {
      * @param dataPoints: unlabeled pool of points
      * @param user: the user for labeling points
      */
-    public Explore(FolderManager folder, IndexedDataset dataPoints, User user) {
+    public Explore(FolderManager folder, ExperimentConfiguration configuration, IndexedDataset dataPoints, User user) {
         this.folder = folder;
+        this.configuration = configuration;
         this.dataPoints = dataPoints;
         this.user = user;
-        this.configuration = folder.getExperimentConfig();
     }
 
     /**
@@ -61,6 +61,11 @@ public final class Explore {
 
     private void resume(int id, int budget, StandardOpenOption openOption) {
         setRandomSeed(id);
+
+        // set run id for fixed sampler
+        if (configuration.getInitialSampler() instanceof FixedSampler) {
+            ((FixedSampler) configuration.getInitialSampler()).setId(id - 1);
+        }
 
         PartitionedDataset partitionedDataset = getPartitionedDataset(id);
         BudgetedUser budgetedUser = new BudgetedUser(user, budget);
@@ -125,7 +130,6 @@ public final class Explore {
                 .map(x -> new PartitionedDataset(dataPoints, x))
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
 
-        System.out.println("the number of evaluation points: " + partitionedDataset.getAllPoints().length());
         folder.getLabeledPoints(id).forEach(partitionedDataset::update);
         return partitionedDataset;
     }

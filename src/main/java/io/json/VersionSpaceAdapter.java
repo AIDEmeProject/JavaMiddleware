@@ -8,7 +8,7 @@ import exceptions.UnknownClassIdentifierException;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
 import machinelearning.active.learning.versionspace.VersionSpace;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
 import machinelearning.bayesian.BayesianLinearVersionSpace;
 import machinelearning.classifier.svm.Kernel;
 import machinelearning.classifier.svm.LinearKernel;
@@ -22,6 +22,7 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         boolean addIntercept = jsonObject.getAsJsonPrimitive("addIntercept").getAsBoolean();
+        boolean decompose = jsonObject.getAsJsonPrimitive("decompose").getAsBoolean();
 
         VersionSpace linearVersionSpace;
 
@@ -36,6 +37,16 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
             if (addIntercept) {
                 ((LinearVersionSpace) linearVersionSpace).addIntercept();
             }
+
+            if (decompose) {
+                ((LinearVersionSpace) linearVersionSpace).useDecomposition();
+
+                double jitter = jsonObject.has("jitter") ? jsonObject.get("jitter").getAsDouble() : 0;
+                ((LinearVersionSpace) linearVersionSpace).setJitter(jitter);
+            }
+
+            if (jsonObject.has("sphere") && jsonObject.get("sphere").getAsBoolean())
+                ((LinearVersionSpace) linearVersionSpace).useSphericalSampling();
         }
         else if (jsonObject.has("bayesianSampler")) {
             JsonObject sampler = jsonObject.get("bayesianSampler").getAsJsonObject();

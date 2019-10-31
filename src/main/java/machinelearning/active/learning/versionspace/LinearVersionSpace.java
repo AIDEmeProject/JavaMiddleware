@@ -1,15 +1,21 @@
 package machinelearning.active.learning.versionspace;
 
 import data.LabeledDataset;
-import machinelearning.active.learning.versionspace.convexbody.ConvexBody;
-import machinelearning.active.learning.versionspace.convexbody.PolyhedralCone;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
+import explore.user.UserLabel;
+import machinelearning.active.learning.versionspace.manifold.ConvexBody;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.euclidean.PolyhedralCone;
+import machinelearning.active.learning.versionspace.manifold.euclidean.UnitBallPolyhedralCone;
+import machinelearning.active.learning.versionspace.manifold.sphere.UnitSpherePolyhedralCone;
 import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.Validator;
+import utils.linalg.IncrementalCholesky;
+import utils.linalg.Matrix;
 import utils.linalg.Vector;
 import utils.linprog.LinearProgramSolver;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -24,10 +30,6 @@ import java.util.Objects;
  * @see PolyhedralCone
  */
 public class LinearVersionSpace implements VersionSpace {
-    /**
-     * Whether to add intercept to data points
-     */
-    private boolean addIntercept;
 
     /**
      * {@link HitAndRunSampler} instance for sampling from this version space
@@ -40,6 +42,25 @@ public class LinearVersionSpace implements VersionSpace {
     private final LinearProgramSolver.FACTORY solverFactory;
 
     /**
+     * Whether to add intercept to data points
+     */
+    private boolean addIntercept = false;
+
+    /**
+     * Whether to decompose data matrix
+     */
+    private boolean decompose = false;
+
+    private IncrementalCholesky decomposition;
+
+    private double jitter = 0;
+
+    /**
+     * Whether to sample from sphere
+     */
+    private boolean useSphericalSampling = false;
+
+    /**
      * By default, no intercept and no sample caching is performed.
      *
      * @param hitAndRunSampler: Hit-and-Run sampler instance
@@ -49,7 +70,15 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearVersionSpace(HitAndRunSampler hitAndRunSampler, LinearProgramSolver.FACTORY solverFactory) {
         this.hitAndRunSampler = Objects.requireNonNull(hitAndRunSampler);
         this.solverFactory = Objects.requireNonNull(solverFactory);
-        this.addIntercept = false;
+    }
+
+    public void setJitter(double jitter) {
+        Validator.assertNonNegative(jitter);
+        this.jitter = jitter;
+    }
+
+    public void useSphericalSampling() {
+        this.useSphericalSampling = true;
     }
 
     /**
@@ -57,6 +86,11 @@ public class LinearVersionSpace implements VersionSpace {
      */
     public void addIntercept() {
         this.addIntercept = true;
+    }
+
+    public void useDecomposition() {
+        decompose = true;
+        decomposition = new IncrementalCholesky();
     }
 
     /**
@@ -68,29 +102,60 @@ public class LinearVersionSpace implements VersionSpace {
     public LinearMajorityVote sample(LabeledDataset labeledPoints, int numSamples) {
         Validator.assertPositive(numSamples);
 
-        ConvexBody cone = new PolyhedralCone(addIntercept(labeledPoints), solverFactory);
+        PolyhedralCone cone = buildPolyhedralCone(labeledPoints);
+        ConvexBody body = useSphericalSampling ? new UnitSpherePolyhedralCone(cone) : new UnitBallPolyhedralCone(cone);
 
-        Vector[] samples = hitAndRunSampler.sample(cone, numSamples);
+        Vector[] samples = hitAndRunSampler.sample(body, numSamples);
 
-        return new LinearMajorityVote(getLinearClassifiers(samples));
+        return buildMajorityVoteClassifier(samples);
     }
 
-    private LabeledDataset addIntercept(LabeledDataset labeledPoints) {
-        if (!addIntercept){
-            return labeledPoints;
+    private PolyhedralCone buildPolyhedralCone(LabeledDataset labeledPoints) {
+        Matrix X = labeledPoints.getData().copy();
+
+        if (decompose) {
+            X.iAddScalarToDiagonal(jitter);
+
+            int lower = decomposition.getCurrentDim(), upper = X.rows();
+
+            // reset Cholesky factorization if necessary
+            if (lower >= upper) {
+                lower = 0;
+                decomposition = new IncrementalCholesky();
+            }
+
+            for (int i = lower; i < upper; i++) {
+                decomposition.increment(X.getRow(i).resize(decomposition.getCurrentDim() + 1));
+            }
+
+            X = decomposition.getL();
         }
 
-        return labeledPoints.copyWithSameIndexesAndLabels(labeledPoints.getData().addBiasColumn());
+        X = addIntercept ? X.addBiasColumn() : X;
+
+        Vector y = Vector.FACTORY.make(
+                Arrays.stream(labeledPoints.getLabels())
+                        .mapToDouble(UserLabel::asSign)
+                        .toArray()
+        );
+
+        return new PolyhedralCone(X.iMultiplyColumn(y), solverFactory);
     }
 
-    private LinearClassifier[] getLinearClassifiers(Vector[] samples) {
-        LinearClassifier[] classifiers = new LinearClassifier[samples.length];
+    private LinearMajorityVote buildMajorityVoteClassifier(Vector[] samples) {
+        Vector bias = Vector.FACTORY.zeros(samples.length);
+        Matrix weights = Matrix.FACTORY.make(samples);
 
-        for (int i = 0; i < samples.length; i++) {
-            classifiers[i] = new LinearClassifier(samples[i], addIntercept);
+        if (addIntercept) {
+            bias = weights.getCol(0);
+            weights = weights.getColSlice(1, weights.cols());
         }
 
-        return classifiers;
+        if (decompose) {
+            weights = weights.matrixMultiply(decomposition.getInverse());
+        }
+
+        return new LinearMajorityVote(bias, weights);
     }
 }
 

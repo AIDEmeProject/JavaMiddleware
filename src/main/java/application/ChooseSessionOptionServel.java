@@ -1,11 +1,10 @@
 package application;
 
+import explore.ExperimentConfiguration;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-import config.TsmConfiguration;
 import data.DataPoint;
 import data.IndexedDataset;
-import config.ExperimentConfiguration;
 import io.json.JsonConverter;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.GaussianKernel;
@@ -19,9 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -97,8 +94,8 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
 
-        TsmConfiguration tsmConf = configuration.getTsmConfiguration();
-        System.out.println(tsmConf.hasTsm());
+        ExperimentConfiguration.TsmConfiguration tsmConf = configuration.getTsmConfiguration();
+        System.out.println(configuration.hasMultiTSM());
         System.out.println(tsmConf.getSearchUnknownRegionProbability());
         System.out.print(configuration.getUseFakePoint());
 

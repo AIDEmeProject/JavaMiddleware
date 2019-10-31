@@ -1,8 +1,8 @@
 package machinelearning.bayesian;
 
 import data.LabeledDataset;
+import explore.user.UserLabel;
 import machinelearning.active.learning.versionspace.VersionSpace;
-import machinelearning.classifier.Label;
 import machinelearning.classifier.LinearMajorityVote;
 import machinelearning.classifier.margin.LinearClassifier;
 import utils.RandomState;
@@ -60,15 +60,19 @@ public class BayesianLinearVersionSpace implements VersionSpace {
         }
 
         int[] ys = Arrays.stream(labeledPoints.getLabels())
-                .mapToInt(Label::asBinary)
+                .mapToInt(UserLabel::asBinary)
                 .toArray();
 
         double[][] samples = sampler.run(numSamples, data.toArray(), ys, RandomState.newInstance().nextInt());
 
-        return new LinearMajorityVote(Arrays.stream(samples)
-                .map(Vector.FACTORY::make)
-                .map(x -> new LinearClassifier(x, addIntercept))
-                .toArray(LinearClassifier[]::new)
-        );
+        Vector bias = Vector.FACTORY.zeros(samples.length);
+        Matrix weights = Matrix.FACTORY.make(samples);
+
+        if (addIntercept) {
+            bias = weights.getCol(0);
+            weights = weights.getColSlice(1, weights.cols());
+        }
+
+        return new LinearMajorityVote(bias, weights);
     }
 }

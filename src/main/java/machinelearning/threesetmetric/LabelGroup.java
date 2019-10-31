@@ -25,7 +25,7 @@ public class LabelGroup implements UserLabel {
      * @param partialLabels: array of partial labels
      * @throws IllegalArgumentException if input is empty
      */
-    public LabelGroup(Label[] partialLabels) {
+    public LabelGroup(Label... partialLabels) {
         Validator.assertNotEmpty(partialLabels);
 
         this.partialLabels = partialLabels;

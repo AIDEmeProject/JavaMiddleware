@@ -56,7 +56,7 @@ public class Statistics {
     }
 
     public double getVariance() {
-        return sampleSize == 1 ? 0.0 : variance / (sampleSize - 1);
+        return sampleSize == 1 ? 0.0 : variance / sampleSize;
     }
 
     public double getStandardDeviation() {
@@ -95,6 +95,6 @@ public class Statistics {
      */
     @Override
     public String toString(){
-        return "{\"metric\": \"" + name + "\", \"mean\": " + mean + ", \"var\": " + variance + ", \"n\": " + sampleSize + '}';
+        return "{\"metric\": \"" + name + "\", \"mean\": " + mean + ", \"std\": " + getStandardDeviation() + ", \"n\": " + sampleSize + '}';
     }
 }

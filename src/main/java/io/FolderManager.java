@@ -1,7 +1,7 @@
 package io;
 
 import data.LabeledPoint;
-import config.ExperimentConfiguration;
+import explore.ExperimentConfiguration;
 import explore.metrics.MetricCalculator;
 import io.json.JsonConverter;
 
@@ -50,9 +50,13 @@ public class FolderManager {
             return 1;
         }
 
-        Arrays.sort(files);
-        String name = files[files.length - 1].getName();
-        int index = Integer.parseInt(name.substring(0, name.length() - 4));
+        int index = Arrays.stream(files)
+                .map(File::getName)
+                .map(name -> name.substring(0, name.length() - 4))
+                .map(Integer::parseInt)
+                .max(Integer::compareTo)
+                .get();
+
         return index + 1;
     }
 

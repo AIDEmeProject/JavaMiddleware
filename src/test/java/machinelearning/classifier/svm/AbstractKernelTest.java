@@ -19,7 +19,7 @@ abstract class AbstractKernelTest {
         Vector x, y;
         x = Vector.FACTORY.make(arr1);
         y = Vector.FACTORY.make(arr2);
-        assertEquals(expected, kernel.compute(x, y));
+        assertEquals(expected, kernel.compute(x, y), 1e-10);
     }
 
     void assertKernelVectorIsCorrect(double[] expected, double[][] arr1, double[] arr2) {
