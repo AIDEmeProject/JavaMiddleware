@@ -59,9 +59,7 @@ class GroupEditor extends Component{
                             </div>
                         )
                     })
-                }
-
-                <button className="btn btn-primary">Validate</button>
+                }                
             </div>
         )
     }
@@ -156,7 +154,8 @@ class GroupVariables extends Component {
             groups: [
                 [],
                 []
-            ],                        
+            ],   
+            editedGroupId: null,                     
             variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
         }
     }
@@ -246,11 +245,12 @@ class GroupVariables extends Component {
                 </div>
 
                 {
-                    typeof this.state.editedGroupId !== "undefined" && 
+                    this.state.editedGroupId !== null && 
 
 
                     <MicroModalComponent
                         title={"Edition of group " + this.state.editedGroupId}
+                        onClose={this.closeFactorizationGroupEdition.bind(this)}
                     >
                         
                         <GroupEditor 
@@ -267,6 +267,11 @@ class GroupVariables extends Component {
 
             </div>
         )
+    }
+
+    closeFactorizationGroupEdition(e){
+        e.preventDefault()
+        this.setState({editedGroupId: null})
     }
 
     onGroupEdit(e){

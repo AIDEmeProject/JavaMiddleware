@@ -18,7 +18,8 @@ class VectorStatistics extends Component{
               max = d3.max(data),
               std = d3.deviation(data),
               mean = d3.mean(data),
-              median = d3.median(data)
+              median = d3.median(data),
+              uniqueValues = d3.set(data).values().length
 
         return (
             <div>
@@ -41,16 +42,19 @@ class VectorStatistics extends Component{
                             </th>
                             <th>
                                 Standard deviation
-                            </th>                            
+                            </th>  
+                            <th>
+                                Unique values
+                            </th>                          
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>
-                                {max}
+                                {min}
                             </td>
                             <td>
-                                {min}
+                                {max}
                             </td>
                             <td>
                                 {mean}
@@ -60,7 +64,10 @@ class VectorStatistics extends Component{
                             </td>
                             <td>
                                 {std}
-                            </td>                            
+                            </td>  
+                            <td>
+                                {uniqueValues}
+                            </td>                          
                         </tr>
                     </tbody>
                 </table>    

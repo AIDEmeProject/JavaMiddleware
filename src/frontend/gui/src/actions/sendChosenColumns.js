@@ -11,7 +11,8 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
     var tsmJson = {
         hasTSM: true,                
         searchUnknownRegionProbability: 0.5,                
-        columns: chosenVariables.map( e => e.name)
+        columns: chosenVariables.map( e => e.name),
+        decompose: true
     }
      
     if (chosenVariables == 2){
@@ -56,7 +57,7 @@ function sendColumns(tokens, state, onSuccess){
     var endPoint = backend + "/choose-options"    
     var configuration = defaultConfiguration
     configuration['useFakePoint'] = state.useFakePoint || false
-                      
+    
     var hasTSM = state.chosenColumns.length == 2 || !! state.variableGroups[0].length > 0
                   
     $('#conf').val(JSON.stringify(configuration))

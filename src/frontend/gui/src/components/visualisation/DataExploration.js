@@ -15,7 +15,7 @@ class DataExploration extends Component{
 
         super(props)
         this.state = {
-            firstVariable: props.firstVariable,
+            firstVariable: props.firstVariable || 0,
             secondVariable: props.secondVariable,
             nBins: 10,
             min:0,
@@ -83,9 +83,13 @@ class DataExploration extends Component{
 
                     <div>
                     
-                        <svg id="histogram" ></svg>            
+                        <svg id="histogram">
+                        </svg>            
 
-                        <svg id="one-dimension-heatmap"></svg>
+                       
+                    </div>
+                    <div>
+                    <svg id="one-dimension-heatmap"></svg>
                     </div>
                     
                 </div>
@@ -167,24 +171,20 @@ class DataExploration extends Component{
     componentDidMount(){
         
         const data = this.getVariable(this.state.firstVariable)
+        const dataset = this.props.dataset
+        console.log(this.state.firstVariable, data)
 
         this.histogramPlotter = new HistogramPlotter()
-        this.histogramPlotter.prepare_plot('#histogram')
+        this.histogramPlotter.prepare_plot('#histogram', data)
         this.histogramPlotter.plot_histogram(data, this.state.nBins)
         
         this.oneDimensionHeatmapPlotter = new OneDimensionHeatmapPlotter()
         this.oneDimensionHeatmapPlotter.prepare_plot('#one-dimension-heatmap')
         this.oneDimensionHeatmapPlotter.plot(data, this.state.nBins)
 
-        this.twoDimensionHeatmapPlotter = new TwoDimensionHeatmapPlotter()
-        this.twoDimensionHeatmapPlotter.prepare_plot('#two-dimension-heatmap')    
-
-        var url = "https://gist.githubusercontent.com/mbostock/d63e6019c63887e39e44646696abfb69/raw/5b2b15b4c652167f6c038e717bbe3385dbb9bb99/diamonds.csv"        
-
-        const dataset = this.props.dataset
-
         const df = dataset.get_columns([0, 1], ['x', 'y'])
-   
+        this.twoDimensionHeatmapPlotter = new TwoDimensionHeatmapPlotter()
+        this.twoDimensionHeatmapPlotter.prepare_plot('#two-dimension-heatmap', df)        
         this.twoDimensionHeatmapPlotter.plot(df)
 
 
@@ -193,7 +193,7 @@ class DataExploration extends Component{
     componentDidUpdate(){
 
         const data = this.getVariable(this.state.firstVariable)
-
+        console.log(data)
         const dataset = this.props.dataset
 
         this.oneDimensionHeatmapPlotter.plot(data, this.state.nBins)

@@ -32,9 +32,7 @@ class PointLabelisation extends Component{
                                 })
                             }
 
-                            <th>
-                                Label 
-                            </th>                                                    
+                                                                             
                         </tr>
                     </thead>
 
@@ -63,28 +61,52 @@ class PointLabelisation extends Component{
                                     })
                                 }
 
-                                <td>
-                                    <button
-                                        className="btn btn-raised btn-primary" 
-                                        data-key={key} 
-                                        onClick={this.props.onPositiveLabel}>
-                                        Yes
-                                    </button>
-
-                                    <button 
-                                        className="btn btn-raised btn-primary"  
-                                        data-key={key} 
-                                        onClick={this.props.onNegativeLabel}
-                                    >
-                                        No
-                                    </button>
-                                </td>
+                               
                             </tr>
                         )
                     })                    
                 }
                 </tbody>
 
+                </table>
+
+                <table className="table-control">
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {
+                        this.props.pointsToLabel.map((point, key) => {
+                            
+                            return (
+
+                                <tr key={key}>
+
+                                    
+                                    <td class="button-td">
+                                        <button
+                                            className="btn btn-raised btn-primary" 
+                                            data-key={key} 
+                                            onClick={this.props.onPositiveLabel}>
+                                            Yes
+                                        </button>
+
+                                        <button 
+                                            className="btn btn-raised btn-primary"  
+                                            data-key={key} 
+                                            onClick={this.props.onNegativeLabel}
+                                        >
+                                            No
+                                        </button>
+                                    </td>
+                                </tr>
+                            )
+                        })
+                    }
+                    </tbody>
                 </table>
             </div>
         )   

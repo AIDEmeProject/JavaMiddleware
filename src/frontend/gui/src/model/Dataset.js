@@ -7,7 +7,7 @@ class Dataset{
 
     get_column_name(name){
 
-        return this.dataset.map( e => e[name])
+        return this.dataset.map( e => parseFloat(e[name]))
     }
 
     get_column_id(id){

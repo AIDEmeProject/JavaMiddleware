@@ -8,10 +8,11 @@ import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration'
 import TSMExploration from './components/TSM/TSMExploration'
 import BreadCrumb from './components/BreadCrumb'
-import DataExploration from './components/visualisation/DataExploration'
-import MicroModalComponent from './components/MicroModalComponent'
+
 import MicroModal from 'micromodal'
-import ModelBehaviorPlotter from './components/visualisation/ModelBehaviorPlotter'
+import ModelBehavior from './components/visualisation/ModelBehavior'
+
+import getDecisionBoundaryData from './actions/getDecisionBoundaryData'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
@@ -20,11 +21,44 @@ import logo from './AIDEME.png'
 import * as d3 from "d3"
 import Dataset from './model/Dataset';
 
+import animate_html_element from './lib/animate_text'
+
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
 const TSM_EXPLORATION = "TSMExploration"
 const AUTHENTICATION = "Authentication"
+
+
+class AnimatedText extends Component{
+
+    constructor(props){
+        super(props)
+    }
+    render(){
+        return (
+            <div>
+                
+                <img 
+                    src={logo}
+                    height={30}
+                    className="speaking-bot"
+                ></img>
+                <span 
+                    id={this.props.id} 
+                    className="animated-text"
+                    
+                >{this.props.text}</span>
+            </div>
+        )
+    }
+
+    componentDidMount(){
+        const elem = document.getElementById(this.props.id)
+        animate_html_element(elem, 10)
+    }
+}
+
 
 
 class App extends Component {
@@ -43,7 +77,9 @@ class App extends Component {
             hasFalse: false,
             availableVariables: [],
             finalVariables: [],
-            bread: this.getBreadCrum(NEW_SESSION)
+            bread: this.getBreadCrum(NEW_SESSION),
+            allLabeledPoints: [],
+            history: []
         }
     }
 
@@ -156,9 +192,13 @@ class App extends Component {
 
                     <div className="col col-lg-12">
 
-                        <ModelBehaviorPlotter />
+                        <AnimatedText 
+                            text="Hello I am aideme you data exploration assistant. Here you can visualize 
+                            the model behavior at each iteration. Click on next and previous to see the evolution"
+                            id="test-bla"
+                        />
                         
-        
+
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                             fileUploaded={this.fileUploaded.bind(this)} 
@@ -310,8 +350,9 @@ class App extends Component {
 
         this.setState({
             pointsToLabel: pointsToLabel
-        })
+        })       
     }
+
 
     onPositiveLabel(e){
         
@@ -335,17 +376,23 @@ class App extends Component {
     dataWasLabeled(dataIndex, label){
 
         var tokens = this.getTokens()
-        var point = this.state.pointsToLabel[dataIndex]
+        var labeledPoint = this.state.pointsToLabel[dataIndex]
+        labeledPoint.label = label
 
-        point.label = label
-                
-        var labeledPoints = this.state.labeledPoints.map(e=>e)
-        labeledPoints.push(point)
+        var allLabeledPoints = this.state.allLabeledPoints
+        allLabeledPoints.push(labeledPoint)
+
+        var labeledPoints = this.state.labeledPoints.map(e => e)
+        labeledPoints.push(labeledPoint)
 
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        console.log(dataIndex, pointsToLabel)
         pointsToLabel.splice(dataIndex, 1)
+        console.log(pointsToLabel)
                                         
+        
         this.setState({
+            allLabeledPoints: allLabeledPoints,
             pointsToLabel: pointsToLabel,
             labeledPoints: labeledPoints
         })
@@ -367,10 +414,14 @@ class App extends Component {
                 })
             }                        
         }
-        else{        
-            sendPointLabel({
-                data: labeledPoints,
-            }, tokens, this.onNewPointsToLabel.bind(this))
+        else{     
+            this.setState({
+                labeledPoints: []
+            }, () =>{  
+                sendPointLabel({
+                    data: labeledPoints,
+                }, tokens, this.onNewPointsToLabel.bind(this))
+            })
         }
     }
 
@@ -385,7 +436,8 @@ class App extends Component {
 
                 this.setState({
                     hasYesAndNo: true,
-                    initialLabelingSession: false
+                    initialLabelingSession: false,
+                    labeledPoints: []
                 }, ()=> {
                     sendPointLabel({
                         data: labeledPoints,
@@ -393,11 +445,34 @@ class App extends Component {
                 })
             }
             else{
+                
                 sendPointLabel({
                     data: labeledPoints,
                 }, tokens, this.onNewPointsToLabel.bind(this))
             }
         }
+    }
+
+    getModelBoundaries(){
+
+        if ( ! this.state.initialLabelingSession){
+            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+        }
+        
+    }
+
+    dataWasReceived(boundaryData){
+        
+        let history = this.state.history
+        history.push(JSON.parse(boundaryData))        
+        this.setState({
+            history: history
+        })        
+    }
+
+
+    componentDidUpdate(){
+        console.log(this.state)
     }
 
     componentDidMount(){
@@ -406,7 +481,7 @@ class App extends Component {
 }
 
 function sendPointLabel(data, tokens, onSuccess){
-    
+    console.log(data)
     var labeledPoints = data.data.map(e => {
         return {
             id: e.id,

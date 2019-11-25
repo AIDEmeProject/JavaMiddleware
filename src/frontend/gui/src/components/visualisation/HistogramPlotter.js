@@ -2,16 +2,15 @@ import * as d3 from "d3"
 
 class HistogramPlotter{
     
-    prepare_plot(svgid){
+    prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
         var margin = {top: 10, right: 30, bottom: 30, left: 40}
-        var width = 600 - margin.left - margin.right
+        var width = 800 - margin.left - margin.right
         var height = 400 - margin.top - margin.bottom
 
         // append the svg object to the body of the page
-        var svg = d3.select(svgid)
-                .append("svg")
+        var svg = d3.select(svgid)                
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
@@ -20,16 +19,18 @@ class HistogramPlotter{
 
         // X axis: scale and draw:
         var x = d3.scaleLinear()
-                  .domain([0, 1000000])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+                  .domain([0, d3.max(data)])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
                   .range([0, width]);
 
 
         // Y axis: initialization
         var y = d3.scaleLinear()
                   .range([height, 0]);
-        var yAxis = svg.append("g")
 
-        svg.append("g")
+        var yAxis = svg.append("g")
+        
+
+        this.xAxis = svg.append("g")
            .attr("transform", "translate(0," + height + ")")
            .call(d3.axisBottom(x));
 
@@ -39,6 +40,7 @@ class HistogramPlotter{
 
         this.yAxis = yAxis
         
+
         this.height = height
         this.width = width        
     }
@@ -51,7 +53,7 @@ class HistogramPlotter{
             y = this.y,
             yAxis = this.yAxis
         var height = this.height
-        
+        x.domain([d3.min(data) - 1, d3.max(data) + 1])
         
         // set the parameters for the histogram
         var histogram = d3.histogram()
@@ -63,6 +65,10 @@ class HistogramPlotter{
         var bins = histogram(data);
         
         
+        this.xAxis.transition()
+            .duration(1000)
+            .call(d3.axisBottom(x))
+             
         y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
         yAxis
             .transition()

@@ -4,7 +4,7 @@ import * as hexbin from 'd3-hexbin'
 
 class TwoDimensionHeatmapPlotter{
     
-    prepare_plot(svgid){
+    prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
         var margin = {top: 30, right: 30, bottom: 30, left: 30}
@@ -13,7 +13,8 @@ class TwoDimensionHeatmapPlotter{
 
         // append the svg object to the body of the page
         var svg = d3.select(svgid)
-            .attr("viewBox", [0, 0, width, height]);
+            .attr("width", width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
 
         /*
         // X axis: scale and draw:
@@ -36,10 +37,30 @@ class TwoDimensionHeatmapPlotter{
            .call(d3.axisLeft(y));
 
         */
+
+        var x = d3.scaleLinear()
+             .domain(d3.extent(data, d => d.x))
+             .range([0, width])
+
+        var y = d3.scaleLinear()
+              .domain(d3.extent(data, d => d.y))
+              .range([height, 0])
+
+       this.xAxis = svg.append("g")
+                       .attr("transform", "translate(0," + height + ")")
+                       .call(d3.axisBottom(x))
+
+        this.yAxis = svg.append("g")
+                        .call(d3.axisLeft(y))
+
+        this.gBins = svg.append("g")
+                        .attr("stroke", "#000")
+                        .attr("stroke-opacity", 0.1)
+
         this.svg = svg
         this.margin = margin
-        //this.x = x
-        //this.y = y
+        this.x = x
+        this.y = y
         this.height = height
         this.width = width        
     }
@@ -53,14 +74,20 @@ class TwoDimensionHeatmapPlotter{
             x = this.x,
             y = this.y,
             radius = 20
-                                   
-        x = d3.scaleLinear()
-              .domain(d3.extent(data, d => d.x))
-              .range([margin.left, width - margin.right])
+                             
+            
+        x.domain(d3.extent(data, d => d.x))
+        y.domain(d3.extent(data, d => d.y))
 
-        y = d3.scaleLinear()
-              .domain(d3.extent(data, d => d.y))
-              .rangeRound([height - margin.bottom, margin.top])
+        this.xAxis
+            .transition()
+            .duration(1000)
+            .call(d3.axisBottom(x))
+
+        this.yAxis
+            .transition()
+            .duration(1000)
+            .call(d3.axisLeft(y))
               
         var yAxis = g => g
                 .attr("transform", `translate(${margin.left},0)`)
@@ -86,13 +113,7 @@ class TwoDimensionHeatmapPlotter{
                     .attr("fill", "currentColor")
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "end")
-                    .text(data.x))
-
-        svg.append("g")
-            .call(xAxis);
-    
-        svg.append("g")
-            .call(yAxis);
+                    .text(data.x))      
               
         var binner = hexbin.hexbin()
                 .x(d => x(d.x))
@@ -105,13 +126,18 @@ class TwoDimensionHeatmapPlotter{
         var color = d3.scaleSequential(d3.interpolateBuPu)
                       .domain([0, d3.max(bins, d => d.length) / 2])
                 
-        svg.append("g")
-           .attr("stroke", "#000")
-           .attr("stroke-opacity", 0.1)
-           .selectAll("path")           
+        var update = this.gBins
+           .selectAll("path")                   
            .data(bins)           
+
+        update.exit().remove()
+
+        update
            .enter()           
-           .append('path')           
+           .append('path')             
+           .merge(update)
+           .transition()
+           .delay(1000)
            .attr("d", binner.hexagon())
            .attr("transform", d => `translate(${d.x},${d.y})`)
            .attr("fill", d => color(d.length));  

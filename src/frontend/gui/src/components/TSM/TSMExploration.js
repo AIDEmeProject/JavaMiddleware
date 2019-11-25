@@ -4,11 +4,11 @@ import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 import DataPoints from './DataPoints'
 import GroupedPointTableHead from './GroupedPointTableHead'
-import ModelBehaviorPlotter from '../visualisation/ModelBehaviorPlotter'
+import ModelBehavior from '../visualisation/ModelBehavior'
+import getDecisionBoundaryData from '../../actions/getDecisionBoundaryData'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../constants/constants'
-
 
 class TSMExploration extends Component{
 
@@ -27,9 +27,11 @@ class TSMExploration extends Component{
             showModelPerformance: false,
             showLabelView: true,
             showLabelHistory: false,
+            showModelBehavior: false,
             visualizationData: {
                 TSMBound: null
-            }
+            },          
+            history: []  
         }        
     }
 
@@ -57,10 +59,11 @@ class TSMExploration extends Component{
                             onClick={() => this.setState({
                                 'showModelPerformance': false, 
                                 'showLabelView': true,
-                                'showLabelHistory': false
+                                'showLabelHistory': false,
+                                'showModelBehavior': false
                                 })}
                             >
-                                Label view
+                                Labeleling
                             </a>
                         </li>
 
@@ -71,12 +74,29 @@ class TSMExploration extends Component{
                                 onClick={() => this.setState({
                                     'showModelPerformance': false, 
                                     'showLabelView': false,  
-                                    'showLabelHistory': true
+                                    'showLabelHistory': true,
+                                    'showModelBehavior': false
                                 })}
                             >
-                                View labeled points
+                                History
                             </a>
                         </li>   
+
+                        <li className="nav-item">
+                                <a 
+                                    className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
+                                    href="#advanced-options"
+                                    onClick={() => this.setState({
+                                        'showModelVisualisation': false, 
+                                        'showLabelView': false,  
+                                        'showHeatmap': false,
+                                        'showLabelHistory': false,
+                                        'showModelBehavior': true
+                                    })}
+                                >
+                                    Model Behavior
+                                </a>
+                            </li>   
 
 
                         <li className="nav-item">
@@ -86,12 +106,21 @@ class TSMExploration extends Component{
                                 onClick={() => this.setState({
                                     'showModelPerformance': true, 
                                     'showLabelView': false,  
-                                    'showLabelHistory': false
+                                    'showLabelHistory': false,
+                                    'showModelBehavior': false
                                 })}
                             >
                                 Assess model Performance
                             </a>
-                        </li>                       
+                        </li>      
+                        <li className="nav-item">
+                                <a
+                                    className="nav-link"
+                                    onClick={this.onLabelWholeDatasetClick.bind(this)}
+                                >                        
+                                    Auto-labeling           
+                                </a>
+                            </li>                 
                     </ul>
                 }
                 { 
@@ -220,15 +249,7 @@ class TSMExploration extends Component{
                         }
                             </tbody>
                         </table>
-                        { 
-                            ! this.state.initialLabelingSession && 
-
-                            <ModelBehaviorPlotter                    
-                                labeledPoints={this.state.allLabeledPoints}
-                                datasetInfos={this.props.datasetInfos}
-                                availableVariables={this.props.chosenColumns}
-                            />
-                        }                                            
+                                                               
                     </div>
 
                 }                           
@@ -238,6 +259,18 @@ class TSMExploration extends Component{
                         TSMBound={this.state.visualizationData.TSMBound}
                     />
                 }
+
+                {
+                    this.state.showModelBehavior && 
+                    
+                    <ModelBehavior                   
+                        labeledPoints={this.state.allLabeledPoints}
+                        datasetInfos={this.props.datasetInfos}
+                        availableVariables={this.props.chosenColumns}
+                        history={this.state.history}
+                    />
+                }
+
                 {
                     this.state.showLabelHistory && 
 
@@ -296,14 +329,13 @@ class TSMExploration extends Component{
             hasYes: true
         },
         () => {
-            
-            if (pointsToLabel.length == 0){
-                getVisualizationData(this.dataWasReceived.bind(this))
+            this.getModelBoundaries()
+            if (pointsToLabel.length == 0){            
                 sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
             }
         })              
     }
-
+    
     groupWasLabeledAsNo(e){
 
         var iPoint = e.target.dataset.point
@@ -345,13 +377,32 @@ class TSMExploration extends Component{
             labeledPoints: labeledPoints,
             allLabeledPoints: allLabeledPoints
         }, ()=> {
-            
+            this.getModelBoundaries()
             if (pointsToLabel.length == 0){
-                getVisualizationData(this.dataWasReceived.bind(this))
+                
                 sendLabels(labeledPoints, this.newPointsToLabel.bind(this))             
             }
         })       
     }
+
+    getModelBoundaries(){
+
+        if ( ! this.state.initialLabelingSession){
+            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+        }
+        
+    }
+
+    dataWasReceived(boundaryData){
+        
+        let history = this.state.history
+        history.push(JSON.parse(boundaryData))
+        console.log(history)
+        this.setState({
+            history: history
+        })        
+    }
+
 
     onSubGroupNo(e){
 
@@ -371,15 +422,10 @@ class TSMExploration extends Component{
         })
     }
     
-    dataWasReceived(data){
-        
-        this.setState({
-            
-            visualizationData: data
-        })
-    }
+   
+    onLabelWholeDatasetClick(e){
 
-    onLabelWholeDatasetClick(){
+        e.preventDefault()
 
         getWholedatasetLabeled()
 
@@ -404,12 +450,6 @@ function getWholedatasetLabeled(){
     })
 }
 
-function getVisualizationData(dataWasReceived){
-
-    var url = backend + "/get-visualization-data"
-
-    $.get(url, dataWasReceived)    
-}
 
 function dataWasLabeledNotification(tokens, data){
     var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"

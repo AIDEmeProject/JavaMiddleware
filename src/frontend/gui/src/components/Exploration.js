@@ -7,7 +7,7 @@ import ModelVisualization from './visualisation/ModelVisualization'
 
 import PointLabelisation from './PointLabelisation'
 import InitialSampling from './InitialSampling/InitialSampling'
-import ModelBehaviorPlotter from './visualisation/ModelBehaviorPlotter'
+import ModelBehavior from './visualisation/ModelBehavior'
 
 import DataPoints from './DataPoints'
 
@@ -19,8 +19,8 @@ class Exploration extends Component{
         this.state = {
             showModelVisualisation: false,
             showLabelView: true,
-            showLabelHistory: false
-            
+            showLabelHistory: false,
+            showModelBehavior: false
         }
     }
 
@@ -34,70 +34,84 @@ class Exploration extends Component{
 
             <div>
                <div className="row">
+                    <div className="col col-lg-8 offset-lg-2">                            
+                        <ul className="nav nav-tabs bg-primary">
+                        
+                            <li className="nav-item">
+                                <a 
+                                    className={this.state.showLabelView ? "nav-link active": "nav-link"} 
+                                    href="#basic-options"
+                                    onClick={() => this.setState({
+                                        'showModelVisualisation': false,
+                                        'showLabelView': true,
+                                        'showHeatmap': false,
+                                        'showLabelHistory': false,
+                                        'showModelBehavior': false
+                                        })}
+                                >
+                                    Labeling
+                                </a>
+                            </li>
+
+                            <li className="nav-item">
+                                <a 
+                                    className={this.state.showLabelHistory ? "nav-link active": "nav-link"} 
+                                    href="#advanced-options"
+                                    onClick={() => this.setState({
+                                        'showModelVisualisation': false, 
+                                        'showLabelView': false, 
+                                        'showHeatmap': false,
+                                        'showLabelHistory': true,
+                                        'showModelBehavior': false
+                                    })}
+                                >
+                                    History
+                                </a>
+                            </li>         
+
+                            <li className="nav-item">
+                                <a 
+                                    className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
+                                    href="#advanced-options"
+                                    onClick={() => this.setState({
+                                        'showModelVisualisation': false, 
+                                        'showLabelView': false,  
+                                        'showHeatmap': false,
+                                        'showLabelHistory': false,
+                                        'showModelBehavior': true
+                                    })}
+                                >
+                                    Model Behavior
+                                </a>
+                            </li>       
 
 
-                    <div className="col col-lg-8 offset-lg-2">
+                            <li className="nav-item">
+                                <a 
+                                    className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
+                                    href="#advanced-options"
+                                    onClick={() => this.setState({
+                                        'showModelVisualisation': true, 
+                                        'showLabelView': false,  
+                                        'showHeatmap': false,
+                                        'showLabelHistory': false,
+                                        'showModelBehavior': false
+                                    })}
+                                >
+                                    Model Performance
+                                </a>
+                            </li>       
 
-                            
-                <ul className="nav nav-tabs bg-primary">
-                   
-                    <li className="nav-item">
-
-                        <a 
-                           className={this.state.showLabelView ? "nav-link active": "nav-link"} 
-                           href="#basic-options"
-                           onClick={() => this.setState({
-                               'showModelVisualisation': false,
-                               'showLabelView': true,
-                               'showHeatmap': false,
-                               'showLabelHistory': false
-                            })}
-                        >
-                            Labeling
-                        </a>
-                    </li>
-
-                    <li className="nav-item">
-                        <a 
-                            className={this.state.showLabelHistory ? "nav-link active": "nav-link"} 
-                            href="#advanced-options"
-                            onClick={() => this.setState({
-                                'showModelVisualisation': false, 
-                                'showLabelView': false, 
-                                'showHeatmap': false,
-                                'showLabelHistory': true
-                            })}
-                        >
-                            History
-                        </a>
-                    </li>         
-
-                    <li className="nav-item">
-                        <a 
-                            className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
-                            href="#advanced-options"
-                            onClick={() => this.setState({
-                                'showModelVisualisation': true, 
-                                'showLabelView': false,  
-                                'showHeatmap': false,
-                                'showLabelHistory': false
-                            })}
-                        >
-                            Model Performance
-                        </a>
-                    </li>       
-
-                    <li className="nav-item">
-                        <a
-                            className="nav-link"
-                            onClick={this.onLabelWholeDatasetClick.bind(this)}
-                        >                        
-                            Auto-labeling           
-                        </a>
-                    </li>
-                </ul>
-
-                </div>
+                            <li className="nav-item">
+                                <a
+                                    className="nav-link"
+                                    onClick={this.onLabelWholeDatasetClick.bind(this)}
+                                >                        
+                                    Auto-labeling           
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                     
         
@@ -108,19 +122,25 @@ class Exploration extends Component{
                             <PointLabelisation 
                                 {...this.props} 
                                 {...this.state}
-                            />
-
-                            <ModelBehaviorPlotter
-                                labeledPoints={this.props.labeledPoints}
-                                datasetInfos={this.props.datasetInfos}
-                                availableVariables={this.props.chosenColumns}
-                            />
+                            />                          
                         </div>
+                }
+
+                { 
+                    this.state.showModelBehavior && 
+
+                    <ModelBehavior
+                        labeledPoints={this.props.labeledPoints}
+                        datasetInfos={this.props.datasetInfos}
+                        availableVariables={this.props.chosenColumns}
+                    />
+
                 }
 
                 {
                     this.state.showModelVisualisation && 
-                                    
+                    
+                    
                     <ModelVisualization 
                         {...this.props}
                         {...this.state}
@@ -147,7 +167,7 @@ class Exploration extends Component{
         
         getWholedatasetLabeled()
 
-        notifyLabel(this.props.tokens)
+        notifyWholeDatasetLabelisationAsked(this.props.tokens)
     }
 
     onVisualizeClick(){
@@ -189,7 +209,7 @@ function getVisualizationData(dataWasReceived){
     
 }
 
-function notifyLabel(tokens){
+function notifyWholeDatasetLabelisationAsked(tokens){
     
     var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
 
