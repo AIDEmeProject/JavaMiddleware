@@ -2,6 +2,8 @@ package application;
 
 import application.data.CsvDatasetReader;
 
+import application.data.CsvDatasetWriter;
+import data.LabeledPoint;
 import explore.Experiment;
 
 import io.FolderManager;
@@ -9,6 +11,12 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.ServletException;
@@ -16,10 +24,44 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
+
+
+
+
+
+class CommandLauncher{
+
+
+    public static void launchCommand(String command){
+        try {
+            Runtime rt = Runtime.getRuntime();
+            //Process pr = rt.exec("cmd /c dir");
+            Process pr = rt.exec(command);
+
+            BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+
+            String line=null;
+
+            while((line=input.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            int exitVal = pr.waitFor();
+            System.out.println("Exited with error code "+exitVal);
+
+        } catch(Exception e) {
+            System.out.println(e.toString());
+            e.printStackTrace();
+        }
+    }
+}
 
 
 public class NewSessionServlet extends HttpServlet {
@@ -31,9 +73,7 @@ public class NewSessionServlet extends HttpServlet {
         //read Dataset and build LabeledDataset labeledDataset, Ranker ranker, BufferedWriter labeledPointsWriter, BufferedWriter metricsWriter
 
 
-        resp.setContentType("application/json");
-
-        String sessionId = "2323232323232323";
+        String sessionId = "42";
         String sessionPath = "./session/" + sessionId;
 
         boolean success = (new File(sessionPath)).mkdirs();

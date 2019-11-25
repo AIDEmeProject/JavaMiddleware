@@ -14,6 +14,7 @@ import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.RandomState;
+import utils.linalg.Matrix;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,10 +25,12 @@ import java.util.List;
  * labeled by the real user.
  */
 public class ExplorationManager {
+
     /**
      * The dataset partition (labeled and unlabeled points)
      */
     private final PartitionedDataset partitionedDataset;
+
 
     private final IndexedDataset rawDataset;
 
@@ -36,12 +39,15 @@ public class ExplorationManager {
      */
     private final ExperimentConfiguration configuration;
 
+
     private final Learner learner;
 
     /**
      * The current Active Learning model
      */
     private Ranker ranker;
+
+    private StandardScaler scaler;
 
     private boolean isInitialSamplingStep;
 
@@ -59,8 +65,6 @@ public class ExplorationManager {
 
         IndexedDataset scaledDataset = rawDataset.copyWithSameIndexes(StandardScaler.fitAndTransform(rawDataset.getData()));
         this.partitionedDataset = getPartitionedDataset(scaledDataset);
-
-
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -70,7 +74,6 @@ public class ExplorationManager {
                 .map(x -> new PartitionedDataset(dataPoints, x))
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
     }
-
 
 
     /**
@@ -111,6 +114,7 @@ public class ExplorationManager {
 
         // pick scaled data
         List<LabeledPoint> scaledLabeledPoints = new ArrayList<>(labeledPoints.size());
+
         for (LabeledPoint point : labeledPoints) {
             long id = point.getId();
             scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
@@ -129,6 +133,9 @@ public class ExplorationManager {
             }
         }
         else{
+
+
+
             return Collections.singletonList(this.runExploreIteration(scaledLabeledPoints));
         }
     }
@@ -165,11 +172,18 @@ public class ExplorationManager {
         // appears, or the dataset runs empty
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
 
+
+        System.out.println("unkown points");
+        System.out.println(partitionedDataset.hasUnknownPoints());
+        System.out.println(partitionedDataset.getUnknownPoints().length());
+
         while (extendedLabel.isKnown() && partitionedDataset.hasUnknownPoints()) {
             labeledPoints = Collections.singletonList(new LabeledPoint(mostInformativePoint, extendedLabel.toLabel()));
             mostInformativePoint = updateModelAndRetrieveNextPointToLabel(labeledPoints);
             extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
         }
+
+
 
         // get unscaled labeled point
         return rawDataset.getFromIndex(mostInformativePoint.getId());
@@ -190,7 +204,10 @@ public class ExplorationManager {
 
 
     protected IndexedDataset scaleDataset(IndexedDataset dataset){
-        IndexedDataset scaledDataset = dataset.copyWithSameIndexes(StandardScaler.fitAndTransform(dataset.getData()));
+
+        StandardScaler scaler = StandardScaler.fit(dataset.getData());
+        this.scaler = scaler;
+        IndexedDataset scaledDataset = dataset.copyWithSameIndexes(scaler.transform(dataset.getData()));
         return scaledDataset;
     }
 
@@ -211,12 +228,13 @@ public class ExplorationManager {
 
         ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
 
-        for (DataPoint point: datasetToLabel
-        ) {
+        for (int i=0;i < datasetToLabel.length(); i++)
+        {
+            DataPoint point = datasetToLabel.get(i);
+            DataPoint rawPoint = this.rawDataset.get(i);
 
             Label label = classifier.predict(point.getData());
-
-            LabeledPoint labeledPoint = new LabeledPoint(point, label);
+            LabeledPoint labeledPoint = new LabeledPoint(rawPoint, label);
 
             labeledDataset.add(labeledPoint);
         }
@@ -228,9 +246,10 @@ public class ExplorationManager {
     public ArrayList<LabeledPoint> labelWholeDataset(){
 
         //add user labeled points
+        //IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
+        IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
 
-        return this.labelPoints(this.partitionedDataset.getUnlabeledPoints(), false);
-
+        return this.labelPoints(pointsToLabel, false);
     }
 
     public ArrayList<LabeledPoint> labelWholeDataset(int n){
@@ -253,6 +272,7 @@ public class ExplorationManager {
         }
 
         //add user labeled points
+
 
         return labeledDataset;
     }

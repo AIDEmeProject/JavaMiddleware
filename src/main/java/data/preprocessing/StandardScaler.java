@@ -78,4 +78,8 @@ public class StandardScaler {
     public Matrix transform(Matrix dataPoints){
         return dataPoints.subtractRow(mean).divideRow(std);
     }
+
+    public Matrix reverseTransform(Matrix dataPoints){
+        return dataPoints.multiplyRow(std).addRow(mean);
+    }
 }

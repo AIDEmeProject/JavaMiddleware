@@ -45,7 +45,7 @@ public class ApplicationServerMain {
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
         handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
-        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/label-fake-points-for-grid");
+        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/get-decision-boundaries");
 
 
         ResourceHandler resource_handler = new ResourceHandler();
