@@ -99,7 +99,6 @@ class ModelBehavior extends Component{
         
         const scale = this.state.scale        
         const labeledPoints = this.getHumanLabeledPoints()
-
         
         return (
 
@@ -248,10 +247,16 @@ class ModelBehavior extends Component{
             '1': 'red'
         }
 
+        const gridPoints = this.getGridPoints()
+        const scale = this.computeMinAndMaxScale(
+            gridPoints.map(e => e[0]),
+            gridPoints.map(e => e[1])
+        )
+
         this.gridPlotter.plotData(
-            this.state.scale,
+            scale,
             this.getHumanLabeledPoints(),
-            this.getGridPoints(),
+            gridPoints,
             this.getChosenVariables(),
             colors
         )
@@ -283,6 +288,7 @@ class ModelBehavior extends Component{
     componentDidMount(){
                 
         if (this.props.availableVariables.length <= 4){
+            
             this.gridPlotter = new ModelBehaviorPlotter()
             this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
             this.plotGridPointPlot()
@@ -401,7 +407,6 @@ class ModelBehavior extends Component{
     }
 
     computeMinMaxOfRawData(iFirstVariable, iSecondVariable){
-
 
         const realIdOne = this.props.availableVariables[iFirstVariable].idx
         const realIdTwo = this.props.availableVariables[iSecondVariable].idx
