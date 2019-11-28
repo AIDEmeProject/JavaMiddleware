@@ -68,8 +68,7 @@ public class ExplorationManager {
         this.rawDataset = dataset;
         this.learner = learner;
 
-        IndexedDataset scaledDataset = rawDataset.copyWithSameIndexes(StandardScaler.fitAndTransform(rawDataset.getData()));
-        this.partitionedDataset = getPartitionedDataset(scaledDataset);
+        this.partitionedDataset = getPartitionedDataset(StandardScaler.fitAndTransform(rawDataset));
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -80,12 +79,10 @@ public class ExplorationManager {
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
     }
 
-
     /**
      * @return an initial selection of points to be labeled by the user
      */
     public List<DataPoint> runInitialSampling(int sampleSize) {
-
         if (this.configuration.getUseFakePoint()){
             FakePointInitialSamplingGenerator generator = new FakePointInitialSamplingGenerator();
             return generator.getFakePoint(this.rawDataset);
@@ -96,7 +93,7 @@ public class ExplorationManager {
     public ArrayList<DataPoint> getPointByRowId(int id){
         DataPoint point = this.rawDataset.get(id);
 
-        ArrayList<DataPoint> points = new ArrayList();
+        ArrayList<DataPoint> points = new ArrayList<>();
         points.add(point);
         return points;
     }
@@ -109,7 +106,7 @@ public class ExplorationManager {
     public List<DataPoint> getNextFakePoint(){
 
 
-        ArrayList<DataPoint> fakePoints = new ArrayList();
+        ArrayList<DataPoint> fakePoints = new ArrayList<>();
         fakePoints.add(this.rawDataset.getFakeData());
         return fakePoints;
     }
@@ -175,7 +172,7 @@ public class ExplorationManager {
         // appears, or the dataset runs empty
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
 
-        System.out.println("unkown points");
+        System.out.println("unknown points");
         System.out.println(partitionedDataset.hasUnknownPoints());
         System.out.println(partitionedDataset.getUnknownPoints().length());
 
@@ -204,11 +201,8 @@ public class ExplorationManager {
 
 
     protected IndexedDataset scaleDataset(IndexedDataset dataset){
-
-        StandardScaler scaler = StandardScaler.fit(dataset.getData());
-        this.scaler = scaler;
-        IndexedDataset scaledDataset = dataset.copyWithSameIndexes(scaler.transform(dataset.getData()));
-        return scaledDataset;
+        this.scaler = StandardScaler.fit(dataset.getData());
+        return scaler.transform(dataset);
     }
 
     public ArrayList<LabeledPoint> labelPoints(IndexedDataset pointsToLabel, boolean scaleDataset){
@@ -218,11 +212,9 @@ public class ExplorationManager {
         Classifier classifier = this.learner.fit(this.partitionedDataset.getLabeledPoints());
 
         if (scaleDataset){
-
             datasetToLabel = this.scaleDataset(pointsToLabel);
         }
         else{
-
             datasetToLabel = pointsToLabel;
         }
 
@@ -243,11 +235,8 @@ public class ExplorationManager {
     }
 
     public ArrayList<LabeledPoint> labelWholeDataset(){
-
         //add user labeled points
-        //IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
         IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
-
         return this.labelPoints(pointsToLabel, false);
     }
 
@@ -272,11 +261,10 @@ public class ExplorationManager {
     }
 
     public ArrayList<LabeledPoint> computeLabelOfFakeGridPoint(){
-
-        if (! this.configuration.hasMultiTSM()){
-
+        if (!this.configuration.hasMultiTSM()){
             return this.labelPoints(this.getOrGenerateGridOfFakePoints(), false);
         }
+
         System.out.println("TSM PREDICTION");
         return this.TSMPrediction(this.getOrGenerateGridOfFakePoints());
     }
