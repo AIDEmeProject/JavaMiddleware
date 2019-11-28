@@ -23,6 +23,8 @@ class StatisticsTest {
         assertEquals(value, statistics.getMean());
         assertEquals(value, statistics.getSum());
         assertEquals(0D, statistics.getVariance(), 1e-10);
+        assertEquals(value, statistics.getMinimum(), 1e-10);
+        assertEquals(value, statistics.getMaximum(), 1e-10);
         assertEquals(1, statistics.getSampleSize());
     }
 
@@ -33,6 +35,8 @@ class StatisticsTest {
         assertEquals(6, statistics.getSum(), 1e-10);
         assertEquals(4, statistics.getVariance(), 1e-10);
         assertEquals(2, statistics.getStandardDeviation(), 1e-10);
+        assertEquals(1, statistics.getMinimum(), 1e-10);
+        assertEquals(5, statistics.getMaximum(), 1e-10);
         assertEquals(2, statistics.getSampleSize());
     }
 
@@ -44,19 +48,23 @@ class StatisticsTest {
         assertEquals(3, statistics.getSum(), 1e-10);
         assertEquals(32.0 / 3, statistics.getVariance(), 1e-10);
         assertEquals(Math.sqrt(32.0 / 3), statistics.getStandardDeviation(), 1e-10);
+        assertEquals(-3, statistics.getMinimum(), 1e-10);
+        assertEquals(5, statistics.getMaximum(), 1e-10);
         assertEquals(3, statistics.getSampleSize());
     }
 
     @Test
-    void update_threeUpdates_allStatisticsAreCorrect() {
+    void update_severalUpdates_allStatisticsAreCorrect() {
         double[] values = new double[] {5, -3, 10, -22, 101};
         for (double val: values) {
             statistics.update(val);
         }
         assertEquals(15.333333333333, statistics.getMean(), 1e-10);
-        //assertEquals(3, statistics.getSum(), 1e-10);
+        assertEquals(92, statistics.getSum(), 1e-10);
         assertEquals(1568.2222222222, statistics.getVariance(), 1e-10);
         assertEquals(39.6007856263, statistics.getStandardDeviation(), 1e-10);
+        assertEquals(-22, statistics.getMinimum(), 1e-10);
+        assertEquals(101, statistics.getMaximum(), 1e-10);
         assertEquals(6, statistics.getSampleSize());
     }
 }

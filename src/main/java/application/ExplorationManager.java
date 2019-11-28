@@ -8,6 +8,7 @@ import explore.metrics.ThreeSetMetricCalculator;
 
 import data.preprocessing.StandardScaler;
 
+import explore.statistics.Statistics;
 import explore.user.GuiUserLabel;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
@@ -70,8 +71,10 @@ public class ExplorationManager {
         this.rawDataset = dataset;
         this.learner = learner;
 
+
         IndexedDataset scaledDataset = this.scaleDataset(rawDataset);
         this.partitionedDataset = getPartitionedDataset(scaledDataset);
+
     }
 
     private PartitionedDataset getPartitionedDataset(IndexedDataset dataPoints) {
@@ -82,12 +85,10 @@ public class ExplorationManager {
                 .orElseGet(() -> new PartitionedDataset(dataPoints));
     }
 
-
     /**
      * @return an initial selection of points to be labeled by the user
      */
     public List<DataPoint> runInitialSampling(int sampleSize) {
-
         if (this.configuration.getUseFakePoint()){
             FakePointInitialSamplingGenerator generator = new FakePointInitialSamplingGenerator();
             return generator.getFakePoint(this.rawDataset);
@@ -98,7 +99,7 @@ public class ExplorationManager {
     public ArrayList<DataPoint> getPointByRowId(int id){
         DataPoint point = this.rawDataset.get(id);
 
-        ArrayList<DataPoint> points = new ArrayList();
+        ArrayList<DataPoint> points = new ArrayList<>();
         points.add(point);
         return points;
     }
@@ -111,7 +112,7 @@ public class ExplorationManager {
     public List<DataPoint> getNextFakePoint(){
 
 
-        ArrayList<DataPoint> fakePoints = new ArrayList();
+        ArrayList<DataPoint> fakePoints = new ArrayList<>();
         fakePoints.add(this.rawDataset.getFakeData());
         return fakePoints;
     }
@@ -177,7 +178,7 @@ public class ExplorationManager {
         // appears, or the dataset runs empty
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
 
-        System.out.println("unkown points");
+        System.out.println("unknown points");
         System.out.println(partitionedDataset.hasUnknownPoints());
         System.out.println(partitionedDataset.getUnknownPoints().length());
 
@@ -206,11 +207,8 @@ public class ExplorationManager {
 
 
     protected IndexedDataset scaleDataset(IndexedDataset dataset){
-
-        StandardScaler scaler = StandardScaler.fit(dataset.getData());
-        this.scaler = scaler;
-        IndexedDataset scaledDataset = dataset.copyWithSameIndexes(scaler.transform(dataset.getData()));
-        return scaledDataset;
+        this.scaler = StandardScaler.fit(dataset.getData());
+        return scaler.transform(dataset);
     }
 
     public ArrayList<LabeledPoint> labelPoints(IndexedDataset pointsToLabel, boolean scaleDataset){
@@ -220,11 +218,9 @@ public class ExplorationManager {
         Classifier classifier = this.learner.fit(this.partitionedDataset.getLabeledPoints());
 
         if (scaleDataset){
-
             datasetToLabel = this.scaleDataset(pointsToLabel);
         }
         else{
-
             datasetToLabel = pointsToLabel;
         }
 
@@ -245,19 +241,29 @@ public class ExplorationManager {
     }
 
     public ArrayList<LabeledPoint> labelWholeDataset(){
-
         //add user labeled points
-        //IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
         IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
-
         return this.labelPoints(pointsToLabel, false);
     }
 
     protected void generateGridOfFakePoints(){
 
+
+        Statistics[] columnStatistics = this.partitionedDataset.getAllPoints().getData().columnStatistics();
         ArrayList<ColumnSpecification> specs = new ArrayList<>();
-        specs.add(new ColumnSpecification(true, (float) -0.1964459298, (float) 169.1100834044, 100));
-        specs.add(new ColumnSpecification(false, 1, 3, 0));
+        System.out.println("IS NUMERIC");
+        for (int i = 0; i < columnStatistics.length; i++) {
+            double min = columnStatistics[i].getMinimum();
+            double max = columnStatistics[i].getMaximum();
+
+            boolean isNumeric = columnStatistics[i].isNumeric();
+            System.out.println(isNumeric);
+            System.out.println(columnStatistics[i].getName());
+            specs.add(new ColumnSpecification(isNumeric, min, max, 100));
+            // do something with min and max of column i
+        }
+
+
 
         GridPointGenerator generator = new GridPointGenerator(specs);
 
@@ -292,7 +298,9 @@ public class ExplorationManager {
         if (! this.configuration.hasMultiTSM()){
 
             return this.labelPoints(this.getScaledGridOfFakePoints(), false);
+
         }
+
         System.out.println("TSM PREDICTION");
         return this.TSMPrediction(this.getScaledGridOfFakePoints());
     }

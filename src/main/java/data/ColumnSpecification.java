@@ -6,13 +6,13 @@ public class ColumnSpecification{
 
     protected boolean isNumeric;
 
-    protected float min;
+    protected double min;
 
-    protected float max;
+    protected double max;
 
     protected int nPointInRange;
 
-    public ColumnSpecification(boolean isNumeric, float min, float max, int nPointInRange){
+    public ColumnSpecification(boolean isNumeric, double min, double max, int nPointInRange){
         this.isNumeric = isNumeric;
         this.min = min;
         this.max = max;
