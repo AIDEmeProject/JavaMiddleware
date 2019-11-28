@@ -55,12 +55,14 @@ public class ExplorationManager {
     private boolean isInitialSamplingStep;
 
     private IndexedDataset gridOfFakePoints;
+    private IndexedDataset scaledGridOfFakePoints;
 
     /**
      * @param dataset: collection of unlabeled points
      * @param configuration: experiment configurations
      */
     public ExplorationManager(IndexedDataset dataset, ExperimentConfiguration configuration, Learner learner) {
+
         this.ranker = null;
         this.isInitialSamplingStep = true;
         this.configuration = configuration;
@@ -68,7 +70,7 @@ public class ExplorationManager {
         this.rawDataset = dataset;
         this.learner = learner;
 
-        IndexedDataset scaledDataset = rawDataset.copyWithSameIndexes(StandardScaler.fitAndTransform(rawDataset.getData()));
+        IndexedDataset scaledDataset = this.scaleDataset(rawDataset);
         this.partitionedDataset = getPartitionedDataset(scaledDataset);
     }
 
@@ -251,34 +253,48 @@ public class ExplorationManager {
         return this.labelPoints(pointsToLabel, false);
     }
 
-    protected IndexedDataset getOrGenerateGridOfFakePoints(){
-
-        if ( this.gridOfFakePoints != null){
-            return this.gridOfFakePoints;
-        }
+    protected void generateGridOfFakePoints(){
 
         ArrayList<ColumnSpecification> specs = new ArrayList<>();
         specs.add(new ColumnSpecification(true, (float) -0.1964459298, (float) 169.1100834044, 100));
         specs.add(new ColumnSpecification(false, 1, 3, 0));
 
-        //Matrix data = this.partitionedDataset.getAllPoints().getData();
-
         GridPointGenerator generator = new GridPointGenerator(specs);
 
         this.gridOfFakePoints = generator.generatePoints();
-        this.gridOfFakePoints.copyWithSameIndexes(this.scaler.transform(this.gridOfFakePoints.getData()));
+        System.out.println("scaler");
+        System.out.println(this.scaler);
+        Matrix scaledFakePoints = this.scaler.transform(this.gridOfFakePoints.getData());
+        this.scaledGridOfFakePoints = this.gridOfFakePoints.copyWithSameIndexes(scaledFakePoints);
+        System.out.println(this.scaledGridOfFakePoints.length());
+        System.out.println(this.gridOfFakePoints.length());
+        System.out.println("End hoho");
+    }
 
+    protected IndexedDataset getScaledGridOfFakePoints(){
+        if (this.scaledGridOfFakePoints == null){
+            this.generateGridOfFakePoints();
+        }
+
+        return this.scaledGridOfFakePoints;
+    }
+
+    public IndexedDataset getGridOfFakePoints(){
+        if (this.gridOfFakePoints == null){
+            this.generateGridOfFakePoints();
+        }
         return this.gridOfFakePoints;
     }
+
 
     public ArrayList<LabeledPoint> computeLabelOfFakeGridPoint(){
 
         if (! this.configuration.hasMultiTSM()){
 
-            return this.labelPoints(this.getOrGenerateGridOfFakePoints(), false);
+            return this.labelPoints(this.getScaledGridOfFakePoints(), false);
         }
         System.out.println("TSM PREDICTION");
-        return this.TSMPrediction(this.getOrGenerateGridOfFakePoints());
+        return this.TSMPrediction(this.getScaledGridOfFakePoints());
     }
 
     public ArrayList<LabeledPoint> computeModelPredictionForProjection(){

@@ -24,7 +24,8 @@ public class getFakePointGridServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        IndexedDataset fakePoints = manager.getOrGenerateGridOfFakePoints();
+        System.out.println("HOHO");
+        IndexedDataset fakePoints = manager.getGridOfFakePoints();
 
         Gson gson = new Gson();
 
