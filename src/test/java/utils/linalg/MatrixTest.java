@@ -1081,9 +1081,9 @@ public class MatrixTest {
     @Test
     void columnStatistics_rectangularMatrix_returnsExpectedValues() {
         Statistics[] expected = new Statistics[matrix1.cols()];
-        expected[0] = new Statistics("column_0", 2.5, 4.5, 2);
-        expected[1] = new Statistics("column_1", 3.5, 4.5, 2);
-        expected[2] = new Statistics("column_2", 4.5, 4.5, 2);
+        expected[0] = new Statistics("column_0", 2.5, 4.5, 1, 4, 2);
+        expected[1] = new Statistics("column_1", 3.5, 4.5, 2, 5, 2);
+        expected[2] = new Statistics("column_2", 4.5, 4.5, 3, 6, 2);
         assertArrayEquals(expected, matrix1.columnStatistics());
     }
 
