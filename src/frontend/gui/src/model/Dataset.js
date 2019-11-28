@@ -34,6 +34,17 @@ class Dataset{
             return d            
         })
     }
+
+    compute_statistics(){
+        var statistics = []
+        this.dataset.columns.forEach(e => {
+            var column = this.get_column_name
+        })
+    }
+
+    generate_grid_point(columnsIds){
+
+    }
 }
 
 

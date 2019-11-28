@@ -40,26 +40,26 @@ class DataExploration extends Component{
               
 
                 <div>
-                        <label htmlFor="min">Min</label>
-                        <input 
-                            className="form-input"
-                            id="min"
-                            type="number"
-                            value={this.state.nBins} 
-                            onChange={e => {this.setState({min: e.target.value}) } } 
-                        />
-                            
-                        <label htmlFor="max">
-                            Max
-                        </label>
+                    <label htmlFor="min">Min</label>
+                    <input 
+                        className="form-input"
+                        id="min"
+                        type="number"
+                        value={this.state.min} 
+                        onChange={e => {this.setState({min: e.target.value}) } } 
+                    />
+                        
+                    <label htmlFor="max">
+                        Max
+                    </label>
 
-                         <input 
-                            className="form-input"
-                            id="max"
-                            type="number"
-                            value={this.state.nBins} 
-                            onChange={e => {this.setState({max: e.target.value}) } } 
-                        />                                                    
+                        <input 
+                        className="form-input"
+                        id="max"
+                        type="number"
+                        value={this.state.max} 
+                        onChange={e => {this.setState({max: e.target.value}) } } 
+                    />                                                    
                 </div>
 
                <VectorStatistics 
@@ -193,7 +193,7 @@ class DataExploration extends Component{
     componentDidUpdate(){
 
         const data = this.getVariable(this.state.firstVariable)
-        console.log(data)
+        
         const dataset = this.props.dataset
 
         this.oneDimensionHeatmapPlotter.plot(data, this.state.nBins)

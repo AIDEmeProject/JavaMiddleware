@@ -6,6 +6,7 @@ import DataPoints from './DataPoints'
 import GroupedPointTableHead from './GroupedPointTableHead'
 import ModelBehavior from '../visualisation/ModelBehavior'
 import getDecisionBoundaryData from '../../actions/getDecisionBoundaryData'
+import getGridPoints from '../../actions/getGridPoints'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../constants/constants'
@@ -31,7 +32,11 @@ class TSMExploration extends Component{
             visualizationData: {
                 TSMBound: null
             },          
-            history: []  
+            history: [],  
+            gridHistory: {
+                grid: [],
+                labelHistory: []
+            }
         }        
     }
 
@@ -39,13 +44,7 @@ class TSMExploration extends Component{
         
         return (
             
-            <div>
-                
-
-                <h4>
-                    Labeleling phase
-                </h4>
-
+            <div>                                
                 {
                     ! this.state.initialLabelingSession &&
                 
@@ -268,6 +267,7 @@ class TSMExploration extends Component{
                         datasetInfos={this.props.datasetInfos}
                         availableVariables={this.props.chosenColumns}
                         history={this.state.history}
+                        gridHistory={this.state.gridHistory}
                     />
                 }
 
@@ -385,19 +385,60 @@ class TSMExploration extends Component{
         })       
     }
 
+    getGridPointLabels(dataWasReceived){
+
+        var url = backend + "/get-label-over-grid-point"
+
+        $.get(url, dataWasReceived)    
+    }
+
     getModelBoundaries(){
 
-        if ( ! this.state.initialLabelingSession){
-            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+
+        if ( this.state.gridHistory.grid.length === 0){
+            getGridPoints(points => {
+                
+                var grid = this.state.gridHistory
+                grid.grid = points
+                this.setState({
+                    gridHistory:grid
+                })
+
+            })
         }
-        
+
+        if ( ! this.state.initialLabelingSession){
+
+            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+            this.getGridPointLabels(response => {
+                                
+                var rawLabels = response
+                
+                var predictedLabels = rawLabels.map(e => {
+                    return {
+                        'id': e.dataPoint.id,
+                        'label': e.label.label
+                    }
+                })
+                var grid = this.state.gridHistory
+                var labelHistory = grid.labelHistory
+                labelHistory.push(predictedLabels)
+                
+                this.setState({
+                    gridHistory: {
+                        'grid': grid.grid,
+                        'labelHistory': labelHistory
+                    }
+                })
+            })
+        }        
     }
 
     dataWasReceived(boundaryData){
         
         let history = this.state.history
         history.push(JSON.parse(boundaryData))
-        console.log(history)
+        
         this.setState({
             history: history
         })        

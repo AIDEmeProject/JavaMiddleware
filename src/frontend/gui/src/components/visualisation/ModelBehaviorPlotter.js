@@ -26,7 +26,6 @@ class ModelBehaviorPlotter{
         var x = d3.scaleLinear()
                   .domain([xMin, xMax])
                   .range([0, width]);
-
         this.x = x
 
             // Add Y axis
@@ -52,8 +51,6 @@ class ModelBehaviorPlotter{
 
         this.gPredictions = svg.append('g')
             .attr('class', 'predictions')
-
-
             
         this.tooltip = this.svg
             .append("g")
@@ -74,9 +71,8 @@ class ModelBehaviorPlotter{
         return svg
     }
 
-    plotData( scale,  labeledPoints, gridPoints, chosenVariables){
-        
-        console.log(gridPoints)
+    plotData( scale, humanLabeledPoints, scatterPoints, chosenVariables, colors){
+                
         var iFirstVariable = chosenVariables[0]
         var iSecondVariable = chosenVariables[1]
 
@@ -101,7 +97,7 @@ class ModelBehaviorPlotter{
 
             //var x = d3.mouse(this)[0] + 90
             //var y = d3.mouse(this)[1] //+ document.getElementById('scatterplot').getBoundingClientRect().y
-            console.log(d)
+            
             var xTooltip = d3.event.pageX + 30
             var yTooltip = d3.event.pageY 
             this.tooltip
@@ -117,12 +113,33 @@ class ModelBehaviorPlotter{
                 .duration(200)
                 .style("opacity", 0)
         }
-                    
+                                
+        // Add dots
+        var updatePrediction = this.gPredictions            
+            .selectAll("circle")
+            .data(scatterPoints)     
+                
+        updatePrediction.exit().remove()
+        
+        updatePrediction
+            .enter()
+            .append("circle")
+            .merge(updatePrediction)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)              
+            .transition(500)            
+            .attr("cx", function (d) { return x(d[iFirstVariable]); } )
+            .attr("cy", function (d) { return y(d[iSecondVariable]); } )
+            .attr("r", 4)
+            .style("fill", function(d){ return colors[d[2]] })
+            .style("opacity", 0.4)
+            .style("stroke", "white") 
+
         var updateLabels = this.gLabels
-           .selectAll("circle")
-           .data(labeledPoints)
-    
-                   
+            .selectAll("circle")
+            .data(humanLabeledPoints)
+     
         updateLabels
             .enter()
             .append("circle")
@@ -132,42 +149,12 @@ class ModelBehaviorPlotter{
             .attr("cx", (d) => { return x(d[iFirstVariable]) } )
             .attr("cy", (d) => { return y(d[iSecondVariable]) } )
             .attr("r", 7)
-            .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
+            .style("fill", function(d){ return d[2] == 1 ? "red" : 'green'})           
             .style("stroke", function(d){
-                    return d[2] == 1 ? "green" : 'red'
+                    return d[2] == 1 ? "red" : 'green'
             })
-            
-        //updateLabels.merge(enterLabels)
-        updateLabels.exit().remove()
- 
-        //this.d3LabeledPoints = d3LabeledPoints
-
-        // Add dots
-        var updatePrediction = this.gPredictions            
-            .selectAll("circle")
-            .data(gridPoints) 
-        
-        
-        updatePrediction.exit().remove()
-        
-        updatePrediction
-            .enter()
-            .append("circle")
-            .merge(updatePrediction)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave)  
-            
-            .transition()
-            
-            .attr("cx", function (d) { return x(d[iFirstVariable]); } )
-            .attr("cy", function (d) { return y(d[iSecondVariable]); } )
-            .attr("r", 4)
-            .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})
-            .style("opacity", 0.5)
-            .style("stroke", "white") 
-            
-            
+                    
+        updateLabels.exit().remove()                     
     }
 
     updateAxis(x, y, scale){

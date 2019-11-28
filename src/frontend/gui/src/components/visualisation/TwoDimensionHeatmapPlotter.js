@@ -7,36 +7,18 @@ class TwoDimensionHeatmapPlotter{
     prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 30, right: 30, bottom: 30, left: 30}
-        var width = 700 - margin.left - margin.right
+        var margin = {top: 10, right: 30, bottom: 30, left: 40}
+        var width = 650 - margin.left - margin.right
         var height = 500 - margin.top - margin.bottom
 
         // append the svg object to the body of the page
         var svg = d3.select(svgid)
             .attr("width", width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
-
-        /*
-        // X axis: scale and draw:
-        var x = d3.scaleLinear()
-                  .domain([0, 20])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-                  .range([0, width]);
-
-
-        var y = d3.scaleLinear()
-                  .domain([0, 20])
-                  .range([height, 0]);
-
-        svg.append("g")
-           .attr("transform", "translate(0," + height + ")")
-           .call(d3.axisBottom(x));
-
-
-        svg.append("g")
-           .attr("transform", "translate(" + 0 + ", 0)")
-           .call(d3.axisLeft(y));
-
-        */
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+    
 
         var x = d3.scaleLinear()
              .domain(d3.extent(data, d => d.x))
@@ -51,6 +33,7 @@ class TwoDimensionHeatmapPlotter{
                        .call(d3.axisBottom(x))
 
         this.yAxis = svg.append("g")
+                        //.attr("transform", "translate(" + 25 + ", 0)")
                         .call(d3.axisLeft(y))
 
         this.gBins = svg.append("g")
@@ -143,60 +126,7 @@ class TwoDimensionHeatmapPlotter{
            .attr("fill", d => color(d.length));  
     }
 
-    plotold(data){
-
-        var svg = this.svg    
-        var x = this.x
-        var y = this.y
-
-        var height = this.height
-        var heat_color = d3.scaleLinear().domain([0, 100]).range(["red", "yellow"]);
-
-        var one_d_heatmap_margin = {top: 20, right: 20, bottom: 40, left: 60},
-            legend_margin = {top: 10, right: 40, bottom: 20, left: 40},
-            legend_width = 40,
-            
-            value_range = {
-                x: {
-                    min_value: 0,
-                    max_value: 600
-                },
-                y: {
-                    min_value: 0,
-                    max_value: 600
-                }
-            }     
-               
-        var heatmap_height = this.height
-
-        svg.selectAll("rect")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("class", "rectangles")
-            .attr("x", function(d, i) {
-                return x(d.x);
-            })
-            .attr("y", function(d, i) {
-                return y(d.y);
-            })
-            .attr("width", function(d, i) {
-                return x(d.width);
-            })
-            .attr("height", function(d, i) {
-                return y(d.height);
-            })
-            .attr("fill", function(d, i) {
-                
-                if(! d.aggValue){                    
-                    return "White";
-                }                
-                    
-                return heat_color(d.aggValue);	                    
-            })
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 1)            
-    }
+    
 }
 
 

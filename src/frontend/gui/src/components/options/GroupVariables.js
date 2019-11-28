@@ -111,11 +111,10 @@ class Group extends Component {
                             key={iVariable}
                         >
                             <div>{/* required because bs theme removes inner div */}
-                            <div                                                            
-                                className=""
-                            >
-                                
-                                {variable.name}                                
+                                <div                                                            
+                                    className=""
+                                >                                
+                                {variable.name} <button  onClick={this.removeVariable.bind(this)}>Remove</button>
                                 </div>        
                             </div>      
                         </div>                        
@@ -124,6 +123,11 @@ class Group extends Component {
             }
             </div>
         )
+    }
+
+    removeVariable(e){
+        e.preventDefault()
+        
     }
 
     onVariableCheckboxClick(e){

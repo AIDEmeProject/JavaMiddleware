@@ -58,7 +58,7 @@ public class CsvDatasetWriter {
                     strings[i + 1] = String.valueOf(data.get(i));
                 }
 
-                String label = Integer.toString(point.getLabel().asBinary());
+                String label = Integer.toString(point.getLabel().asSign());
                 strings[strings.length - 1] = label;
                 csvWriter.writeNext(strings);
             }

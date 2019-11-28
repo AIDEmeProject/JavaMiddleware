@@ -22,9 +22,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 class MyHttpClient{
-
 
     public String getModelBoundary() throws IOException {
 
@@ -47,42 +45,13 @@ public class LabelPointForDecisionBoundaryServlet extends HttpServlet {
 
         String filePath = "./src/main/model_behavior/labeled_points_java.csv";
         CsvDatasetWriter writer = new CsvDatasetWriter();
-        ArrayList<LabeledPoint> labeledPoints = manager.labelWholeDataset();
+        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionForProjection();
         writer.savedLabeledPointsAsCsv(labeledPoints, filePath);
 
         MyHttpClient c = new MyHttpClient();
         String jsonEmbedding = c.getModelBoundary();
 
         resp.getWriter().println(jsonEmbedding);
-
-
-        /*
-        int nPoint = 200;
-        double[] data = new double[3];
-
-        IndexedDataset.Builder builder = new IndexedDataset.Builder();
-
-        int min = 0;
-        int max = 60;
-
-        for (int i=0; i< nPoint; i++){
-
-            Random rand = new Random();
-
-            data[0] = (new Random()).nextFloat() * (max - min) + min;
-            data[1] = (new Random()).nextFloat() * (max - min) + min;
-            data[2] = (new Random()).nextFloat() * (max - min) + min;
-            builder.add(i, data);
-        }
-
-        IndexedDataset pointsToLabel = builder.build();
-
-        ArrayList<LabeledPoint> labeledPoints = manager.labelPoints(pointsToLabel, false);
-        */
-        //Gson gson = new Gson();
-
-        //resp.getWriter().println(gson.toJson(labeledPoints.toArray()));
-
     }
 }
 

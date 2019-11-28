@@ -198,6 +198,7 @@ class App extends Component {
                             id="test-bla"
                         />
                         
+                       
 
                         <View 
                             onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}

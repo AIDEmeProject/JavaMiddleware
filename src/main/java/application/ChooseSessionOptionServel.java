@@ -161,6 +161,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
         int nInitialPoints = 3;
 
 
+        //manager.generateGridOfFakePoints();
 
         resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
 

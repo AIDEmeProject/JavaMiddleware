@@ -98,6 +98,8 @@ class ModelBehavior extends Component{
     render(){
         
         const scale = this.state.scale        
+        const labeledPoints = this.getHumanLabeledPoints()
+
         
         return (
 
@@ -113,7 +115,7 @@ class ModelBehavior extends Component{
 
                     <LabelInfos
                         iteration={this.state.modelIteration}
-                        labeledPoints={this.props.labeledPoints}
+                        labeledPoints={labeledPoints}
                     />
 
                 <div className="form-inline">
@@ -190,7 +192,8 @@ class ModelBehavior extends Component{
                                             key={i}
                                         >
                                             {variable.name}
-                                        </option>)
+                                        </option>
+                                    )
                                 })
                             }
                         </select>
@@ -210,7 +213,6 @@ class ModelBehavior extends Component{
                             className="range-input"
                             onChange={this.onChangeScale.bind(this)} 
                         />  
-
                     </div>
 
                     <div className="form-group">                    
@@ -228,6 +230,9 @@ class ModelBehavior extends Component{
             </div>        
 
                 <div className="col col-lg-8">
+                    
+                    <svg id="gridpoint-svg"></svg>
+
                     <svg id="scatterplot-svg"></svg>                
                 </div>
         
@@ -235,38 +240,122 @@ class ModelBehavior extends Component{
         )
     }
 
-    componentDidMount(){
+    plotGridPointPlot(){
+
+        var colors = {
+            '-1': 'green',
+            '0': 'grey',
+            '1': 'red'
+        }
+
+        this.gridPlotter.plotData(
+            this.state.scale,
+            this.getHumanLabeledPoints(),
+            this.getGridPoints(),
+            this.getChosenVariables(),
+            colors
+        )
+    }
+
+    plotDataEmbbedingPlot(){
+
+        var colors = {
+            '-1': 'green',
+            '0': 'grey',
+            '1': 'red'
+        }
+
+        const embeddings = this.getEmbbedings()
+        const x = embeddings.map(e => e[0])
+        const y = embeddings.map(e => e[1])
         
+        const scale = this.computeMinAndMaxScale(x, y)
+                
+        this.plotter.plotData(
+            scale,              
+            this.getLabeledEmbedding(),
+            embeddings, 
+            [0, 1],
+            colors
+        )        
+    }
+
+    componentDidMount(){
+                
+        if (this.props.availableVariables.length <= 4){
+            this.gridPlotter = new ModelBehaviorPlotter()
+            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
+            this.plotGridPointPlot()
+        }
+        return
         this.plotter = new ModelBehaviorPlotter()
         this.plotter.createPlot("#scatterplot-svg", this.state.scale)
-        this.plotter.plotData(
-            this.state.scale,              
-            this.getLabeledEmbedding(),
-            this.getGridPoints(), 
-            this.getChosenVariables()
-        )
+        this.plotDataEmbbedingPlot()
         
     }
 
-    getLabeledPoints(){
+    componentDidUpdate(){
+        
+        if (this.props.availableVariables.length <= 4){
+            this.plotGridPointPlot()
+        }
+        
+        return
+        this.plotDataEmbbedingPlot()
+    }
+
+    getGridPoints(){
+
+        const iteration = this.state.modelIteration
+        const modelPredictions = this.props.gridHistory.labelHistory[iteration]
+        const grid = this.props.gridHistory.grid        
+        
+        const vars = this.getChosenVariables()
+        const iColOne = vars[0]
+        const iColTwo = vars[1]
+        
+        var gridPoints = d3.zip(grid, modelPredictions).map(e =>{
+            
+            return [e[0][iColOne], e[0][iColTwo], e[1].label]
+        })
+        console.log(gridPoints)
+        
+        return gridPoints
+    }
+
+    getGridPointsLabels(){
+
+        const iteration = this.state.modelIteration
+
+        return this.props.gridHistory.labelHistory[iteration]
+    }
+
+    getHumanLabeledPoints(){
 
         const iteration = this.state.modelIteration
 
         const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
+        }).map(e => {
+            return e.data
         })
-        
+
+        console.log(labeledPoints)
         return labeledPoints
     }
+
     getEmbbedings(){
-        return this.getGridPoints()
+        
+        const iteration = this.state.modelIteration
+
+        return this.props.history[iteration].embedding
     }
 
     getLabeledEmbedding(){
-        const labeledPoints = this.getLabeledPoints()
-
+        
+        const labeledPoints = this.getHumanLabeledPoints()
         const embeddings = this.getEmbbedings()
-
+        
         const labeledEmbeddings =  labeledPoints.map( e => {
             
             return embeddings[e.id]
@@ -274,47 +363,25 @@ class ModelBehavior extends Component{
         
         return labeledEmbeddings
     }
-
-    componentDidUpdate(){
-        //this.plotter.updatePlot(this.getChosenVariables(), this.state.scale)
-        const embbedings = this.getGridPoints()
-
-        const scale = this.computeMinAndMaxScale(embbedings.map(e => e[0]), embbedings.map(e => e[1]))
-        this.plotter.plotData(
-            scale,              
-            this.getLabeledEmbedding(),
-            embbedings, 
-            this.getChosenVariables()
-        )
-    }
-
+   
     onPreviousIteration(){
 
         var iteration = this.state.modelIteration - 1
         this.setState({
             modelIteration: Math.max(iteration, 0)
-        })
-        
+        })    
     }
 
     onNextIteration(){
 
-        const history = this.props.history
+        const nIteration = this.props.labeledPoints.length
         var iteration = this.state.modelIteration + 1
 
         this.setState({
-            modelIteration: Math.min(iteration, history.length - 1)
+            modelIteration: Math.min(iteration, nIteration - 1)
         })        
     }
-
-    getGridPoints(){
-        
-        const iterationData = this.props.history[this.state.modelIteration]
-        console.log(iterationData)
-        return iterationData.embedding       
-    }
-
-
+   
     componentWillReceiveProps(nextProps){   
         
         const labeledPoints = nextProps.labeledPoints
@@ -357,6 +424,7 @@ class ModelBehavior extends Component{
     }
 
     getChosenVariables(){
+
         const variables = [this.state.firstVariable, this.state.secondVariable]
         
         return variables
@@ -405,24 +473,8 @@ class ModelBehavior extends Component{
                 scale: newScale    
             }, this.updatePlot)                   
         }                                          
-    }
-    
+    } 
 }
-
-var xMin = 0, 
-    xMax = 20,
-    yMin = 0,
-    yMax = 20
-
-var nPoints = 80
-
-var xRange = d3.range(xMin, xMax, (xMax - xMin) / nPoints),
-    yRange = d3.range(xMin, yMax, (yMax - yMin) / nPoints)
-
-const fake1 = generateFakePoints(xRange, yRange)
-const fake2 = generateFakePoints(xRange, yRange)
-
-
 
 const d = {
     
@@ -735,12 +787,22 @@ const d = {
     ],     
 ]
 
-
 }
 
 const history = [    
     d
 ]
+
+const nPoints = 100
+
+var xMin = -20, 
+    xMax = 20,
+    yMin = -20,
+    yMax = 20
+
+
+var xRange = d3.range(xMin, xMax, (xMax - xMin) / nPoints),
+    yRange = d3.range(xMin, yMax, (yMax - yMin) / nPoints)
 
 
 function generateFakePoints(xRange, yRange){
@@ -749,50 +811,64 @@ function generateFakePoints(xRange, yRange){
     xRange.forEach(x => {
 
         yRange.forEach(y => {   
-        
+            /*
             {                
                 gridPoints.push({
                     data: [x, y, x - y],
                     label:  Math.floor(Math.random()* 2)
                 })            
-            }
+            }*/
+
+            gridPoints.push([x, y, x - y])
         })
     })
     return gridPoints
 }
 
-ModelBehavior.defaultProps = {
+const fake1 = generateFakePoints(xRange, yRange)
 
-    labeledPoints: [
-        {
-            'id': 1,
-            'label': 1,
-            'data': [0, 0, 1, 0]
-        },
-        {
-            'id': 2,
-            'label': 1,
-            'data': [0, 1, 2, 3]
-        },
-        {
-            'id': 3,
-            'label': 0,
-            'data': [1, 0, 3, 2]
-        },
-        {
-            'id': 4,
-            'label': 1,
-            'data': [1, 1, 4, 1]
-        },
-    ],
+var nGridPoints = fake1.length
+
+const modelLabelsHistory = [
+    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2)),
+    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2)),
+    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2))
+]
+
+const gridHistory = {
+    'grid': fake1,
+    'labelHistory': modelLabelsHistory
+}
+
+const labeledPoints = [
+    {
+        'id': 1,
+        'label': 1,
+        'data': [0, 0, 1, 0]
+    },
+    {
+        'id': 2,
+        'label': 1,
+        'data': [0, 1, 2, 3]
+    },
+    {
+        'id': 3,
+        'label': 0,
+        'data': [1, 0, 3, 2]
+    },       
+]
+
+ModelBehavior.defaultProps = {
+    //grid: fake1,
+    //gridHistory: gridHistory,
+    //history: history,
+    //labeledPoints: labeledPoints,
     
     datasetInfos: {
         minimums: [0, 0, 0],
         maximums: [10, 10, 10]
     },
-
-    history: history,
-    iteration: 0,
+       
     availableVariables: [
         {
             'name': 'test1',

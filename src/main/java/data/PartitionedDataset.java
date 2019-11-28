@@ -79,6 +79,10 @@ public final class PartitionedDataset {
     }
 
 
+    public ExtendedClassifier getTSMClassifier(){
+        return this.classifier;
+    }
+
     /**
      * Add a new point to the dataset. Needed for FakePoint sampling
      * @param point
