@@ -269,9 +269,9 @@ class Exploration extends Component{
                 explorationSendLabeledPoint({
                     data: labeledPoints,
                 }, tokens, response => {
-                    console.log('LOLO')
+                    
                     this.onNewPointsToLabel(response)
-                    console.log('LELE')
+                    
                     this.getModelBehaviorData()
                 })
             })
@@ -301,11 +301,11 @@ class Exploration extends Component{
             getGridPointLabels(response => {
                                 
                 var rawLabels = response
-                console.log(response)
+                
                 var predictedLabels = rawLabels.map(e => {
                     return {
                         'id': e.dataPoint.id,
-                        'label': e.label.label
+                        'label': e.label === "NEGATIVE" ? -1: 1
                     }
                 })
                 var grid = this.state.gridHistory
