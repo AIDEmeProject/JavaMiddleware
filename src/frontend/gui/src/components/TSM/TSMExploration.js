@@ -333,7 +333,7 @@ class TSMExploration extends Component{
         () => {
 
             if (pointsToLabel.length == 0){
-                console.log('HCHSDSHDSHDS')
+                
                 sendLabels(labeledPoints, data => {
                     this.newPointsToLabel(data)
                     this.getModelBehaviorData()

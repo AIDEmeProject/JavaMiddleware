@@ -1,6 +1,6 @@
 import $ from 'jquery'
-
-getGridPointLabels(dataWasReceived){
+import {backend, webplatformApi} from '../constants/constants'
+function getGridPointLabels(dataWasReceived){
 
     var url = backend + "/get-label-over-grid-point"
 

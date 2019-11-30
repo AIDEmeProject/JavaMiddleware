@@ -3,7 +3,7 @@ import {backend, webplatformApi} from '../constants/constants'
 
 
 function explorationSendLabeledPoint(data, tokens, onSuccess){
-    console.log(data)
+    
     var labeledPoints = data.data.map(e => {
         return {
             id: e.id,

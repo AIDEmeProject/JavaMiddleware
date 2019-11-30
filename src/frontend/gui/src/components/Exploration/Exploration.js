@@ -16,6 +16,11 @@ import explorationSendLabeledPoint from '../../actions/explorationSendLabeledPoi
 import getWholedatasetLabeled from '../../actions/getWholeLabeledDataset'
 import getDecisionBoundaryData from '../../actions/getDecisionBoundaryData'
 
+import getGridPoints from '../../actions/getGridPoints'
+import getGridPointLabels from '../../actions/getGridPointLabels'
+
+
+
 class Exploration extends Component{
 
     constructor(props){
@@ -29,7 +34,12 @@ class Exploration extends Component{
             labeledPoints: [],
             pointsToLabel: this.props.pointsToLabel.map(e => e),
             allLabeledPoints: [],
-            initialLabelingSession: true
+            initialLabelingSession: true,
+            history: [],  
+            gridHistory: {
+                grid: [],
+                labelHistory: []
+            }
         }
     }
 
@@ -38,8 +48,8 @@ class Exploration extends Component{
         if (this.state.initialLabelingSession){
             return (
                 <InitialSampling 
-                    {...this.state} 
-                    {...this.props} 
+                    pointsToLabel={this.state.pointsToLabel}
+                    chosenColumns={this.props.chosenColumns}
 
                     onPositiveLabel={this.onPositiveLabel.bind(this)}
                     onNegativeLabel={this.onNegativeLabel.bind(this)}
@@ -129,31 +139,29 @@ class Exploration extends Component{
                         </ul>
                     </div>
                 </div>
-                    
-        
-                {                     
-                    this.state.showLabelView &&                                                             
-                    
-                        <div>
-                            <PointLabelisation 
+                                                                                     
+                { 
+                    this.state.showLabelView && 
 
-                                
-                                {...this.props} 
-                                {...this.state}
+                        <div>
+                            <PointLabelisation                                                           
+                                chosenColumns={this.props.chosenColumns}
+                                pointsToLabel={this.state.pointsToLabel}
                                 onPositiveLabel={this.onPositiveLabel.bind(this)}
                                 onNegativeLabel={this.onNegativeLabel.bind(this)}
-
-                            />                          
+                            />
                         </div>
                 }
 
                 { 
                     this.state.showModelBehavior && 
 
-                    <ModelBehavior
-                        labeledPoints={this.props.labeledPoints}
+                    <ModelBehavior                        
+                        labeledPoints={this.state.allLabeledPoints}
                         datasetInfos={this.props.datasetInfos}
                         availableVariables={this.props.chosenColumns}
+                        history={this.state.history}
+                        gridHistory={this.state.gridHistory}
                     />
 
                 }
@@ -205,20 +213,20 @@ class Exploration extends Component{
 
     onPositiveLabel(e){
         
-        var dataIndex = e.target.dataset.key
+        var dataIndex = parseInt(e.target.dataset.key)
         this.dataWasLabeled(dataIndex, 1)
     }
 
     onNegativeLabel(e){
-        var dataIndex = e.target.dataset.key
+        var dataIndex = parseInt(e.target.dataset.key)
         this.dataWasLabeled(dataIndex, 0)                      
     }
 
     dataWasLabeled(dataIndex, label){
-
+        
         var tokens = this.props.tokens
         var labeledPoint = this.state.pointsToLabel[dataIndex]
-        console.log(pointsToLabel, dataIndex)
+        
         labeledPoint.label = label
 
         var allLabeledPoints = this.state.allLabeledPoints
@@ -230,7 +238,7 @@ class Exploration extends Component{
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         
         pointsToLabel.splice(dataIndex, 1)
-                                                    
+        
         this.setState({
             allLabeledPoints: allLabeledPoints,
             pointsToLabel: pointsToLabel,
@@ -260,10 +268,60 @@ class Exploration extends Component{
             }, () =>{  
                 explorationSendLabeledPoint({
                     data: labeledPoints,
-                }, tokens, this.onNewPointsToLabel.bind(this))
+                }, tokens, response => {
+                    console.log('LOLO')
+                    this.onNewPointsToLabel(response)
+                    console.log('LELE')
+                    this.getModelBehaviorData()
+                })
             })
         }
     }
+
+
+
+    getModelBehaviorData(){
+
+        console.log(this.state.gridHistory.grid.length)
+        if ( this.state.gridHistory.grid.length === 0){
+            getGridPoints(points => {
+                
+                var grid = this.state.gridHistory
+                grid.grid = points
+                this.setState({
+                    gridHistory:grid
+                })
+
+            })
+        }
+
+        if ( ! this.state.initialLabelingSession){
+
+            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+            getGridPointLabels(response => {
+                                
+                var rawLabels = response
+                console.log(response)
+                var predictedLabels = rawLabels.map(e => {
+                    return {
+                        'id': e.dataPoint.id,
+                        'label': e.label.label
+                    }
+                })
+                var grid = this.state.gridHistory
+                var labelHistory = grid.labelHistory
+                labelHistory.push(predictedLabels)
+                
+                this.setState({
+                    gridHistory: {
+                        'grid': grid.grid,
+                        'labelHistory': labelHistory
+                    }
+                })
+            })
+        }        
+    }
+
 
 
     labelForInitialSession(labeledPoints, pointsToLabel){
@@ -331,7 +389,6 @@ class Exploration extends Component{
         })       
     }
 
-
     onPositiveLabel(e){
         
         var dataIndex = e.target.dataset.key
@@ -343,23 +400,15 @@ class Exploration extends Component{
         this.dataWasLabeled(dataIndex, 0)                      
     }
 
-    getModelBoundaries(){
-
-        if ( ! this.state.initialLabelingSession){
-            getDecisionBoundaryData(this.dataWasReceived.bind(this))
-        }
-        
-    }
-
     dataWasReceived(boundaryData){
         
         let history = this.state.history
-        history.push(JSON.parse(boundaryData))        
+        history.push(JSON.parse(boundaryData))
+        
         this.setState({
             history: history
         })        
-    }
-
+    }   
 }
 
 

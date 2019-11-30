@@ -342,7 +342,7 @@ class App extends Component {
    
 
     componentDidUpdate(){
-        console.log(this.state)
+        
     }
 
     componentDidMount(){

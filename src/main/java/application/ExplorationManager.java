@@ -32,12 +32,22 @@ public class ExplorationManager {
 
     /**
      * The dataset partition (labeled and unlabeled points)
+     * Scaled dataset
      */
     private final PartitionedDataset partitionedDataset;
 
     private final IndexedDataset rawDataset;
 
-    private IndexedDataset encodedDataset;
+    /**
+     * this dataset is used to plot model decision boundary
+     */
+    private IndexedDataset gridOfFakePoints;
+
+    /**
+     * Scaled version of fake point grid
+     */
+    private IndexedDataset scaledGridOfFakePoints;
+
 
     /**
      * The experiment configuration (active learner, initial sampler, ...)
@@ -55,8 +65,6 @@ public class ExplorationManager {
 
     private boolean isInitialSamplingStep;
 
-    private IndexedDataset gridOfFakePoints;
-    private IndexedDataset scaledGridOfFakePoints;
 
     /**
      * @param dataset: collection of unlabeled points
@@ -67,11 +75,9 @@ public class ExplorationManager {
         this.ranker = null;
         this.isInitialSamplingStep = true;
         this.configuration = configuration;
-
-        this.rawDataset = dataset;
         this.learner = learner;
 
-
+        this.rawDataset = dataset;
         IndexedDataset scaledDataset = this.scaleDataset(rawDataset);
         this.partitionedDataset = getPartitionedDataset(scaledDataset);
 
@@ -107,14 +113,6 @@ public class ExplorationManager {
 
     public void addLabeledPointToDataset(LabeledPoint point){
         this.partitionedDataset.addLabeledPointToDataset(point);
-    }
-
-    public List<DataPoint> getNextFakePoint(){
-
-
-        ArrayList<DataPoint> fakePoints = new ArrayList<>();
-        fakePoints.add(this.rawDataset.getFakeData());
-        return fakePoints;
     }
 
     public List<DataPoint> getNextPointsToLabel(List<LabeledPoint> labeledPoints){
@@ -211,7 +209,7 @@ public class ExplorationManager {
         return scaler.transform(dataset);
     }
 
-    public ArrayList<LabeledPoint> labelPoints(IndexedDataset pointsToLabel, boolean scaleDataset){
+    public ArrayList<LabeledPoint> labelPoints(IndexedDataset pointsToLabel, IndexedDataset rawPoints, boolean scaleDataset){
 
 
         IndexedDataset datasetToLabel;
@@ -229,7 +227,7 @@ public class ExplorationManager {
         for (int i=0;i < datasetToLabel.length(); i++)
         {
             DataPoint point = datasetToLabel.get(i);
-            DataPoint rawPoint = this.rawDataset.get(i);
+            DataPoint rawPoint = rawPoints.get(i);
 
             Label label = classifier.predict(point.getData());
             LabeledPoint labeledPoint = new LabeledPoint(rawPoint, label);
@@ -243,7 +241,7 @@ public class ExplorationManager {
     public ArrayList<LabeledPoint> labelWholeDataset(){
         //add user labeled points
         IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
-        return this.labelPoints(pointsToLabel, false);
+        return this.labelPoints(pointsToLabel, rawDataset,  false);
     }
 
     protected void generateGridOfFakePoints(){
@@ -257,24 +255,17 @@ public class ExplorationManager {
             double max = columnStatistics[i].getMaximum();
 
             boolean isNumeric = columnStatistics[i].isNumeric();
-            System.out.println(isNumeric);
-            System.out.println(columnStatistics[i].getName());
             specs.add(new ColumnSpecification(isNumeric, min, max, 100));
-            // do something with min and max of column i
+
         }
-
-
 
         GridPointGenerator generator = new GridPointGenerator(specs);
 
         this.gridOfFakePoints = generator.generatePoints();
-        System.out.println("scaler");
-        System.out.println(this.scaler);
+
         Matrix scaledFakePoints = this.scaler.transform(this.gridOfFakePoints.getData());
         this.scaledGridOfFakePoints = this.gridOfFakePoints.copyWithSameIndexes(scaledFakePoints);
-        System.out.println(this.scaledGridOfFakePoints.length());
-        System.out.println(this.gridOfFakePoints.length());
-        System.out.println("End hoho");
+
     }
 
     protected IndexedDataset getScaledGridOfFakePoints(){
@@ -297,11 +288,10 @@ public class ExplorationManager {
 
         if (! this.configuration.hasMultiTSM()){
 
-            return this.labelPoints(this.getScaledGridOfFakePoints(), false);
+            return this.labelPoints(this.getScaledGridOfFakePoints(), this.getGridOfFakePoints(), false);
 
         }
 
-        System.out.println("TSM PREDICTION");
         return this.TSMPrediction(this.getScaledGridOfFakePoints());
     }
 

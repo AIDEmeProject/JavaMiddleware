@@ -281,6 +281,7 @@ class ModelBehavior extends Component{
             scale: this.computeMinMaxOfRawData()
         })
     }
+    
     componentDidMount(){
         
         if (this.props.availableVariables.length <= 4){
@@ -383,25 +384,7 @@ class ModelBehavior extends Component{
             modelIteration: Math.min(iteration, nIteration - 1)
         })        
     }
-   
-    componentWillReceiveProps(nextProps){   
-        return
-        const labeledPoints = nextProps.labeledPoints
-        
-        if (labeledPoints.length > 3){
-
-            //this.getGridPoints()
-            //this.removeData(this.svg, labeledPoints, this.props.gridPoints)
-            this.plotter.plotData(this.svg, 
-                this.state.scale, 
-                this.width, 
-                this.height, 
-                labeledPoints, 
-                this.getGridPoints(), 
-                this.getChosenVariables())
-        }
-    }
-
+     
     computeMinMaxOfRawData(){
                 
         const grid = this.getGridPoints()

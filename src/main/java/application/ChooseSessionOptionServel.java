@@ -104,6 +104,8 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
 
         ArrayList<Double> rowValues = new ArrayList();
+        ArrayList<String> rowRawValues = new ArrayList();
+
 
         ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
@@ -118,12 +120,16 @@ public class ChooseSessionOptionServel extends HttpServlet {
             // nextLine[] is an array of values from the line
 
             rowValues.removeAll(rowValues);
+            rowRawValues.removeAll(rowRawValues);
             int i = 0;
             for (Integer id : columnIds){
 
+
+                String rawValue = nextLine[id];
                 Double value = parser.parseValue(nextLine[id], i);
 
                 rowValues.add(value);
+                rowRawValues.add(rawValue);
                 i++;
             }
 
