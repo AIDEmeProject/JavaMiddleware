@@ -149,9 +149,9 @@ class ModelBehaviorPlotter{
             .attr("cx", (d) => { return x(d[iFirstVariable]) } )
             .attr("cy", (d) => { return y(d[iSecondVariable]) } )
             .attr("r", 7)
-            .style("fill", function(d){ return d[2] == 1 ? "red" : 'green'})           
+            .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
             .style("stroke", function(d){
-                    return d[2] == 1 ? "red" : 'green'
+                    return d[2] == 1 ? "green" : 'red'
             })
                     
         updateLabels.exit().remove()                     

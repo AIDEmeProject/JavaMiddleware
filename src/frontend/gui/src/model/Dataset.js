@@ -19,6 +19,14 @@ class Dataset{
         return this.dataset.columns
     }
 
+    get_column_from_id(id){
+        const name = this.get_column_id(id)
+        
+        return this.dataset.map(row => {
+            return row[name]
+        })
+    }
+
     get_columns(ids, aliases){
 
         const names = this.get_column_names()

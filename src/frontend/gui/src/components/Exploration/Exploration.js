@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
 
 import $ from "jquery";
-import {backend, webplatformApi} from '../constants/constants'
+import {backend, webplatformApi} from '../../constants/constants'
 
-import ModelVisualization from './visualisation/ModelVisualization'
+import ModelVisualization from '../visualisation/ModelVisualization'
 
-import PointLabelisation from './PointLabelisation'
+import PointLabelisation from '../PointLabelisation'
 import InitialSampling from './InitialSampling/InitialSampling'
-import ModelBehavior from './visualisation/ModelBehavior'
+import ModelBehavior from '../visualisation/ModelBehavior'
 
-import DataPoints from './DataPoints'
+import DataPoints from '../DataPoints'
+
+import wholeDatasetLabelizationWasAsked from '../../actions/statisticCollection/wholeDatasetLabelizationWasAsked'
+import explorationSendLabeledPoint from '../../actions/explorationSendLabeledPoint'
+import getWholedatasetLabeled from '../../actions/getWholeLabeledDataset'
+import getDecisionBoundaryData from '../../actions/getDecisionBoundaryData'
 
 class Exploration extends Component{
 
@@ -20,14 +25,25 @@ class Exploration extends Component{
             showModelVisualisation: false,
             showLabelView: true,
             showLabelHistory: false,
-            showModelBehavior: false
+            showModelBehavior: false,
+            labeledPoints: [],
+            pointsToLabel: this.props.pointsToLabel.map(e => e),
+            allLabeledPoints: [],
+            initialLabelingSession: true
         }
     }
 
     render(){
                     
-        if (this.props.initialLabelingSession){
-            return (<InitialSampling {...this.state} {...this.props} />)
+        if (this.state.initialLabelingSession){
+            return (
+                <InitialSampling 
+                    {...this.state} 
+                    {...this.props} 
+
+                    onPositiveLabel={this.onPositiveLabel.bind(this)}
+                    onNegativeLabel={this.onNegativeLabel.bind(this)}
+                />)
         }
         
         return (
@@ -120,8 +136,13 @@ class Exploration extends Component{
                     
                         <div>
                             <PointLabelisation 
+
+                                
                                 {...this.props} 
                                 {...this.state}
+                                onPositiveLabel={this.onPositiveLabel.bind(this)}
+                                onNegativeLabel={this.onNegativeLabel.bind(this)}
+
                             />                          
                         </div>
                 }
@@ -161,18 +182,126 @@ class Exploration extends Component{
         )
     }
 
+
+    onNewPointsToLabel(points){
+        
+        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
+
+        var receivedPoints = points.map(e => {
+            return {
+                id: e.id,
+                data: e.data.array
+            }
+        })
+
+        for (var point of receivedPoints){
+            pointsToLabel.push(point)
+        }
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })       
+    }
+
+    onPositiveLabel(e){
+        
+        var dataIndex = e.target.dataset.key
+        this.dataWasLabeled(dataIndex, 1)
+    }
+
+    onNegativeLabel(e){
+        var dataIndex = e.target.dataset.key
+        this.dataWasLabeled(dataIndex, 0)                      
+    }
+
+    dataWasLabeled(dataIndex, label){
+
+        var tokens = this.props.tokens
+        var labeledPoint = this.state.pointsToLabel[dataIndex]
+        console.log(pointsToLabel, dataIndex)
+        labeledPoint.label = label
+
+        var allLabeledPoints = this.state.allLabeledPoints
+        allLabeledPoints.push(labeledPoint)
+
+        var labeledPoints = this.state.labeledPoints.map(e => e)
+        labeledPoints.push(labeledPoint)
+
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        
+        pointsToLabel.splice(dataIndex, 1)
+                                                    
+        this.setState({
+            allLabeledPoints: allLabeledPoints,
+            pointsToLabel: pointsToLabel,
+            labeledPoints: labeledPoints
+        })
+        
+        if (this.state.initialLabelingSession){
+
+            if (label === 1){
+                this.setState({
+                    hasYes: true
+                }, () => {
+                    this.labelForInitialSession(labeledPoints, pointsToLabel)
+                })
+            }
+            else{
+                this.setState({
+                    hasNo: true
+                }, () => {
+                    this.labelForInitialSession(labeledPoints, pointsToLabel)
+                })
+            }                        
+        }
+        else{     
+            this.setState({
+                labeledPoints: []
+            }, () =>{  
+                explorationSendLabeledPoint({
+                    data: labeledPoints,
+                }, tokens, this.onNewPointsToLabel.bind(this))
+            })
+        }
+    }
+
+
+    labelForInitialSession(labeledPoints, pointsToLabel){
+        
+        var tokens = this.props.tokens
+
+        if  (pointsToLabel.length === 0){
+
+            if (this.state.hasYes && this.state.hasNo ){
+                
+                this.setState({
+                    hasYesAndNo: true,
+                    initialLabelingSession: false,
+                    labeledPoints: []
+                }, ()=> {
+                    explorationSendLabeledPoint({
+                        data: labeledPoints,
+                    }, tokens, this.onNewPointsToLabel.bind(this))
+                })
+            }
+            else{
+                
+                explorationSendLabeledPoint({
+                    data: labeledPoints,
+                }, tokens, this.onNewPointsToLabel.bind(this))
+            }
+        }
+    }
+
     onLabelWholeDatasetClick(e){
 
         e.preventDefault()
         
         getWholedatasetLabeled()
 
-        notifyWholeDatasetLabelisationAsked(this.props.tokens)
+        wholeDatasetLabelizationWasAsked(this.props.tokens)
     }
 
-    onVisualizeClick(){
-        getVisualizationData(this.dataWasReceived.bind(this))        
-    }
 
     dataWasReceived(data){
         
@@ -181,51 +310,57 @@ class Exploration extends Component{
             visualizationData: data
         })
     }
-}
 
-
-function getWholedatasetLabeled(){
-
-    var url = backend + "/get-labeled-dataset"
-
-    $.get(url, response => {
-
-        var blob = new Blob([response]);
-        var link = document.createElement('a');
+    onNewPointsToLabel(points){
         
-        link.href = window.URL.createObjectURL(blob);
-        document.body.appendChild(link);
-        link.download = "labeled_dataset.csv";
-        link.click();
-    })
+        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
+
+        var receivedPoints = points.map(e => {
+            return {
+                id: e.id,
+                data: e.data.array
+            }
+        })
+
+        for (var point of receivedPoints){
+            pointsToLabel.push(point)
+        }
+
+        this.setState({
+            pointsToLabel: pointsToLabel
+        })       
+    }
+
+
+    onPositiveLabel(e){
+        
+        var dataIndex = e.target.dataset.key
+        this.dataWasLabeled(dataIndex, 1)
+    }
+
+    onNegativeLabel(e){
+        var dataIndex = e.target.dataset.key
+        this.dataWasLabeled(dataIndex, 0)                      
+    }
+
+    getModelBoundaries(){
+
+        if ( ! this.state.initialLabelingSession){
+            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+        }
+        
+    }
+
+    dataWasReceived(boundaryData){
+        
+        let history = this.state.history
+        history.push(JSON.parse(boundaryData))        
+        this.setState({
+            history: history
+        })        
+    }
 
 }
-
-function getVisualizationData(dataWasReceived){
-
-    var url = backend + "/get-visualization-data"
-
-    $.get(url, dataWasReceived)
-    
-}
-
-function notifyWholeDatasetLabelisationAsked(tokens){
-    
-    var wasAskedToLabelDatasetUrl = webplatformApi + "/session/" + tokens.sessionToken + "/label-whole-dataset"
-
-    $.ajax({
-        type: "PUT", 
-        dataType: "JSON",
-        url: wasAskedToLabelDatasetUrl,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        },
-        data:{
-            clicked_on_label_dataset: true
-        }        
-    })
-}
-
 
 
 export default Exploration

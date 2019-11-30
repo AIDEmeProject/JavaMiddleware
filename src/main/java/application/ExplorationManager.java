@@ -249,7 +249,7 @@ public class ExplorationManager {
     protected void generateGridOfFakePoints(){
 
 
-        Statistics[] columnStatistics = this.partitionedDataset.getAllPoints().getData().columnStatistics();
+        Statistics[] columnStatistics = this.rawDataset.getData().columnStatistics();
         ArrayList<ColumnSpecification> specs = new ArrayList<>();
         System.out.println("IS NUMERIC");
         for (int i = 0; i < columnStatistics.length; i++) {

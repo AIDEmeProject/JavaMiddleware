@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery'
-import {backend} from '../../constants/constants'
+import {backend} from '../../../constants/constants'
 
 
 class SpecificPointToLabel extends Component{

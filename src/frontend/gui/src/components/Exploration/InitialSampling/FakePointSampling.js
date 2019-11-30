@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery'
-import {backend, webplatformApi} from '../../constants/constants'
+import {backend, webplatformApi} from '../../../constants/constants'
 
 class FakePointSampling extends Component{
 

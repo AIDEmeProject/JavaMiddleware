@@ -16,9 +16,9 @@ class LabelInfos extends Component{
 
         //const iteration = this.props.iteration
         const labeledPoints = this.props.labeledPoints
-
-        const negativeSamples = labeledPoints.filter(e => e.label === 0)
-        const positiveSamples = labeledPoints.filter(e => e.label === 1)
+        
+        const negativeSamples = labeledPoints.filter(e => e[2] === 0)
+        const positiveSamples = labeledPoints.filter(e => e[2] === 1)
 
         return (
 
@@ -85,13 +85,7 @@ class ModelBehavior extends Component{
             gridPoints: [],
             modelIteration: 0,            
             firstVariable: 0,
-            secondVariable: 1,
-            scale: {
-                xMin: -5,
-                xMax: 5,
-                yMin: -5,
-                yMax: 5
-            }
+            secondVariable: 1,           
         }
     }
 
@@ -227,34 +221,28 @@ class ModelBehavior extends Component{
                     </div>
                 </div>      
             </div>        
-
                 <div className="col col-lg-8">
                     
                     <svg id="gridpoint-svg"></svg>
 
                     <svg id="scatterplot-svg"></svg>                
-                </div>
-        
+                </div>        
             </div>
         )
     }
 
     plotGridPointPlot(){
-
+        
         var colors = {
-            '-1': 'green',
+            '-1': 'red',
             '0': 'grey',
-            '1': 'red'
+            '1': 'green'
         }
 
         const gridPoints = this.getGridPoints()
-        const scale = this.computeMinAndMaxScale(
-            gridPoints.map(e => e[0]),
-            gridPoints.map(e => e[1])
-        )
-
+        
         this.gridPlotter.plotData(
-            scale,
+            this.state.scale,
             this.getHumanLabeledPoints(),
             gridPoints,
             this.getChosenVariables(),
@@ -265,9 +253,9 @@ class ModelBehavior extends Component{
     plotDataEmbbedingPlot(){
 
         var colors = {
-            '-1': 'green',
+            '-1': 'red',
             '0': 'grey',
-            '1': 'red'
+            '1': 'green'
         }
 
         const embeddings = this.getEmbbedings()
@@ -276,28 +264,36 @@ class ModelBehavior extends Component{
         
         const scale = this.computeMinAndMaxScale(x, y)
                 
+        const humanLabeledPoints = this.getLabeledEmbedding()
+
         this.plotter.plotData(
             scale,              
-            this.getLabeledEmbedding(),
+            humanLabeledPoints,
             embeddings, 
             [0, 1],
             colors
         )        
     }
 
+    componentWillMount(){
+
+        this.setState({
+            scale: this.computeMinMaxOfRawData()
+        })
+    }
     componentDidMount(){
-                
+        
         if (this.props.availableVariables.length <= 4){
-            
+        
             this.gridPlotter = new ModelBehaviorPlotter()
             this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
             this.plotGridPointPlot()
         }
-        return
+        
         this.plotter = new ModelBehaviorPlotter()
         this.plotter.createPlot("#scatterplot-svg", this.state.scale)
         this.plotDataEmbbedingPlot()
-        
+
     }
 
     componentDidUpdate(){
@@ -306,7 +302,7 @@ class ModelBehavior extends Component{
             this.plotGridPointPlot()
         }
         
-        return
+        
         this.plotDataEmbbedingPlot()
     }
 
@@ -324,7 +320,6 @@ class ModelBehavior extends Component{
             
             return [e[0][iColOne], e[0][iColTwo], e[1].label]
         })
-        console.log(gridPoints)
         
         return gridPoints
     }
@@ -336,20 +331,6 @@ class ModelBehavior extends Component{
         return this.props.gridHistory.labelHistory[iteration]
     }
 
-    getHumanLabeledPoints(){
-
-        const iteration = this.state.modelIteration
-
-        const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
-            return i <= iteration
-        }).map(e => {
-            return e.data
-        })
-
-        console.log(labeledPoints)
-        return labeledPoints
-    }
-
     getEmbbedings(){
         
         const iteration = this.state.modelIteration
@@ -357,11 +338,26 @@ class ModelBehavior extends Component{
         return this.props.history[iteration].embedding
     }
 
+    getHumanLabeledPoints(){
+
+        const iteration = this.state.modelIteration       
+        const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
+            return i <= iteration
+        }).map(e => {
+            return [...e.data, e.label]
+        })
+        
+        return labeledPoints
+    }
+
     getLabeledEmbedding(){
-        
-        const labeledPoints = this.getHumanLabeledPoints()
+                
         const embeddings = this.getEmbbedings()
-        
+        const iteration = this.state.modelIteration       
+        const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
+            return i <= iteration
+        })
+
         const labeledEmbeddings =  labeledPoints.map( e => {
             
             return embeddings[e.id]
@@ -380,7 +376,7 @@ class ModelBehavior extends Component{
 
     onNextIteration(){
 
-        const nIteration = this.props.labeledPoints.length
+        const nIteration = this.props.gridHistory.labelHistory.length
         var iteration = this.state.modelIteration + 1
 
         this.setState({
@@ -389,7 +385,7 @@ class ModelBehavior extends Component{
     }
    
     componentWillReceiveProps(nextProps){   
-        
+        return
         const labeledPoints = nextProps.labeledPoints
         
         if (labeledPoints.length > 3){
@@ -406,23 +402,20 @@ class ModelBehavior extends Component{
         }
     }
 
-    computeMinMaxOfRawData(iFirstVariable, iSecondVariable){
-
-        const realIdOne = this.props.availableVariables[iFirstVariable].idx
-        const realIdTwo = this.props.availableVariables[iSecondVariable].idx
-        
-        const datasetInfos = this.props.datasetInfos
+    computeMinMaxOfRawData(){
                 
-        return this.computeMinAndMaxScale(datasetInfos[realIdOne], datasetInfos[realIdTwo])
+        const grid = this.getGridPoints()
+        const offset = {x: 2, y:1}
+        return this.computeMinAndMaxScale(grid.map(e => e[0]), grid.map(e => e[1]), offset)
     }
 
-    computeMinAndMaxScale(xValues, yValues){
+    computeMinAndMaxScale(xValues, yValues, offset ={x: 0, y:0}){
 
         var scale = {
-            xMin: d3.min(xValues),
-            xMax: d3.max(xValues),
-            yMin: d3.min(yValues),
-            yMax: d3.max(yValues)
+            xMin: d3.min(xValues) - offset.x,
+            xMax: d3.max(xValues) + offset.x,
+            yMin: d3.min(yValues) - offset.y,
+            yMax: d3.max(yValues) + offset.y
         }
         
         return scale
@@ -434,7 +427,6 @@ class ModelBehavior extends Component{
         
         return variables
     }
-
 
     firstVariableChanged(e){
         var firstVariable = parseInt(e.target.value) 
@@ -476,7 +468,7 @@ class ModelBehavior extends Component{
 
             this.setState({
                 scale: newScale    
-            }, this.updatePlot)                   
+            }, this.plotGridPointPlot)                   
         }                                          
     } 
 }
@@ -830,38 +822,6 @@ function generateFakePoints(xRange, yRange){
     return gridPoints
 }
 
-const fake1 = generateFakePoints(xRange, yRange)
-
-var nGridPoints = fake1.length
-
-const modelLabelsHistory = [
-    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2)),
-    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2)),
-    d3.range(nGridPoints).map(e => Math.floor(Math.random()* 2))
-]
-
-const gridHistory = {
-    'grid': fake1,
-    'labelHistory': modelLabelsHistory
-}
-
-const labeledPoints = [
-    {
-        'id': 1,
-        'label': 1,
-        'data': [0, 0, 1, 0]
-    },
-    {
-        'id': 2,
-        'label': 1,
-        'data': [0, 1, 2, 3]
-    },
-    {
-        'id': 3,
-        'label': 0,
-        'data': [1, 0, 3, 2]
-    },       
-]
 
 ModelBehavior.defaultProps = {
     //grid: fake1,

@@ -7,7 +7,6 @@ import GroupedPointTableHead from './GroupedPointTableHead'
 import ModelBehavior from '../../visualisation/ModelBehavior'
 import getDecisionBoundaryData from '../../../actions/getDecisionBoundaryData'
 import getGridPoints from '../../../actions/getGridPoints'
-import getGridPointLabels from '../../actions/getGridPoints'
 
 import $ from 'jquery'
 import {backend, webplatformApi} from '../../../constants/constants'
@@ -20,10 +19,9 @@ class TSMExploration extends Component{
 
         this.state = {
             pointsToLabel: this.props.pointsToLabel.map(e => e),
-            
+            noPoints: [],
             allLabeledPoints: [],
             labeledPoints: [],   
-            
             initialLabelingSession: true,    
             hasYes: false,
             hasNo: false,
@@ -221,7 +219,7 @@ class TSMExploration extends Component{
                                                 style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
                                                 className="btn btn-primary btn-raised"
                                                 data-point={i}
-                                                onClick={this.pointWasLabeledAsYes.bind(this)}
+                                                onClick={this.groupWasLabeledAsYes.bind(this)}
                                             >
                                                 Yes
                                             </button>
@@ -230,7 +228,7 @@ class TSMExploration extends Component{
                                                 style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
                                                 className="btn btn-primary btn-raised"
                                                 data-point={i}
-                                                onClick={this.pointWasLabeledAsNo.bind(this)}
+                                                onClick={this.groupWasLabeledAsNo.bind(this)}
                                             >
                                                 No
                                             </button>
@@ -305,7 +303,7 @@ class TSMExploration extends Component{
         })        
     }
      
-    pointWasLabeledAsYes(e){
+    groupWasLabeledAsYes(e){
 
         var pointId = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
@@ -331,17 +329,6 @@ class TSMExploration extends Component{
             hasYes: true
         },
         () => {
-
-            if (pointsToLabel.length == 0){
-                console.log('HCHSDSHDSHDS')
-                sendLabels(labeledPoints, data => {
-                    this.newPointsToLabel(data)
-                    this.getModelBehaviorData()
-                })
-            }
-                                
-            
-            return
             this.getModelBoundaries()
             if (pointsToLabel.length == 0){            
                 sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
@@ -349,7 +336,7 @@ class TSMExploration extends Component{
         })              
     }
     
-    pointWasLabeledAsNo(e){
+    groupWasLabeledAsNo(e){
 
         var iPoint = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
@@ -364,36 +351,19 @@ class TSMExploration extends Component{
         })   
     }
 
-    onSubGroupNo(e){
-
-        var data = e.target.dataset
-        var iPoint = data.point
-        var iSubgroup = data.subgroup
-
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-        var point = pointsToLabel[iPoint]
-       
-        point.labels[iSubgroup] = 0
-            
-        pointsToLabel[iPoint] = point
-        this.setState({
-            pointsToLabel: pointsToLabel,
-          
-        })
-    }
-    
     groupSubLabelisationFinished(e){
         
         var iPoint = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         var point = pointsToLabel[iPoint]
         
-        const noSubGroupLabels = point.labels.reduce( (acc, v) => acc + v) == point.labels.length
-        if ( noSubGroupLabels ){
+
+        if ( point.labels.reduce( (acc, v) => acc + v) == point.labels.length ){
             alert('please label at least one subgroup')
             return
         }
-    
+
+        
         pointsToLabel.splice(iPoint, 1)
 
         var labeledPoints = this.state.labeledPoints.map(e => e)
@@ -407,18 +377,23 @@ class TSMExploration extends Component{
             labeledPoints: labeledPoints,
             allLabeledPoints: allLabeledPoints
         }, ()=> {
-            
+            this.getModelBoundaries()
             if (pointsToLabel.length == 0){
-                                    
-                sendLabels(labeledPoints, data => {
-                    this.newPointsToLabel(data)
-                    this.getModelBehaviorData()
-                })                                                
+                
+                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))             
             }
         })       
     }
 
-    getModelBehaviorData(){
+    getGridPointLabels(dataWasReceived){
+
+        var url = backend + "/get-label-over-grid-point"
+
+        $.get(url, dataWasReceived)    
+    }
+
+    getModelBoundaries(){
+
 
         if ( this.state.gridHistory.grid.length === 0){
             getGridPoints(points => {
@@ -435,7 +410,7 @@ class TSMExploration extends Component{
         if ( ! this.state.initialLabelingSession){
 
             getDecisionBoundaryData(this.dataWasReceived.bind(this))
-            getGridPointLabels(response => {
+            this.getGridPointLabels(response => {
                                 
                 var rawLabels = response
                 
@@ -459,11 +434,6 @@ class TSMExploration extends Component{
         }        
     }
 
-
-   
-
-
-
     dataWasReceived(boundaryData){
         
         let history = this.state.history
@@ -473,6 +443,26 @@ class TSMExploration extends Component{
             history: history
         })        
     }
+
+
+    onSubGroupNo(e){
+
+        var data = e.target.dataset
+        var iPoint = data.point
+        var iSubgroup = data.subgroup
+
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        var point = pointsToLabel[iPoint]
+       
+        point.labels[iSubgroup] = 0
+            
+        pointsToLabel[iPoint] = point
+        this.setState({
+            pointsToLabel: pointsToLabel,
+          
+        })
+    }
+    
    
     onLabelWholeDatasetClick(e){
 

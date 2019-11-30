@@ -86,7 +86,7 @@ class PointLabelisation extends Component{
                                 <tr key={key}>
 
                                     
-                                    <td class="button-td">
+                                    <td className="button-td">
                                         <button
                                             className="btn btn-raised btn-primary" 
                                             data-key={key} 

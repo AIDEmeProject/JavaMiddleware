@@ -5,7 +5,7 @@ import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 
 import $ from 'jquery'
-import {backend, webplatformApi} from '../../constants/constants'
+import {backend, webplatformApi} from '../../../constants/constants'
 
 
 class TSMRow extends Component{

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery'
-import {backend, webplatformApi} from '../../constants/constants'
+import {backend, webplatformApi} from '../../../constants/constants'
 
 import SpecificPointToLabel from './SpecificPointToLabel'
 import FakePointSampling from './FakePointSampling'
-import PointLabelisation from '../PointLabelisation'
+import PointLabelisation from '../../PointLabelisation'
 
 class InitialSampling extends Component{
 
