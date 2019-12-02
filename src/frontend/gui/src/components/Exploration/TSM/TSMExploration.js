@@ -306,21 +306,28 @@ class TSMExploration extends Component{
     groupWasLabeledAsYes(e){
 
         var pointId = e.target.dataset.point
+        console.log(pointId)
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
 
         var labeledPoint = this.state.pointsToLabel[pointId]
         
         labeledPoint.labels = this.props.groups.map( e => 1)
         labeledPoint.label= 1
-        
+        console.log(pointsToLabel)
         pointsToLabel.splice(pointId, 1)
+        console.log(pointsToLabel)
         
         var labeledPoints = this.state.labeledPoints.map(e => e)
 
         labeledPoints.push(labeledPoint)
 
         var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
-        allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+        
+        if (pointsToLabel.length === 0){
+            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+        }
+        
+        console.log(allLabeledPoints)
         
         this.setState({
             allLabeledPoints: allLabeledPoints,
@@ -339,6 +346,7 @@ class TSMExploration extends Component{
     groupWasLabeledAsNo(e){
 
         var iPoint = e.target.dataset.point
+        console.log(iPoint)
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
 
         var point = pointsToLabel[iPoint]
@@ -362,16 +370,21 @@ class TSMExploration extends Component{
             alert('please label at least one subgroup')
             return
         }
-
-        
+        console.log(iPoint)
+        console.log(pointsToLabel)
         pointsToLabel.splice(iPoint, 1)
+        console.log(pointsToLabel)
 
         var labeledPoints = this.state.labeledPoints.map(e => e)
         labeledPoints.push(point)
 
         var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
-        allLabeledPoints = allLabeledPoints.concat(labeledPoints)
         
+        if (pointsToLabel.length === 0){
+            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+        }
+        
+        console.log(allLabeledPoints)
         this.setState({
             pointsToLabel: pointsToLabel,
             labeledPoints: labeledPoints,

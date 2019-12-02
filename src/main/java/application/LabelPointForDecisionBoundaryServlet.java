@@ -43,7 +43,7 @@ public class LabelPointForDecisionBoundaryServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        String filePath = "./src/main/model_behavior/labeled_points_java.csv";
+        String filePath = "./labeled_points_java.csv";
         CsvDatasetWriter writer = new CsvDatasetWriter();
         ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionForProjection();
         writer.savedLabeledPointsAsCsv(labeledPoints, filePath);

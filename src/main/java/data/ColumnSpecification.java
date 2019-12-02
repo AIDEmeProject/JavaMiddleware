@@ -49,7 +49,7 @@ public class ColumnSpecification{
                 values[i] = (max - min) / nPointInRange * i;
             }
             else{
-                values[i] = i + 1   ;
+                values[i] = i + min;
             }
 
         }

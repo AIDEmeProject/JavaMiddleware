@@ -24,7 +24,6 @@ class SpecificPointToLabel extends Component{
                 </p>
                 <div className="form-inline">
                     <div className="form-group">
-
                     
                     <label htmlFor="rowid">
                         Row id </label>

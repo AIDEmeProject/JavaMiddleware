@@ -10,11 +10,21 @@ public class GridPointGenerator{
 
     protected int[] indices;
 
+    protected int movingIndice;
+
+    protected int indiceToUpdate;
+
+    protected int carry;
+
+    protected int[] carries;
+
     public static void main(String[] args){
 
         ArrayList<ColumnSpecification> specs = new ArrayList<>();
-        specs.add(new ColumnSpecification(true, 0, 150, 75));
-        specs.add(new ColumnSpecification(false, 0, 1, 0));
+        specs.add(new ColumnSpecification(true, 0, 170, 100));
+        specs.add(new ColumnSpecification(false, 1, 3, 0));
+
+        specs.add(new ColumnSpecification(false, 0, 3, 0));
         GridPointGenerator generator = new GridPointGenerator(specs);
 
         IndexedDataset data = generator.generatePoints();
@@ -76,11 +86,16 @@ public class GridPointGenerator{
         ArrayList<double[]> cartesianProduct = new ArrayList();
         IndexedDataset.Builder builder = new IndexedDataset.Builder();
 
+        this.movingIndice = 0;
+        this.carry = 0;
+
         int nColumn = this.gridSpecifications.size();
         this.indices = new int[nColumn];
         for (int iCol = 0; iCol< nColumn; iCol++){
             cartesianProduct.add(this.gridSpecifications.get(iCol).generateValues());
             this.indices[iCol] = 0;
+
+            System.out.println(this.gridSpecifications.get(iCol).getNPointToGenerate());
         }
 
         int iValue;
@@ -91,8 +106,8 @@ public class GridPointGenerator{
 
                 iValue = indices[iCol];
                 data[iCol] = cartesianProduct.get(iCol)[iValue];
-                this.updateIndices(iCol);
             }
+            this.updateIndices(0);
             builder.add(iPoint, data);
         }
 
@@ -101,22 +116,18 @@ public class GridPointGenerator{
         return fakePointGrid;
     }
 
-    protected void updateIndices(int iCol){
+    protected void updateIndices(int colToUpdate){
 
-        if (iCol >= this.gridSpecifications.size()){
-            return;
+
+        int nPoint = this.gridSpecifications.get(colToUpdate).getNPointToGenerate();
+        int nColumn = this.gridSpecifications.size();
+        this.indices[colToUpdate] = this.indices[colToUpdate] + 1;
+
+        if (this.indices[colToUpdate] == nPoint){
+            this.indices[colToUpdate] = 0;
+            if (colToUpdate < nColumn - 1){
+                this.updateIndices(colToUpdate +1);
+            }
         }
-
-        int nPoint = this.gridSpecifications.get(iCol).getNPointToGenerate();
-
-        int currentIndice = this.indices[iCol];
-        if (currentIndice == nPoint -1){
-            this.indices[iCol] = 0;
-            this.updateIndices(iCol + 1);
-        }
-        else{
-            this.indices[iCol] += 1;
-        }
-
     }
 }

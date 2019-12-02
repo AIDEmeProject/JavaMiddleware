@@ -298,13 +298,17 @@ class ModelBehavior extends Component{
     }
 
     componentDidUpdate(){
+
+        this.plotAll()
+    }
+
+    plotAll(){
         
         if (this.props.availableVariables.length <= 4){
             this.plotGridPointPlot()
         }
-        
-        
-        this.plotDataEmbbedingPlot()
+
+        this.plotDataEmbbedingPlot()   
     }
 
     getGridPoints(){
@@ -312,7 +316,7 @@ class ModelBehavior extends Component{
         const iteration = this.state.modelIteration
         const modelPredictions = this.props.gridHistory.labelHistory[iteration]
         const grid = this.props.gridHistory.grid        
-        
+        console.log(this.props.gridHistory.grid)
         const vars = this.getChosenVariables()
         const iColOne = vars[0]
         const iColTwo = vars[1]
@@ -321,7 +325,7 @@ class ModelBehavior extends Component{
             
             return [e[0][iColOne], e[0][iColTwo], e[1].label]
         })
-        
+        console.log(gridPoints)
         return gridPoints
     }
 
@@ -407,7 +411,6 @@ class ModelBehavior extends Component{
     getChosenVariables(){
 
         const variables = [this.state.firstVariable, this.state.secondVariable]
-        
         return variables
     }
 
@@ -417,9 +420,9 @@ class ModelBehavior extends Component{
         
         var newState = {
             firstVariable: firstVariable,
-            scale: this.computeMinAndMaxScale(firstVariable, secondVariable)
+            scale: this.computeMinMaxOfRawData()
         }         
-        this.setState(newState, this.updatePlot) 
+        this.setState(newState, this.plotAll) 
     }
 
     secondVariableChanged(e){
@@ -429,10 +432,10 @@ class ModelBehavior extends Component{
         
         var newState = {
             secondVariable: secondVariable,
-            scale: this.computeMinAndMaxScale(firstVariable, secondVariable)
+            scale: this.computeMinMaxOfRawData()
         }         
 
-        this.setState(newState, this.updatePlot) 
+        this.setState(newState, this.plotAll) 
     }
 
     onChangeScale(e){
@@ -456,387 +459,6 @@ class ModelBehavior extends Component{
     } 
 }
 
-const d = {
-    
-    "embedding": [
-    [
-        6.6314544677734375, 
-        1.7069072723388672, 
-        1.0
-    ], 
-    [
-        4.779907703399658, 
-        4.3746232986450195, 
-        1.0
-    ], 
-    [
-        -0.5685606002807617, 
-        11.141488075256348, 
-        1.0
-    ], 
-    [
-        -0.16208447515964508, 
-        11.511297225952148, 
-        1.0
-    ], 
-    [
-        -7.838195323944092, 
-        0.18343234062194824, 
-        1.0
-    ], 
-    [
-        -9.697022438049316, 
-        -6.937088489532471, 
-        0.0
-    ], 
-    [
-        -0.8049123287200928, 
-        10.952290534973145, 
-        1.0
-    ], 
-    [
-        5.085594654083252, 
-        4.069980144500732, 
-        1.0
-    ], 
-    [
-        1.8216571807861328, 
-        11.191843032836914, 
-        1.0
-    ], 
-    [
-        0.11190945655107498, 
-        11.648695945739746, 
-        0.0
-    ], 
-    [
-        -9.648449897766113, 
-        -8.574637413024902, 
-        1.0
-    ], 
-    [
-        -0.8103950619697571, 
-        10.9370698928833, 
-        0.0
-    ], 
-    
-    [
-        -8.879761695861816, 
-        1.3719234466552734, 
-        0.0
-    ], 
-    [
-        -9.38370418548584, 
-        -7.433465003967285, 
-        1.0
-    ], 
-    [
-        10.157100677490234, 
-        -5.933054447174072, 
-        0.0
-    ], 
-    [
-        8.675350189208984, 
-        -1.7537881135940552, 
-        1.0
-    ], 
-    [
-        8.412959098815918, 
-        -1.461712121963501, 
-        0.0
-    ], 
-    [
-        1.5539385080337524, 
-        11.286014556884766, 
-        0.0
-    ], 
-    [
-        6.238748550415039, 
-        2.75685715675354, 
-        1.0
-    ], 
-    [
-        -9.743083953857422, 
-        -5.694484233856201, 
-        0.0
-    ], 
-    [
-        6.810112953186035, 
-        1.3901573419570923, 
-        0.0
-    ], 
-    [
-        6.983276844024658, 
-        1.1797120571136475, 
-        0.0
-    ], 
-    [
-        -0.785017728805542, 
-        10.98387336730957, 
-        1.0
-    ], 
-    [
-        8.14511489868164, 
-        -0.8582469820976257, 
-        1.0
-    ], 
-    [
-        10.184682846069336, 
-        -5.946341037750244, 
-        1.0
-    ], 
-    [
-        2.78277850151062, 
-        11.339861869812012, 
-        1.0
-    ], 
-    [
-        9.710125923156738, 
-        -3.4237120151519775, 
-        1.0
-    ], 
-    [
-        -8.447199821472168, 
-        4.427943706512451, 
-        1.0
-    ], 
-    [
-        -9.204044342041016, 
-        2.181438684463501, 
-        1.0
-    ], 
-    [
-        -8.607685089111328, 
-        -4.163544178009033, 
-        1.0
-    ], 
-    [
-        -8.04598617553711, 
-        -2.2373642921447754, 
-        1.0
-    ], 
-    [
-        2.7975804805755615, 
-        11.075854301452637, 
-        1.0
-    ], 
-    [
-        10.240021705627441, 
-        -5.848012447357178, 
-        1.0
-    ], 
-    [
-        -8.907685279846191, 
-        3.7134904861450195, 
-        1.0
-    ], 
-    [
-        6.659791946411133, 
-        2.1227095127105713, 
-        1.0
-    ], 
-    [
-        -7.48036527633667, 
-        -0.141850084066391, 
-        1.0
-    ], 
-    [
-        -9.382011413574219, 
-        -7.396576404571533, 
-        1.0
-    ], 
-    [
-        -8.843470573425293, 
-        -4.253382205963135, 
-        1.0
-    ], 
-    [
-        5.354788303375244, 
-        3.639265298843384, 
-        0.0
-    ], 
-    [
-        -7.875974178314209, 
-        -1.710100769996643, 
-        1.0
-    ], 
-    [
-        7.014988899230957, 
-        1.6969362497329712, 
-        1.0
-    ], 
-    [
-        0.4509063959121704, 
-        11.365342140197754, 
-        1.0
-    ], 
-    [
-        4.845384120941162, 
-        4.326573848724365, 
-        1.0
-    ], 
-    [
-        9.955839157104492, 
-        -3.9620838165283203, 
-        1.0
-    ], 
-    [
-        8.393305778503418, 
-        -1.3593502044677734, 
-        1.0
-    ], 
-    [
-        2.6502766609191895, 
-        10.988636016845703, 
-        1.0
-    ], 
-    [
-        -8.460102081298828, 
-        4.9286675453186035, 
-        1.0
-    ], 
-    [
-        -9.517230033874512, 
-        -7.218629837036133, 
-        1.0
-    ], 
-    [
-        -0.6420661211013794, 
-        11.227463722229004, 
-        1.0
-    ], 
-    [
-        -0.06403443962335587, 
-        11.572739601135254, 
-        1.0
-    ], 
-    [
-        5.151364326477051, 
-        3.9874231815338135, 
-        1.0
-    ], 
-    [
-        10.2652587890625, 
-        -4.7694878578186035, 
-        1.0
-    ], 
-    [
-        -8.262139320373535, 
-        -2.738879919052124, 
-        1.0
-    ], 
-    [
-        10.315261840820312, 
-        -4.9285783767700195, 
-        1.0
-    ], 
-    [
-        -8.60484504699707, 
-        1.0225255489349365, 
-        1.0
-    ], 
-    [
-        4.817389488220215, 
-        4.166478157043457, 
-        1.0
-    ], 
-    [
-        2.3115482330322266, 
-        11.200616836547852, 
-        1.0
-    ], 
-    [
-        10.265813827514648, 
-        -5.351025581359863, 
-        1.0
-    ], 
-    [
-        -7.729633331298828, 
-        0.05888275429606438, 
-        1.0
-    ], 
-    [
-        -9.419160842895508, 
-        -7.992431640625, 
-        1.0
-    ], 
-    [
-        6.6542582511901855, 
-        1.9308836460113525, 
-        1.0
-    ],     
-]
 
-}
-
-const history = [    
-    d
-]
-
-const nPoints = 100
-
-var xMin = -20, 
-    xMax = 20,
-    yMin = -20,
-    yMax = 20
-
-
-var xRange = d3.range(xMin, xMax, (xMax - xMin) / nPoints),
-    yRange = d3.range(xMin, yMax, (yMax - yMin) / nPoints)
-
-
-function generateFakePoints(xRange, yRange){
-
-    var gridPoints = []
-    xRange.forEach(x => {
-
-        yRange.forEach(y => {   
-            /*
-            {                
-                gridPoints.push({
-                    data: [x, y, x - y],
-                    label:  Math.floor(Math.random()* 2)
-                })            
-            }*/
-
-            gridPoints.push([x, y, x - y])
-        })
-    })
-    return gridPoints
-}
-
-
-ModelBehavior.defaultProps = {
-    //grid: fake1,
-    //gridHistory: gridHistory,
-    //history: history,
-    //labeledPoints: labeledPoints,
-    
-    datasetInfos: {
-        minimums: [0, 0, 0],
-        maximums: [10, 10, 10]
-    },
-       
-    availableVariables: [
-        {
-            'name': 'test1',
-            'realId': 0,
-            'idx': 0,
-            'id': 1
-        },
-        {
-            'name': 'test2',
-            'realId': 1,
-            'idx': 0,
-            'id': 2
-        },  
-        {
-            'name': 'test3',
-            'realId': 2,
-            'idx': 0,
-            'id': 3
-        },
-    ]
-}
 
 export default ModelBehavior

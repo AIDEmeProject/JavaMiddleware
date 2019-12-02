@@ -306,8 +306,10 @@ class TSMExploration extends Component{
     }
      
     pointWasLabeledAsYes(e){
-
+        
         var pointId = e.target.dataset.point
+        console.log('HELLO')
+        console.log(pointId)
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
 
         var labeledPoint = this.state.pointsToLabel[pointId]
@@ -385,6 +387,8 @@ class TSMExploration extends Component{
     groupSubLabelisationFinished(e){
         
         var iPoint = e.target.dataset.point
+        console.log('HELLO')
+        console.log(iPoint)
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
         var point = pointsToLabel[iPoint]
         

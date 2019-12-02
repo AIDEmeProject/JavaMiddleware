@@ -53,6 +53,7 @@ class Exploration extends Component{
 
                     onPositiveLabel={this.onPositiveLabel.bind(this)}
                     onNegativeLabel={this.onNegativeLabel.bind(this)}
+                    onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
                 />)
         }
         
@@ -192,6 +193,7 @@ class Exploration extends Component{
 
 
     onNewPointsToLabel(points){
+        console.log(points)
         
         var pointsToLabel = this.state.pointsToLabel.map(e=>e)
 

@@ -187,18 +187,9 @@ class App extends Component {
            
             <div className="App container-fluid">                                    
                 <div className="row">
-
                     <div className="col col-lg-12">
-
-                        <AnimatedText 
-                            text="Hello I am aideme you data exploration assistant. Here you can visualize 
-                            the model behavior at each iteration. Click on next and previous to see the evolution"
-                            id="test-bla"
-                        />
-                        
-                    
-                        <View         
-                        
+                 
+                        <View                        
                             {...this.state}
                             fileUploaded={this.fileUploaded.bind(this)} 
                             sessionWasStarted={this.sessionWasStarted.bind(this)}  
@@ -281,7 +272,7 @@ class App extends Component {
 
         var options = {
             chosenColumns: chosenColumns,
-            groups: groups
+            groups: groups,            
         }
         var newOptions = Object.assign({}, this.state.options, options)
         
@@ -329,9 +320,7 @@ class App extends Component {
             })
         }        
     }
-    
    
-
     getTokens(){
 
         return {
@@ -340,11 +329,6 @@ class App extends Component {
         }
     }
    
-
-    componentDidUpdate(){
-        
-    }
-
     componentDidMount(){
         MicroModal.init()
     }
