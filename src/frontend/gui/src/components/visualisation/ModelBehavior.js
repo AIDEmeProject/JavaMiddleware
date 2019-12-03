@@ -257,8 +257,7 @@ class ModelBehavior extends Component{
         this.gridPlotter.plotData(
             this.state.scale,
             this.getHumanLabeledPoints(),
-            gridPoints,
-            this.getChosenVariables(),
+            gridPoints,            
             colors
         )
     }
@@ -282,8 +281,7 @@ class ModelBehavior extends Component{
         this.plotter.plotData(
             scale,              
             humanLabeledPoints,
-            embeddings, 
-            [0, 1],
+            embeddings,             
             colors
         )        
     }
@@ -314,7 +312,7 @@ class ModelBehavior extends Component{
     }
 
     componentDidUpdate(){
-        setInterval(() => {
+        setTimeout(() => {
             
             if ( ! this.gridPlotter){
             
@@ -354,16 +352,18 @@ class ModelBehavior extends Component{
         const iteration = this.state.modelIteration
         const modelPredictions = this.props.gridHistory.labelHistory[iteration]
         const grid = this.props.gridHistory.grid        
-        console.log(this.props.gridHistory.grid)
+        
         const vars = this.getChosenVariables()
         const iColOne = vars[0]
         const iColTwo = vars[1]
         
-        var gridPoints = d3.zip(grid, modelPredictions).map(e =>{
+        const gridPoints = d3.zip(grid, modelPredictions).map(e =>{
+            const gridPoint = e[0]
+            const prediction = e[1]
             
-            return [e[0][iColOne], e[0][iColTwo], e[1].label]
+            return [gridPoint[iColOne], gridPoint[iColTwo], prediction.label]
         })
-        console.log(gridPoints)
+        
         return gridPoints
     }
 
@@ -454,7 +454,7 @@ class ModelBehavior extends Component{
 
     firstVariableChanged(e){
         var firstVariable = parseInt(e.target.value) 
-        var secondVariable = this.state.secondVariable
+        
         
         var newState = {
             firstVariable: firstVariable,
@@ -465,9 +465,9 @@ class ModelBehavior extends Component{
 
     secondVariableChanged(e){
             
-        var firstVariable = this.state.firstVariable
-        var secondVariable = parseInt(e.target.value) 
         
+        var secondVariable = parseInt(e.target.value) 
+        console.log(secondVariable)
         var newState = {
             secondVariable: secondVariable,
             scale: this.computeMinMaxOfRawData()

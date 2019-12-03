@@ -91,10 +91,9 @@ class ModelBehaviorPlotter{
         return svg
     }
 
-    plotData( scale, humanLabeledPoints, scatterPoints, chosenVariables, colors){
+    plotData( scale, humanLabeledPoints, scatterPoints, colors){
                 
-        var iFirstVariable = chosenVariables[0]
-        var iSecondVariable = chosenVariables[1]
+      
 
         const svg = this.svg        
         const x = this.x
@@ -149,8 +148,8 @@ class ModelBehaviorPlotter{
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)              
             .transition(500)            
-            .attr("cx", function (d) { return x(d[iFirstVariable]); } )
-            .attr("cy", function (d) { return y(d[iSecondVariable]); } )
+            .attr("cx", function (d) { return x(d[0]); } )
+            .attr("cy", function (d) { return y(d[1]); } )
             .attr("r", 4)
             .style("fill", function(d){ return colors[d[2]] })
             .style("opacity", 0.4)
@@ -166,8 +165,8 @@ class ModelBehaviorPlotter{
             .merge(updateLabels)
             .transition()
             .delay(500)    
-            .attr("cx", (d) => { return x(d[iFirstVariable]) } )
-            .attr("cy", (d) => { return y(d[iSecondVariable]) } )
+            .attr("cx", (d) => { return x(d[0]) } )
+            .attr("cy", (d) => { return y(d[1]) } )
             .attr("r", 7)
             .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
             .style("stroke", function(d){
