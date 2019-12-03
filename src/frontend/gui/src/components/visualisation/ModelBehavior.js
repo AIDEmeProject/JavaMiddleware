@@ -85,7 +85,13 @@ class ModelBehavior extends Component{
             gridPoints: [],
             modelIteration: 0,            
             firstVariable: 0,
-            secondVariable: 1,           
+            secondVariable: 1,
+            scale: {
+                xMin: -5,
+                xMax: 5,
+                yMin: -5,
+                yMax: 5
+            }
         }
     }
 
@@ -94,6 +100,13 @@ class ModelBehavior extends Component{
         const scale = this.state.scale        
         const labeledPoints = this.getHumanLabeledPoints()
         
+
+        const hasBehaviorData = this.props.history.length > 0 &&
+                                this.props.gridHistory.labelHistory.length > 0
+
+        if ( ! hasBehaviorData){
+            return (<div>Please label at least one point after the initial sampling phase. If it was done, please wait while vizualization data is computed</div>)
+        }
         return (
 
             <div className="row">
@@ -276,39 +289,64 @@ class ModelBehavior extends Component{
     }
 
     componentWillMount(){
-
+        
+        const hasBehaviorData = this.props.history.length > 0 &&
+                                this.props.gridHistory.labelHistory.length > 0
+        
+        if ( ! hasBehaviorData){
+            return
+        }
+        
         this.setState({
             scale: this.computeMinMaxOfRawData()
-        })
+        })       
     }
     
     componentDidMount(){
-        
-        if (this.props.availableVariables.length <= 4){
-        
-            this.gridPlotter = new ModelBehaviorPlotter()
-            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
-            this.plotGridPointPlot()
+
+        const hasBehaviorData = this.props.history.length > 0 &&
+                                this.props.gridHistory.labelHistory.length > 0
+        if (! hasBehaviorData){
+            return
         }
         
-        this.plotter = new ModelBehaviorPlotter()
-        this.plotter.createPlot("#scatterplot-svg", this.state.scale)
-        this.plotDataEmbbedingPlot()
-
+        this.plotAll()        
     }
 
     componentDidUpdate(){
-
-        this.plotAll()
+        setInterval(() => {
+            
+            if ( ! this.gridPlotter){
+            
+                this.setState({
+                    scale: this.computeMinMaxOfRawData()
+                }, this.plotAll)
+            }
+            else{
+                this.plotAll()
+            }
+        }, 10)
+        
     }
 
     plotAll(){
         
+        if ( ! this.gridPlotter && this.props.availableVariables.length <= 4){
+            
+            this.gridPlotter = new ModelBehaviorPlotter()
+            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
+        }
+        
         if (this.props.availableVariables.length <= 4){
             this.plotGridPointPlot()
         }
 
-        this.plotDataEmbbedingPlot()   
+        if ( ! this.plotter){
+            this.plotter = new ModelBehaviorPlotter()
+            this.plotter.createPlot("#scatterplot-svg", this.state.scale)
+        }
+
+        this.plotDataEmbbedingPlot()
     }
 
     getGridPoints(){

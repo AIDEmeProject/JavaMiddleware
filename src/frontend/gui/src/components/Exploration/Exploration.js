@@ -193,7 +193,7 @@ class Exploration extends Component{
 
 
     onNewPointsToLabel(points){
-        console.log(points)
+        
         
         var pointsToLabel = this.state.pointsToLabel.map(e=>e)
 
@@ -345,10 +345,16 @@ class Exploration extends Component{
                 })
             }
             else{
+
+                this.setState({
+                    labeledPoints: []
+                }, () => {
+                    explorationSendLabeledPoint({
+                        data: labeledPoints,
+                    }, tokens, this.onNewPointsToLabel.bind(this))
+                })
                 
-                explorationSendLabeledPoint({
-                    data: labeledPoints,
-                }, tokens, this.onNewPointsToLabel.bind(this))
+                
             }
         }
     }
