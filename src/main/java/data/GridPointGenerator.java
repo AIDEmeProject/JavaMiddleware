@@ -33,7 +33,6 @@ public class GridPointGenerator{
 
             System.out.println(point.toString());
         }
-
     }
 
     protected ArrayList<ColumnSpecification> gridSpecifications;
@@ -51,36 +50,6 @@ public class GridPointGenerator{
         return nPoint;
     }
 
-    public IndexedDataset buildGridOfFakePoints(){
-
-
-
-        int nColumn = this.gridSpecifications.size();
-        int nPointToCompute = this.getNPointsToCompute();
-        System.out.println("N point to compute");
-        System.out.println(nPointToCompute);
-
-        System.out.println("N columns");
-        System.out.println(nColumn);
-
-        IndexedDataset.Builder builder = new IndexedDataset.Builder();
-
-        for (int iPoint=0; iPoint < nPointToCompute; iPoint++){
-
-            double[] data = new double[nColumn];
-            for (int iCol = 0; iCol < nColumn; iCol++){
-
-                data[iCol] = this.gridSpecifications.get(iCol).generateValue();
-            }
-            builder.add(iPoint, data);
-        }
-
-        IndexedDataset fakePointGrid = builder.build();
-
-        return fakePointGrid;
-    }
-
-
     public IndexedDataset generatePoints(){
 
         ArrayList<double[]> cartesianProduct = new ArrayList();
@@ -91,12 +60,21 @@ public class GridPointGenerator{
 
         int nColumn = this.gridSpecifications.size();
         this.indices = new int[nColumn];
+
+        System.out.println("Number of points to generate");
         for (int iCol = 0; iCol< nColumn; iCol++){
+            System.out.println(iCol);
+            System.out.println(this.gridSpecifications.get(iCol).getNPointToGenerate());
+
+
             cartesianProduct.add(this.gridSpecifications.get(iCol).generateValues());
             this.indices[iCol] = 0;
 
-            System.out.println(this.gridSpecifications.get(iCol).getNPointToGenerate());
+
         }
+
+        System.out.println("N points to compute");
+        System.out.println(getNPointsToCompute());
 
         int iValue;
         for (int iPoint = 0; iPoint < this.getNPointsToCompute(); iPoint++){

@@ -49,7 +49,7 @@ public class Statistics {
 
         this(name, value, 0D, value, value, 1);
 
-        this.uniqueValues = new HashSet<Double>();
+        this.uniqueValues = new HashSet<>();
         this.uniqueValues.add(value);
     }
 
@@ -93,7 +93,16 @@ public class Statistics {
     }
 
     public boolean isNumeric(){
-        return (double) this.uniqueValues.size() > 0.8 * this.sampleSize;
+
+        System.out.println("unique values and sample size");
+        System.out.println(this.uniqueValues.size());
+        System.out.println(this.sampleSize);
+        System.out.println(0.8 * this.sampleSize);
+
+        boolean hasMoreThan100UniqueValues = this.uniqueValues.size() > 100;
+
+        return hasMoreThan100UniqueValues || ((double) this.uniqueValues.size() > 0.8 * this.sampleSize);
+
     }
 
     public int getSampleSize() {
@@ -113,6 +122,7 @@ public class Statistics {
         min = Math.min(min, value);
         max = Math.max(max, value);
         uniqueValues.add(value);
+
     }
 
     @Override
