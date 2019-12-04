@@ -54,6 +54,7 @@ class Exploration extends Component{
                     onPositiveLabel={this.onPositiveLabel.bind(this)}
                     onNegativeLabel={this.onNegativeLabel.bind(this)}
                     onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
+                    dataset={this.props.dataset}
                 />)
         }
         
@@ -150,6 +151,7 @@ class Exploration extends Component{
                                 pointsToLabel={this.state.pointsToLabel}
                                 onPositiveLabel={this.onPositiveLabel.bind(this)}
                                 onNegativeLabel={this.onNegativeLabel.bind(this)}
+                                dataset={this.props.dataset}
                             />
                         </div>
                 }
@@ -169,8 +171,7 @@ class Exploration extends Component{
 
                 {
                     this.state.showModelVisualisation && 
-                    
-                    
+                                        
                     <ModelVisualization 
                         {...this.props}
                         {...this.state}
@@ -182,7 +183,7 @@ class Exploration extends Component{
 
                     <DataPoints                             
                         availableVariables={this.props.finalVariables}
-                        points={this.props.labeledPoints}
+                        points={this.state.allLabeledPoints}
                         chosenColumns={this.props.chosenColumns}
                         show={true}
                     />
@@ -352,9 +353,7 @@ class Exploration extends Component{
                     explorationSendLabeledPoint({
                         data: labeledPoints,
                     }, tokens, this.onNewPointsToLabel.bind(this))
-                })
-                
-                
+                })                            
             }
         }
     }

@@ -5,6 +5,10 @@ class Dataset{
         this.dataset = d3dataset
     }
 
+    set_columns_selected_by_users(names){
+        this.select_column_names = names.map(e => e['name'])
+    }
+
     get_column_name(name){
 
         return this.dataset.map( e => parseFloat(e[name]))
@@ -25,6 +29,16 @@ class Dataset{
         return this.dataset.map(row => {
             return row[name]
         })
+    }
+
+    get_point(id){
+        
+        const row = this.dataset[id]
+        var d = this.select_column_names.map(e => {
+            return row[e]
+        })
+        
+        return d
     }
 
     get_columns(ids, aliases){

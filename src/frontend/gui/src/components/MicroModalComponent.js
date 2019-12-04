@@ -24,7 +24,15 @@ class MicroModalComponent extends Component{
                 <h2 className="modal__title" id="modal-1-title">
                     {this.props.title}
                 </h2>
-                <button className="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                <button
+                     className="modal__close"                     
+                     
+                    onClick={this.props.onClose}
+                    role="button"
+                    type="button"
+                >
+
+                </button>
                 </header>
                 <main className="modal__content" id="modal-1-content">
                 <div>

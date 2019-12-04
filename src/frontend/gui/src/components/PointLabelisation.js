@@ -40,7 +40,7 @@ class PointLabelisation extends Component{
                     
                 {
                     this.props.pointsToLabel.map((point, key) => {
-                        
+                        const pointData = this.props.dataset.get_point(point.id)
                         return (
 
                             <tr key={key}>
@@ -51,7 +51,7 @@ class PointLabelisation extends Component{
                       
                                 {
 
-                                    point.data.map((value, valueKey) => {
+                                    pointData.map((value, valueKey) => {
                                         return (
                                             
                                             <td  key={valueKey}>

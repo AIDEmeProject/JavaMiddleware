@@ -14,6 +14,8 @@ class DataPoints extends Component{
             if ( ! this.props.show){
                 return (<div></div>)
             }
+
+        
             return (
 
                 <div>

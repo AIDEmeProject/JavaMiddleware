@@ -247,10 +247,8 @@ class TSMExploration extends Component{
                             })
                         }
                             </tbody>
-                        </table>
-                                                               
+                        </table>                                                               
                     </div>
-
                 }                           
                 {
                     this.state.showModelPerformance && 

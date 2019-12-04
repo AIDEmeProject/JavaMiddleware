@@ -46,7 +46,7 @@ class ModelBehaviorPlotter{
                                  (height + margin.top + 30) + ")")
             .style("text-anchor", "middle")
             .style('fill', 'black')
-            .text("COUCOU");
+            .text("Variable 1");
 
           // text label for the y axis
         svg.append("text")
@@ -56,7 +56,7 @@ class ModelBehaviorPlotter{
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
                 .style('fill', 'black')
-                .text("Value"); 
+                .text("Variable 2"); 
         
 
         this.yAxis = svg.append("g")

@@ -76,9 +76,9 @@ class GroupEditor extends Component{
         if (isChecked){
             this.props.onVariableAddedToGroup(iGroup, iVariable)
         }
-        else{
-            this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-        }        
+        //else{
+        //    this.props.onVariableRemovedFromGroup(iGroup, iVariable)
+        //}        
     }
 }
 
@@ -114,7 +114,13 @@ class Group extends Component {
                                 <div                                                            
                                     className=""
                                 >                                
-                                {variable.name} <button  onClick={this.removeVariable.bind(this)}>Remove</button>
+                                {variable.name} <button 
+                                                    data-variable={iVariable}
+                                                    data-group={iGroup}
+                                                    onClick={this.removeVariable.bind(this)}
+                                                >
+                                                    Remove
+                                                </button>
                                 </div>        
                             </div>      
                         </div>                        
@@ -127,7 +133,9 @@ class Group extends Component {
 
     removeVariable(e){
         e.preventDefault()
-        
+        var iVariable = parseInt(e.target.dataset.variable)
+        var iGroup = parseInt(e.target.dataset.group)
+        this.props.onVariableRemovedFromGroup(iGroup, iVariable)
     }
 
     onVariableCheckboxClick(e){
@@ -325,17 +333,18 @@ class GroupVariables extends Component {
         var modifiedGroup = newGroupsState[groupId]
 
         console.log(modifiedGroup, removedColumnId)
-        
-        modifiedGroup = modifiedGroup.filter(variable => {
-            console.log(parseInt(variable.idx) !== parseInt(removedColumnId), variable.idx)
-            return parseInt(variable.idx) !== parseInt(removedColumnId)
+        /*
+        modifiedGroup = modifiedGroup.filter((variable, i) => {
+            
+            return i !== removedColumnId
         })
-
+        */
+        modifiedGroup.splice(removedColumnId, 1)
         console.log(modifiedGroup, removedColumnId)
 
         var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(e => e)
         variablesNotAlreadyInAGivenGroup.push(variable)
-        
+        newGroupsState[groupId] = modifiedGroup
         this.setState({
             groups: newGroupsState,
             variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup

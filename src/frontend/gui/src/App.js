@@ -263,6 +263,11 @@ class App extends Component {
     sessionOptionsWereChosen(options){
         
         var newOptions = Object.assign({}, this.state.options, options)
+
+        const chosenColumns = options.chosenColumns
+        console.log('COLUMNS')
+        console.log(chosenColumns)
+        this.state.dataset.set_columns_selected_by_users(chosenColumns)
         this.setState({
             options: newOptions
         })
