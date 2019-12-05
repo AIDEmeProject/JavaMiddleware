@@ -101,13 +101,7 @@ class Exploration extends Component{
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
                                     href="#advanced-options"
-                                    onClick={() => this.setState({
-                                        'showModelVisualisation': false, 
-                                        'showLabelView': false,  
-                                        'showHeatmap': false,
-                                        'showLabelHistory': false,
-                                        'showModelBehavior': true
-                                    })}
+                                    onClick={this.onModelBehaviorClick.bind(this)}
                                 >
                                     Model Behavior
                                 </a>
@@ -166,7 +160,6 @@ class Exploration extends Component{
                         history={this.state.history}
                         gridHistory={this.state.gridHistory}
                     />
-
                 }
 
                 {
@@ -186,6 +179,7 @@ class Exploration extends Component{
                         points={this.state.allLabeledPoints}
                         chosenColumns={this.props.chosenColumns}
                         show={true}
+                        dataset={this.props.dataset}
                     />
                 }                
             </div>
@@ -194,7 +188,6 @@ class Exploration extends Component{
 
 
     onNewPointsToLabel(points){
-        
         
         var pointsToLabel = this.state.pointsToLabel.map(e=>e)
 
@@ -214,6 +207,27 @@ class Exploration extends Component{
         })       
     }
 
+
+    onModelBehaviorClick(e){
+        
+        const hasBehaviorData = this.state.history.length > 0 &&
+                                this.state.gridHistory.labelHistory.length > 0
+        
+
+        if (hasBehaviorData){    
+            this.setState({
+                'showModelVisualisation': false, 
+                'showLabelView': false,  
+                'showHeatmap': false,
+                'showLabelHistory': false,
+                'showModelBehavior': true
+            })
+        }
+        else{
+            alert('Please label at least one more point or wait for computation to finish')
+        }
+    }
+
     onPositiveLabel(e){
         
         var dataIndex = parseInt(e.target.dataset.key)
@@ -223,6 +237,11 @@ class Exploration extends Component{
     onNegativeLabel(e){
         var dataIndex = parseInt(e.target.dataset.key)
         this.dataWasLabeled(dataIndex, 0)                      
+    }
+
+    componentDidUpdate(){
+        //console.log(this.state)
+        //console.log(this.state.allLabeledPoints)
     }
 
     dataWasLabeled(dataIndex, label){
@@ -281,11 +300,9 @@ class Exploration extends Component{
         }
     }
 
-
-
     getModelBehaviorData(){
 
-        console.log(this.state.gridHistory.grid.length)
+    
         if ( this.state.gridHistory.grid.length === 0){
             getGridPoints(points => {
                 
@@ -311,10 +328,11 @@ class Exploration extends Component{
                         'label': e.label === "NEGATIVE" ? -1: 1
                     }
                 })
+
                 var grid = this.state.gridHistory
                 var labelHistory = grid.labelHistory
                 labelHistory.push(predictedLabels)
-                
+                                
                 this.setState({
                     gridHistory: {
                         'grid': grid.grid,
@@ -324,8 +342,6 @@ class Exploration extends Component{
             })
         }        
     }
-
-
 
     labelForInitialSession(labeledPoints, pointsToLabel){
         

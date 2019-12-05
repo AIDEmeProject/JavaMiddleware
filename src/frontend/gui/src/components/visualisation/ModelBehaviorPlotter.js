@@ -91,10 +91,8 @@ class ModelBehaviorPlotter{
         return svg
     }
 
-    plotData( scale, humanLabeledPoints, scatterPoints, colors){
-                
-      
-
+    plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors){
+        
         const svg = this.svg        
         const x = this.x
         const y = this.y
@@ -155,25 +153,30 @@ class ModelBehaviorPlotter{
             .style("opacity", 0.4)
             .style("stroke", "white") 
 
-        var updateLabels = this.gLabels
+
+
+        var updateHumanLabels = this.gLabels
             .selectAll("circle")
             .data(humanLabeledPoints)
-     
-        updateLabels
+                 
+        const var1 = chosenVariables[0],
+              var2 = chosenVariables[1]
+        
+        updateHumanLabels
             .enter()
             .append("circle")
-            .merge(updateLabels)
+            .merge(updateHumanLabels)
             .transition()
             .delay(500)    
-            .attr("cx", (d) => { return x(d[0]) } )
-            .attr("cy", (d) => { return y(d[1]) } )
+            .attr("cx", function(d) { return x(d[var1]) } )
+            .attr("cy", function(d) { return y(d[var2]) } )
             .attr("r", 7)
             .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
             .style("stroke", function(d){
                     return d[2] == 1 ? "green" : 'red'
             })
                     
-        updateLabels.exit().remove()                     
+        updateHumanLabels.exit().remove()                     
     }
 
     updateAxis(x, y, scale){

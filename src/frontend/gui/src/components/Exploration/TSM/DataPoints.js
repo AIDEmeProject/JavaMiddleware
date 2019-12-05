@@ -27,7 +27,7 @@ class DataPoints extends Component{
                     <tbody>                
                         {
                             this.props.labeledPoints.map((point, i) => {
-                                
+                                const data = this.props.dataset.get_point(point.id)
                                 return (
                                     <tr 
                                         key={i}
@@ -44,7 +44,7 @@ class DataPoints extends Component{
                                                 var dataAsGroups = []
 
                                                 pointIds.forEach(realId => {
-                                                    var value = point.data[realId]
+                                                    var value = data[realId]
                                                 
                                                     dataAsGroups.push(value)
                                                 })

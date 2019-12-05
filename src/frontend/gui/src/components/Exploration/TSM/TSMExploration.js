@@ -85,13 +85,7 @@ class TSMExploration extends Component{
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
                                     href="#advanced-options"
-                                    onClick={() => this.setState({
-                                        'showModelVisualisation': false, 
-                                        'showLabelView': false,  
-                                        'showHeatmap': false,
-                                        'showLabelHistory': false,
-                                        'showModelBehavior': true
-                                    })}
+                                    onClick={this.onModelBehaviorClick.bind(this)}
                                 >
                                     Model Behavior
                                 </a>
@@ -162,7 +156,7 @@ class TSMExploration extends Component{
                             <tbody>                
                             {
                             this.state.pointsToLabel.map((point, i) => {
-                                
+                                const pointData = this.props.dataset.get_point(point.id)
                                 return (
 
                                     <tr 
@@ -180,7 +174,7 @@ class TSMExploration extends Component{
                                                 var dataAsGroups = []
 
                                                 pointIds.forEach(realId => {
-                                                    var value = point.data[realId]
+                                                    var value = pointData[realId]
                                                 
                                                     dataAsGroups.push(value)
                                                 })
@@ -277,10 +271,32 @@ class TSMExploration extends Component{
                         labeledPoints={this.state.allLabeledPoints}
                         chosenColumns={this.props.chosenColumns}
                         groups={this.props.groups}
+                        dataset={this.props.dataset}
                     />
                 }                
             </div>
         )
+    }
+
+    onModelBehaviorClick(e){
+        
+        const hasBehaviorData = this.state.history.length > 0 &&
+                                this.state.gridHistory.labelHistory.length > 0
+        
+
+        if (hasBehaviorData){ 
+
+            this.setState({
+                'showModelVisualisation': false, 
+                'showLabelView': false,  
+                'showHeatmap': false,
+                'showLabelHistory': false,
+                'showModelBehavior': true
+            })
+        }
+        else{
+            alert('Please label at least one more point or wait for computation to finish')
+        }    
     }
 
     newPointsToLabel(points){
@@ -313,8 +329,7 @@ class TSMExploration extends Component{
         labeledPoint.label= 1
         
         pointsToLabel.splice(pointId, 1)
-        
-        
+                
         var labeledPoints = this.state.labeledPoints.map(e => e)
 
         labeledPoints.push(labeledPoint)

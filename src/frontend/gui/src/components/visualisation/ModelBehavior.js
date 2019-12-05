@@ -98,15 +98,16 @@ class ModelBehavior extends Component{
     render(){
         
         const scale = this.state.scale        
-        const labeledPoints = this.getHumanLabeledPoints()
+        const labeledPoints =  this.getHumanLabeledPoints()
         
 
-        const hasBehaviorData = this.props.history.length > 0 &&
-                                this.props.gridHistory.labelHistory.length > 0
+        //const hasBehaviorData = this.props.history.length > 0 &&
+        //                        this.props.gridHistory.labelHistory.length > 0
 
-        if ( ! hasBehaviorData){
-            return (<div>Please label at least one point after the initial sampling phase. If it was done, please wait while vizualization data is computed</div>)
-        }
+        //if ( ! hasBehaviorData){
+        //    return (<div>Please label at least one point after the initial sampling phase. If it was done, please wait while vizualization data is computed</div>)
+        //}
+
         return (
 
             <div className="row">
@@ -244,6 +245,50 @@ class ModelBehavior extends Component{
         )
     }
 
+    
+    componentWillMount(){
+        
+        const hasBehaviorData = this.props.history.length > 0 &&
+                                this.props.gridHistory.labelHistory.length > 0
+        
+        if ( ! hasBehaviorData){
+            return
+        }
+        
+        this.setState({
+            scale: this.computeMinMaxOfRawData()
+        })       
+    }
+    
+    componentDidMount(){
+
+       
+        if (this.props.availableVariables.length <= 4){
+            
+            this.gridPlotter = new ModelBehaviorPlotter()
+            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
+        }
+        
+        this.plotter = new ModelBehaviorPlotter()
+        this.plotter.createPlot("#scatterplot-svg", this.state.scale)
+        
+        this.plotAll()   
+    }
+
+    componentDidUpdate(){
+
+        //this.plotAll()            
+    }
+
+    plotAll(){
+        
+        if (this.props.availableVariables.length <= 4){
+            this.plotGridPointPlot()
+        }
+
+        this.plotDataEmbbedingPlot()
+    }
+
     plotGridPointPlot(){
         
         var colors = {
@@ -252,14 +297,14 @@ class ModelBehavior extends Component{
             '1': 'green'
         }
 
-        const gridPoints = this.getGridPoints()
-        
-        this.gridPlotter.plotData(
-            this.state.scale,
-            this.getHumanLabeledPoints(),
-            gridPoints,            
-            colors
-        )
+        const scatterPoints = this.getGridPoints()
+        const chosenVariables = this.getChosenVariables()
+        const humanLabeledPoints = this.getHumanLabeledPoints()
+        const scale = this.state.scale
+        console.log("WHY UNDEFINED")
+        console.log(humanLabeledPoints)
+        console.log(chosenVariables)
+        this.gridPlotter.plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors)
     }
 
     plotDataEmbbedingPlot(){
@@ -277,75 +322,17 @@ class ModelBehavior extends Component{
         const scale = this.computeMinAndMaxScale(x, y)
                 
         const humanLabeledPoints = this.getLabeledEmbedding()
-
+        console.log(humanLabeledPoints)
+        const chosenVariables = [0, 1]
         this.plotter.plotData(
             scale,              
             humanLabeledPoints,
+            chosenVariables,
             embeddings,             
             colors
         )        
     }
 
-    componentWillMount(){
-        
-        const hasBehaviorData = this.props.history.length > 0 &&
-                                this.props.gridHistory.labelHistory.length > 0
-        
-        if ( ! hasBehaviorData){
-            return
-        }
-        
-        this.setState({
-            scale: this.computeMinMaxOfRawData()
-        })       
-    }
-    
-    componentDidMount(){
-
-        const hasBehaviorData = this.props.history.length > 0 &&
-                                this.props.gridHistory.labelHistory.length > 0
-        if (! hasBehaviorData){
-            return
-        }
-        
-        this.plotAll()        
-    }
-
-    componentDidUpdate(){
-        setTimeout(() => {
-            
-            if ( ! this.gridPlotter){
-            
-                this.setState({
-                    scale: this.computeMinMaxOfRawData()
-                }, this.plotAll)
-            }
-            else{
-                this.plotAll()
-            }
-        }, 10)
-        
-    }
-
-    plotAll(){
-        
-        if ( ! this.gridPlotter && this.props.availableVariables.length <= 4){
-            
-            this.gridPlotter = new ModelBehaviorPlotter()
-            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
-        }
-        
-        if (this.props.availableVariables.length <= 4){
-            this.plotGridPointPlot()
-        }
-
-        if ( ! this.plotter){
-            this.plotter = new ModelBehaviorPlotter()
-            this.plotter.createPlot("#scatterplot-svg", this.state.scale)
-        }
-
-        this.plotDataEmbbedingPlot()
-    }
 
     getGridPoints(){
 
@@ -382,13 +369,21 @@ class ModelBehavior extends Component{
     }
 
     getHumanLabeledPoints(){
-
+                
         const iteration = this.state.modelIteration       
-        const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
+        var labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
-        }).map(e => {
-            return [...e.data, e.label]
         })
+        
+        console.log(labeledPoints)
+        labeledPoints = labeledPoints.map(e => {
+            
+            var v = e.data
+            v.push(e.label)
+            console.log(v)
+            return v
+        })
+        console.log(labeledPoints)
         
         return labeledPoints
     }
@@ -396,13 +391,16 @@ class ModelBehavior extends Component{
     getLabeledEmbedding(){
                 
         const embeddings = this.getEmbbedings()
-        const iteration = this.state.modelIteration       
+        const iteration = this.state.modelIteration
+
         const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
         })
 
-        const labeledEmbeddings =  labeledPoints.map( e => {
-            
+        console.log(labeledPoints)
+        console.log(embeddings)
+
+        const labeledEmbeddings = labeledPoints.map(e => {            
             return embeddings[e.id]
         })
         
@@ -467,7 +465,7 @@ class ModelBehavior extends Component{
             
         
         var secondVariable = parseInt(e.target.value) 
-        console.log(secondVariable)
+        
         var newState = {
             secondVariable: secondVariable,
             scale: this.computeMinMaxOfRawData()
@@ -496,7 +494,5 @@ class ModelBehavior extends Component{
         }                                          
     } 
 }
-
-
 
 export default ModelBehavior

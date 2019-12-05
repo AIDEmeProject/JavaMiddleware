@@ -279,6 +279,9 @@ class App extends Component {
             chosenColumns: chosenColumns,
             groups: groups,            
         }
+        
+        this.state.dataset.set_columns_selected_by_users(chosenColumns)
+
         var newOptions = Object.assign({}, this.state.options, options)
         
         this.setState({options: newOptions}, callback)
