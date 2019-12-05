@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GetLabelsOfFakePointGridServlet extends HttpServlet {
+public class GetModelPredictionOverFakePointGridServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -28,7 +28,7 @@ public class GetLabelsOfFakePointGridServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        ArrayList<LabeledPoint> labeledPoints = manager.computeLabelOfFakeGridPoint();
+        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionsOverFakeGridPoints();
 
         Gson gson = new Gson();
 

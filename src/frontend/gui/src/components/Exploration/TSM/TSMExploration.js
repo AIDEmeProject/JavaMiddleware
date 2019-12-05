@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import $ from 'jquery'
+
 import TSMModelVisualization from './TSMModelVisualization'
 import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 import DataPoints from './DataPoints'
@@ -8,7 +10,9 @@ import ModelBehavior from '../../visualisation/ModelBehavior'
 import getDecisionBoundaryData from '../../../actions/getDecisionBoundaryData'
 import getGridPoints from '../../../actions/getGridPoints'
 
-import $ from 'jquery'
+import getTSMPredictions from '../../../actions/getTSMPredictionsOverGridPoints';
+import getModelPredictionsOverGridPoints from '../../../actions/getModelPredictionsOverGridPoints';
+
 import {backend, webplatformApi} from '../../../constants/constants'
 
 class TSMExploration extends Component{
@@ -32,11 +36,11 @@ class TSMExploration extends Component{
             visualizationData: {
                 TSMBound: null
             },          
-            history: [],  
-            gridHistory: {
-                grid: [],
-                labelHistory: []
-            }
+            
+            fakePointGrid:[],
+            TSMPredictionHistory: [],
+            modelPredictionHistory: [],
+            projectionHistory: []
         }        
     }
 
@@ -258,8 +262,11 @@ class TSMExploration extends Component{
                         labeledPoints={this.state.allLabeledPoints}
                         datasetInfos={this.props.datasetInfos}
                         availableVariables={this.props.chosenColumns}
-                        history={this.state.history}
-                        gridHistory={this.state.gridHistory}
+                        fakePointGrid={this.state.fakePointGrid}
+                        TSMPredictionHistory={this.state.TSMPredictionHistory}
+                        modelPredictionHistory={this.state.modelPredictionHistory}                        
+                        projectionHistory={this.state.projectionHistory}
+                        hasTSM={this.state.TSMPredictionHistory.length > 0}
                     />
                 }
 
@@ -280,9 +287,7 @@ class TSMExploration extends Component{
 
     onModelBehaviorClick(e){
         
-        const hasBehaviorData = this.state.history.length > 0 &&
-                                this.state.gridHistory.labelHistory.length > 0
-        
+        const hasBehaviorData = this.state.modelPredictionHistory.length > 0
 
         if (hasBehaviorData){ 
 
@@ -339,8 +344,7 @@ class TSMExploration extends Component{
         if (pointsToLabel.length === 0){
             allLabeledPoints = allLabeledPoints.concat(labeledPoints)
         }
-        
-        
+                
         this.setState({
             allLabeledPoints: allLabeledPoints,
             pointsToLabel: pointsToLabel,
@@ -358,12 +362,12 @@ class TSMExploration extends Component{
     groupWasLabeledAsNo(e){
 
         var iPoint = e.target.dataset.point
-        console.log(iPoint)
+        
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
 
         var point = pointsToLabel[iPoint]
         point.labels = this.props.groups.map (e => 1)
-        point.label= 0
+        point.label = 0
 
         this.setState({
             pointsToLabel: pointsToLabel,  
@@ -382,10 +386,8 @@ class TSMExploration extends Component{
             alert('please label at least one subgroup')
             return
         }
-        
-        
-        pointsToLabel.splice(iPoint, 1)
-        
+                
+        pointsToLabel.splice(iPoint, 1)        
 
         var labeledPoints = this.state.labeledPoints.map(e => e)
         labeledPoints.push(point)
@@ -409,23 +411,13 @@ class TSMExploration extends Component{
         })       
     }
 
-    getGridPointLabels(dataWasReceived){
-
-        var url = backend + "/get-label-over-grid-point"
-
-        $.get(url, dataWasReceived)    
-    }
-
     getModelBoundaries(){
 
-
-        if ( this.state.gridHistory.grid.length === 0){
+        if ( this.state.fakePointGrid.length === 0){
             getGridPoints(points => {
                 
-                var grid = this.state.gridHistory
-                grid.grid = points
                 this.setState({
-                    gridHistory:grid
+                    fakePointGrid: points
                 })
 
             })
@@ -434,37 +426,34 @@ class TSMExploration extends Component{
         if ( ! this.state.initialLabelingSession){
 
             getDecisionBoundaryData(this.dataWasReceived.bind(this))
-            this.getGridPointLabels(response => {
-                                
-                var rawLabels = response
-                
-                var predictedLabels = rawLabels.map(e => {
-                    return {
-                        'id': e.dataPoint.id,
-                        'label': e.label.label
-                    }
-                })
-                var grid = this.state.gridHistory
-                var labelHistory = grid.labelHistory
-                labelHistory.push(predictedLabels)
+            getTSMPredictions(predictedLabels => {
+                                            
+                var TSMPredictionHistory = this.state.TSMPredictionHistory
+                TSMPredictionHistory.push(predictedLabels)
                 
                 this.setState({
-                    gridHistory: {
-                        'grid': grid.grid,
-                        'labelHistory': labelHistory
-                    }
+                    'TSMPredictionHistory': TSMPredictionHistory
                 })
             })
+
+            getModelPredictionsOverGridPoints(predictions => {
+                var history = this.state.modelPredictionHistory
+
+                history.push(predictions)                
+                this.setState({
+                    'modelPredictionHistory': history
+                })
+            }, true)
         }        
     }
 
     dataWasReceived(boundaryData){
         
-        let history = this.state.history
+        let history = this.state.projectionHistory
         history.push(JSON.parse(boundaryData))
         
         this.setState({
-            history: history
+            projectionHistory: history
         })        
     }
 

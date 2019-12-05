@@ -1,7 +1,5 @@
 package application;
 
-import org.eclipse.jetty.io.SelectChannelEndPoint;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -47,7 +45,8 @@ public class ApplicationServerMain {
         handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
         handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/get-decision-boundaries");
         handler.addServlet(getFakePointGridServlet.class, "/get-fake-point-grid");
-        handler.addServlet(GetLabelsOfFakePointGridServlet.class, "/get-label-over-grid-point");
+        handler.addServlet(GetModelPredictionOverFakePointGridServlet.class, "/get-model-predictions-over-grid-point");
+        handler.addServlet(getTSMPredictionOverFakePointGridServlet.class, "/get-tsm-predictions-over-grid-point");
 
 
         ResourceHandler resource_handler = new ResourceHandler();

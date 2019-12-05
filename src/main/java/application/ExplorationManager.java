@@ -284,6 +284,19 @@ public class ExplorationManager {
     }
 
 
+    public ArrayList<LabeledPoint> computeTSMPredictionsOverFakeGridPoints(){
+
+        return this.TSMPrediction(this.getScaledGridOfFakePoints());
+    }
+
+    public ArrayList<LabeledPoint> computeModelPredictionsOverFakeGridPoints(){
+
+        return this.labelPoints(this.getScaledGridOfFakePoints(), this.getGridOfFakePoints(), false);
+    }
+
+
+
+
     public ArrayList<LabeledPoint> computeLabelOfFakeGridPoint(){
 
         if (! this.configuration.hasMultiTSM()){

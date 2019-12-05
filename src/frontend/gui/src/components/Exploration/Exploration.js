@@ -17,7 +17,7 @@ import getWholedatasetLabeled from '../../actions/getWholeLabeledDataset'
 import getDecisionBoundaryData from '../../actions/getDecisionBoundaryData'
 
 import getGridPoints from '../../actions/getGridPoints'
-import getGridPointLabels from '../../actions/getGridPointLabels'
+import getModelPredictionsOverGridPoints from '../../actions/getModelPredictionsOverGridPoints'
 
 
 
@@ -34,12 +34,12 @@ class Exploration extends Component{
             labeledPoints: [],
             pointsToLabel: this.props.pointsToLabel.map(e => e),
             allLabeledPoints: [],
-            initialLabelingSession: true,
-            history: [],  
-            gridHistory: {
-                grid: [],
-                labelHistory: []
-            }
+            initialLabelingSession: true,            
+            fakePointGridabelHistory: [],
+            projectionHistory: [],
+            fakePointGrid: [],
+            modelPredictionHistory: []
+
         }
     }
 
@@ -157,8 +157,10 @@ class Exploration extends Component{
                         labeledPoints={this.state.allLabeledPoints}
                         datasetInfos={this.props.datasetInfos}
                         availableVariables={this.props.chosenColumns}
-                        history={this.state.history}
-                        gridHistory={this.state.gridHistory}
+                        projectionHistory={this.state.projectionHistory}
+                        fakePointGrid={this.state.fakePointGrid}
+                        modelPredictionHistory={this.state.modelPredictionHistory}
+                        hasTSM={false}
                     />
                 }
 
@@ -210,9 +212,7 @@ class Exploration extends Component{
 
     onModelBehaviorClick(e){
         
-        const hasBehaviorData = this.state.history.length > 0 &&
-                                this.state.gridHistory.labelHistory.length > 0
-        
+        const hasBehaviorData = this.state.modelPredictionHistory.length > 0 
 
         if (hasBehaviorData){    
             this.setState({
@@ -303,13 +303,10 @@ class Exploration extends Component{
     getModelBehaviorData(){
 
     
-        if ( this.state.gridHistory.grid.length === 0){
-            getGridPoints(points => {
-                
-                var grid = this.state.gridHistory
-                grid.grid = points
+        if ( this.state.fakePointGrid.length === 0){
+            getGridPoints(points => {                                                
                 this.setState({
-                    gridHistory:grid
+                    fakePointGrid: points
                 })
 
             })
@@ -318,28 +315,14 @@ class Exploration extends Component{
         if ( ! this.state.initialLabelingSession){
 
             getDecisionBoundaryData(this.dataWasReceived.bind(this))
-            getGridPointLabels(response => {
-                                
-                var rawLabels = response
-                
-                var predictedLabels = rawLabels.map(e => {
-                    return {
-                        'id': e.dataPoint.id,
-                        'label': e.label === "NEGATIVE" ? -1: 1
-                    }
-                })
-
-                var grid = this.state.gridHistory
-                var labelHistory = grid.labelHistory
-                labelHistory.push(predictedLabels)
-                                
+            getModelPredictionsOverGridPoints(predictedLabels => {
+                                                            
+                var history = this.state.modelPredictionHistory
+                history.push(predictedLabels)                
                 this.setState({
-                    gridHistory: {
-                        'grid': grid.grid,
-                        'labelHistory': labelHistory
-                    }
+                    modelPredictionHistory: history
                 })
-            })
+            }, false)
         }        
     }
 
@@ -425,11 +408,11 @@ class Exploration extends Component{
 
     dataWasReceived(boundaryData){
         
-        let history = this.state.history
+        let history = this.state.projectionHistory
         history.push(JSON.parse(boundaryData))
         
         this.setState({
-            history: history
+            projectionHistory: history
         })        
     }   
 }

@@ -1,7 +1,6 @@
 package application;
 
 import com.google.gson.Gson;
-import data.IndexedDataset;
 import data.LabeledPoint;
 
 import javax.servlet.ServletException;
@@ -11,8 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
-public class getFakePointGridServlet extends HttpServlet {
+public class getTSMPredictionOverFakePointGridServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -22,11 +20,11 @@ public class getFakePointGridServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        IndexedDataset fakePoints = manager.getGridOfFakePoints();
+        ArrayList<LabeledPoint> labeledPoints = manager.computeTSMPredictionsOverFakeGridPoints();
 
         Gson gson = new Gson();
 
-        String strLabeledPoints = gson.toJson(fakePoints.toList());
+        String strLabeledPoints = gson.toJson(labeledPoints);
 
         resp.getWriter().println(strLabeledPoints);
     }

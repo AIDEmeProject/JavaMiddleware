@@ -237,9 +237,11 @@ class ModelBehavior extends Component{
             </div>        
                 <div className="col col-lg-8">
                     
-                    <svg id="gridpoint-svg"></svg>
+                    <svg id="model-predictions-grid-point"></svg>
 
-                    <svg id="scatterplot-svg"></svg>                
+                    { this.props.hasTSM && <svg id="tsm-plot"></svg> }
+
+                    <svg id="projection"></svg>                
                 </div>        
             </div>
         )
@@ -248,9 +250,8 @@ class ModelBehavior extends Component{
     
     componentWillMount(){
         
-        const hasBehaviorData = this.props.history.length > 0 &&
-                                this.props.gridHistory.labelHistory.length > 0
-        
+        const hasBehaviorData = this.props.modelPredictionHistory.length > 0 
+
         if ( ! hasBehaviorData){
             return
         }
@@ -262,15 +263,21 @@ class ModelBehavior extends Component{
     
     componentDidMount(){
         const columnNames = this.props.availableVariables.map( e => e.name)
-        console.log(columnNames)
+        
         if (this.props.availableVariables.length <= 4){
             
-            this.gridPlotter = new ModelBehaviorPlotter(columnNames)
-            this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
+            this.modelPredictionPlotter = new ModelBehaviorPlotter(columnNames)
+            this.modelPredictionPlotter.createPlot('#model-predictions-grid-point', this.state.scale)
         }
         
-        this.plotter = new ModelBehaviorPlotter(['X', 'Y'])
-        this.plotter.createPlot("#scatterplot-svg", this.state.scale)
+        this.projectionPlotter = new ModelBehaviorPlotter(['X', 'Y'])
+        this.projectionPlotter.createPlot("#projection", this.state.scale)
+
+
+        if (this.props.hasTSM){
+            this.tsmPlotter = new ModelBehaviorPlotter(columnNames)
+            this.tsmPlotter.createPlot("#tsm-plot", this.state.scale)
+        }
         
         this.plotAll()   
     }
@@ -283,13 +290,33 @@ class ModelBehavior extends Component{
     plotAll(){
         
         if (this.props.availableVariables.length <= 4){
-            this.plotGridPointPlot()
+            this.plotPredictionOnGridPoints()
+        }
+
+        if (this.props.hasTSM){
+            this.plotTSMPredictionsOnGridPoints()
         }
 
         this.plotDataEmbbedingPlot()
     }
 
-    plotGridPointPlot(){
+    plotTSMPredictionsOnGridPoints(){
+
+        var colors = {
+            '-1': 'red',
+            '0': 'grey',
+            '1': 'green'
+        }
+
+        const scatterPoints = this.getTSMPredictionOverGridPoints()
+        const chosenVariables = this.getChosenVariables()
+        const humanLabeledPoints = this.getHumanLabeledPoints()
+        const scale = this.state.scale
+        
+        this.tsmPlotter.plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors)
+    }
+
+    plotPredictionOnGridPoints(){
         
         var colors = {
             '-1': 'red',
@@ -297,12 +324,13 @@ class ModelBehavior extends Component{
             '1': 'green'
         }
 
-        const scatterPoints = this.getGridPoints()
+        const scatterPoints = this.getModelPredictionOverGridPoints()
+        
         const chosenVariables = this.getChosenVariables()
         const humanLabeledPoints = this.getHumanLabeledPoints()
         const scale = this.state.scale
         
-        this.gridPlotter.plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors)
+        this.modelPredictionPlotter.plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors)
     }
 
     plotDataEmbbedingPlot(){
@@ -321,7 +349,7 @@ class ModelBehavior extends Component{
         const humanLabeledPoints = this.getLabeledEmbedding()
         
         const chosenVariables = [0, 1]
-        this.plotter.plotData(
+        this.projectionPlotter.plotData(
             scale,              
             humanLabeledPoints,
             chosenVariables,
@@ -331,11 +359,11 @@ class ModelBehavior extends Component{
     }
 
 
-    getGridPoints(){
+    getTSMPredictionOverGridPoints(){
 
         const iteration = this.state.modelIteration
-        const modelPredictions = this.props.gridHistory.labelHistory[iteration]
-        const grid = this.props.gridHistory.grid        
+        const modelPredictions = this.props.TSMPredictionHistory[iteration]
+        const grid = this.props.fakePointGrid        
         
         const vars = this.getChosenVariables()
         const iColOne = vars[0]
@@ -349,20 +377,38 @@ class ModelBehavior extends Component{
         })
         
         return gridPoints
+
     }
 
-    getGridPointsLabels(){
+    
+    getModelPredictionOverGridPoints(){
 
         const iteration = this.state.modelIteration
+        const modelPredictions = this.props.modelPredictionHistory[iteration]        
+        const grid = this.props.fakePointGrid        
 
-        return this.props.gridHistory.labelHistory[iteration]
+        
+
+        const vars = this.getChosenVariables()
+        const iColOne = vars[0]
+        const iColTwo = vars[1]
+        
+        const scatter = d3.zip(grid, modelPredictions).map(e =>{
+            const gridPoint = e[0]
+            const prediction = e[1]
+        
+            return [gridPoint[iColOne], gridPoint[iColTwo], prediction.label]
+        })
+        
+        return scatter
     }
 
+    
     getEmbbedings(){
         
         const iteration = this.state.modelIteration
 
-        return this.props.history[iteration].embedding
+        return this.props.projectionHistory[iteration].embedding
     }
 
     getHumanLabeledPoints(){
@@ -408,7 +454,7 @@ class ModelBehavior extends Component{
 
     onNextIteration(){
 
-        const nIteration = this.props.gridHistory.labelHistory.length
+        const nIteration = this.props.modelPredictionHistory.length
         var iteration = this.state.modelIteration + 1
 
         this.setState({
@@ -418,7 +464,7 @@ class ModelBehavior extends Component{
      
     computeMinMaxOfRawData(){
                 
-        const grid = this.getGridPoints()
+        const grid = this.getModelPredictionOverGridPoints()
         const offset = {x: 2, y:1}
         return this.computeMinAndMaxScale(grid.map(e => e[0]), grid.map(e => e[1]), offset)
     }
