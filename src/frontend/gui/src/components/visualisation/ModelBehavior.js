@@ -277,7 +277,7 @@ class ModelBehavior extends Component{
 
     componentDidUpdate(){
 
-        //this.plotAll()            
+        this.plotAll()            
     }
 
     plotAll(){
@@ -301,9 +301,7 @@ class ModelBehavior extends Component{
         const chosenVariables = this.getChosenVariables()
         const humanLabeledPoints = this.getHumanLabeledPoints()
         const scale = this.state.scale
-        console.log("WHY UNDEFINED")
-        console.log(humanLabeledPoints)
-        console.log(chosenVariables)
+        
         this.gridPlotter.plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors)
     }
 
@@ -319,10 +317,9 @@ class ModelBehavior extends Component{
         const x = embeddings.map(e => e[0])
         const y = embeddings.map(e => e[1])
         
-        const scale = this.computeMinAndMaxScale(x, y)
-                
+        const scale = this.computeMinAndMaxScale(x, y)            
         const humanLabeledPoints = this.getLabeledEmbedding()
-        console.log(humanLabeledPoints)
+        
         const chosenVariables = [0, 1]
         this.plotter.plotData(
             scale,              
@@ -374,16 +371,13 @@ class ModelBehavior extends Component{
         var labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
         })
-        
-        console.log(labeledPoints)
-        labeledPoints = labeledPoints.map(e => {
-            
+                
+        labeledPoints = labeledPoints.map(e => {            
             var v = e.data
-            v.push(e.label)
-            console.log(v)
+            v.push(e.label)            
             return v
         })
-        console.log(labeledPoints)
+        
         
         return labeledPoints
     }
@@ -396,10 +390,7 @@ class ModelBehavior extends Component{
         const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
         })
-
-        console.log(labeledPoints)
-        console.log(embeddings)
-
+        
         const labeledEmbeddings = labeledPoints.map(e => {            
             return embeddings[e.id]
         })
