@@ -41,6 +41,7 @@ class DataExploration extends Component{
         uniqueValues = d3.zip(rawUniqueValues, uniqueValues).map(e => {
             return [e[0][0], e[1][1]]
         })
+        
         return (
             <div id="data-exploration">    
               

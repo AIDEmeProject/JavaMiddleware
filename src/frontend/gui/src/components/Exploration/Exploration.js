@@ -333,6 +333,23 @@ class Exploration extends Component{
         
         var tokens = this.props.tokens
 
+        const hasYesAndNo = this.state.hasYes && this.state.hasNo
+
+        if (hasYesAndNo){
+            this.setState({
+                hasYesAndNo: true,
+                initialLabelingSession: false,
+                labeledPoints: [],
+                pointsToLabel: []
+            }, ()=> {
+                explorationSendLabeledPoint({
+                    data: labeledPoints,
+                }, tokens, this.onNewPointsToLabel.bind(this))
+            })
+
+            return 
+        }
+
         if  (pointsToLabel.length === 0){
 
             if (this.state.hasYes && this.state.hasNo ){

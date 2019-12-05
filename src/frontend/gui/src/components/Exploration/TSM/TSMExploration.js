@@ -324,39 +324,107 @@ class TSMExploration extends Component{
      
     groupWasLabeledAsYes(e){
 
-        var pointId = e.target.dataset.point
-        
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-
+        var pointId = e.target.dataset.point                
         var labeledPoint = this.state.pointsToLabel[pointId]
-        
-        labeledPoint.labels = this.props.groups.map( e => 1)
-        labeledPoint.label= 1
-        
-        pointsToLabel.splice(pointId, 1)
-                
-        var labeledPoints = this.state.labeledPoints.map(e => e)
+        labeledPoint.labels = this.props.groups.map(e => 1)
+        labeledPoint.label = 1
 
+        var pointsToLabel = this.state.pointsToLabel.map(e => e)
+        pointsToLabel.splice(pointId, 1)        
+                                                          
+        if (this.state.initialLabelingSession){
+            
+           this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel)
+        }        
+        else{
+            this.pointWasLabeledAfterInitialSession(labeledPoint, pointsToLabel)
+        }                
+    }
+
+    pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel){
+
+        var labeledPoints = this.state.labeledPoints.map(e => e)
         labeledPoints.push(labeledPoint)
 
         var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
-        
-        if (pointsToLabel.length === 0){
-            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+
+        const isYes = labeledPoint.label === 1
+        var hasYesAndNo
+
+        if (isYes){
+            hasYesAndNo = this.state.hasNo
         }
-                
+        else{
+            hasYesAndNo = this.state.hasYes
+        }
+        
+        if (hasYesAndNo){
+            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+            this.setState({
+                pointsToLabel: [],
+                initialLabelingSession: false,
+                hasYesAndNo: true,
+                allLabeledPoints: allLabeledPoints
+            }, () => {
+                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
+            })                
+            
+        }
+        else if (this.state.pointsToLabel.length === 0){
+
+            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
+
+            var newState = {
+                pointsToLabel: pointsToLabel,
+                initialLabelingSession: false,                
+                allLabeledPoints: allLabeledPoints
+            }
+            if (isYes) {
+                newState['hasYes'] = true
+            }
+            else{
+                newState['hasNo'] = true
+            }
+
+            this.setState(newState, () => {
+                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
+            })                            
+        }
+        else{
+
+            var newState = {                
+                pointsToLabel: pointsToLabel,
+                labeledPoints: labeledPoints            
+            }
+            if (isYes) {
+                newState['hasYes'] = true
+            }
+            else{
+                newState['hasNo'] = true
+            }
+            this.setState(newState)
+        }
+    }
+
+    pointWasLabeledAfterInitialSession(labeledPoint){
+
+        var labeledPoints = this.state.labeledPoints
+        labeledPoints.push(labeledPoint)
+        var allLabeledPoints = this.state.allLabeledPoints.concat(labeledPoints)
+
+        
         this.setState({
             allLabeledPoints: allLabeledPoints,
-            pointsToLabel: pointsToLabel,
-            labeledPoints: labeledPoints,
-            hasYes: true
+            pointsToLabel: [],
+            labeledPoints: labeledPoints,            
         },
         () => {
-            this.getModelBoundaries()
-            if (pointsToLabel.length == 0){            
-                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))
-            }
-        })              
+            
+            sendLabels(labeledPoints, response => {
+                this.newPointsToLabel(response)
+                this.getModelBoundaries()
+            })            
+        })      
     }
     
     groupWasLabeledAsNo(e){
@@ -379,36 +447,25 @@ class TSMExploration extends Component{
         
         var iPoint = e.target.dataset.point
         var pointsToLabel = this.state.pointsToLabel.map(e => e)
-        var point = pointsToLabel[iPoint]
+        var labeledPoint = pointsToLabel[iPoint]
         
-
-        if ( point.labels.reduce( (acc, v) => acc + v) == point.labels.length ){
+        if ( labeledPoint.labels.reduce( (acc, v) => acc + v) == labeledPoint.labels.length ){
             alert('please label at least one subgroup')
             return
         }
                 
         pointsToLabel.splice(iPoint, 1)        
-
         var labeledPoints = this.state.labeledPoints.map(e => e)
-        labeledPoints.push(point)
+        labeledPoints.push(labeledPoint)
 
-        var allLabeledPoints = this.state.allLabeledPoints.map(e => e)
         
-        if (pointsToLabel.length === 0){
-            allLabeledPoints = allLabeledPoints.concat(labeledPoints)
-        }
-                
-        this.setState({
-            pointsToLabel: pointsToLabel,
-            labeledPoints: labeledPoints,
-            allLabeledPoints: allLabeledPoints
-        }, ()=> {
-            this.getModelBoundaries()
-            if (pointsToLabel.length == 0){
-                
-                sendLabels(labeledPoints, this.newPointsToLabel.bind(this))             
-            }
-        })       
+        if (this.state.initialLabelingSession){
+            
+            this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel)
+         }        
+         else{
+             this.pointWasLabeledAfterInitialSession(labeledPoint, pointsToLabel)
+         }   
     }
 
     getModelBoundaries(){
