@@ -13,16 +13,21 @@ def compute_boundary(file_path):
 
     if not os.path.isfile(file_path):
         file_path=os.path.join('../../../', file_path)
+
+    print(file_path)
     df = pd.read_csv(file_path, index_col=0)
-    print(df.head(5))
+
     print(len(df))
     print('computing projections')
     embedding = compute_umap(df)
-    print('done')
+
     labels = df[df.columns[-1]].astype('int').values
+    embedding_with_labels = np.hstack((embedding, labels.reshape(-1, 1)))
 
-    return np.hstack((embedding, labels.reshape(-1, 1))), df
+    print(embedding.shape)
 
+    os.remove(file_path)
+    return embedding_with_labels, df
 
 
 def compute_umap(data):
@@ -36,6 +41,7 @@ def umap_route():
 
     embedding, df = compute_boundary('labeled_points_java.csv')
 
+    print('done')
     return jsonify(embedding=embedding.tolist())
 
 
