@@ -16,7 +16,7 @@ class DataExploration extends Component{
         super(props)
         this.state = {
             firstVariable: props.firstVariable || 0,
-            secondVariable: props.secondVariable,
+            secondVariable: props.secondVariable || 1,
             nBins: 10,
             min:0,
             max: 10
@@ -32,9 +32,15 @@ class DataExploration extends Component{
         
         const variables = dataset.get_column_names()
         
+        const parsedFirstVariable = dataset.get_parsed_column_by_id(iFirstVariable)
         const firstVariable = dataset.get_column_id(iFirstVariable)
-        const secondVariable = dataset.get_column_id(iSecondVariable)
-                
+
+        var uniqueValues = Object.entries(this.uniqueValues(parsedFirstVariable))
+        const rawUniqueValues = Object.entries(this.uniqueValues(dataset.get_column_id(iFirstVariable)))
+
+        uniqueValues = d3.zip(rawUniqueValues, uniqueValues).map(e => {
+            return [e[0][0], e[1][1]]
+        })
         return (
             <div id="data-exploration">    
               
@@ -64,6 +70,8 @@ class DataExploration extends Component{
 
                <VectorStatistics 
                     data={firstVariable}
+                    uniqueValues={uniqueValues}
+                    rawUniqueValues={rawUniqueValues}
                />
                                
                 <div className="one-dimensional-plot">
@@ -81,15 +89,11 @@ class DataExploration extends Component{
                         </label>                        
                     </div>
 
-                    <div>
-                    
-                        <svg id="histogram">
-                        </svg>            
-
-                       
+                    <div>                
+                        <svg id="histogram"></svg>                                   
                     </div>
                     <div>
-                    <svg id="one-dimension-heatmap"></svg>
+                        <svg id="one-dimension-heatmap"></svg>
                     </div>
                     
                 </div>
@@ -166,6 +170,9 @@ class DataExploration extends Component{
     }
 
    
+    getParsedVariable(iVariable){
+        return this.props.dataset.get_parsed_column_by_id(iVariable)
+    }
     componentDidMount(){
         
         const data = this.getVariable(this.state.firstVariable)
@@ -173,33 +180,46 @@ class DataExploration extends Component{
         
         this.histogramPlotter = new HistogramPlotter()
         this.histogramPlotter.prepare_plot('#histogram', data)
-        this.histogramPlotter.plot_histogram(data, this.state.nBins)
+        //this.histogramPlotter.plot_histogram(data, this.state.nBins)
         
         //this.oneDimensionHeatmapPlotter = new OneDimensionHeatmapPlotter()
         //this.oneDimensionHeatmapPlotter.prepare_plot('#one-dimension-heatmap')
         //this.oneDimensionHeatmapPlotter.plot(data, this.state.nBins)
 
-        const df = dataset.get_columns([0, 1], ['x', 'y'])
+        const heatmapData = dataset.get_parsed_columns_by_id([0, 1])
         this.twoDimensionHeatmapPlotter = new TwoDimensionHeatmapPlotter()
-        this.twoDimensionHeatmapPlotter.prepare_plot('#two-dimension-heatmap', df)        
-        this.twoDimensionHeatmapPlotter.plot(df)
+        this.twoDimensionHeatmapPlotter.prepare_plot('#two-dimension-heatmap', heatmapData)        
+        //this.twoDimensionHeatmapPlotter.plot(df)
+
+        this.plotAll()
+    }
+
+    uniqueValues(arr){
+
+        var counts = {};
+        for (var i = 0; i < arr.length; i++) {
+            counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+        }
+
+        return counts
+    }
+
+    plotAll(){
+        const iFirstVariable = this.state.firstVariable
+        const iSecondVariable = this.state.secondVariable
+
+        const data = this.getVariable(iFirstVariable)        
+        const dataset = this.props.dataset
+        this.histogramPlotter.plot_histogram(data, this.state.nBins)
+
+        
+        const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
+        this.twoDimensionHeatmapPlotter.plot(heatmapData)
     }
 
     componentDidUpdate(){
 
-        const data = this.getVariable(this.state.firstVariable)
-        
-        const dataset = this.props.dataset
-
-        
-        this.histogramPlotter.plot_histogram(data, this.state.nBins)
-
-        const iFirst = this.state.firstVariable
-        const iSecond = this.state.secondVariable
-
-        const df = dataset.get_columns([iFirst, iSecond], ['x', 'y'])
-   
-        this.twoDimensionHeatmapPlotter.plot(df)
+        this.plotAll()
 
     }
 }

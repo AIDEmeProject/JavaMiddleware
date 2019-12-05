@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
+import { iif } from 'rxjs';
 
 class Dataset{
-
 
     static buildFromLoadedInput(fileContent){
         
@@ -9,8 +9,10 @@ class Dataset{
         var dataset = new Dataset(csv)
         return dataset
     }
+
     constructor(d3dataset){
         this.dataset = d3dataset
+        this.parsedColumns = {}
     }
 
     set_columns_selected_by_users(names){
@@ -19,10 +21,57 @@ class Dataset{
 
     get_column_name(name){
 
+        if (Number.isNaN(parseFloat(this.dataset[0][name])) ){
+            return this.get_parsed_column_by_name(name)
+        }
+
         return this.dataset.map( e => parseFloat(e[name]))
     }
 
+    get_parsed_column_by_id(id){
+
+        const name = this._get_column_name_from_id(id)
+
+        return this.get_parsed_column_by_name(name)
+    }
+
+
+    get_parsed_column_by_name(name){
+
+        if ( ! (name in this.parsedColumns)){
+            this.parsedColumns[name] = this.parse_string_column(name)
+        }
+
+        return this.parsedColumns[name]
+    }
+
+    _get_column_name_from_id(id){
+        
+        return this.dataset.columns[id]        
+    }
+
+    parse_string_column(name){
+
+        var categories = {}
+        var parsed = []
+        var i = 0
+
+        this.dataset.forEach(e => {
+            var value = e[name]
+            
+            if ( ! (value in categories)){
+                categories[value] = i
+                i++
+            }
+
+            parsed.push(categories[value])
+        })
+                
+        return parsed
+    }
+
     get_column_id(id){
+        
         var name = this.dataset.columns[id]
         return this.get_column_name(name)
     }
@@ -49,12 +98,23 @@ class Dataset{
         return d
     }
 
+    get_parsed_columns_by_id(ids){
+        
+        var columns = ids.map(id => {
+            return this.get_parsed_column_by_id(id)
+        })
+
+        return d3.zip(...columns)
+
+    }
+
     get_columns(ids, aliases){
 
         const names = this.get_column_names()
         return this.dataset.map(row => {
             const d = []
             ids.forEach((id, i) => {
+        
                 const name = names[id]
                 const alias = aliases[i]
 

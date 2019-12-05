@@ -70,7 +70,46 @@ class VectorStatistics extends Component{
                             </td>                          
                         </tr>
                     </tbody>
-                </table>    
+                </table>  
+
+                { 
+                    this.props.uniqueValues.length < 50 &&
+                    <div>
+                        <p>
+                            Unique value counts
+                        </p>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Value
+                                    </th>
+                                    <th>
+                                        Count
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {
+                                    this.props.uniqueValues.map(d => {
+                                    return (
+                                        <tr>
+                                            <td>
+                                                { d[0]}
+                                            </td>
+                                            <td>
+                                                { d[1] }
+                                            </td>
+                                        </tr>
+                                        )
+                                    })
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
         )
     }

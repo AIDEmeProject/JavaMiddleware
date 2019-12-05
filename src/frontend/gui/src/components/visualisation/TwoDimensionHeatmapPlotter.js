@@ -21,11 +21,11 @@ class TwoDimensionHeatmapPlotter{
     
 
         var x = d3.scaleLinear()
-             .domain(d3.extent(data, d => d.x))
+             .domain(d3.extent(data, d => d[0]))
              .range([0, width])
 
         var y = d3.scaleLinear()
-              .domain(d3.extent(data, d => d.y))
+              .domain(d3.extent(data, d => d[1]))
               .range([height, 0])
 
        this.xAxis = svg.append("g")
@@ -59,8 +59,8 @@ class TwoDimensionHeatmapPlotter{
             radius = 20
                              
             
-        x.domain(d3.extent(data, d => d.x))
-        y.domain(d3.extent(data, d => d.y))
+        x.domain(d3.extent(data, d => d[0]))
+        y.domain(d3.extent(data, d => d[1]))
 
         this.xAxis
             .transition()
@@ -99,8 +99,8 @@ class TwoDimensionHeatmapPlotter{
                     .text(data.x))      
               
         var binner = hexbin.hexbin()
-                .x(d => x(d.x))
-                .y(d => y(d.y))
+                .x(d => x(d[0]))
+                .y(d => y(d[1]))
                 .radius(radius * width / 954)
                 .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
             
