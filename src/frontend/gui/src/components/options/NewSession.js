@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import axios from "axios" ;
 
 import {backend} from '../../constants/constants'
-
+import loadCSVFromInputFile from '../../lib/data_utils'
 
 function uploadFile(event, onSuccess){
 
@@ -40,11 +40,8 @@ class NewSession extends Component{
 
       event.preventDefault()
       uploadFile(event, this.props.fileUploaded)
-      var fileReader = new FileReader()
-      const file = document.getElementById("dataset")
-      fileReader.onload = this.props.onDatasetLoaded
-      fileReader.readAsText(file.files[0])
       
+      loadCSVFromInputFile("dataset", this.props.onDatasetLoaded)
   }
 
   render(){

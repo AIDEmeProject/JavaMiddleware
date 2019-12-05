@@ -1,6 +1,14 @@
+import * as d3 from 'd3'
 
 class Dataset{
 
+
+    static buildFromLoadedInput(fileContent){
+        
+        var csv = d3.csvParse(fileContent)        
+        var dataset = new Dataset(csv)
+        return dataset
+    }
     constructor(d3dataset){
         this.dataset = d3dataset
     }

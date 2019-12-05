@@ -1,11 +1,12 @@
 package application;
 
-import io.CSVParser;
-import explore.ExperimentConfiguration;
+import application.data.LabeledPointsDTO;
 import com.google.gson.Gson;
-
 import data.DataPoint;
 import data.IndexedDataset;
+import data.LabeledPoint;
+import explore.ExperimentConfiguration;
+import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.GaussianKernel;
@@ -16,17 +17,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+
 import java.util.Map;
 
 
 
-public class ChooseSessionOptionServel extends HttpServlet {
+
+public class TraceInitializationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -34,40 +32,25 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         resp.setContentType("application/json");
 
-        Map<String, String[]> postData = req.getParameterMap();
-
-        String sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
-
-        String clientJson = req.getParameter("configuration");
-
-
-        ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
-        ExperimentConfiguration.TsmConfiguration tsmConf = configuration.getTsmConfiguration();
-
-        Gson gson = new Gson();
+        Gson json = new Gson();
 
         CSVParser parser = new CSVParser();
+        Map<String, String[]> postData = req.getParameterMap();
 
-        IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", postData);
+        IndexedDataset carDataset = parser.buildIndexedDataset("./car_raw.csv", postData);
+
+        String clientJson = req.getParameter("configuration");
+        ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
 
         double C = 1000;
         Kernel kernel = new GaussianKernel();
         Learner learner = new SvmLearner(C, kernel);
-        ExplorationManager manager = new ExplorationManager(dataset, configuration, learner);
+        ExplorationManager manager = new ExplorationManager(carDataset, configuration, learner);
 
-
-        int nInitialPoints = 3;
-
-
-
-
-        resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
 
         this.getServletContext().setAttribute("experimentManager", manager);
 
     }
-
-
 }
 
 

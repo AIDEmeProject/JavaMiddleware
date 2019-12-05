@@ -170,8 +170,7 @@ class DataExploration extends Component{
         
         const data = this.getVariable(this.state.firstVariable)
         const dataset = this.props.dataset
-        console.log(this.state.firstVariable, data)
-
+        
         this.histogramPlotter = new HistogramPlotter()
         this.histogramPlotter.prepare_plot('#histogram', data)
         this.histogramPlotter.plot_histogram(data, this.state.nBins)

@@ -212,7 +212,10 @@ class Exploration extends Component{
 
     onModelBehaviorClick(e){
         
-        const hasBehaviorData = this.state.modelPredictionHistory.length > 0 
+
+        const hasBehaviorData = this.state.modelPredictionHistory.length > 0 && 
+                                this.state.projectionHistory.length > 0 
+
 
         if (hasBehaviorData){    
             this.setState({

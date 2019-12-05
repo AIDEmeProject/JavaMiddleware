@@ -302,6 +302,13 @@ class GroupVariables extends Component {
         }, this.forceUpdate)
     }
 
+
+    isVariableInGroup(group, variable){
+        const names = group.map(e => e.name)
+
+        return names.includes(variable.name)
+    }
+
     onVariableAddedToGroup(groupId, variableId){
         
         var variable = this.props.chosenColumns[variableId]
@@ -311,8 +318,12 @@ class GroupVariables extends Component {
         var modifiedGroup = newGroupsState[groupId]
         
         variable['realId'] = variableId
-        modifiedGroup.push(variable)
-                
+
+        if ( ! this.isVariableInGroup(modifiedGroup, variable)){
+
+            modifiedGroup.push(variable)
+        }
+                    
         newGroupsState[groupId] = modifiedGroup
                                 
         var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.filter(v => {

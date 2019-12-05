@@ -8,6 +8,7 @@ import SessionOptions from './components/options/SessionOptions'
 import Exploration from './components/Exploration/Exploration'
 import TSMExploration from './components/Exploration/TSM/TSMExploration'
 import BreadCrumb from './components/BreadCrumb'
+import Trace from './components/Trace/Trace'
 
 import MicroModal from 'micromodal'
 import ModelBehavior from './components/visualisation/ModelBehavior'
@@ -26,6 +27,7 @@ const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
 const TSM_EXPLORATION = "TSMExploration"
 const AUTHENTICATION = "Authentication"
+const TRACE = 'Trace'
 
 
 class AnimatedText extends Component{
@@ -144,6 +146,10 @@ class App extends Component {
             View = Authentication
             break
 
+        case TRACE:
+            View = Trace
+            break
+
         case NEW_SESSION:
             View = NewSession
             break
@@ -189,6 +195,12 @@ class App extends Component {
                 <div className="row">
                     <div className="col col-lg-12">
                  
+
+                        <button
+                            onClick={(e) => this.setState({'step': TRACE}) }
+                        >
+                            Trace
+                        </button>
                         <View                        
                             {...this.state}
                             fileUploaded={this.fileUploaded.bind(this)} 
