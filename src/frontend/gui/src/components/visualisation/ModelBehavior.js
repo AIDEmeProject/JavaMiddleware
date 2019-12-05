@@ -261,15 +261,15 @@ class ModelBehavior extends Component{
     }
     
     componentDidMount(){
-
-       
+        const columnNames = this.props.availableVariables.map( e => e.name)
+        console.log(columnNames)
         if (this.props.availableVariables.length <= 4){
             
-            this.gridPlotter = new ModelBehaviorPlotter()
+            this.gridPlotter = new ModelBehaviorPlotter(columnNames)
             this.gridPlotter.createPlot('#gridpoint-svg', this.state.scale)
         }
         
-        this.plotter = new ModelBehaviorPlotter()
+        this.plotter = new ModelBehaviorPlotter(['X', 'Y'])
         this.plotter.createPlot("#scatterplot-svg", this.state.scale)
         
         this.plotAll()   

@@ -2,6 +2,11 @@ import * as  d3 from "d3"
 
 class ModelBehaviorPlotter{
 
+    constructor(columnNames){
+        
+        this.columnNames = columnNames
+    }
+
     createPlot(svgId, scale){
 
         // set the dimensions and margins of the graph
@@ -40,7 +45,7 @@ class ModelBehaviorPlotter{
             .call(d3.axisBottom(x));
 
 
-        d3.select(svgId).append("text")             
+        this.xLabel = d3.select(svgId).append("text")             
             .attr("transform",
                   "translate(" + (width/2) + " ," + 
                                  (height + margin.top + 30) + ")")
@@ -49,7 +54,7 @@ class ModelBehaviorPlotter{
             .text("Variable 1");
 
           // text label for the y axis
-        svg.append("text")
+        this.yLabel = svg.append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 0 - margin.left - 5)
                 .attr("x",0 - (height / 2))
@@ -91,13 +96,15 @@ class ModelBehaviorPlotter{
         return svg
     }
 
+    
+
     plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors){
         
         const svg = this.svg        
         const x = this.x
         const y = this.y
                              
-        this.updateAxis(x, y, scale)
+        this.updateAxis(x, y, scale, chosenVariables)
         // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
         // Its opacity is set to 0: we don't see it by default.
         
@@ -179,7 +186,16 @@ class ModelBehaviorPlotter{
         updateHumanLabels.exit().remove()                     
     }
 
-    updateAxis(x, y, scale){
+    updateAxis(x, y, scale, chosenColumns){
+
+        const xLabel = this.columnNames[chosenColumns[0]]
+        const yLabel = this.columnNames[chosenColumns[1]]
+
+        this.xLabel
+            .text(xLabel)
+
+        this.yLabel
+            .text(yLabel)
 
         const transitionLength = 200
         x.domain([scale.xMin, scale.xMax])
