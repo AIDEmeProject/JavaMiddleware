@@ -1,11 +1,16 @@
 package application;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import data.DataPoint;
 import data.IndexedDataset;
 import data.LabeledPoint;
 import explore.ExperimentConfiguration;
+import explore.user.GuiUserLabel;
+import explore.user.UserLabel;
 import io.CSVParser;
 import io.json.JsonConverter;
+import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.GaussianKernel;
 import machinelearning.classifier.svm.Kernel;
@@ -22,29 +27,56 @@ import java.util.Map;
 
 class TraceResultsComputer{
 
-    TraceResultDTO getTraceResults(ExplorationManager manager, LabeledPoint point){
+    public void pointsWereLabeled(ExplorationManager manager, ArrayList<LabelDTO> labeledPointData) throws IOException{
+
+
+        for (LabelDTO point:labeledPointData
+             ) {
+
+            LabeledPoint labeledPoint = this.getLabeledPoint(manager, point.id, point.label);
+            ArrayList<LabeledPoint> points = new ArrayList<>();
+            points.add(labeledPoint);
+            manager.getNextPointsToLabel(points);
+        }
+
+    }
+
+
+
+    protected LabeledPoint getLabeledPoint(ExplorationManager manager, long index, int label){
+
+        DataPoint point = manager.getPoint(index);
+        UserLabel userLabel = new GuiUserLabel(label);
+
+        LabeledPoint labeledPoint = new LabeledPoint(point, userLabel);
+
+        return labeledPoint;
+    }
+
+    TraceResultDTO computeTraceResults(ExplorationManager manager) throws IOException{
+
 
         TraceResultDTO dto = new TraceResultDTO();
 
+        ModelProjectionComputer computer = new ModelProjectionComputer();
+
+        dto.labeledPointsOverGrid = manager.computeModelPredictionsOverFakeGridPoints();
+
+        String filePath = "./labeled_points_java.csv";
+        String json = computer.getEmbbeddingAsJson(filePath, manager);
+        dto.jsonProjectionPredictions = json;
 
         return dto;
-
-
     }
 
 
-    ArrayList<LabeledPoint> getNextLabeledPointFromTrace(){
-        ArrayList<LabeledPoint> labeledPoints = new ArrayList<>();
-
-        return labeledPoints;
-    }
 }
 
 class TraceResultDTO{
 
     protected ArrayList<LabeledPoint> labeledPointsOverGrid;
 
-    protected ArrayList<LabeledPoint> projectionPredictions;
+    protected String jsonProjectionPredictions;
 
 }
 
@@ -57,29 +89,37 @@ class QueryTraceLoader{
 }
 
 
+class LabelDTO{
+
+    long id;
+
+    int label;
+}
+
+class LabelsDto{
+    public ArrayList<LabelDTO> data;
+}
+
 public class TraceComputationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        resp.setContentType("application/json");
-
         Gson json = new Gson();
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
-        TraceResultsComputer traceResultComputer = (TraceResultsComputer) this.getServletContext().getAttribute("traceComputer");
+
+        String strLabelData = req.getParameter("labelData");
+        System.out.println(strLabelData);
+        ArrayList<LabelDTO> labeledPointsData = json.fromJson(strLabelData, LabelsDto.class).data;
 
 
-        ArrayList<LabeledPoint> labeledPoints = traceResultComputer.getNextLabeledPointFromTrace();
-        ArrayList<TraceResultDTO> traceResults = new ArrayList<>();
+        TraceResultsComputer traceResultComputer = new TraceResultsComputer();
+        traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
+        TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
 
-        for (LabeledPoint point: labeledPoints
-             ) {
 
-            TraceResultDTO result = traceResultComputer.getTraceResults(manager, point);
-            traceResults.add(result);
-        }
-
-        resp.getWriter().println(json.toJson(traceResults));
+        resp.setContentType("application/json");
+        resp.getWriter().println(json.toJson(result));
     }
 }

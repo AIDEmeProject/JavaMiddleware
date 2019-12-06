@@ -1,4 +1,4 @@
-function loadCSVFromInputFile(inputId, onFileLoaded){
+function loadFileFromInputFile(inputId, onFileLoaded){
 
 
     var fileReader = new FileReader()
@@ -8,4 +8,4 @@ function loadCSVFromInputFile(inputId, onFileLoaded){
 
 }
 
-export default loadCSVFromInputFile
+export default loadFileFromInputFile

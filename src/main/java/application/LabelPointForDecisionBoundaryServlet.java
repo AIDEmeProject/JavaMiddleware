@@ -22,16 +22,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
-class MyHttpClient{
-
-    public String getModelBoundary() throws IOException {
-
-        HttpGet request = new HttpGet("http://localhost:5000/umap");
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = client.execute(request);
-        return EntityUtils.toString(response.getEntity());
-    }
-}
 
 
 
@@ -44,13 +34,10 @@ public class LabelPointForDecisionBoundaryServlet extends HttpServlet {
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
         String filePath = "./labeled_points_java.csv";
-        CsvDatasetWriter writer = new CsvDatasetWriter();
-        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionForProjection();
-        writer.savedLabeledPointsAsCsv(labeledPoints, filePath);
 
-        MyHttpClient c = new MyHttpClient();
-        String jsonEmbedding = c.getModelBoundary();
+        ModelProjectionComputer c = new ModelProjectionComputer();
 
+        String jsonEmbedding = c.getEmbbeddingAsJson(filePath, manager);
         resp.getWriter().println(jsonEmbedding);
     }
 }

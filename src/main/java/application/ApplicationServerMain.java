@@ -47,7 +47,9 @@ public class ApplicationServerMain {
         handler.addServlet(getFakePointGridServlet.class, "/get-fake-point-grid");
         handler.addServlet(GetModelPredictionOverFakePointGridServlet.class, "/get-model-predictions-over-grid-point");
         handler.addServlet(getTSMPredictionOverFakePointGridServlet.class, "/get-tsm-predictions-over-grid-point");
+        handler.addServlet(TraceInitializationServlet.class, "/start-trace");
         handler.addServlet(TraceComputationServlet.class, "/get-next-traces");
+
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);

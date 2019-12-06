@@ -19,6 +19,10 @@ class Dataset{
         this.select_column_names = names.map(e => e['name'])
     }
 
+    get_raw_col_by_name(name){
+        return this.dataset.map(e => e[name])
+    }
+
     get_column_name(name){
 
         if (Number.isNaN(parseFloat(this.dataset[0][name])) ){

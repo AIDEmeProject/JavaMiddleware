@@ -80,7 +80,7 @@ class ModelBehavior extends Component{
     constructor(props){
 
         super(props)    
-        
+        console.log(props)
         this.state = {
             gridPoints: [],
             modelIteration: 0,            
@@ -403,7 +403,6 @@ class ModelBehavior extends Component{
         return scatter
     }
 
-    
     getEmbbedings(){
         
         const iteration = this.state.modelIteration

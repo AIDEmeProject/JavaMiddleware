@@ -27,6 +27,26 @@ var defautConfiguration = {
     "task": "sdss_Q4_0.1%"
 }
 
+
+var SimpleMarginConfiguration = {
+
+    "activeLearner": {
+        "name": "SimpleMargin",
+        "svmLearner": {
+            "C": 1024,
+            "kernel": {
+                "gamma": 0,
+                "name": "gaussian"
+            },
+            "name": "SVM"
+        }
+    },
+    "subsampleSize": 50000,    
+    "useFactorizationInformation": false
+}
+
+
+
 module.exports = {
     backend: "http://localhost:7060",
     webplatformApi: "http://localhost:8000/api",

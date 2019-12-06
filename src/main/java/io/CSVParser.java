@@ -14,29 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CSVParser{
-    public IndexedDataset buildIndexedDataset(String filePath, Map<String, String[]> postData)
-            throws IOException {
+
+
+    public IndexedDataset buildIndexedDataset(String filePath, ArrayList<Integer> columnIds) throws IOException{
 
         Reader in = new FileReader(filePath);
         CSVReader reader = new CSVReader(in);
-
-        Integer columnId;
-
-        ArrayList<Integer> columnIds = new ArrayList<>();
-
-        for (Map.Entry<String, String[]> entry : postData.entrySet()){
-
-            if (entry.getKey().indexOf("column") != -1){
-
-                String strColumnId = String.join(",", entry.getValue());
-
-                columnId = Integer.parseInt(strColumnId);
-
-                columnIds.add(columnId);
-            }
-        }
-
-        columnIds.sort(Comparator.comparingInt((Integer n) -> n));
 
         ArrayList<Double> rowValues = new ArrayList();
         ArrayList<String> rowRawValues = new ArrayList();
@@ -81,6 +64,18 @@ public class CSVParser{
         return dataset;
     }
 
+
+
+    public IndexedDataset buildIndexedDataset(String filePath, Map<String, String[]> postData)
+            throws IOException {
+
+
+        ArrayList<Integer> columnIds = this.loadColumnIds(postData);
+        columnIds.sort(Comparator.comparingInt((Integer n) -> n));
+        return this.buildIndexedDataset(filePath, columnIds);
+
+    }
+
     public double[] doubleConversion(ArrayList<Double> values){
 
         double[] convertedValues = new double[values.size()];
@@ -93,6 +88,28 @@ public class CSVParser{
 
         return convertedValues;
     }
+
+
+    protected ArrayList<Integer> loadColumnIds(Map<String, String[]> postData){
+
+        Integer columnId;
+        ArrayList<Integer> columnIds = new ArrayList<>();
+
+        for (Map.Entry<String, String[]> entry : postData.entrySet()){
+
+            if (entry.getKey().indexOf("column") != -1){
+
+                String strColumnId = String.join(",", entry.getValue());
+
+                columnId = Integer.parseInt(strColumnId);
+
+                columnIds.add(columnId);
+            }
+        }
+
+        return columnIds;
+    }
+
 }
 
 

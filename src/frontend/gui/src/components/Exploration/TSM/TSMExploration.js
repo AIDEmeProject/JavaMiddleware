@@ -318,7 +318,7 @@ class TSMExploration extends Component{
         this.setState({
             pointsToLabel: pointsToLabel.concat(newPoints),
             labeledPoints: [],
-            initialLabelingSession: ! (this.state.hasYes && this.state.hasNo)
+            //initialLabelingSession: ! (this.state.hasYes && this.state.hasNo)
         })        
     }
      

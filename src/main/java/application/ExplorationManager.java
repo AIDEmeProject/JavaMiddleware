@@ -144,6 +144,12 @@ public class ExplorationManager {
         }
     }
 
+
+    public DataPoint getPoint(long index){
+        return this.partitionedDataset.getAllPoints().get((int) index);
+    }
+
+
     protected boolean hasPositiveAndNegativeExamples(){
 
         boolean hasPositive = false;
@@ -255,7 +261,7 @@ public class ExplorationManager {
             double max = columnStatistics[i].getMaximum();
 
             boolean isNumeric = columnStatistics[i].isNumeric();
-            specs.add(new ColumnSpecification(isNumeric, min, max, 100));
+            specs.add(new ColumnSpecification(isNumeric, min, max, 50));
 
         }
 
