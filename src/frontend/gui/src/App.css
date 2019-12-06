@@ -365,3 +365,7 @@ h4, h3{
 .speaking-bot{
   border-radius: 5px;
 }
+
+.iteration-number{
+  font-weight: bold;
+}

@@ -61,18 +61,7 @@ class QueryTrace extends Component{
                         </input>
 
                         
-                        <div>
-                            <select
-                                onChange={this.encodedDatasetChanged.bind(this)}
-                            >
-                                <option
-                                    value="cars"
-                                >Cars</option>
-                                <option
-                                    value="jobs"
-                                >Jobs</option>
-                            </select>
-                        </div>
+                        
 
                         <button
                             onClick={this.onValidateTrace.bind(this)}
@@ -94,6 +83,7 @@ class QueryTrace extends Component{
                                     <button 
                                         className="btn btn-primary btn-raised"
                                         onClick={this.sendLabelDataForComputation.bind(this)}
+                                        disabled={this.state.isComputing ? true:false}
                                     >
                                         Compute next iteration
                                     </button>
@@ -104,6 +94,7 @@ class QueryTrace extends Component{
                                             showModelBehavior: false,
                                             showDataPoints: true
                                         })}
+                                        
                                     >
                                         Show labeled points
                                     </button>
@@ -237,10 +228,11 @@ class QueryTrace extends Component{
     initializeBackend(){
 
         var options = {
-            columnIds: this.state.traceColumns.encoded_dataset,
+            columnIds: this.state.traceColumns.encodedDataset,
             encodedDatasetName: "cars_encoded.csv"
         }
 
+        console.log(options)
         this.setState({
             isComputing: true,
             showLoading: false
