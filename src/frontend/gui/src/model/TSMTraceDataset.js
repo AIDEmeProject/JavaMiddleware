@@ -36,7 +36,7 @@ class TSMTraceDataset extends Dataset{
                               .replace(/,]/g, "]")            
                               //.replace(/$,/g, "]")
             
-            console.log(cleanedStr)
+            
             return JSON.parse(cleanedStr)
             //return parseFloat(e.replace(/[\[\]']/g,'' ))                
         })

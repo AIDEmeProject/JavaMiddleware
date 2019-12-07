@@ -2,6 +2,9 @@ import $ from 'jquery'
 import * as d3 from 'd3'
 import React, { Component } from 'react';
 
+
+
+import {algorithmNames} from '../../constants/constants'
 import loadFileFromInputFile from '../../lib/data_utils'
 import TSMTraceDataset from '../../model/TSMTraceDataset'
 import TraceDataset from '../../model/TraceDataset';
@@ -27,7 +30,12 @@ class QueryTrace extends Component{
 
     render(){
 
-        const algorithm = this.state.algorithm
+        const algorithm = algorithmNames[this.state.algorithm]
+        const iteration = this.state.iteration
+        const nPositivePoints = this.state.positivePoints[iteration]
+        
+        console.log(this.state.positivePoints, iteration)
+
         return (
             <div>
                 { 
@@ -162,17 +170,9 @@ class QueryTrace extends Component{
 
                                 <div>
                                     <p>                                       
-                                        Algorithm {algorithm} <br />
-
-                                        {
-                                            this.state.useTSM && 
-
-                                            <span>TSM is enabled  <br /></span>
-                                        }
-
-                                        Number of positive predictions :
-                                         {this.state.positivePoints}
-
+                                        Algorithm : {algorithm} <br />
+                                        
+                                        Number of positive predictions : {nPositivePoints}
                                     </p>
                                     
 
@@ -208,18 +208,16 @@ class QueryTrace extends Component{
                     </div>
                 }
 
-
                 <a 
                     onClick={this.saveTrace.bind(this)}
                     id="download-trace" download="trace.json" type="application/json"
                     className="btn btn-raised"
                 >
-
                     Save trace
                 </a>
                
                 <label htmlFor="load-trace">
-                    Trace file (json)
+                   Trace file (json)
                 </label>
                 <input 
                     id="load-trace"
@@ -228,6 +226,7 @@ class QueryTrace extends Component{
                 />
 
                 <button 
+                    className="btn btn-raised"
                     onClick={this.loadTrace.bind(this)}    
                 >
                     Load
@@ -250,9 +249,10 @@ class QueryTrace extends Component{
             fakePointGrid: [],
             TSMPredictionHistory: [],
             modelPredictionHistory: [],
+            positivePoints: [],
             projectionHistory: [],
             allLabeledPoints: [],
-            iteration: 0,
+            iteration: -1,
             lastIndice: 0,
             allLabeledPoints: [],
             useTSM: false,
@@ -260,16 +260,15 @@ class QueryTrace extends Component{
         }
     }
 
-    computeFullTrace(){
-
+    getAlgorithmName(algorithm){        
+        return algorithmNames[algorithm]
     }
 
     learnerChanged(algorithm){
 
         var useTSM = algorithm === "simplemargintsm" || 
                      algorithm === "factorizedversionspace"
-        
-        console.log(useTSM)
+                
         this.setState({
             useTSM: useTSM,
             algorithm: algorithm
@@ -282,31 +281,13 @@ class QueryTrace extends Component{
         })
     }
 
-
     onValidateTrace(e){
-
-        loadFileFromInputFile("trace", event => {
-
-            var fileContent = event.target.result 
-            var filePath = $("#trace").val(); 
-            const ext = filePath.substr(filePath.lastIndexOf('.') + 1,filePath.length);    
-            
-            const isCsv = ext === "csv"
-            const useTSM = this.state.useTSM
-            
-            if (useTSM){
-                var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
-            }
-            else{
-                var trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv)
-                
-            }
-         
-            this.setState({ 
-                'traceDataset': trace                
-            })
-        })
         
+        this.loadDataset()        
+    }
+
+    loadDataset(){
+
         loadFileFromInputFile("dataset", event => {
             
             var fileContent = event.target.result 
@@ -314,20 +295,79 @@ class QueryTrace extends Component{
            
             this.setState({
                 'dataset': dataset
-            }, this.initializeBackend)
+            }, this.loadTraceScenario)
         })
+    }
+
+    loadTraceScenario(){
 
         loadFileFromInputFile('trace-columns', event => {
             
             var fileContent = event.target.result
             var traceColumns = JSON.parse(fileContent)        
-                    
-            this.setState({
-                'traceColumns': traceColumns,               
+            var dataset = this.state.dataset
+
+            const usedColumnIds = traceColumns.rawDataset    
+            var columnNames = dataset.get_column_names_from_ids(usedColumnIds)
+            
+            dataset.set_column_names_selected_by_user(columnNames)
+
+             var availableVariables =  columnNames.map((e, i) => {
+                return {name: e, realId: i}
             })
+
+            this.setState({
+                'traceColumns': traceColumns,    
+                'columnNames': columnNames,
+                'availableVariables': availableVariables,           
+                'dataset': dataset
+            }, this.loadTraceFile)
         })
     }
 
+    loadTraceFile(){
+
+        loadFileFromInputFile("trace", event => {
+            var fileContent = event.target.result 
+            
+            var ext = getFileExtension('trace')
+            const isCsv = ext === "csv"
+            const useTSM = this.state.useTSM
+            
+            if (useTSM){
+                var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
+            }
+            else{
+                var trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv)                
+            }
+            
+            var encodedColumnNames = trace.get_column_names_from_ids(this.state.traceColumns.encodedDataset)
+            trace.set_column_names_selected_by_user(encodedColumnNames)
+         
+            this.setState({ 
+                'traceDataset': trace                
+            }, this.initializeBackend)
+        })
+    }
+
+    initializeBackend(){
+
+        var options = {
+            algorithm: this.state.algorithm,
+            columnIds: this.state.traceColumns.encodedDataset,
+            encodedDatasetName: "./cars_encoded.csv",
+            configuration: this.buildConfiguration(),            
+        }
+                
+        this.setState({
+            isComputing: true,
+            showLoading: false
+        }, () => {
+            initializeBackend(options, this.traceBackendWasInitialized.bind(this))
+        })        
+    }
+
+    
     getPositivePredictedPoints(modelPredictionHistory, step){
         
         var iteration = Math.min(step, modelPredictionHistory.length - 1)
@@ -338,7 +378,6 @@ class QueryTrace extends Component{
     }
 
 
- 
     buildConfiguration(){
         
         var configurations = {
@@ -351,60 +390,32 @@ class QueryTrace extends Component{
         var configuration = configurations[this.state.algorithm]
 
         if (this.state.useTSM){
-            var allColumns = this.props.carColumns
-            
+
+            var allColumns = this.props.carColumns            
             const factorizationGroups = this.state.traceColumns.factorizationGroups  
-            const usedColumns = this.state.traceColumns.encodedDataset.map (e => allColumns[e])
-            console.log(usedColumns)
-            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, allColumns)
-            console.log(configuration)
+            const usedColumns = this.state.traceColumns.encodedDataset.map (e => allColumns[e])            
+            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, allColumns)            
         }
         
         return configuration
     }
 
-    initializeBackend(){
-
-        var options = {
-            algorithm: this.state.algorithm,
-            columnIds: this.state.traceColumns.encodedDataset,
-            encodedDatasetName: "./cars_encoded.csv",
-            configuration: this.buildConfiguration(),            
-        }
-
-        this.state.dataset.set_columns_selected_by_users(this.state.columnNames)
-            
-        this.setState({
-            isComputing: true,
-            showLoading: false
-        }, () => {
-            initializeBackend(options, this.traceBackendWasInitialized.bind(this))
-        })        
-    }
-
     traceBackendWasInitialized(fakePointGrid){
-        
-        const usedColumnIds = this.state.traceColumns.rawDataset
-        
-        var columnNames = this.state.dataset.get_column_names_from_ids(usedColumnIds)
-        var availableVariables =  columnNames.map((e, i) => {
-                return {name: e, realId: i}
-        })
-        console.log(usedColumnIds, columnNames)
+                        
+               
         //var grid = fakePointGrid.map(e => {return e.data.array})
                 
-        var grid = this.state.dataset.get_parsed_columns_by_names(columnNames)
+        var grid = this.state.dataset.get_parsed_columns_by_names(this.state.columnNames)
       
         this.setState({
-            fakePointGrid: grid, 
-            availableVariables: availableVariables,
-            columnNames: columnNames
+            fakePointGrid: grid,            
         }, this.sendLabelDataForComputation.bind(this))        
     }
 
     getLabeledPointToSend(iRowTrace){
 
         var point = this.state.traceDataset.get_point(iRowTrace)
+        
         point.data = {
             array: [2]
         }
@@ -418,6 +429,8 @@ class QueryTrace extends Component{
             return this.getLabeledPointToSend(i + lastIndice)
         })
 
+        console.log(pointsToSend)
+        
         this.setState({
             isComputing: true,
             lastIndice: lastIndice + 2
@@ -432,7 +445,7 @@ class QueryTrace extends Component{
     getDataPointFromId(sentPoint){
 
         const id = sentPoint.id
-        var data = this.state.dataset.get_point(id)
+        var data = this.state.dataset.get_selected_columns_point(id)
 
         return {
             id: id,
@@ -451,13 +464,18 @@ class QueryTrace extends Component{
         )
     
         var modelPredictionHistory = this.state.modelPredictionHistory
-        var modelPredictions = backendPredToFrontendFormat(response.labeledPointsOverGrid, false)
+        var useTSM = this.state.useTSM
+        var modelPredictions = backendPredToFrontendFormat(response.labeledPointsOverGrid, useTSM)
         modelPredictionHistory.push(modelPredictions)
 
         var allLabeledPoints = this.state.allLabeledPoints
         allLabeledPoints = allLabeledPoints.concat(sentPoints.map(this.getDataPointFromId.bind(this)))
         
-
+        
+        var nPositivePoints = this.getPositivePredictedPoints(modelPredictionHistory, this.state.lastIndice / 2)
+        var positivePoints = this.state.positivePoints
+        
+        positivePoints.push(nPositivePoints)
         var newState = {
             modelPredictionHistory: modelPredictionHistory,
             projectionHistory: projectionHistory,            
@@ -465,7 +483,7 @@ class QueryTrace extends Component{
             iteration: this.state.iteration + 1,
             allLabeledPoints: allLabeledPoints,
             isComputing: false,
-            positivePoints: this.getPositivePredictedPoints(modelPredictionHistory, this.state.lastIndice / 2)
+            positivePoints: positivePoints
         }
         
         if (this.state.useTSM){
@@ -497,8 +515,18 @@ class QueryTrace extends Component{
             this.setState(JSON.parse(event.target.result))
         })
     }
+
+    computeFullTrace(){
+        
+    }
 }
 
+
+function getFileExtension(id){
+    var filePath = $("#" + id).val(); 
+    const ext = filePath.substr(filePath.lastIndexOf('.') + 1,filePath.length);    
+    return ext
+}
 
 function backendPredToFrontendFormat(rawPoints, useTSM){
 

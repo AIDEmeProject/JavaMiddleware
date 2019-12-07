@@ -79,6 +79,13 @@ var simpleMarginConfiguration = {
     "useFactorizationInformation": false
 }
 
+var algorithmNames = {
+    'simplemargin': 'Simple Margin (SVM)',
+    'simplemargintsm': 'Simple Margin (SVM) + TSM',
+    'versionspace': 'Version Space',
+    'factorizedversionspace': 'Factorized Version Space'
+}
+
 module.exports = {
     backend: "http://localhost:7060",
     webplatformApi: "http://localhost:8000/api",
@@ -88,5 +95,7 @@ module.exports = {
     
     simpleMarginConfiguration: simpleMarginConfiguration,
     
-    factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration
+    factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration,
+
+    algorithmNames: algorithmNames
 }

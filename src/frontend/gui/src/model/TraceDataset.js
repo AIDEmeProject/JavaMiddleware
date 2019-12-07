@@ -29,7 +29,7 @@ class TraceDataset extends Dataset{
     }
 
     parse_trace(){
-        console.log(this.get_column_names())
+        
         this.labels = this.get_raw_col_by_name('labels').flatMap(e => {
             var cleanedStr = e.replace("0.", "0").replace("1.", "1").replace(' ', ',')
             

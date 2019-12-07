@@ -15,14 +15,14 @@ class Dataset{
         this.parsedColumns = {}
     }
 
-    set_columns_selected_by_users(names){
-
-        if (typeof names === "object"){
-            this.select_column_names = names.map(e => e['name'])
+    set_column_names_selected_by_user(names){
+        
+        if ( ! Array.isArray(names)){
+            this.selected_columns_for_exploration = names.map(e => e['name'])
         }
         else{
-            this.select_column_names = names
-        }
+            this.selected_columns_for_exploration = names.map( e => e)
+        }           
         
     }
 
@@ -58,7 +58,6 @@ class Dataset{
         })
         
         return d3.zip(...columns)
-
     }
 
     get_parsed_column_by_name(name){
@@ -99,9 +98,7 @@ class Dataset{
                 
         return parsed
     }
-
    
-
     _get_column_name_from_id(id){
         
         return this.dataset.columns[id]        
@@ -129,15 +126,22 @@ class Dataset{
         })
     }
 
-    get_point(id){
+    get_selected_columns_point(id){
         
         const row = this.dataset[id]
-        console.log(this.select_column_names, row, id)
-        var d = this.select_column_names.map(e => {
-            return row[e]
+        
+        var d = this.selected_columns_for_exploration.map(colName => {
+            return row[colName]
         })
         
         return d
+    }
+
+    get_point(id){
+        
+        const row = this.dataset[id]
+
+
     }
 
     
