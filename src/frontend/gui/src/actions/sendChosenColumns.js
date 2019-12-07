@@ -57,23 +57,25 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
 }
 
 
-function sendColumns(tokens, state, onSuccess){
+function sendColumns(tokens, chosenColumns, onSuccess){
     
     var endPoint = backend + "/choose-options"    
+
     var configuration = defaultConfiguration
-    configuration['useFakePoint'] = state.useFakePoint || false
-    
-    
-                  
-    $('#conf').val(JSON.stringify(configuration))
+    //configuration['useFakePoint'] = state.useFakePoint || false
+                          
+    //$('#conf').val(JSON.stringify(configuration))
       
-    var payload = $('#choose-columns').serialize()
+    //var payload = $('#choose-columns').serialize()
 
     $.ajax({
 
         type: "POST",
         url: endPoint,
-        data: payload,        
+        data: {
+            configuration: JSON.stringify(configuration),
+            columnIds: JSON.stringify(chosenColumns.map(e => e.idx))
+        },
         success: (response) =>  {onSuccess(response)},
         
     });    

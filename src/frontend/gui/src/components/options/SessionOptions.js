@@ -292,11 +292,11 @@ class SessionOptions extends Component{
             this.groupsWereValidated(groups)
         }
         else{
-
-            actions.sendColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
+            console.log(this.state)
+            actions.sendColumns(this.props.tokens, chosenColumns, this.props.sessionWasStarted)        
 
             this.props.sessionOptionsWereChosen({            
-                chosenColumns: this.state.chosenColumns.filter(e => e.isUsed),                
+                chosenColumns: chosenColumns,                
             })                
         }        
     }
