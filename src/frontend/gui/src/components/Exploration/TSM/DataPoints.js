@@ -9,7 +9,8 @@ class DataPoints extends Component{
     }
   
     render(){         
-        
+        const dataset = this.props.dataset
+        console.log("LOL")
         return (
 
             <div>
@@ -27,7 +28,10 @@ class DataPoints extends Component{
                     <tbody>                
                         {
                             this.props.labeledPoints.map((point, i) => {
-                                const data = this.props.dataset.get_point(point.id)
+                                
+                                console.log(point, dataset.get_point(point.id))
+                                const data = dataset.get_point(point.id)
+                                
                                 return (
                                     <tr 
                                         key={i}
@@ -39,7 +43,7 @@ class DataPoints extends Component{
                                         {
                                             this.props.groups.map((g, iGroup) => {
                                                 
-                                                var pointIds = g.map(e => e.finalIdx)    
+                                                var pointIds = g.map(e => e.realId)    
                                                 
                                                 var dataAsGroups = []
 

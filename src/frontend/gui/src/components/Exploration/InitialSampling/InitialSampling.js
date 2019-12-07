@@ -6,6 +6,7 @@ import {backend, webplatformApi} from '../../../constants/constants'
 import SpecificPointToLabel from './SpecificPointToLabel'
 import FakePointSampling from './FakePointSampling'
 import PointLabelisation from '../../PointLabelisation'
+import sendFakePoint from '../../../actions/sendFakePoint'
 
 class InitialSampling extends Component{
 
@@ -87,18 +88,24 @@ class InitialSampling extends Component{
                         <div>
                             <FakePointSampling 
                                 pointToLabel={this.props.pointsToLabel[0].data}                            
-                                variableTypes={this.props.options.variableTypes}
-                                {...this.props}
+                                onFakePointValidation={this.fakePointWasValidated.bind(this)}
+                                availableVariables={this.props.availableVariables}
                             />
                        </div>
                
                     }
-
-
-                </div>
-                                                  
+                </div>                                                  
             </div>
         )
+    }
+
+    fakePointWasValidated(fakePointData){
+
+        const fakePoint = {
+            'data': fakePointData,
+            'label':1
+        }
+        sendFakePoint(fakePoint, this.props.fakePointWasValidated)
     }
 }
 

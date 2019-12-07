@@ -301,17 +301,36 @@ class SessionOptions extends Component{
         }        
     }
    
-    groupsWereValidated(groups){
+   
 
+    groupsWereValidated(groups){
         
         var chosenColumns = groups.flatMap( g => {
-            return g.map( v => {return {name: v.name}} )
+            return g.map( v => {return v} )
         })
-        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
-        console.log(chosenColumns)
+        //var chosenColumns = this.state.chosenColumns //.filter(e => e.isUsed)      
+        
+        this.computeVariableColumnIndices(groups)
+        
         this.props.groupsWereValidated(chosenColumns, groups, ()=> {
             actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, this.props.sessionWasStarted)    
         })                                  
+    }
+
+    computeVariableColumnIndices(groups){
+        
+        var i = 0;
+
+        groups.forEach( variables => {
+            
+            variables.forEach(variable => {
+                
+                variable['realId'] = i
+                i++
+            })
+            
+        })
+        
     }
 
     groupWasAdded(){

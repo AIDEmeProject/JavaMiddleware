@@ -3,11 +3,10 @@ import {backend, webplatformApi, defaultConfiguration} from '../constants/consta
 import $ from "jquery";
 
 
-
-
 function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
 
-    var endPoint = backend + "/choose-options"    
+    var endPoint = backend + "/choose-options"
+
     var configuration = defaultConfiguration
     configuration['useFakePoint'] = false
 
@@ -27,6 +26,9 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
         var flags =  groups.map(g => {return [true, false]})        
         var groups = groups.map( g => { return g.map(v => v.name)})        
     }
+
+    console.log(flags)
+    console.log(groups)
    
     Object.assign(tsmJson, {
         flags: flags,
@@ -44,7 +46,10 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
 
         type: "POST",
         url: endPoint,
-        data: payload,        
+        data: {
+            'configuration': JSON.stringify(configuration),
+            'columnIds': JSON.stringify(chosenVariables.map(e => e.idx))
+        },        
         success: (response) =>  {onSuccess(response)},
         
     });    
@@ -58,7 +63,7 @@ function sendColumns(tokens, state, onSuccess){
     var configuration = defaultConfiguration
     configuration['useFakePoint'] = state.useFakePoint || false
     
-    var hasTSM = state.chosenColumns.length == 2 || !! state.variableGroups[0].length > 0
+    
                   
     $('#conf').val(JSON.stringify(configuration))
       

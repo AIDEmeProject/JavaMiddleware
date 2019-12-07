@@ -355,6 +355,35 @@ public class ExplorationManager {
         return this.TSMPrediction(datasetToLabel);
     }
 
+    public ArrayList<LabeledPoint> getModelPredictionWithTSM(IndexedDataset datasetToLabel){
+
+        ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
+        ExtendedLabel[] labels = this.partitionedDataset.getTSMClassifier().predict(datasetToLabel);
+        Classifier standardClassifier = this.learner.fit(partitionedDataset.getLabeledPoints());
+
+        Label finalLabel;
+        for (int i=0; i < labels.length; i++)
+        {
+            ExtendedLabel label = labels[i];
+
+            DataPoint rawPoint = datasetToLabel.get(i);
+
+            if (label.isUnknown()){
+                finalLabel = standardClassifier.predict(rawPoint.getData());
+            }
+            else{
+                finalLabel = label.toLabel();
+            }
+
+            LabeledPoint labeledPoint = new LabeledPoint(rawPoint, finalLabel);
+
+            labeledDataset.add(labeledPoint);
+        }
+
+        return labeledDataset;
+
+    }
+
     public ArrayList<LabeledPoint> TSMPrediction(IndexedDataset datasetToLabel){
 
         ExtendedLabel[] labels = this.partitionedDataset.getTSMClassifier().predict(datasetToLabel);

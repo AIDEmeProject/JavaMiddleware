@@ -123,6 +123,7 @@ public class LabeledPointsDTO {
 
 
 class FakePointDTO{
+
     public double[] data;
 
     int label;

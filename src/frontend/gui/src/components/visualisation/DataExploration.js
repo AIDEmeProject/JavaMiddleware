@@ -134,11 +134,7 @@ class DataExploration extends Component{
                     </div>
 
                     <div>
-
-
-                        <svg id="two-dimension-heatmap">
-                        </svg>
-
+                        <svg id="two-dimension-heatmap"></svg>
                     </div>                   
                 </div>
             </div>
@@ -149,7 +145,7 @@ class DataExploration extends Component{
         
         this.setState({
             firstVariable: nextProps.firstVariable,
-            secondVariable: nextProps.secondVariable
+        //    secondVariable: nextProps.secondVariable
         })
     }
 
@@ -174,6 +170,7 @@ class DataExploration extends Component{
     getParsedVariable(iVariable){
         return this.props.dataset.get_parsed_column_by_id(iVariable)
     }
+    
     componentDidMount(){
         
         const data = this.getVariable(this.state.firstVariable)

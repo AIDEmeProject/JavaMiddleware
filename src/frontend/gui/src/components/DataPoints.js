@@ -53,6 +53,7 @@ class DataPoints extends Component{
                     {
                         this.props.points.map((point, key) => {
                             const data = this.props.dataset.get_point(point.id)
+                            console.log(data, point)
                             return (
 
                                 <tr key={key}>

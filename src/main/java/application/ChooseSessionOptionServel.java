@@ -1,5 +1,6 @@
 package application;
 
+import com.google.gson.reflect.TypeToken;
 import io.CSVParser;
 import explore.ExperimentConfiguration;
 import com.google.gson.Gson;
@@ -34,24 +35,29 @@ public class ChooseSessionOptionServel extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        resp.setContentType("application/json");
+
+        Gson gson = new Gson();
+
 
         Map<String, String[]> postData = req.getParameterMap();
 
         String sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
 
-        String clientJson = req.getParameter("configuration");
+        String jsonConfiguration = req.getParameter("configuration");
+        String jsonColumnIds = req.getParameter("columnIds");
+        ArrayList<Integer> columnIds = gson.fromJson(jsonColumnIds, new TypeToken<ArrayList<Integer>>(){}.getType());
+        System.out.println("column ids");
+        System.out.println(jsonColumnIds);
 
 
-        ExperimentConfiguration configuration = JsonConverter.deserialize(clientJson, ExperimentConfiguration.class);
+        ExperimentConfiguration configuration = JsonConverter.deserialize(jsonConfiguration, ExperimentConfiguration.class);
         ExperimentConfiguration.TsmConfiguration tsmConf = configuration.getTsmConfiguration();
 
-        Gson gson = new Gson();
+
 
         CSVParser parser = new CSVParser();
 
-        IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", postData);
-
+        IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", columnIds);
 
         Learner learner;
         if  (configuration.getActiveLearner() instanceof SimpleMargin){
@@ -70,15 +76,12 @@ public class ChooseSessionOptionServel extends HttpServlet {
         //Learner learner = new SvmLearner(C, kernel);
         ExplorationManager manager = new ExplorationManager(dataset, configuration, learner);
 
-
         int nInitialPoints = 3;
 
-
-
-
-        resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
-
         this.getServletContext().setAttribute("experimentManager", manager);
+
+        resp.setContentType("application/json");
+        resp.getWriter().println(gson.toJson(manager.runInitialSampling(nInitialPoints)));
 
     }
 

@@ -14,6 +14,7 @@ function initializeBackend(traceOptions, onSuccess){
         dataType: 'JSON',
         url: url,
         data: {
+            'algorithm': traceOptions.algorithm,
             "configuration": JSON.stringify(traceOptions.configuration),
             'dataLoading': JSON.stringify({
                 'columnIds': traceOptions.columnIds

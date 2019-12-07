@@ -45,7 +45,7 @@ class TSMExploration extends Component{
     }
 
     render(){
-        
+        var dataset = this.props.dataset
         return (
             
             <div>                                
@@ -160,7 +160,8 @@ class TSMExploration extends Component{
                             <tbody>                
                             {
                             this.state.pointsToLabel.map((point, i) => {
-                                const pointData = this.props.dataset.get_point(point.id)
+                                console.log(point, dataset.get_point(point.id))
+                                const pointData = dataset.get_point(point.id)
                                 return (
 
                                     <tr 
@@ -172,8 +173,8 @@ class TSMExploration extends Component{
                                         </td>
                                         {
                                             this.props.groups.map((g, iGroup) => {
-                                                
-                                                var pointIds = g.map(e => e.finalIdx)    
+                                                console.log(g)
+                                                var pointIds = g.map(e => e.realId)    
                                                 
                                                 var dataAsGroups = []
 
@@ -468,17 +469,11 @@ class TSMExploration extends Component{
          }   
     }
 
+
+
     getModelBoundaries(){
 
-        if ( this.state.fakePointGrid.length === 0){
-            getGridPoints(points => {
-                
-                this.setState({
-                    fakePointGrid: points
-                })
-
-            })
-        }
+        this.getGridPoints()
 
         if ( ! this.state.initialLabelingSession){
 
@@ -514,6 +509,19 @@ class TSMExploration extends Component{
         })        
     }
 
+
+
+    getGridPoints(){
+
+        if ( this.state.fakePointGrid.length === 0){
+            getGridPoints(points => {
+                
+                this.setState({
+                    fakePointGrid: points
+                })
+            })
+        }
+    }
 
     onSubGroupNo(e){
 

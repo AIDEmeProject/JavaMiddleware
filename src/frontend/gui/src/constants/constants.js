@@ -1,5 +1,39 @@
+var factorizedVersionSpaceConfiguration ={ 
+    "activeLearner": {
+        "learners": {
+            "name": "MajorityVote",
+            "sampleSize": 8,
+            "versionSpace": {
+                "addIntercept": true, 
+                "decompose": true,
+                "hitAndRunSampler": {
+                    "cache": true,
+                    "rounding": true, 
+                    "roundingCache": true, 
+                    "selector": {
+                        "name": "WarmUpAndThin",
+                        "thin": 64,
+                        "warmUp": 256 
+                    } 
+                },
+                "jitter": 1e-09, 
+                "kernel": {
+                    "gamma": 0, 
+                    "name": "gaussian" 
+                },
+                "solver": "gurobi" 
+            } 
+        }, 
+        "lossFunctionId": "GREEDY", 
+        "name": "SubspatialSampler", 
+        "repeat": 5 
+    },
+    "subsampleSize": 50000, 
+    "task": "sdss_overlapping_0.1%", 
+    "useFactorizationInformation": true
+} 
 
-var defautConfiguration = {
+var versionSpaceConfiguration = {
     "activeLearner": {
         "learner": {
             "name": "MajorityVote", // MajorityVote | SVM |
@@ -21,13 +55,13 @@ var defautConfiguration = {
                 "solver": "ojalgo"
             }
         },
-        "name": "UncertaintySampler"
+        "name": "UncertaintySampler" //Version space = uncertainty sampler
     },
     "subsampleSize": 50000,
     "task": "sdss_Q4_0.1%"
 }
 
-var versionSpaceConfiguration = defautConfiguration
+
 var simpleMarginConfiguration = {
 
     "activeLearner": {
@@ -45,12 +79,14 @@ var simpleMarginConfiguration = {
     "useFactorizationInformation": false
 }
 
-
-
 module.exports = {
     backend: "http://localhost:7060",
     webplatformApi: "http://localhost:8000/api",
-    defaultConfiguration: defautConfiguration,
+    defaultConfiguration: versionSpaceConfiguration,
+
     versionSpaceConfiguration: versionSpaceConfiguration,
-    simpleMarginConfiguration: simpleMarginConfiguration
+    
+    simpleMarginConfiguration: simpleMarginConfiguration,
+    
+    factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration
 }

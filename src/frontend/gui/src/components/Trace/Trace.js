@@ -10,6 +10,9 @@ import Dataset from '../../model/Dataset'
 import Exploration from '../Exploration/Exploration'
 
 import LabelInfos from '../visualisation/LabelInfos'
+import LearnerOption from '../options/LearnerOption'
+
+
 
 import DataPoints from '../DataPoints'
 import ModelBehavior from '../visualisation/ModelBehavior'
@@ -19,12 +22,16 @@ import sendPointBatch from '../../actions/trace/sendPointBatch'
 import carColumns from './carColumns'
 
 import buildTSMConfiguration from '../../lib/buildTSMConfiguration'
-import {simpleMarginConfiguration, versionSpaceConfiguration} from '../../constants/constants'
+import {simpleMarginConfiguration, 
+        versionSpaceConfiguration, 
+        factorizedVersionSpaceConfiguration} from '../../constants/constants'
+
 
 class QueryTrace extends Component{
 
     render(){
 
+        const algorithm = this.state.algorithm
         return (
             <div>
                 { 
@@ -69,8 +76,12 @@ class QueryTrace extends Component{
                         >                           
                         </input>
 
+                        { false && 
+                        
                         <div>              
-                            <label htmlFor="use-tsm">TSM?</label>              
+                            <label htmlFor="use-tsm">
+                                Use TSM ?
+                            </label>              
                             <input 
                                 name="use-tsm"
                                 id="use-tsm"
@@ -80,11 +91,11 @@ class QueryTrace extends Component{
                                 checked={this.state.useTSM}
                             />
                         </div>
-                
-                        <select onChange={this.onFakePointOrRealChange}>
-                            <option>Fake point</option>
-                            <option>Real dataset</option>
-                        </select>
+                        }
+                     
+                        <LearnerOption                         
+                            learnerChanged={this.learnerChanged.bind(this)}
+                        />
 
                         <button                    
                             className="btn btn-raised"
@@ -146,10 +157,18 @@ class QueryTrace extends Component{
                                 this.state.showModelBehavior && 
 
                                 <div>
+                                    <p>                                       
+                                        Algorithm {algorithm} <br />
 
-                                    <p>
+                                        {
+                                            this.state.useTSM && 
+
+                                            <span>TSM is enabled  <br /></span>
+                                        }
+
                                         Number of positive predictions :
                                          {this.state.positivePoints}
+
                                     </p>
                                     
 
@@ -207,9 +226,21 @@ class QueryTrace extends Component{
             iteration: 0,
             lastIndice: 0,
             allLabeledPoints: [],
-            useTSM: true,
-            useVersionSpace: true
+            useTSM: false,
+            algorithm: 'simplemargin'
         }
+    }
+
+    learnerChanged(algorithm){
+
+        var useTSM = algorithm === "simplemargintsm" || 
+                     algorithm === "factorizedversionspace"
+        
+        console.log(useTSM)
+        this.setState({
+            useTSM: useTSM,
+            algorithm: algorithm
+        })
     }
 
     encodedDatasetChanged(e){
@@ -247,10 +278,7 @@ class QueryTrace extends Component{
             
             var fileContent = event.target.result 
             var dataset = Dataset.buildFromLoadedInput(fileContent)
-            dataset.set_columns_selected_by_users(this.state.columnNames.map(e => {
-                return {'name': e}
-            }))
-
+           
             this.setState({
                 'dataset': dataset
             }, this.initializeBackend)
@@ -282,9 +310,14 @@ class QueryTrace extends Component{
 
     buildConfiguration(){
         
-        var configuration = this.state.useVersionSpace ? 
-                                    versionSpaceConfiguration :
-                                    simpleMarginConfiguration
+        var configurations = {
+            'simplemargin': simpleMarginConfiguration,
+            'simplemargintsm': simpleMarginConfiguration,
+            'versionspace': versionSpaceConfiguration,
+            'factorizedversionspace': factorizedVersionSpaceConfiguration
+        }
+        
+        var configuration = configurations[this.state.algorithm]
 
 
         if (this.state.useTSM){
@@ -299,10 +332,14 @@ class QueryTrace extends Component{
     initializeBackend(){
 
         var options = {
+            algorithm: this.state.algorithm,
             columnIds: this.state.traceColumns.encodedDataset,
             encodedDatasetName: "./cars_encoded.csv",
-            configuration: this.buildConfiguration()
+            configuration: this.buildConfiguration(),
+            
         }
+        this.state.dataset.set_columns_selected_by_users(this.state.columnNames)
+        
         
         this.setState({
             isComputing: true,
@@ -315,11 +352,12 @@ class QueryTrace extends Component{
     traceBackendWasInitialized(fakePointGrid){
         
         const usedColumnIds = this.state.traceColumns.rawDataset
+        
         var columnNames = this.state.dataset.get_column_names_from_ids(usedColumnIds)
         var availableVariables =  columnNames.map((e, i) => {
                 return {name: e, realId: i}
         })
-
+        console.log(usedColumnIds, columnNames)
         //var grid = fakePointGrid.map(e => {return e.data.array})
                 
         var grid = this.state.dataset.get_parsed_columns_by_names(columnNames)

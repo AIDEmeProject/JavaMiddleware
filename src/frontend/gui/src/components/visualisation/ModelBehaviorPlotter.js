@@ -96,8 +96,6 @@ class ModelBehaviorPlotter{
         return svg
     }
 
-    
-
     plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors){
         
         const svg = this.svg        

@@ -45,8 +45,19 @@ public class GridPointGenerator{
         int nPoint = 1;
 
         for (int iCol=0; iCol < this.gridSpecifications.size(); iCol++){
-            nPoint *= this.gridSpecifications.get(iCol).getNPointToGenerate();
+
+            int nPointToComputeInCol = this.gridSpecifications.get(iCol).getNPointToGenerate();
+            System.out.println("iCol");
+            System.out.println(iCol);
+            System.out.println("n point to compute");
+            System.out.println(nPointToComputeInCol);
+
+            nPoint *= nPointToComputeInCol;
         }
+
+        System.out.println("final npoint To compute");
+        System.out.println(nPoint);
+
         return nPoint;
     }
 
@@ -63,22 +74,15 @@ public class GridPointGenerator{
 
         System.out.println("Number of points to generate");
         for (int iCol = 0; iCol< nColumn; iCol++){
-            System.out.println(iCol);
-            System.out.println(this.gridSpecifications.get(iCol).getNPointToGenerate());
-
 
             cartesianProduct.add(this.gridSpecifications.get(iCol).generateValues());
             this.indices[iCol] = 0;
 
-
         }
-
-        System.out.println("N points to compute");
-        System.out.println(getNPointsToCompute());
 
         int iValue;
 
-        int nPoint = Math.min(this.getNPointsToCompute(), 20000);
+        int nPoint = Math.min(this.getNPointsToCompute(), 200);
         for (int iPoint = 0; iPoint < nPoint ; iPoint++){
 
             double[] data = new double[nColumn];

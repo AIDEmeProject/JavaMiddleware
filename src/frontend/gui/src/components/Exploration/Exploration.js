@@ -39,7 +39,6 @@ class Exploration extends Component{
             projectionHistory: [],
             fakePointGrid: [],
             modelPredictionHistory: []
-
         }
     }
 
@@ -52,6 +51,7 @@ class Exploration extends Component{
                 <InitialSampling 
                     pointsToLabel={this.state.pointsToLabel}
                     chosenColumns={this.props.chosenColumns}
+                    availableVariables={this.props.availableVariables}
 
                     onPositiveLabel={this.onPositiveLabel.bind(this)}
                     onNegativeLabel={this.onNegativeLabel.bind(this)}

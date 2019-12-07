@@ -6,6 +6,7 @@ import machinelearning.active.Ranker;
 import machinelearning.active.ranker.SubspatialRanker;
 import machinelearning.active.ranker.subspatial.LossFunction;
 import machinelearning.classifier.Classifier;
+import machinelearning.classifier.Learner;
 import machinelearning.classifier.SubspatialLearner;
 
 /**
@@ -28,6 +29,10 @@ public class SubspatialActiveLearner implements ActiveLearner {
     public SubspatialActiveLearner(SubspatialLearner subspatialLearner, LossFunction lossFunction) {
         this.subspatialLearner = subspatialLearner;
         this.lossFunction = lossFunction;
+    }
+
+    public Learner getSubspatialLearner() {
+        return subspatialLearner;
     }
 
     @Override

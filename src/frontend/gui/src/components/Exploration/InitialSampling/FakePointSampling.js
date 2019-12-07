@@ -149,39 +149,12 @@ class FakePointSampling extends Component{
 
     onValidatePoint(){
 
-
-        var data = {
-            'data': this.state.fakePoint,
-            'label': 0
-        }
-
-        sendPoint(data, this.props.fakePointWasValidated)
+        this.props.onFakePointValidation(this.state.fakePoint)
+        
+       
     }
 }
 
-function sendPoint(dataPoint, onSuccess){
-    var url = backend + "/fake-point-initial-sampling"
 
-
-    $.ajax({
-        type: "POST",
-        dataType: 'JSON',
-        url: url,
-        data: {
-            fakePoint: JSON.stringify(dataPoint)
-        },
-       
-        success: onSuccess
-    })
-  
-
-}
-
-FakePointSampling.defaultProps = {
-    availableVariables: ['age', 'sex'],
-    variableTypes: ["numerical", 'categorical'],
-    pointToLabel: [22, 1],
-        
-}
 
 export default FakePointSampling

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import MicroModalComponent from '../MicroModalComponent'
+import Group from './Group'
 
 function containsObject(obj, list) {
 
@@ -31,7 +32,7 @@ class GroupEditor extends Component{
     render(){
         const availableVariables = this.props.availableVariables
         const chosenColumns = this.props.chosenColumns
-
+        
         return (
             <div>
                                 
@@ -82,100 +83,9 @@ class GroupEditor extends Component{
     }
 }
 
-class Group extends Component {
-
-    constructor(props){
-
-        super(props)      
-        this.state = {}
-    }
-
-    render(){
-        
-        const availableVariables = this.props.availableVariables
-        const iGroup = this.props.iGroup
-        const group = this.props.group
-        console.log(group)
-        
-        return (
-
-            <div>
-            
-                { 
-                    this.props.group.map((variable, iVariable) => {
-
-                   
-                    return ( 
-                        <div                                    
-                            className=""
-                            key={iVariable}
-                        >
-                            <div>{/* required because bs theme removes inner div */}
-                                <div                                                            
-                                    className=""
-                                >                                
-                                {variable.name} <button 
-                                                    data-variable={iVariable}
-                                                    data-group={iGroup}
-                                                    onClick={this.removeVariable.bind(this)}
-                                                >
-                                                    Remove
-                                                </button>
-                                </div>        
-                            </div>      
-                        </div>                        
-                    )
-                    })
-            }
-            </div>
-        )
-    }
-
-    removeVariable(e){
-        e.preventDefault()
-        var iVariable = parseInt(e.target.dataset.variable)
-        var iGroup = parseInt(e.target.dataset.group)
-        this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-    }
-
-    onVariableCheckboxClick(e){
-
-        var isChecked = e.target.checked
-        var iVariable = parseInt(e.target.dataset.variableorder)
-            
-        
-        var iGroup = parseInt(e.target.dataset.groupid)
-        
-        if (isChecked){
-            this.props.onVariableAddedToGroup(iGroup, iVariable)
-        }
-        else{
-            this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-        }        
-    }
-    
-}
 
 class GroupVariables extends Component {
-        
-    constructor(props){
-
-        super(props)        
-        
-        this.state = {
-            groups: [
-                [],
-                []
-            ],   
-            editedGroupId: null,                     
-            variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
-        }
-    }
-
-    componentDidUpdate(){
-        window.$('input').bootstrapMaterialDesign()    
-    }
-    
+                
     render(){
 
         var availableVariables = this.state.variablesNotAlreadyInAGivenGroup
@@ -281,6 +191,24 @@ class GroupVariables extends Component {
         )
     }
 
+    constructor(props){
+
+        super(props)        
+        
+        this.state = {
+            groups: [
+                [],
+                []
+            ],   
+            editedGroupId: null,                     
+            variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
+        }
+    }
+
+    componentDidUpdate(){
+        window.$('input').bootstrapMaterialDesign()    
+    }
+
     closeFactorizationGroupEdition(e){
         e.preventDefault()
         this.setState({editedGroupId: null})
@@ -343,7 +271,7 @@ class GroupVariables extends Component {
         var newGroupsState = this.state.groups.map(e => e)
         var modifiedGroup = newGroupsState[groupId]
 
-        console.log(modifiedGroup, removedColumnId)
+        
         /*
         modifiedGroup = modifiedGroup.filter((variable, i) => {
             
@@ -351,7 +279,7 @@ class GroupVariables extends Component {
         })
         */
         modifiedGroup.splice(removedColumnId, 1)
-        console.log(modifiedGroup, removedColumnId)
+        
 
         var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(e => e)
         variablesNotAlreadyInAGivenGroup.push(variable)

@@ -1,6 +1,5 @@
 package application;
 
-import application.data.LabeledPointsDTO;
 import com.google.gson.Gson;
 import data.DataPoint;
 import data.IndexedDataset;
@@ -9,38 +8,19 @@ import explore.ExperimentConfiguration;
 import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.active.LearnerFactory;
-import machinelearning.active.learning.SimpleMargin;
-import machinelearning.active.learning.SubspatialActiveLearner;
-import machinelearning.active.learning.UncertaintySampler;
-import machinelearning.active.ranker.SubspatialRanker;
+import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-import machinelearning.classifier.MajorityVoteLearner;
-import machinelearning.classifier.svm.GaussianKernel;
-import machinelearning.classifier.svm.Kernel;
-import machinelearning.classifier.svm.SvmLearner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
 
 
-class ColumnDTO{
-
-   ArrayList<Integer> columnIds;
-}
-
-
-class FullTraceComputing{
-
-}
-
-public class TraceInitializationServlet extends HttpServlet {
+public class FullTraceComputationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -69,43 +49,24 @@ public class TraceInitializationServlet extends HttpServlet {
 
 
         Learner learner = (new LearnerFactory()).buildLearner(algorithmName, configuration);
-        //System.out.println(learner.getClass().toString());
-        /*
-        Learner learner;
-        if  (configuration.getActiveLearner() instanceof SimpleMargin){
-
-            System.out.println("SVM");
-            double C = 1000;
-            Kernel kernel = new GaussianKernel();
-            learner = new SvmLearner(C, kernel);
-
-        }
-        else{
-            System.out.println("Version space");
-            learner = ((UncertaintySampler) configuration.getActiveLearner()).getLearner();
-        }
-        */
-
-
-        //double C = 1000;
-        //Kernel kernel = new GaussianKernel();
-        //learner = new SvmLearner(C, kernel);
-
-        System.out.println("Columns of data");
-        System.out.println(carDataset.getData().cols());
-        ExplorationManager manager = new ExplorationManager(carDataset, configuration, learner);
 
 
 
-        IndexedDataset fakePoints = manager.getRawDataset();
 
-        this.getServletContext().setAttribute("experimentManager", manager);
+
+        ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
+
+        String strLabelData = req.getParameter("labelData");
+        System.out.println(strLabelData);
+        ArrayList<LabelDTO> labeledPointsData = json.fromJson(strLabelData, LabelsDto.class).data;
+
+
+        TraceResultsComputer traceResultComputer = new TraceResultsComputer();
+        traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
+        TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
 
 
         resp.setContentType("application/json");
-        resp.getWriter().println(json.toJson(fakePoints.toList()));
-
+        resp.getWriter().println(json.toJson(result));
     }
 }
-
-

@@ -16,7 +16,14 @@ class Dataset{
     }
 
     set_columns_selected_by_users(names){
-        this.select_column_names = names.map(e => e['name'])
+
+        if (typeof names === "object"){
+            this.select_column_names = names.map(e => e['name'])
+        }
+        else{
+            this.select_column_names = names
+        }
+        
     }
 
     get_raw_col_by_name(name){
@@ -125,6 +132,7 @@ class Dataset{
     get_point(id){
         
         const row = this.dataset[id]
+        console.log(this.select_column_names, row, id)
         var d = this.select_column_names.map(e => {
             return row[e]
         })
