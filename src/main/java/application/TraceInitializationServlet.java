@@ -32,6 +32,14 @@ class ColumnDTO{
    ArrayList<Integer> columnIds;
 }
 
+
+
+class FullTraceComputing{
+
+}
+
+
+
 public class TraceInitializationServlet extends HttpServlet {
 
     @Override
@@ -58,23 +66,30 @@ public class TraceInitializationServlet extends HttpServlet {
 
         Learner learner;
         if  (configuration.getActiveLearner() instanceof SimpleMargin){
+            System.out.println("SVM");
             double C = 1000;
             Kernel kernel = new GaussianKernel();
             learner = new SvmLearner(C, kernel);
         }
         else{
-
+            System.out.println("Version space");
             learner = ((UncertaintySampler) configuration.getActiveLearner()).getLearner();
         }
 
-        double C = 1000;
-        Kernel kernel = new GaussianKernel();
-        learner = new SvmLearner(C, kernel);
+        System.out.println("configuration");
+        System.out.println(json.toJson(configuration));
+
+        //double C = 1000;
+        //Kernel kernel = new GaussianKernel();
+        //learner = new SvmLearner(C, kernel);
+
+        System.out.println("Columns of data");
+        System.out.println(carDataset.getData().cols());
 
         ExplorationManager manager = new ExplorationManager(carDataset, configuration, learner);
 
 
-        IndexedDataset fakePoints = manager.getGridOfFakePoints();
+        IndexedDataset fakePoints = manager.getRawDataset();
 
         this.getServletContext().setAttribute("experimentManager", manager);
 

@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import data.DataPoint;
 import data.IndexedDataset;
 import io.json.JsonConverter;
+import machinelearning.active.learning.SimpleMargin;
+import machinelearning.active.learning.UncertaintySampler;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.GaussianKernel;
 import machinelearning.classifier.svm.Kernel;
@@ -50,9 +52,22 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", postData);
 
-        double C = 1000;
-        Kernel kernel = new GaussianKernel();
-        Learner learner = new SvmLearner(C, kernel);
+
+        Learner learner;
+        if  (configuration.getActiveLearner() instanceof SimpleMargin){
+            System.out.println("SVM");
+            double C = 1000;
+            Kernel kernel = new GaussianKernel();
+            learner = new SvmLearner(C, kernel);
+        }
+        else{
+            System.out.println("Version space");
+            learner = ((UncertaintySampler) configuration.getActiveLearner()).getLearner();
+        }
+
+        //double C = 1000;
+        //Kernel kernel = new GaussianKernel();
+        //Learner learner = new SvmLearner(C, kernel);
         ExplorationManager manager = new ExplorationManager(dataset, configuration, learner);
 
 

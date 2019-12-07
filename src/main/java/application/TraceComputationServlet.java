@@ -38,33 +38,40 @@ class TraceResultsComputer{
             points.add(labeledPoint);
             manager.getNextPointsToLabel(points);
         }
-
     }
 
+    protected LabeledPoint getLabeledPoint(ExplorationManager manager, long index, int intLabel){
 
 
-    protected LabeledPoint getLabeledPoint(ExplorationManager manager, long index, int label){
+        DataPoint dataPoint = new DataPoint(index, manager.getPoint(index).getData());
 
-        DataPoint point = manager.getPoint(index);
-        UserLabel userLabel = new GuiUserLabel(label);
+        Label label = Label.fromSign((double) intLabel);
+        LabeledPoint lblPoint = new LabeledPoint(dataPoint, label);
+        return lblPoint;
 
-        LabeledPoint labeledPoint = new LabeledPoint(point, userLabel);
+        //DataPoint point = manager.getPoint(index);
+        //serLabel userLabel = new GuiUserLabel(label);
 
-        return labeledPoint;
+        //LabeledPoint labeledPoint = new LabeledPoint(point, userLabel);
+
+        //return labeledPoint;
     }
 
     TraceResultDTO computeTraceResults(ExplorationManager manager) throws IOException{
-
 
         TraceResultDTO dto = new TraceResultDTO();
 
         ModelProjectionComputer computer = new ModelProjectionComputer();
 
-        dto.labeledPointsOverGrid = manager.computeModelPredictionsOverFakeGridPoints();
+        dto.labeledPointsOverGrid = manager.computeModelPredictionsOverRealDataset();
 
         String filePath = "./labeled_points_java.csv";
         String json = computer.getEmbbeddingAsJson(filePath, manager);
         dto.jsonProjectionPredictions = json;
+
+        if (manager.useTSM()){
+            dto.TSMPredictionsOverGrid = manager.computeTSMPredictionOverRealDataset();
+        }
 
         return dto;
     }
@@ -75,6 +82,8 @@ class TraceResultsComputer{
 class TraceResultDTO{
 
     protected ArrayList<LabeledPoint> labeledPointsOverGrid;
+
+    protected ArrayList<LabeledPoint> TSMPredictionsOverGrid;
 
     protected String jsonProjectionPredictions;
 

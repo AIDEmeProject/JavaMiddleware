@@ -3,6 +3,8 @@ package application;
 import data.*;
 
 import explore.ExperimentConfiguration;
+import explore.metrics.ConfusionMatrix;
+import explore.metrics.ConfusionMatrixCalculator;
 import explore.metrics.MetricStorage;
 import explore.metrics.ThreeSetMetricCalculator;
 
@@ -10,6 +12,7 @@ import data.preprocessing.StandardScaler;
 
 import explore.statistics.Statistics;
 import explore.user.GuiUserLabel;
+import explore.user.UserStub;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
@@ -111,6 +114,18 @@ public class ExplorationManager {
     }
 
 
+    //public ConfusionMatrix computeConfusionMatrix(){
+
+
+    //    UserStub userStub = new UserStub();
+    //    ConfusionMatrixCalculator calculator = new ConfusionMatrixCalculator(this.learner);
+
+    //    return calculator.compute(partitionedDataset, );
+
+
+    //}
+
+
     public void addLabeledPointToDataset(LabeledPoint point){
         this.partitionedDataset.addLabeledPointToDataset(point);
     }
@@ -123,10 +138,12 @@ public class ExplorationManager {
 
         for (LabeledPoint point : labeledPoints) {
             long id = point.getId();
+
             scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
         }
 
         this.partitionedDataset.update(scaledLabeledPoints);
+
         if (this.isInitialSamplingStep){
 
             if (this.hasPositiveAndNegativeExamples()){
@@ -182,9 +199,6 @@ public class ExplorationManager {
         // appears, or the dataset runs empty
         ExtendedLabel extendedLabel = partitionedDataset.getLabel(mostInformativePoint);
 
-        System.out.println("unknown points");
-        System.out.println(partitionedDataset.hasUnknownPoints());
-        System.out.println(partitionedDataset.getUnknownPoints().length());
 
         while (extendedLabel.isKnown() && partitionedDataset.hasUnknownPoints()) {
             labeledPoints = Collections.singletonList(new LabeledPoint(mostInformativePoint, extendedLabel.toLabel()));
@@ -219,7 +233,9 @@ public class ExplorationManager {
 
 
         IndexedDataset datasetToLabel;
-        Classifier classifier = this.learner.fit(this.partitionedDataset.getLabeledPoints());
+        LabeledDataset labeledDatasetDbd = this.partitionedDataset.getLabeledPoints();
+
+        Classifier classifier = this.learner.fit(labeledDatasetDbd);
 
         if (scaleDataset){
             datasetToLabel = this.scaleDataset(pointsToLabel);
@@ -229,6 +245,7 @@ public class ExplorationManager {
         }
 
         ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
+
 
         for (int i=0;i < datasetToLabel.length(); i++)
         {
@@ -255,7 +272,7 @@ public class ExplorationManager {
 
         Statistics[] columnStatistics = this.rawDataset.getData().columnStatistics();
         ArrayList<ColumnSpecification> specs = new ArrayList<>();
-        System.out.println("IS NUMERIC");
+
         for (int i = 0; i < columnStatistics.length; i++) {
             double min = columnStatistics[i].getMinimum();
             double max = columnStatistics[i].getMaximum();
@@ -289,6 +306,10 @@ public class ExplorationManager {
         return this.gridOfFakePoints;
     }
 
+    public IndexedDataset getRawDataset(){
+        return this.partitionedDataset.getAllPoints();
+    }
+
 
     public ArrayList<LabeledPoint> computeTSMPredictionsOverFakeGridPoints(){
 
@@ -300,8 +321,18 @@ public class ExplorationManager {
         return this.labelPoints(this.getScaledGridOfFakePoints(), this.getGridOfFakePoints(), false);
     }
 
+    public ArrayList<LabeledPoint> computeTSMPredictionOverRealDataset(){
+        return this.TSMPrediction(partitionedDataset.getAllPoints());
+    }
 
+    public ArrayList<LabeledPoint> computeModelPredictionsOverRealDataset(){
 
+        return this.labelPoints(this.partitionedDataset.getAllPoints(), this.rawDataset, false);
+    }
+
+    public boolean useTSM(){
+        return configuration.hasMultiTSM();
+    }
 
     public ArrayList<LabeledPoint> computeLabelOfFakeGridPoint(){
 
@@ -334,7 +365,6 @@ public class ExplorationManager {
         {
             ExtendedLabel label = labels[i];
 
-            System.out.println(label.asSign());
             DataPoint rawPoint = datasetToLabel.get(i);
 
             GuiUserLabel guiLabel = GuiUserLabel.fromExtendedLabel(label);
