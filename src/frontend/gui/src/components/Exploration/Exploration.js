@@ -44,6 +44,8 @@ class Exploration extends Component{
     }
 
     render(){
+
+        console.log(this.props.chosenColumns)
                     
         if (this.state.initialLabelingSession){
             return (

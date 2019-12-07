@@ -24,21 +24,35 @@ class Dataset{
     }
 
     get_column_name(name){
-
-        if (Number.isNaN(parseFloat(this.dataset[0][name])) ){
+        
+        const firstValue = parseFloat(this.dataset[0][name])
+        const isValueNan = Number.isNaN(firstValue)
+        
+        if (isValueNan ){
             return this.get_parsed_column_by_name(name)
         }
 
         return this.dataset.map( e => parseFloat(e[name]))
     }
 
-    get_parsed_column_by_id(id){
+    get_parsed_columns_by_names(names){
+        var columns = names.map(name => {
+            return this.get_column_name(name)
+        })
 
-        const name = this._get_column_name_from_id(id)
-
-        return this.get_parsed_column_by_name(name)
+        
+        return d3.zip(...columns)
     }
 
+    get_parsed_columns_by_id(ids){
+        
+        var columns = ids.map(id => {
+            return this.get_parsed_column_by_id(id)
+        })
+        
+        return d3.zip(...columns)
+
+    }
 
     get_parsed_column_by_name(name){
 
@@ -49,10 +63,15 @@ class Dataset{
         return this.parsedColumns[name]
     }
 
-    _get_column_name_from_id(id){
-        
-        return this.dataset.columns[id]        
+    get_parsed_column_by_id(id){
+
+        const name = this._get_column_name_from_id(id)
+
+        return this.get_parsed_column_by_name(name)
     }
+
+
+    
 
     parse_string_column(name){
 
@@ -74,6 +93,13 @@ class Dataset{
         return parsed
     }
 
+   
+
+    _get_column_name_from_id(id){
+        
+        return this.dataset.columns[id]        
+    }
+
     get_column_id(id){
         
         var name = this.dataset.columns[id]
@@ -82,6 +108,10 @@ class Dataset{
 
     get_column_names(){
         return this.dataset.columns
+    }
+
+    get_column_names_from_ids(ids){
+        return ids.map(id => this.dataset.columns[id])
     }
 
     get_column_from_id(id){
@@ -102,15 +132,7 @@ class Dataset{
         return d
     }
 
-    get_parsed_columns_by_id(ids){
-        
-        var columns = ids.map(id => {
-            return this.get_parsed_column_by_id(id)
-        })
-
-        return d3.zip(...columns)
-
-    }
+    
 
     get_columns(ids, aliases){
 
@@ -127,18 +149,7 @@ class Dataset{
 
             return d            
         })
-    }
-
-    compute_statistics(){
-        var statistics = []
-        this.dataset.columns.forEach(e => {
-            var column = this.get_column_name
-        })
-    }
-
-    generate_grid_point(columnsIds){
-
-    }
+    }   
 }
 
 

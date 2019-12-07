@@ -5,46 +5,6 @@ import * as  d3 from "d3"
 
 import ModelBehaviorPlotter from './ModelBehaviorPlotter'
 
-
-class LabelInfos extends Component{
-    
-    constructor(props){
-        super(props)
-    }
-
-    render(){
-
-        //const iteration = this.props.iteration
-        const labeledPoints = this.props.labeledPoints
-        
-        const negativeSamples = labeledPoints.filter(e => e[2] === 0)
-        const positiveSamples = labeledPoints.filter(e => e[2] === 1)
-
-        return (
-
-            <div id="iteration-labels">
-                <div>
-                    Labeled sample {
-                        labeledPoints.length
-                    }
-                </div>
-
-                <div>
-                    Positive labels {
-                        positiveSamples.length
-                    }
-                </div>
-
-                <div>
-                    Negative labels {
-                        negativeSamples.length
-                    }
-                </div>
-            </div>
-        )
-    }
-}
-
 class ModelBehaviorControls extends Component{
 
     constructor(props){
@@ -80,9 +40,9 @@ class ModelBehavior extends Component{
     constructor(props){
 
         super(props)    
-        console.log(props)
+        
         this.state = {
-            gridPoints: [],
+            
             modelIteration: 0,            
             firstVariable: 0,
             secondVariable: 1,
@@ -108,6 +68,8 @@ class ModelBehavior extends Component{
         //    return (<div>Please label at least one point after the initial sampling phase. If it was done, please wait while vizualization data is computed</div>)
         //}
 
+        
+
         return (
 
             <div className="row">
@@ -120,10 +82,6 @@ class ModelBehavior extends Component{
                         onNextIteration={this.onNextIteration.bind(this)}
                     />
 
-                    <LabelInfos
-                        iteration={this.state.modelIteration}
-                        labeledPoints={labeledPoints}
-                    />
 
                 <div className="form-inline">
 
@@ -246,7 +204,6 @@ class ModelBehavior extends Component{
             </div>
         )
     }
-
     
     componentWillMount(){
         
@@ -264,7 +221,7 @@ class ModelBehavior extends Component{
     componentDidMount(){
         const columnNames = this.props.availableVariables.map( e => e.name)
         
-        if (this.props.availableVariables.length <= 4){
+        if (this.props.availableVariables.length <= 4 || this.props.realDataset){
             
             this.modelPredictionPlotter = new ModelBehaviorPlotter(columnNames)
             this.modelPredictionPlotter.createPlot('#model-predictions-grid-point', this.state.scale)
@@ -272,7 +229,6 @@ class ModelBehavior extends Component{
         
         this.projectionPlotter = new ModelBehaviorPlotter(['X', 'Y'])
         this.projectionPlotter.createPlot("#projection", this.state.scale)
-
 
         if (this.props.hasTSM){
             this.tsmPlotter = new ModelBehaviorPlotter(columnNames)
@@ -289,7 +245,7 @@ class ModelBehavior extends Component{
 
     plotAll(){
         
-        if (this.props.availableVariables.length <= 4){
+        if (this.props.availableVariables.length <= 4 || this.props.realDataset){
             this.plotPredictionOnGridPoints()
         }
 
@@ -327,6 +283,7 @@ class ModelBehavior extends Component{
         const scatterPoints = this.getModelPredictionOverGridPoints()
         
         const chosenVariables = this.getChosenVariables()
+        
         const humanLabeledPoints = this.getHumanLabeledPoints()
         const scale = this.state.scale
         
@@ -358,7 +315,6 @@ class ModelBehavior extends Component{
         )        
     }
 
-
     getTSMPredictionOverGridPoints(){
 
         const iteration = this.state.modelIteration
@@ -377,17 +333,13 @@ class ModelBehavior extends Component{
         })
         
         return gridPoints
-
     }
-
     
     getModelPredictionOverGridPoints(){
 
         const iteration = this.state.modelIteration
         const modelPredictions = this.props.modelPredictionHistory[iteration]        
         const grid = this.props.fakePointGrid        
-
-        
 
         const vars = this.getChosenVariables()
         const iColOne = vars[0]
@@ -498,8 +450,7 @@ class ModelBehavior extends Component{
     }
 
     secondVariableChanged(e){
-            
-        
+                    
         var secondVariable = parseInt(e.target.value) 
         
         var newState = {

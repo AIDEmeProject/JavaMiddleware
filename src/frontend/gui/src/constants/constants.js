@@ -27,8 +27,8 @@ var defautConfiguration = {
     "task": "sdss_Q4_0.1%"
 }
 
-
-var SimpleMarginConfiguration = {
+var versionSpaceConfiguration = defautConfiguration
+var simpleMarginConfiguration = {
 
     "activeLearner": {
         "name": "SimpleMargin",
@@ -50,5 +50,7 @@ var SimpleMarginConfiguration = {
 module.exports = {
     backend: "http://localhost:7060",
     webplatformApi: "http://localhost:8000/api",
-    defaultConfiguration: defautConfiguration
+    defaultConfiguration: defautConfiguration,
+    versionSpaceConfiguration: versionSpaceConfiguration,
+    simpleMarginConfiguration: simpleMarginConfiguration
 }

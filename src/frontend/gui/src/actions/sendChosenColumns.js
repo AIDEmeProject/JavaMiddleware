@@ -2,6 +2,9 @@ import {backend, webplatformApi, defaultConfiguration} from '../constants/consta
 
 import $ from "jquery";
 
+
+
+
 function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
 
     var endPoint = backend + "/choose-options"    
@@ -18,14 +21,11 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
     if (chosenVariables == 2){
             
         var flags = chosenVariables.map(g => { return [true, false]}) 
-        var groups = chosenVariables.map( v => [v.name] ) //array because each variable is a group
-        
+        var groups = chosenVariables.map( v => [v.name] ) //array because each variable is a group        
     }
-    else{
-        
+    else{        
         var flags =  groups.map(g => {return [true, false]})        
-        var groups = groups.map( g => { return g.map(v => v.name)})
-        
+        var groups = groups.map( g => { return g.map(v => v.name)})        
     }
    
     Object.assign(tsmJson, {
@@ -123,6 +123,6 @@ function sendDataToWebPlateform(availableVariables, options, hasTSM, featureGrou
 
 export default {
     sendColumns: sendColumns,
-    sendVariableGroups: sendVariableGroups    
+    sendVariableGroups: sendVariableGroups
 }
 

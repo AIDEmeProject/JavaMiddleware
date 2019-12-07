@@ -281,8 +281,9 @@ class SessionOptions extends Component{
         e.preventDefault()
                        
         var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)
-        const enableTSM = chosenColumns.length == 2
-
+        //const enableTSM = chosenColumns.length == 2
+        const enableTSM = false
+        console.log(enableTSM)
         if (enableTSM){
             var groups = [
                 [chosenColumns[0]],
@@ -302,8 +303,12 @@ class SessionOptions extends Component{
    
     groupsWereValidated(groups){
 
-        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
         
+        var chosenColumns = groups.flatMap( g => {
+            return g.map( v => {return {name: v.name}} )
+        })
+        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
+        console.log(chosenColumns)
         this.props.groupsWereValidated(chosenColumns, groups, ()=> {
             actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, this.props.sessionWasStarted)    
         })                                  

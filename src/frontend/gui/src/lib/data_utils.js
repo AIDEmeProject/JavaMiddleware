@@ -6,6 +6,8 @@ function loadFileFromInputFile(inputId, onFileLoaded){
     fileReader.onload = onFileLoaded
     fileReader.readAsText(file.files[0])
 
+
+
 }
 
 export default loadFileFromInputFile

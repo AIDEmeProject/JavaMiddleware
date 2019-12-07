@@ -10,7 +10,7 @@ class ModelBehaviorPlotter{
     createPlot(svgId, scale){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 40, right: 20, bottom: 50, left: 40},
+        var margin = {top: 40, right: 20, bottom: 50, left: 50},
         width = 500 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -56,7 +56,7 @@ class ModelBehaviorPlotter{
           // text label for the y axis
         this.yLabel = svg.append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left - 5)
+                .attr("y", 0 - margin.left - 10)
                 .attr("x",0 - (height / 2))
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")

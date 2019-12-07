@@ -1,17 +1,25 @@
+import $ from 'jquery'
 import * as d3 from 'd3'
 import React, { Component } from 'react';
 
 import loadFileFromInputFile from '../../lib/data_utils'
+import TSMTraceDataset from '../../model/TSMTraceDataset'
 import TraceDataset from '../../model/TraceDataset';
 import Dataset from '../../model/Dataset'
 
 import Exploration from '../Exploration/Exploration'
 
+import LabelInfos from '../visualisation/LabelInfos'
 
 import DataPoints from '../DataPoints'
 import ModelBehavior from '../visualisation/ModelBehavior'
 import initializeBackend from '../../actions/trace/initializeBackend'
 import sendPointBatch from '../../actions/trace/sendPointBatch'
+
+import carColumns from './carColumns'
+
+import buildTSMConfiguration from '../../lib/buildTSMConfiguration'
+import {simpleMarginConfiguration, versionSpaceConfiguration} from '../../constants/constants'
 
 class QueryTrace extends Component{
 
@@ -19,9 +27,10 @@ class QueryTrace extends Component{
 
         return (
             <div>
-                { this.state.showLoading && 
-            <div className="row">
-                <div className="col col-lg-6 offset-3 card">
+                { 
+                    this.state.showLoading && 
+                    <div className="row">
+                    <div className="col col-lg-6 offset-3 card">
 
                     <h1>
                         Trace module
@@ -60,14 +69,30 @@ class QueryTrace extends Component{
                         >                           
                         </input>
 
-                        
-                        
+                        <div>              
+                            <label htmlFor="use-tsm">TSM?</label>              
+                            <input 
+                                name="use-tsm"
+                                id="use-tsm"
+                                className="checkbox"
+                                type="checkbox" 
+                                onChange={e => this.setState({useTSM: e.target.checked})}
+                                checked={this.state.useTSM}
+                            />
+                        </div>
+                
+                        <select onChange={this.onFakePointOrRealChange}>
+                            <option>Fake point</option>
+                            <option>Real dataset</option>
+                        </select>
 
-                        <button
+                        <button                    
+                            className="btn btn-raised"
                             onClick={this.onValidateTrace.bind(this)}
                         >
                             Validate
                         </button>
+
                     </div>
                 </div>
                 </div>
@@ -122,13 +147,26 @@ class QueryTrace extends Component{
 
                                 <div>
 
+                                    <p>
+                                        Number of positive predictions :
+                                         {this.state.positivePoints}
+                                    </p>
+                                    
+
+                                    <LabelInfos
+                                        iteration={this.state.lastIndice}
+                                        labeledPoints={this.state.allLabeledPoints}
+                                    />
+
                                     <ModelBehavior                     
                                         labeledPoints={this.state.allLabeledPoints}                        
-                                        availableVariables={this.props.availableVariables}
+                                        availableVariables={this.state.availableVariables}
                                         projectionHistory={this.state.projectionHistory}
                                         fakePointGrid={this.state.fakePointGrid}
                                         modelPredictionHistory={this.state.modelPredictionHistory}
-                                        hasTSM={false}                        
+                                        hasTSM={this.state.useTSM}     
+                                        realDataset={true}     
+                                        TSMPredictionHistory={this.state.TSMPredictionHistory}              
                                     />
 
                                 </div>
@@ -159,28 +197,18 @@ class QueryTrace extends Component{
             showModelBehavior: false,
             showLoading: true,
             isComputing: false,
-            columnNames: ['year', 'length', 'width'],            
-            availableVariables: [
-                {
-                    'id': 0,
-                    'name': 'year',                    
-                },
-                {
-                    'id': 1,
-                    'name': 'length',                    
-                },
-                {
-                    'id': 2,
-                    'name': 'width',                    
-                }
-            ],
+            columnNames: [],
+            availableVariables: [],
             fakePointGrid: [],
+            TSMPredictionHistory: [],
             modelPredictionHistory: [],
             projectionHistory: [],
             allLabeledPoints: [],
             iteration: 0,
             lastIndice: 0,
-            allLabeledPoints: []
+            allLabeledPoints: [],
+            useTSM: true,
+            useVersionSpace: true
         }
     }
 
@@ -191,6 +219,29 @@ class QueryTrace extends Component{
     }
 
     onValidateTrace(e){
+
+        loadFileFromInputFile("trace", event => {
+
+            var fileContent = event.target.result 
+            var filePath = $("#trace").val(); 
+            const ext = filePath.substr(filePath.lastIndexOf('.') + 1,filePath.length);    
+            
+            const isCsv = ext === "csv"
+            const useTSM = this.state.useTSM
+            
+            if (useTSM){
+                var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
+            }
+            else{
+                var trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv)
+                
+            }
+         
+            this.setState({ 
+                'traceDataset': trace                
+            })
+        })
+        
 
         loadFileFromInputFile("dataset", event => {
             
@@ -205,48 +256,78 @@ class QueryTrace extends Component{
             }, this.initializeBackend)
         })
 
-        loadFileFromInputFile("trace", event => {
-
-            var fileContent = event.target.result 
-            var trace = TraceDataset.buildFromLoadedInput(fileContent)    
-            
-            this.setState({ 
-                'traceDataset': trace                
-            })
-        })
-
         loadFileFromInputFile('trace-columns', event => {
             
             var fileContent = event.target.result
-
+            var traceColumns = JSON.parse(fileContent)            
             this.setState({
-                'traceColumns': JSON.parse(fileContent)
+                'traceColumns': traceColumns,                
             })
         })
+    }
+
+    getPositivePredictedPoints(modelPredictionHistory, step){
+        
+        var iteration = Math.min(step, modelPredictionHistory.length - 1)
+
+        return modelPredictionHistory[iteration].filter(e => {
+            return e.label === 1
+        }).length
+    }
+
+    getGroups(){
+        var groups = this.state.availableVariables.filter((e, i) => i < 5 ).map( e => [e])
+        return groups
+    }
+
+    buildConfiguration(){
+        
+        var configuration = this.state.useVersionSpace ? 
+                                    versionSpaceConfiguration :
+                                    simpleMarginConfiguration
+
+
+        if (this.state.useTSM){
+
+            var groups = this.getGroups()
+            configuration = buildTSMConfiguration(configuration, groups, this.state.availableVariables)
+        }
+        
+        return configuration
     }
 
     initializeBackend(){
 
         var options = {
             columnIds: this.state.traceColumns.encodedDataset,
-            encodedDatasetName: "cars_encoded.csv"
+            encodedDatasetName: "./cars_encoded.csv",
+            configuration: this.buildConfiguration()
         }
-
-        console.log(options)
+        
         this.setState({
             isComputing: true,
             showLoading: false
         }, () => {
             initializeBackend(options, this.traceBackendWasInitialized.bind(this))
-        })
-        
+        })        
     }
 
     traceBackendWasInitialized(fakePointGrid){
         
-        var grid = fakePointGrid.map(e => {return e.data.array})
+        const usedColumnIds = this.state.traceColumns.rawDataset
+        var columnNames = this.state.dataset.get_column_names_from_ids(usedColumnIds)
+        var availableVariables =  columnNames.map((e, i) => {
+                return {name: e, realId: i}
+        })
+
+        //var grid = fakePointGrid.map(e => {return e.data.array})
+                
+        var grid = this.state.dataset.get_parsed_columns_by_names(columnNames)
+      
         this.setState({
-            fakePointGrid: grid,            
+            fakePointGrid: grid, 
+            availableVariables: availableVariables,
+            columnNames: columnNames
         }, this.sendLabelDataForComputation.bind(this))        
     }
 
@@ -276,10 +357,12 @@ class QueryTrace extends Component{
     getDataPointFromId(sentPoint){
 
         const id = sentPoint.id
+        var data = this.state.dataset.get_point(id)
+
         return {
             id: id,
             label: sentPoint.label,        
-            data: this.state.dataset.get_point(id)
+            data: data.map(e => parseFloat(e))
         } 
     }
 
@@ -291,33 +374,55 @@ class QueryTrace extends Component{
         projectionHistory.push(
             projectionData
         )
-
+    
         var modelPredictionHistory = this.state.modelPredictionHistory
         var modelPredictions = backendPredToFrontendFormat(response.labeledPointsOverGrid, false)
         modelPredictionHistory.push(modelPredictions)
-        
+
         var allLabeledPoints = this.state.allLabeledPoints
         allLabeledPoints = allLabeledPoints.concat(sentPoints.map(this.getDataPointFromId.bind(this)))
+        
 
-        this.setState({
+        var newState = {
             modelPredictionHistory: modelPredictionHistory,
             projectionHistory: projectionHistory,            
             showLoading: false,
             iteration: this.state.iteration + 1,
             allLabeledPoints: allLabeledPoints,
-            isComputing: false
-        })
+            isComputing: false,
+            positivePoints: this.getPositivePredictedPoints(modelPredictionHistory, this.state.lastIndice / 2)
+        }
+        
+        if (this.state.useTSM){
+            var TSMPredictionHistory = this.state.TSMPredictionHistory
+            var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map(e => {
+                return {
+                    'id': e.dataPoint.id,
+                    'label': e.label.label
+                }
+            })
+            TSMPredictionHistory.push(TSMPredictionsOverGrid)
+            newState['TSMPredictionHistory'] = TSMPredictionHistory
+            
+        }
+
+        this.setState(newState)
     }
 }
 
 
-function backendPredToFrontendFormat(rawPoints, isTSM){
+function backendPredToFrontendFormat(rawPoints, useTSM){
+
     return rawPoints.map(e => {
         return {
-            'id': isTSM ? e.id: e.dataPoint.id,
+            'id': useTSM ? e.id: e.dataPoint.id,
             'label': e.label == 'POSITIVE' ? 1: -1
         }
     })
+}
+
+QueryTrace.defaultProps = {
+    carColumns: carColumns
 }
 
 export default QueryTrace

@@ -59,7 +59,6 @@ class AnimatedText extends Component{
     }
 }
 
-
 class App extends Component {
 
     constructor(props){
@@ -311,18 +310,13 @@ class App extends Component {
         })
         
         var finalVariables =  options.chosenColumns
-        var onlyTwoVariables = finalVariables.length == 2
-        var hasTSM = options.groups || onlyTwoVariables
+        //var onlyTwoVariables = finalVariables.length == 2
+        var hasTSM = options.groups
                 
         if (hasTSM){
-
-            if (onlyTwoVariables){
-                var groups = [[finalVariables[0]], [finalVariables[1]]]
-            }
-            else{
-                var groups = options.groups
-            }
-
+        
+            var groups = options.groups
+          
             this.setState({
                 step: TSM_EXPLORATION,
                 bread: this.getBreadCrum(TSM_EXPLORATION),
