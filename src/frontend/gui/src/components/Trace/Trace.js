@@ -207,6 +207,31 @@ class QueryTrace extends Component{
                             }
                     </div>
                 }
+
+
+                <a 
+                    onClick={this.saveTrace.bind(this)}
+                    id="download-trace" download="trace.json" type="application/json"
+                    className="btn btn-raised"
+                >
+
+                    Save trace
+                </a>
+               
+                <label htmlFor="load-trace">
+                    Trace file (json)
+                </label>
+                <input 
+                    id="load-trace"
+                    name="load-trace"
+                    type="file"
+                />
+
+                <button 
+                    onClick={this.loadTrace.bind(this)}    
+                >
+                    Load
+                </button>
             </div>           
         )
     }
@@ -457,6 +482,20 @@ class QueryTrace extends Component{
         }
 
         this.setState(newState)
+    }
+
+    saveTrace(){
+        const jsonState = JSON.stringify(this.state)
+
+        var data = new Blob([jsonState]);
+        var a = document.getElementById("download-trace");
+        a.href = URL.createObjectURL(data);
+    }
+
+    loadTrace(){
+        loadFileFromInputFile("load-trace", event => {
+            this.setState(JSON.parse(event.target.result))
+        })
     }
 }
 
