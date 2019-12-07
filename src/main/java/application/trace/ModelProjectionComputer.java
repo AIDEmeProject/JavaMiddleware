@@ -1,5 +1,6 @@
-package application;
+package application.trace;
 
+import application.ExplorationManager;
 import application.data.CsvDatasetWriter;
 import data.LabeledPoint;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +12,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class ModelProjectionComputer{
+public class ModelProjectionComputer{
 
     public String getModelBoundary() throws IOException {
 

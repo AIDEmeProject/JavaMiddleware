@@ -11,8 +11,7 @@ function sendPointBatch(labeledPoints, onSuccess){
         dataType: 'JSON',
         url: url,
         data: {
-            "labelData": JSON.stringify({
-                data: labeledPoints}),            
+            "labeledPoints": JSON.stringify(labeledPoints),            
         },
         success: onSuccess
     })

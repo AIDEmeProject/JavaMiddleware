@@ -1,5 +1,7 @@
 package application;
 
+import application.trace.TraceComputationServlet;
+import application.trace.TraceInitializationServlet;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;

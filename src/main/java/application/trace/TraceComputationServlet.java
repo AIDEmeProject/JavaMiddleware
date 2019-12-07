@@ -1,20 +1,13 @@
-package application;
+package application.trace;
 
+import application.ExplorationManager;
+
+import application.data.LabeledPointsDTO;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import data.DataPoint;
-import data.IndexedDataset;
 import data.LabeledPoint;
-import explore.ExperimentConfiguration;
-import explore.user.GuiUserLabel;
-import explore.user.UserLabel;
-import io.CSVParser;
-import io.json.JsonConverter;
 import machinelearning.classifier.Label;
-import machinelearning.classifier.Learner;
-import machinelearning.classifier.svm.GaussianKernel;
-import machinelearning.classifier.svm.Kernel;
-import machinelearning.classifier.svm.SvmLearner;
+import machinelearning.threesetmetric.ExtendedLabel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,10 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collection;
 
 
 class TraceResultsComputer{
+/*
 
     public void pointsWereLabeled(ExplorationManager manager, ArrayList<LabelDTO> labeledPointData) throws IOException{
 
@@ -39,6 +33,21 @@ class TraceResultsComputer{
             manager.getNextPointsToLabel(points);
         }
     }
+
+    public void pointsWereLabeled(ExplorationManager manager, ArrayList<TSMLabelDTO> labeledPointData) throws IOException{
+
+
+        for (TSMLabelDTO point:labeledPointData
+        ) {
+
+            LabeledPoint labeledPoint = this.getLabeledPoint(manager, point.id, point.labels);
+            ArrayList<LabeledPoint> points = new ArrayList<>();
+            points.add(labeledPoint);
+            manager.getNextPointsToLabel(points);
+        }
+    }
+
+*/
 
     protected LabeledPoint getLabeledPoint(ExplorationManager manager, long index, int intLabel){
 
@@ -105,6 +114,17 @@ class LabelDTO{
     int label;
 }
 
+class TSMLabelDTO{
+
+    long id;
+
+    int[] labels;
+}
+
+class TSMLabelsDTO{
+    public ArrayList<TSMLabelDTO> data;
+}
+
 class LabelsDto{
     public ArrayList<LabelDTO> data;
 }
@@ -118,13 +138,22 @@ public class TraceComputationServlet extends HttpServlet {
         Gson json = new Gson();
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        String strLabelData = req.getParameter("labelData");
+        String strLabelData = req.getParameter("labeledPoints");
         System.out.println(strLabelData);
-        ArrayList<LabelDTO> labeledPointsData = json.fromJson(strLabelData, LabelsDto.class).data;
+
+        LabeledPointsDTO dtoManager = new LabeledPointsDTO();
+        ArrayList<LabeledPoint> labeledPoints;
+
+        if (manager.useTSM()){
+             labeledPoints = (ArrayList<LabeledPoint>) dtoManager.getTSMLabeledPoints(strLabelData);
+        }
+        else{
+            labeledPoints = (ArrayList<LabeledPoint>) dtoManager.getLabeledPoints(strLabelData);
+        }
 
 
         TraceResultsComputer traceResultComputer = new TraceResultsComputer();
-        traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
+        manager.getNextPointsToLabel(labeledPoints);
         TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
 
 

@@ -7,12 +7,8 @@ import TSMTraceDataset from '../../model/TSMTraceDataset'
 import TraceDataset from '../../model/TraceDataset';
 import Dataset from '../../model/Dataset'
 
-import Exploration from '../Exploration/Exploration'
-
 import LabelInfos from '../visualisation/LabelInfos'
 import LearnerOption from '../options/LearnerOption'
-
-
 
 import DataPoints from '../DataPoints'
 import ModelBehavior from '../visualisation/ModelBehavior'
@@ -102,6 +98,14 @@ class QueryTrace extends Component{
                             onClick={this.onValidateTrace.bind(this)}
                         >
                             Validate
+                        </button>
+
+
+                        <button
+                            className="btn btn-raised"
+                            onClick={this.computeFullTrace.bind(this)}
+                        >
+                            Compute full trace
                         </button>
 
                     </div>
@@ -231,6 +235,10 @@ class QueryTrace extends Component{
         }
     }
 
+    computeFullTrace(){
+
+    }
+
     learnerChanged(algorithm){
 
         var useTSM = algorithm === "simplemargintsm" || 
@@ -248,6 +256,7 @@ class QueryTrace extends Component{
             encodedDatasetChanged: e.target.value
         })
     }
+
 
     onValidateTrace(e){
 
@@ -273,7 +282,6 @@ class QueryTrace extends Component{
             })
         })
         
-
         loadFileFromInputFile("dataset", event => {
             
             var fileContent = event.target.result 
@@ -287,9 +295,10 @@ class QueryTrace extends Component{
         loadFileFromInputFile('trace-columns', event => {
             
             var fileContent = event.target.result
-            var traceColumns = JSON.parse(fileContent)            
+            var traceColumns = JSON.parse(fileContent)        
+                    
             this.setState({
-                'traceColumns': traceColumns,                
+                'traceColumns': traceColumns,               
             })
         })
     }
@@ -303,11 +312,8 @@ class QueryTrace extends Component{
         }).length
     }
 
-    getGroups(){
-        var groups = this.state.availableVariables.filter((e, i) => i < 5 ).map( e => [e])
-        return groups
-    }
 
+ 
     buildConfiguration(){
         
         var configurations = {
@@ -319,11 +325,14 @@ class QueryTrace extends Component{
         
         var configuration = configurations[this.state.algorithm]
 
-
         if (this.state.useTSM){
-
-            var groups = this.getGroups()
-            configuration = buildTSMConfiguration(configuration, groups, this.state.availableVariables)
+            var allColumns = this.props.carColumns
+            
+            const factorizationGroups = this.state.traceColumns.factorizationGroups  
+            const usedColumns = this.state.traceColumns.encodedDataset.map (e => allColumns[e])
+            console.log(usedColumns)
+            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, allColumns)
+            console.log(configuration)
         }
         
         return configuration
@@ -335,12 +344,11 @@ class QueryTrace extends Component{
             algorithm: this.state.algorithm,
             columnIds: this.state.traceColumns.encodedDataset,
             encodedDatasetName: "./cars_encoded.csv",
-            configuration: this.buildConfiguration(),
-            
+            configuration: this.buildConfiguration(),            
         }
+
         this.state.dataset.set_columns_selected_by_users(this.state.columnNames)
-        
-        
+            
         this.setState({
             isComputing: true,
             showLoading: false
@@ -371,7 +379,11 @@ class QueryTrace extends Component{
 
     getLabeledPointToSend(iRowTrace){
 
-        return this.state.traceDataset.get_point(iRowTrace)
+        var point = this.state.traceDataset.get_point(iRowTrace)
+        point.data = {
+            array: [2]
+        }
+        return point
     }
     
     sendLabelDataForComputation(){

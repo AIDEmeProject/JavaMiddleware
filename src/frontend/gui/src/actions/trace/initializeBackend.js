@@ -6,7 +6,9 @@ function initializeBackend(traceOptions, onSuccess){
 
     var url = backend + "/start-trace"
 
+    var configuration = traceOptions.configuration
 
+    configuration.columns = traceOptions.columnNames
 
     $.ajax({
 
@@ -16,9 +18,7 @@ function initializeBackend(traceOptions, onSuccess){
         data: {
             'algorithm': traceOptions.algorithm,
             "configuration": JSON.stringify(traceOptions.configuration),
-            'dataLoading': JSON.stringify({
-                'columnIds': traceOptions.columnIds
-            }),
+            'columnIds': JSON.stringify(traceOptions.columnIds),                            
             'encodedDatasetName': traceOptions.encodedDatasetName
         },
         success: onSuccess

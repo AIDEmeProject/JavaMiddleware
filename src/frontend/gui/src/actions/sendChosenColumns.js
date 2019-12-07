@@ -26,9 +26,6 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
         var flags =  groups.map(g => {return [true, false]})        
         var groups = groups.map( g => { return g.map(v => v.name)})        
     }
-
-    console.log(flags)
-    console.log(groups)
    
     Object.assign(tsmJson, {
         flags: flags,

@@ -1,16 +1,18 @@
-function buildTSMConfiguration(baseConfiguration, groups, chosenVariables){
+
+
+
+function buildTSMConfiguration(baseConfiguration, groupsWithIds, usedColumnNames, allColumns){
     
     var tsmJson = {
         hasTSM: true,                
         searchUnknownRegionProbability: 0.5,                
-        columns: chosenVariables.map( e => e.name),
+        columns: usedColumnNames,
         decompose: true
     }
 
+    var groups = buildGroupsFromJson(groupsWithIds, allColumns)
     var flags =  groups.map(g => {return [true, false]})        
-    var groups = groups.map( g => { return g.map(v => v.name)})
-
-
+    
     Object.assign(tsmJson, {
         flags: flags,
         featureGroups: groups,                   
@@ -20,5 +22,22 @@ function buildTSMConfiguration(baseConfiguration, groups, chosenVariables){
 
     return baseConfiguration
 }
+
+
+function buildGroupsFromJson(factorizationGroupByIds, encodedColumnNames){
+        
+    var groupWithNames = factorizationGroupByIds.map(spec => {
+        return spec.map(id => {
+    
+            return encodedColumnNames[id]
+        })
+    })
+    
+    return groupWithNames
+}
+
+
+
+
 
 export default buildTSMConfiguration

@@ -196,6 +196,7 @@ class App extends Component {
                  
 
                         <button
+                            className="btn btn-raised"
                             onClick={(e) => this.setState({'step': TRACE}) }
                         >
                             Trace

@@ -1,28 +1,12 @@
 package application;
 
-import application.data.CsvDatasetWriter;
-import com.google.gson.Gson;
-import data.IndexedDataset;
-import data.LabeledDataset;
-import data.LabeledPoint;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import application.trace.ModelProjectionComputer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Random;
-
-
 
 
 public class LabelPointForDecisionBoundaryServlet extends HttpServlet {

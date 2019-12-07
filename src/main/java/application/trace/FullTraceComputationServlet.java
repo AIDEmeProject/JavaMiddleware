@@ -1,14 +1,13 @@
-package application;
+package application.trace;
 
+import application.ExplorationManager;
+import application.trace.*;
 import com.google.gson.Gson;
-import data.DataPoint;
 import data.IndexedDataset;
-import data.LabeledPoint;
 import explore.ExperimentConfiguration;
 import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.active.LearnerFactory;
-import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 
 import javax.servlet.ServletException;
@@ -62,7 +61,7 @@ public class FullTraceComputationServlet extends HttpServlet {
 
 
         TraceResultsComputer traceResultComputer = new TraceResultsComputer();
-        traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
+        //traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
         TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
 
 

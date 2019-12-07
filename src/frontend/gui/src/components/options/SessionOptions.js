@@ -278,31 +278,15 @@ class SessionOptions extends Component{
     
     onSessionStartClick(e){
         
-        e.preventDefault()
-                       
+        e.preventDefault()                       
         var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)
-        //const enableTSM = chosenColumns.length == 2
-        const enableTSM = false
-        console.log(enableTSM)
-        if (enableTSM){
-            var groups = [
-                [chosenColumns[0]],
-                [chosenColumns[1]]
-            ]
-            this.groupsWereValidated(groups)
-        }
-        else{
-            console.log(this.state)
-            actions.sendColumns(this.props.tokens, chosenColumns, this.props.sessionWasStarted)        
-
-            this.props.sessionOptionsWereChosen({            
-                chosenColumns: chosenColumns,                
-            })                
-        }        
+        //const enableTSM = chosenColumns.length == 2                           
+        actions.sendColumns(this.props.tokens, chosenColumns, this.props.sessionWasStarted)        
+        this.props.sessionOptionsWereChosen({            
+            chosenColumns: chosenColumns,                
+        })                            
     }
    
-   
-
     groupsWereValidated(groups){
         
         var chosenColumns = groups.flatMap( g => {
@@ -327,10 +311,8 @@ class SessionOptions extends Component{
                 
                 variable['realId'] = i
                 i++
-            })
-            
-        })
-        
+            })  
+        })     
     }
 
     groupWasAdded(){
@@ -353,11 +335,5 @@ class SessionOptions extends Component{
     }      
 }
 
-SessionOptions.defaultProps = {
-    "classifiers": [
-        {value: "svm", label:"SVM"},
-        {value: "majorityVote", label:"Majority vote"},
-    ]
-}
 
 export default SessionOptions

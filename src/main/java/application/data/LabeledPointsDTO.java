@@ -72,12 +72,12 @@ public class LabeledPointsDTO {
         ArrayList<LabeledPoint> lblPoints = new ArrayList<>();
 
         for (TSMLabeledPointDTO point : points){
-            System.out.println(point.data.array[0]);System.out.println(point.id);
+
             DataPoint dataPoint = new DataPoint(point.id, point.data.array);
 
             int nPartialLabel = point.labels.length;
 
-            System.out.println(nPartialLabel);
+
             Label[] partialLabels = new Label[nPartialLabel];
 
             for (int i = 0; i < nPartialLabel; i++){
