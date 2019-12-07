@@ -25,6 +25,7 @@ class Group extends Component {
                                     className=""
                                 >                                
                                 {variable.name} <button 
+                                                    className="btn btn-raised btn-sm"
                                                     data-variable={iVariable}
                                                     data-group={iGroup}
                                                     onClick={this.removeVariable.bind(this)}
