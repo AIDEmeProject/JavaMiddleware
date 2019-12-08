@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import React, { Component } from 'react';
 
 
+import TSMPredictionStatistics from '../Exploration/TSM/TSMPredictionStatistics'
 
 import {algorithmNames} from '../../constants/constants'
 import loadFileFromInputFile from '../../lib/data_utils'
@@ -15,6 +16,8 @@ import LearnerOption from '../options/LearnerOption'
 
 import DataPoints from '../DataPoints'
 import ModelBehavior from '../visualisation/ModelBehavior'
+import ModelBehaviorControls from '../visualisation/ModelBehaviorControls'
+
 import initializeBackend from '../../actions/trace/initializeBackend'
 import sendPointBatch from '../../actions/trace/sendPointBatch'
 
@@ -34,8 +37,6 @@ class QueryTrace extends Component{
         const iteration = this.state.iteration
         const nPositivePoints = this.state.positivePoints[iteration]
         
-        console.log(this.state.positivePoints, iteration)
-
         return (
             <div>
                 { 
@@ -80,6 +81,18 @@ class QueryTrace extends Component{
                         >                           
                         </input>
 
+
+
+                        <label htmlFor="f1-score">
+                            4. Load f1 score
+                        </label>
+                        <input
+                            className="form-control-file"
+                            id="f1-score" name="f1-score"
+                            type="file"
+                        >                           
+                        </input>
+
                         { false && 
                         
                         <div>              
@@ -108,14 +121,6 @@ class QueryTrace extends Component{
                             Validate
                         </button>
 
-
-                        <button
-                            className="btn btn-raised"
-                            onClick={this.computeFullTrace.bind(this)}
-                        >
-                            Compute full trace
-                        </button>
-
                     </div>
                 </div>
                 </div>
@@ -124,9 +129,13 @@ class QueryTrace extends Component{
                     {
                         ! this.state.showLoading && 
 
-                        <div>
+                        <div className="row">
 
-                            <div>
+                            <div className="col col-lg-8">
+
+                                <h4>
+                                    Algorithm : {algorithm} 
+                                </h4>
                                 <div>
                                     <button 
                                         className="btn btn-primary btn-raised"
@@ -167,19 +176,54 @@ class QueryTrace extends Component{
                         
                             { 
                                 this.state.showModelBehavior && 
-
                                 <div>
-                                    <p>                                       
-                                        Algorithm : {algorithm} <br />
-                                        
-                                        Number of positive predictions : {nPositivePoints}
-                                    </p>
-                                    
+                                <div className="row">
 
-                                    <LabelInfos
-                                        iteration={this.state.lastIndice}
-                                        labeledPoints={this.state.allLabeledPoints}
-                                    />
+                                    <div className="col col-lg-3">
+                                        
+                                       
+                                        
+                                        <ModelBehaviorControls       
+                                            iteration={iteration}          
+                                            onPreviousIteration={this.onPreviousIteration.bind(this)}
+                                            onNextIteration={this.onNextIteration.bind(this)}
+                                        />
+
+                                        <LabelInfos
+                                            iteration={this.state.lastIndice}
+                                            labeledPoints={this.state.allLabeledPoints}
+                                        />
+                                    </div>
+
+                                    <div className="col col-lg-4">
+                                       
+                                       <p>
+                                           Classifier statistics
+                                       </p>
+                                       
+                                        <p>                                                                                                                              
+                                            Number of positive predictions : {nPositivePoints}
+                                        </p>
+
+                                        { 
+                                            this.state.useTSM && 
+
+                                            <div>
+                                                <p>
+                                                    TSM Prediction Statistics
+                                                </p>
+
+                                                <TSMPredictionStatistics 
+                                                    stats={this.getTSMStats()}
+                                                />
+
+                                            </div>
+                                        }
+                                    </div>
+                                    
+                                    <div className="col col-lg-5">
+                                        <img src={this.state.f1ScoreImg} />
+                                    </div>
 
                                     <ModelBehavior                     
                                         labeledPoints={this.state.allLabeledPoints}                        
@@ -188,10 +232,11 @@ class QueryTrace extends Component{
                                         fakePointGrid={this.state.fakePointGrid}
                                         modelPredictionHistory={this.state.modelPredictionHistory}
                                         hasTSM={this.state.useTSM}     
-                                        realDataset={true}     
+                                        realDataset={true}   
+                                        iteration={iteration}  
                                         TSMPredictionHistory={this.state.TSMPredictionHistory}              
                                     />
-
+                                    </div>
                                 </div>
                             }
                     
@@ -248,10 +293,12 @@ class QueryTrace extends Component{
             availableVariables: [],
             fakePointGrid: [],
             TSMPredictionHistory: [],
+            TSMStatsHistory: [],
             modelPredictionHistory: [],
             positivePoints: [],
             projectionHistory: [],
             allLabeledPoints: [],
+            nIteration: 0,
             iteration: -1,
             lastIndice: 0,
             allLabeledPoints: [],
@@ -260,9 +307,44 @@ class QueryTrace extends Component{
         }
     }
 
+    getTSMStats(){
+        
+        const iteration = this.state.iteration
+        var stat = this.state.TSMStatsHistory[iteration];
+        
+        return stat
+    }
+
     getAlgorithmName(algorithm){        
         return algorithmNames[algorithm]
     }
+
+
+    onPreviousIteration(){
+
+        var iteration = this.getIteration() - 1
+        this.setState({
+            modelIteration: Math.max(iteration, 0)
+        })    
+    }
+
+    getNumberOfIterations(){
+        return this.state.nIteration
+    }
+
+    onNextIteration(){
+
+        const nIteration = this.getNumberOfIterations()
+        var iteration = this.getIteration() + 1
+
+        this.setState({
+            modelIteration: Math.min(iteration, nIteration - 1)
+        })        
+    }
+
+    getIteration(){
+        return this.state.iteration
+    }     
 
     learnerChanged(algorithm){
 
@@ -283,7 +365,26 @@ class QueryTrace extends Component{
 
     onValidateTrace(e){
         
-        this.loadDataset()        
+        this.loadDataset()   
+        this.loadF1Score()     
+    }
+
+    loadF1Score(){
+        
+        var file  = document.querySelector('#f1-score').files[0];
+
+        var reader  = new FileReader();
+
+        reader.onloadend = () => {
+
+            
+            this.setState({
+                f1ScoreImg: reader.result
+            })
+        }
+
+        reader.readAsDataURL(file);
+        
     }
 
     loadDataset(){
@@ -367,16 +468,6 @@ class QueryTrace extends Component{
         })        
     }
 
-    
-    getPositivePredictedPoints(modelPredictionHistory, step){
-        
-        var iteration = Math.min(step, modelPredictionHistory.length - 1)
-
-        return modelPredictionHistory[iteration].filter(e => {
-            return e.label === 1
-        }).length
-    }
-
 
     buildConfiguration(){
         
@@ -399,8 +490,7 @@ class QueryTrace extends Component{
             configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, datasetMetadata)            
 
             if (this.state.algorithm == "factorizedversionspace") {
-                configuration = this.buildFactorizedVersionSpaceGroup(configuration)
-                console.log(configuration)
+                configuration = this.buildFactorizedVersionSpaceGroup(configuration)                
             }
         }
         
@@ -416,8 +506,7 @@ class QueryTrace extends Component{
                 categorical.push(i)
             }
         })
-        console.log(categorical)
-
+        
         configuration["activeLearner"].repeat = this.state.traceColumns.factorizationGroups.length
         configuration["activeLearner"].categorical = categorical
         configuration["multiTSM"]["hasTsm"] = false
@@ -425,8 +514,7 @@ class QueryTrace extends Component{
     }
 
     traceBackendWasInitialized(fakePointGrid){
-                        
-               
+                                       
         //var grid = fakePointGrid.map(e => {return e.data.array})
                 
         var grid = this.state.dataset.get_parsed_columns_by_names(this.state.columnNames)
@@ -452,9 +540,7 @@ class QueryTrace extends Component{
         var pointsToSend = d3.range(2).map((e, i) => {
             return this.getLabeledPointToSend(i + lastIndice)
         })
-
-        console.log(pointsToSend)
-        
+                
         this.setState({
             isComputing: true,
             lastIndice: lastIndice + 2
@@ -470,28 +556,30 @@ class QueryTrace extends Component{
 
         const id = sentPoint.id
         var data = this.state.dataset.get_selected_columns_point(id)
-
-        return {
+        
+        var data =  {
             id: id,
-            label: sentPoint.label,        
+            label: this.getLabelFromPoint(sentPoint),        
             data: data.map(e => parseFloat(e))
         } 
+        
+        return data
+    }
+    getLabelFromPoint(point){
+
+        if (this.state.useTSM){
+            
+            return point.labels.every(e => e == 1) ? 1: 0
+        }
+        return point.label
     }
 
+    /* Process and data received from the backend and put it in the component state */
     dataReceived(response, sentPoints){
                 
         var projectionHistory = this.state.projectionHistory
         var projectionData = JSON.parse(response.jsonProjectionPredictions)
-        console.log(projectionData.embedding[0])
-        console.log(projectionData.embedding[1])
-        //console.log(projectionData.embedding.filter(e => e[2] == 1)[0])
-        const nonPositiveProjections = projectionData.embedding.filter(e => e[2] != 1)
-        console.log(nonPositiveProjections[0])
-        console.log(nonPositiveProjections[1])
-        console.log(nonPositiveProjections[2])
-        console.log(nonPositiveProjections[3])
-        console.log(nonPositiveProjections[4])
-
+                        
         projectionHistory.push(
             projectionData
         )
@@ -514,34 +602,58 @@ class QueryTrace extends Component{
             projectionHistory: projectionHistory,            
             showLoading: false,
             iteration: this.state.iteration + 1,
+            nIteration: this.state.nIteration + 1,
             allLabeledPoints: allLabeledPoints,
             isComputing: false,
             positivePoints: positivePoints
         }
         
         if (this.state.useTSM){
-            var nonZero = response.TSMPredictionsOverGrid.filter( e => e.label.label != 0)
-            var positives = response.TSMPredictionsOverGrid.filter( e => e.label.label == 1)
-            console.log(nonZero.length, positives.length)
-            console.log(response.TSMPredictionsOverGrid[0])
+                        
             var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map(e => {
-
-                //console.log(e)
+                
                 return {
                     'id': e.dataPoint.id,
                     'label': e.label.label
                 }
             })
-
             
-
             var TSMPredictionHistory = this.state.TSMPredictionHistory
             TSMPredictionHistory.push(TSMPredictionsOverGrid)
             newState['TSMPredictionHistory'] = TSMPredictionHistory
             
+            
+            var TSMstats = this.computeTSMStats(TSMPredictionsOverGrid)
+            var TSMStatsHistory = this.state.TSMStatsHistory
+            TSMStatsHistory.push(TSMstats)
+            newState['TSMStatsHistory'] = TSMStatsHistory
         }
 
         this.setState(newState)
+    }
+
+
+    /* compute final model stats. To add negative ones*/
+    getPositivePredictedPoints(modelPredictionHistory, step){
+        
+        var iteration = Math.min(step, modelPredictionHistory.length - 1)
+
+        return modelPredictionHistory[iteration].filter(e => {
+            return e.label === 1
+        }).length
+    }
+
+    computeTSMStats(TSMPredictionOverPoints){
+
+        var negative = TSMPredictionOverPoints.filter( e => e.label == -1).length
+        var positive = TSMPredictionOverPoints.filter( e => e.label == 1).length
+        var unknown = TSMPredictionOverPoints.filter( e => e.label == 0).length
+
+        return {
+            positive: positive,
+            negative: negative,
+            unknown: unknown
+        }
     }
 
     saveTrace(){
@@ -557,10 +669,7 @@ class QueryTrace extends Component{
             this.setState(JSON.parse(event.target.result))
         })
     }
-
-    computeFullTrace(){
-        
-    }
+  
 }
 
 

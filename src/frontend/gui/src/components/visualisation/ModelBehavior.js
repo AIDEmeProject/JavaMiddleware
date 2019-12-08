@@ -4,36 +4,7 @@ import $ from "jquery";
 import * as  d3 from "d3"
 
 import ModelBehaviorPlotter from './ModelBehaviorPlotter'
-
-class ModelBehaviorControls extends Component{
-
-    constructor(props){
-        super(props)
-    }
-
-    render(){
-
-        const iteration = this.props.iteration
-
-        return (
-            <div id="iteration-control">
-
-                <div>Iteration <span className="iteration-number">{iteration + 1}</span></div>
-                <button
-                    className="btn btn-primary btn-raised"
-                    onClick={this.props.onPreviousIteration}
-                > Previous </button>
-                <button
-                    className="btn btn-primary btn-raised"
-                    onClick={this.props.onNextIteration}
-                >
-                    Next
-                </button>
-
-            </div>
-        )
-    }
-}
+import ModelBehaviorControls from './ModelBehaviorControls'
 
 class ModelBehavior extends Component{
 
@@ -69,23 +40,19 @@ class ModelBehavior extends Component{
         //}
 
         
+        var iteration = this.getIteration()
 
         return (
 
+            <div>
+
             <div className="row">
             
-                <div className="col-lg-4 behavior-options">
+                <div className="col-lg-12 behavior-options">
+                 
+                    <div className="form-inline">
 
-                    <ModelBehaviorControls       
-                        iteration={this.state.modelIteration}          
-                        onPreviousIteration={this.onPreviousIteration.bind(this)}
-                        onNextIteration={this.onNextIteration.bind(this)}
-                    />
-
-
-                <div className="form-inline">
-
-                    <div className="form-group" >
+                        <div className="form-group" >
 
                         <select 
                             value={this.state.firstVariable}
@@ -192,15 +159,44 @@ class ModelBehavior extends Component{
                         />  
                     </div>
                 </div>      
-            </div>        
-                <div className="col col-lg-8">
+            </div>
+            </div>
+
+            <div className="row">
+                                             
+                <div className="col col-lg-6">
+                    
+                    <h4>
+                        Final predictions
+                    </h4>
                     
                     <svg id="model-predictions-grid-point"></svg>
 
-                    { this.props.hasTSM && <svg id="tsm-plot"></svg> }
+                </div>
+                
+                { 
+                    this.props.hasTSM &&
+                    
+                    <div className="col col-lg-6">
+                        <h3>TSM Predictions</h3>
+                        <svg id="tsm-plot"></svg>                         
+                    </div>
+                }
+                <div className={this.props.hasTSM ? "col col-lg-6 offset-lg-3":  "col-lg-6"}>
+                    
+                    {
+                        this.props.hasTSM &&
+                        <h4>TSM Predictions over projected dataset</h4>
+                    }
 
+                    {
+                        ! this.props.hasTSM &&
+                        <h4>Predictions over projected dataset</h4>
+                    }
                     <svg id="projection"></svg>                
                 </div>        
+              </div>
+            
             </div>
         )
     }
@@ -218,6 +214,10 @@ class ModelBehavior extends Component{
         })       
     }
     
+    getIteration(){
+        return this.props.iteration
+    }
+
     componentDidMount(){
         const columnNames = this.props.availableVariables.map( e => e.name)
         
@@ -317,7 +317,7 @@ class ModelBehavior extends Component{
 
     getTSMPredictionOverGridPoints(){
 
-        const iteration = this.state.modelIteration
+        const iteration = this.getIteration()
         const modelPredictions = this.props.TSMPredictionHistory[iteration]
         const grid = this.props.fakePointGrid        
         
@@ -337,7 +337,7 @@ class ModelBehavior extends Component{
     
     getModelPredictionOverGridPoints(){
 
-        const iteration = this.state.modelIteration
+        const iteration = this.getIteration()
         const modelPredictions = this.props.modelPredictionHistory[iteration]        
         const grid = this.props.fakePointGrid        
 
@@ -357,14 +357,14 @@ class ModelBehavior extends Component{
 
     getEmbbedings(){
         
-        const iteration = this.state.modelIteration
+        const iteration = this.getIteration()
 
         return this.props.projectionHistory[iteration].embedding
     }
 
     getHumanLabeledPoints(){
                 
-        const iteration = this.state.modelIteration       
+        const iteration = this.getIteration()       
         var labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
         })
@@ -382,7 +382,7 @@ class ModelBehavior extends Component{
     getLabeledEmbedding(){
                 
         const embeddings = this.getEmbbedings()
-        const iteration = this.state.modelIteration
+        const iteration = this.getIteration()
 
         const labeledPoints = this.props.labeledPoints.filter((e, i) =>{
             return i <= iteration
@@ -395,24 +395,7 @@ class ModelBehavior extends Component{
         return labeledEmbeddings
     }
    
-    onPreviousIteration(){
-
-        var iteration = this.state.modelIteration - 1
-        this.setState({
-            modelIteration: Math.max(iteration, 0)
-        })    
-    }
-
-    onNextIteration(){
-
-        const nIteration = this.props.modelPredictionHistory.length
-        var iteration = this.state.modelIteration + 1
-
-        this.setState({
-            modelIteration: Math.min(iteration, nIteration - 1)
-        })        
-    }
-     
+  
     computeMinMaxOfRawData(){
                 
         const grid = this.getModelPredictionOverGridPoints()

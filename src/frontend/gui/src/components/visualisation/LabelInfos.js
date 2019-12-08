@@ -18,7 +18,7 @@ class LabelInfos extends Component{
         
         const negativeSamples = labeledPoints.filter(e => e.label === 0)
         const positiveSamples = labeledPoints.filter(e => e.label === 1)
-
+        
         return (
 
             <div id="iteration-labels">
@@ -43,6 +43,7 @@ class LabelInfos extends Component{
         )
     }
 }
+
 
 
 export default LabelInfos
