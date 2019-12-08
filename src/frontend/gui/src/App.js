@@ -193,14 +193,7 @@ class App extends Component {
             <div className="App container-fluid">                                    
                 <div className="row">
                     <div className="col col-lg-12">
-                 
-
-                        <button
-                            className="btn btn-raised"
-                            onClick={(e) => this.setState({'step': TRACE}) }
-                        >
-                            Trace
-                        </button>
+                                         
                         <View                        
                             {...this.state}
                             fileUploaded={this.fileUploaded.bind(this)} 
@@ -226,6 +219,17 @@ class App extends Component {
 
                 <div id="pandas-profiling">
                 </div>
+
+                {
+                    this.state.step == NEW_SESSION && 
+                
+                    <button
+                        className="btn btn-raised"
+                        onClick={(e) => this.setState({'step': TRACE}) }
+                        >
+                        Trace
+                    </button>
+                }
             </div>
       </div>
     );

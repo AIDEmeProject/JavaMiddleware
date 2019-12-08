@@ -332,15 +332,23 @@ h4, h3{
     pointer-events: none;
   }
 
-
+#iteration-control{
+  margin-top: 20px;
+}
 
 #iteration-labels > div, #iteration-control{
   text-align: center;
   padding: 15px;
   border-radius: 5px;
   border: 1px solid grey;
-  width: 250px;
+  max-width: 250px;
+  margin-left: 25%;
 }
+
+#tsm-pred-stats, #prediction-stats{
+  margin-top: 20px;
+}
+
 
 /*
 .iteration-number{

@@ -164,7 +164,7 @@ class ModelBehavior extends Component{
 
             <div className="row">
                                              
-                <div className="col col-lg-6">
+                <div className="col col-lg-12">
                     
                     <h4>
                         Model predictions
@@ -174,6 +174,9 @@ class ModelBehavior extends Component{
 
                 </div>
                 
+            </div>
+            <div className="row">
+                <div className="col col-lg-12">
                 { 
                     this.props.hasTSM &&
                     
@@ -182,7 +185,11 @@ class ModelBehavior extends Component{
                         <svg id="tsm-plot"></svg>                         
                     </div>
                 }
-                <div className={this.props.hasTSM ? "col col-lg-6 offset-lg-3":  "col-lg-6"}>
+                </div>
+            </div>
+            <div className="row">
+                
+                <div className="col-lg-12">
                     
                     {
                         this.props.hasTSM &&
@@ -195,9 +202,10 @@ class ModelBehavior extends Component{
                     }
                     <svg id="projection"></svg>                
                 </div>        
-              </div>
-            
             </div>
+        </div>
+            
+        
         )
     }
     
@@ -344,7 +352,7 @@ class ModelBehavior extends Component{
         const iteration = this.getIteration()
         const modelPredictions = this.props.modelPredictionHistory[iteration]  
         console.log(this.props.modelPredictionHistory.length)      
-        
+
         const grid = this.props.fakePointGrid        
 
         const vars = this.getChosenVariables()

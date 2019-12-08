@@ -28,6 +28,7 @@ import buildTSMConfiguration from '../../lib/buildTSMConfiguration'
 import {simpleMarginConfiguration, 
         versionSpaceConfiguration, 
         factorizedVersionSpaceConfiguration} from '../../constants/constants'
+import PredictionStatistics from '../Exploration/TSM/PredictionStatitics';
 
 
 const ENCODED_DATASET_NAME = "./cars_encoded.csv"
@@ -41,96 +42,93 @@ class QueryTrace extends Component{
         const nPositivePoints = this.state.positivePoints[iteration]
         
         return (
-            <div>
+            <div className="row">
+                <div className="col col-lg-12">
                 { 
                     this.state.showLoading && 
                     <div className="row">
-                    <div className="col col-lg-6 offset-3 card">
+                        <div className="col col-lg-6 offset-3 card">
 
-                    <h1>
-                        Trace module
-                    </h1>
-                
-                    <div className="form-group ">
-                    
-                        <label htmlFor="dataset">
-                            1. Choose the dataset to be labeled
-                        </label>
-                        <input
-                            required
-                            className="form-control-file"
-                            id="dataset" name="dataset" type="file" 
-                        />
-
-
-                        <label htmlFor="trace">
-                            2. Choose the trace
-                        </label>
-                        <input
-                            className="form-control-file"
-                            id="trace" name="trace"
-                            type="file"
-                        >                           
-                        </input>
-
-
-                        <label htmlFor="trace-columns">
-                            3. Choose the trace columns
-                        </label>
-                        <input
-                            className="form-control-file"
-                            id="trace-columns" name="trace-columns"
-                            type="file"
-                        >                           
-                        </input>
-
-
-
-                        <label htmlFor="f1-score">
-                            4. Load f1 score
-                        </label>
-                        <input
-                            className="form-control-file"
-                            id="f1-score" name="f1-score"
-                            type="file"
-                        >                           
-                        </input>
-
-                        { false && 
+                            <h1>
+                                Trace module
+                            </h1>
                         
-                        <div>              
-                            <label htmlFor="use-tsm">
-                                Use TSM ?
-                            </label>              
-                            <input 
-                                name="use-tsm"
-                                id="use-tsm"
-                                className="checkbox"
-                                type="checkbox" 
-                                onChange={e => this.setState({useTSM: e.target.checked})}
-                                checked={this.state.useTSM}
-                            />
-                        </div>
-                        }
+                            <div className="form-group ">
+                    
+                                <label htmlFor="dataset">
+                                    1. Choose the dataset to be labeled
+                                </label>
+                                <input
+                                    required
+                                    className="form-control-file"
+                                    id="dataset" name="dataset" type="file" 
+                                />
+
+                                <label htmlFor="trace">
+                                    2. Choose the trace
+                                </label>
+                                <input
+                                    className="form-control-file"
+                                    id="trace" name="trace"
+                                    type="file"
+                                >                           
+                                </input>
+
+                                <label htmlFor="trace-columns">
+                                    3. Choose the trace columns
+                                </label>
+                                <input
+                                    className="form-control-file"
+                                    id="trace-columns" name="trace-columns"
+                                    type="file"
+                                >                           
+                                </input>
+
+                                <label htmlFor="f1-score">
+                                    4. Load f1 score
+                                </label>
+                                <input
+                                    className="form-control-file"
+                                    id="f1-score" name="f1-score"
+                                    type="file"
+                                >                           
+                                </input>
+
+                                { 
+                                    false && 
+                                
+                                    <div>              
+                                        <label htmlFor="use-tsm">
+                                            Use TSM ?
+                                        </label>              
+                                        <input 
+                                            name="use-tsm"
+                                            id="use-tsm"
+                                            className="checkbox"
+                                            type="checkbox" 
+                                            onChange={e => this.setState({useTSM: e.target.checked})}
+                                            checked={this.state.useTSM}
+                                        />
+                                    </div>
+                                }
                      
-                        <LearnerOption                         
-                            learnerChanged={this.learnerChanged.bind(this)}
-                        />
+                                <LearnerOption                         
+                                    learnerChanged={this.learnerChanged.bind(this)}
+                                />
 
-                        <button                    
-                            className="btn btn-raised"
-                            onClick={this.onValidateTrace.bind(this)}
-                        >
-                            Validate
-                        </button>
-
+                                <button                    
+                                    className="btn btn-raised"
+                                    onClick={this.onValidateTrace.bind(this)}
+                                >
+                                    Validate
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                </div>
                 }
                         
-                    {
-                        ! this.state.showLoading && 
+                {
+                    ! this.state.showLoading && 
 
                         <div className="row">
 
@@ -179,10 +177,10 @@ class QueryTrace extends Component{
                         
                             { 
                                 this.state.showModelBehavior && 
-                                <div>
+                                
                                 <div className="row">
 
-                                    <div className="col col-lg-3">
+                                    <div className="col col-lg-5">
                                                                                                                        
                                         <ModelBehaviorControls       
                                             iteration={iteration}          
@@ -195,57 +193,48 @@ class QueryTrace extends Component{
                                             iteration={this.state.iteration}
                                             labeledPoints={this.state.allLabeledPoints}                                            
                                         />
-                                    </div>
 
-                                    <div className="col col-lg-4">
-                                       <div>
-                                        <p>
-                                            Classifier statistics
-                                        </p>
 
-                                            <p>                                                                                                                              
-                                                Number of positive predictions : {nPositivePoints}
-                                            </p>
+                                        <div>
+
+                                            <PredictionStatistics 
+                                                stats={this.getClassifierStats()}   
+                                            />
+                                         
 
                                             { 
                                                 this.state.useTSM && 
 
                                                 <div>
-                                                    <p>
-                                                        TSM Prediction Statistics
-                                                    </p>
-
+                                                    
                                                     <TSMPredictionStatistics 
                                                         stats={this.getTSMStats()}
                                                     />
-
                                                 </div>
                                             }
                                         </div>
-                                    </div>
-                                    
-                                    <ModelBehavior                     
-                                        labeledPoints={this.state.allLabeledPoints}                        
-                                        availableVariables={this.state.availableVariables}
-                                        projectionHistory={this.state.projectionHistory}
-                                        fakePointGrid={this.state.fakePointGrid}
-                                        modelPredictionHistory={this.state.modelPredictionHistory}
-                                        hasTSM={this.state.useTSM}     
-                                        realDataset={true}   
-                                        iteration={iteration}  
-                                        TSMPredictionHistory={this.state.TSMPredictionHistory}              
-                                    />
-                                    </div>
-                                    
-                                    <div className="row">
 
-                                        <div className="col col-lg-5">
+                                        <div>
                                             <img src={this.state.f1ScoreImg} />
                                         </div>
+
                                     </div>
-
-
-                                </div>
+                                  
+                                        <div className="col col-lg-7">
+                                            
+                                            <ModelBehavior                     
+                                                labeledPoints={this.state.allLabeledPoints}                        
+                                                availableVariables={this.state.availableVariables}
+                                                projectionHistory={this.state.projectionHistory}
+                                                fakePointGrid={this.state.fakePointGrid}
+                                                modelPredictionHistory={this.state.modelPredictionHistory}
+                                                hasTSM={this.state.useTSM}     
+                                                realDataset={true}   
+                                                iteration={iteration}  
+                                                TSMPredictionHistory={this.state.TSMPredictionHistory}              
+                                            />
+                                        </div>
+                                    </div>                                    
                             }
                     
                             {
@@ -284,6 +273,7 @@ class QueryTrace extends Component{
                 >
                     Load
                 </button>
+                </div>
             </div>           
         )
     }
@@ -302,6 +292,7 @@ class QueryTrace extends Component{
             fakePointGrid: [],
             TSMPredictionHistory: [],
             TSMStatsHistory: [],
+            classifierStatsHistory: [],
             modelPredictionHistory: [],
             positivePoints: [],
             projectionHistory: [],
@@ -323,6 +314,12 @@ class QueryTrace extends Component{
         return stat
     }
 
+
+    getClassifierStats(){
+        const iteration = this.state.iteration
+        var stat = this.state.classifierStatsHistory[iteration]
+        return stat
+    }
     getAlgorithmName(algorithm){        
         return algorithmNames[algorithm]
     }
@@ -584,6 +581,20 @@ class QueryTrace extends Component{
         return point.label
     }
 
+    computeClassifierStats(modelPredictions){
+        console.log(modelPredictions)
+
+        var nPositives = modelPredictions.filter(e => e.label == 1).length
+        var nNegative = modelPredictions.filter(e => e.label != 1).length
+
+        var stats = {
+            positive: nPositives,
+            negative: nNegative
+        }
+        console.log(stats)
+        return stats
+    }
+
     /* Process and data received from the backend and put it in the component state */
     dataReceived(response, sentPoints){
                 
@@ -602,11 +613,13 @@ class QueryTrace extends Component{
 
         var allLabeledPoints = this.state.allLabeledPoints
         allLabeledPoints = allLabeledPoints.concat(sentPoints.map(this.getDataPointFromId.bind(this)))
-        
-        var nPositivePoints = 0
-        //var nPositivePoints = this.getPositivePredictedPoints(modelPredictionHistory, this.getIteration())
-        var positivePoints = this.state.positivePoints        
-        positivePoints.push(nPositivePoints)
+                
+        var classifierStats = this.computeClassifierStats(modelPredictions)
+        var classifierStatsHistory = this.state.classifierStatsHistory
+        classifierStatsHistory.push(classifierStats)
+
+        //var positivePoints = this.state.positivePoints        
+        //positivePoints.push(nPositivePoints)
 
         var newState = {
             modelPredictionHistory: modelPredictionHistory,
@@ -615,7 +628,7 @@ class QueryTrace extends Component{
             nIteration: this.state.nIteration + 1,
             allLabeledPoints: allLabeledPoints,
             isComputing: false,
-            positivePoints: positivePoints
+
         }
         
         if (this.state.useTSM){

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-class TSMPredictionStatistics extends Component{
+class PredictionStatistics extends Component{
   
     render(){         
-        
-
+    
         return (
 
-            <div id="tsm-pred-stats">
-                <h5>TSM prediction Statistics</h5>
+            <div id="prediction-stats">
+                
+                <h5>Classifier statistics</h5>
                 
                 <table className="table">                
                     <tbody>
@@ -28,16 +28,7 @@ class TSMPredictionStatistics extends Component{
                             <td>
                                 {this.props.stats.negative}
                             </td>                        
-                        </tr>
-
-                        <tr>
-                            <td>
-                            Unknown  
-                            </td>
-                            <td>
-                                {this.props.stats.unknown}
-                            </td>                        
-                        </tr>
+                        </tr>                       
                     </tbody>
                 </table>
             </div>
@@ -50,4 +41,4 @@ class TSMPredictionStatistics extends Component{
 
 }
 
-export default TSMPredictionStatistics
+export default PredictionStatistics
