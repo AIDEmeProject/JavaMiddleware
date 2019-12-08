@@ -347,6 +347,16 @@ h4, h3{
 
 #tsm-pred-stats, #prediction-stats{
   margin-top: 20px;
+  padding: 15px;
+  margin: 20px;
+}
+
+#tsm-pred-stats, #prediction-stats > h5{
+  text-align: center;
+}
+
+#f1-score{
+  text-align: center;
 }
 
 

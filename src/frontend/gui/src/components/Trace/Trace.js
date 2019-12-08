@@ -138,14 +138,18 @@ class QueryTrace extends Component{
                                     Algorithm : {algorithm} 
                                 </h4>
                                 <div>
-                                    <button 
-                                        className="btn btn-primary btn-raised"
-                                        onClick={this.sendLabelDataForComputation.bind(this)}
-                                        disabled={this.state.isComputing ? true:false}
-                                    >
-                                        Compute next iteration
-                                    </button>
 
+                                    {
+                                        ! this.state.loadMode &&
+                                    
+                                        <button 
+                                            className="btn btn-primary btn-raised"
+                                            onClick={this.sendLabelDataForComputation.bind(this)}
+                                            disabled={this.state.isComputing ? true:false}
+                                        >
+                                            Compute next iteration
+                                        </button>
+                                    }
                                     <button
                                         className="btn btn-primary btn-raised"
                                         onClick={e => this.setState({
@@ -214,7 +218,7 @@ class QueryTrace extends Component{
                                             }
                                         </div>
 
-                                        <div>
+                                        <div id="f1-score">
                                             <img src={this.state.f1ScoreImg} />
                                         </div>
 
@@ -302,7 +306,8 @@ class QueryTrace extends Component{
             lastIndice: 0,
             allLabeledPoints: [],
             useTSM: false,
-            algorithm: 'simplemargin'
+            algorithm: 'simplemargin',
+            loadMode: false
         }
     }
 
@@ -683,7 +688,9 @@ class QueryTrace extends Component{
     }
 
     saveTrace(){
-        const jsonState = JSON.stringify(this.state)
+        var state = this.state
+        state.loadMode = true
+        const jsonState = JSON.stringify(state)
 
         var data = new Blob([jsonState]);
         var a = document.getElementById("download-trace");
@@ -693,6 +700,7 @@ class QueryTrace extends Component{
     loadTrace(){
         loadFileFromInputFile("load-trace", event => {
             this.setState(JSON.parse(event.target.result))
+
         })
     }
   
