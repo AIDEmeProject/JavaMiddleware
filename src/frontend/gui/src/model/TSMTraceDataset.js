@@ -28,16 +28,7 @@ class TSMTraceDataset extends Dataset{
 
         this.labels = this.get_raw_col_by_name('labels').flatMap(s => {
             
-            var cleanedStr = s.replace(/0.|0/g, "0,")
-                              .replace(/1.|1/g, "1,")
-                              .replace(/\n/g, ',')
-                              .replace(/ /g, '')
-                              
-                              .replace(/,]/g, "]")            
-                              //.replace(/$,/g, "]")
-            
-            
-            return JSON.parse(cleanedStr)
+            return JSON.parse(s)
             //return parseFloat(e.replace(/[\[\]']/g,'' ))                
         })
         

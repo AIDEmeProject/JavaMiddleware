@@ -621,8 +621,8 @@ class QueryTrace extends Component{
         if (this.state.useTSM){
                         
             var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map((e, i) => {
-                if ( 2000 <= i && i <=  2050){
-//                    console.log(e)
+                if ( 2000 <= i && i <=  2010){
+                    console.log(e)
                 }
                 return {
                     'id': e.dataPoint.id,
