@@ -167,7 +167,7 @@ class ModelBehavior extends Component{
                 <div className="col col-lg-6">
                     
                     <h4>
-                        Final predictions
+                        Model predictions
                     </h4>
                     
                     <svg id="model-predictions-grid-point"></svg>
@@ -178,7 +178,7 @@ class ModelBehavior extends Component{
                     this.props.hasTSM &&
                     
                     <div className="col col-lg-6">
-                        <h3>TSM Predictions</h3>
+                        <h3>Polytope Model</h3>
                         <svg id="tsm-plot"></svg>                         
                     </div>
                 }
@@ -186,7 +186,7 @@ class ModelBehavior extends Component{
                     
                     {
                         this.props.hasTSM &&
-                        <h4>TSM Predictions over projected dataset</h4>
+                        <h4>Polytope model Predictions over projected dataset</h4>
                     }
 
                     {
@@ -215,6 +215,7 @@ class ModelBehavior extends Component{
     }
     
     getIteration(){
+        console.log(this.props.iteration)
         return this.props.iteration
     }
 
@@ -292,6 +293,9 @@ class ModelBehavior extends Component{
 
     plotDataEmbbedingPlot(){
 
+        console.log(this.getIteration(), this.props.projectionHistory)
+        console.log(this.getEmbbedings())
+        
         var colors = {
             '-1': 'red',
             '0': 'grey',
@@ -338,7 +342,9 @@ class ModelBehavior extends Component{
     getModelPredictionOverGridPoints(){
 
         const iteration = this.getIteration()
-        const modelPredictions = this.props.modelPredictionHistory[iteration]        
+        const modelPredictions = this.props.modelPredictionHistory[iteration]  
+        console.log(this.props.modelPredictionHistory.length)      
+        
         const grid = this.props.fakePointGrid        
 
         const vars = this.getChosenVariables()
@@ -374,6 +380,9 @@ class ModelBehavior extends Component{
             v.push(e.label)            
             return v
         })
+
+        console.log(this.props.labeledPoints)
+        console.log(labeledPoints)
         
         
         return labeledPoints
@@ -389,8 +398,11 @@ class ModelBehavior extends Component{
         })
         
         const labeledEmbeddings = labeledPoints.map(e => {            
+            console.log(e)
             return embeddings[e.id]
-        })
+        }).filter( e => {return ( typeof e !== "undefined")} )
+
+        console.log(labeledEmbeddings)
         
         return labeledEmbeddings
     }

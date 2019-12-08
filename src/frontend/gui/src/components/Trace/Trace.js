@@ -18,6 +18,7 @@ import DataPoints from '../DataPoints'
 import ModelBehavior from '../visualisation/ModelBehavior'
 import ModelBehaviorControls from '../visualisation/ModelBehaviorControls'
 
+
 import initializeBackend from '../../actions/trace/initializeBackend'
 import sendPointBatch from '../../actions/trace/sendPointBatch'
 
@@ -28,6 +29,8 @@ import {simpleMarginConfiguration,
         versionSpaceConfiguration, 
         factorizedVersionSpaceConfiguration} from '../../constants/constants'
 
+
+const ENCODED_DATASET_NAME = "./cars_encoded.csv"
 
 class QueryTrace extends Component{
 
@@ -131,7 +134,7 @@ class QueryTrace extends Component{
 
                         <div className="row">
 
-                            <div className="col col-lg-8">
+                            <div className="col col-lg-12">
 
                                 <h4>
                                     Algorithm : {algorithm} 
@@ -180,51 +183,47 @@ class QueryTrace extends Component{
                                 <div className="row">
 
                                     <div className="col col-lg-3">
-                                        
-                                       
-                                        
+                                                                                                                       
                                         <ModelBehaviorControls       
                                             iteration={iteration}          
+                                            nIteration={this.state.nIteration}
                                             onPreviousIteration={this.onPreviousIteration.bind(this)}
                                             onNextIteration={this.onNextIteration.bind(this)}
                                         />
 
                                         <LabelInfos
-                                            iteration={this.state.lastIndice}
-                                            labeledPoints={this.state.allLabeledPoints}
+                                            iteration={this.state.iteration}
+                                            labeledPoints={this.state.allLabeledPoints}                                            
                                         />
                                     </div>
 
                                     <div className="col col-lg-4">
-                                       
-                                       <p>
-                                           Classifier statistics
-                                       </p>
-                                       
-                                        <p>                                                                                                                              
-                                            Number of positive predictions : {nPositivePoints}
+                                       <div>
+                                        <p>
+                                            Classifier statistics
                                         </p>
 
-                                        { 
-                                            this.state.useTSM && 
+                                            <p>                                                                                                                              
+                                                Number of positive predictions : {nPositivePoints}
+                                            </p>
 
-                                            <div>
-                                                <p>
-                                                    TSM Prediction Statistics
-                                                </p>
+                                            { 
+                                                this.state.useTSM && 
 
-                                                <TSMPredictionStatistics 
-                                                    stats={this.getTSMStats()}
-                                                />
+                                                <div>
+                                                    <p>
+                                                        TSM Prediction Statistics
+                                                    </p>
 
-                                            </div>
-                                        }
+                                                    <TSMPredictionStatistics 
+                                                        stats={this.getTSMStats()}
+                                                    />
+
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                     
-                                    <div className="col col-lg-5">
-                                        <img src={this.state.f1ScoreImg} />
-                                    </div>
-
                                     <ModelBehavior                     
                                         labeledPoints={this.state.allLabeledPoints}                        
                                         availableVariables={this.state.availableVariables}
@@ -237,6 +236,15 @@ class QueryTrace extends Component{
                                         TSMPredictionHistory={this.state.TSMPredictionHistory}              
                                     />
                                     </div>
+                                    
+                                    <div className="row">
+
+                                        <div className="col col-lg-5">
+                                            <img src={this.state.f1ScoreImg} />
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             }
                     
@@ -299,7 +307,7 @@ class QueryTrace extends Component{
             projectionHistory: [],
             allLabeledPoints: [],
             nIteration: 0,
-            iteration: -1,
+            iteration: 0,
             lastIndice: 0,
             allLabeledPoints: [],
             useTSM: false,
@@ -319,17 +327,20 @@ class QueryTrace extends Component{
         return algorithmNames[algorithm]
     }
 
+    getNumberOfIterations(){
+        return this.state.nIteration
+    }
+
+    getIteration(){
+        return this.state.iteration
+    }     
 
     onPreviousIteration(){
 
         var iteration = this.getIteration() - 1
         this.setState({
-            modelIteration: Math.max(iteration, 0)
+            iteration: Math.max(iteration, 0)
         })    
-    }
-
-    getNumberOfIterations(){
-        return this.state.nIteration
     }
 
     onNextIteration(){
@@ -338,13 +349,10 @@ class QueryTrace extends Component{
         var iteration = this.getIteration() + 1
 
         this.setState({
-            modelIteration: Math.min(iteration, nIteration - 1)
+            iteration: Math.min(iteration, nIteration - 1)
         })        
     }
 
-    getIteration(){
-        return this.state.iteration
-    }     
 
     learnerChanged(algorithm){
 
@@ -412,8 +420,8 @@ class QueryTrace extends Component{
             var columnNames = dataset.get_column_names_from_ids(usedColumnIds)
             
             dataset.set_column_names_selected_by_user(columnNames)
-
-             var availableVariables =  columnNames.map((e, i) => {
+            
+            var availableVariables =  columnNames.map((e, i) => {
                 return {name: e, realId: i}
             })
 
@@ -456,7 +464,7 @@ class QueryTrace extends Component{
         var options = {
             algorithm: this.state.algorithm,
             columnIds: this.state.traceColumns.encodedDataset,
-            encodedDatasetName: "./cars_encoded.csv",
+            encodedDatasetName: ENCODED_DATASET_NAME,
             configuration: this.buildConfiguration(),            
         }
                 
@@ -536,14 +544,16 @@ class QueryTrace extends Component{
     
     sendLabelDataForComputation(){
         
+        var nPointToSend = 1
         var lastIndice = this.state.lastIndice
-        var pointsToSend = d3.range(2).map((e, i) => {
+        var pointsToSend = d3.range(nPointToSend).map((e, i) => {
             return this.getLabeledPointToSend(i + lastIndice)
         })
                 
+        
         this.setState({
             isComputing: true,
-            lastIndice: lastIndice + 2
+            lastIndice: lastIndice + nPointToSend
         }, () => {
             
             sendPointBatch(pointsToSend, response => {
@@ -583,6 +593,7 @@ class QueryTrace extends Component{
         projectionHistory.push(
             projectionData
         )
+        console.log(projectionHistory)
     
         var modelPredictionHistory = this.state.modelPredictionHistory
         var useTSM = this.state.useTSM
@@ -592,16 +603,15 @@ class QueryTrace extends Component{
         var allLabeledPoints = this.state.allLabeledPoints
         allLabeledPoints = allLabeledPoints.concat(sentPoints.map(this.getDataPointFromId.bind(this)))
         
-        
-        var nPositivePoints = this.getPositivePredictedPoints(modelPredictionHistory, this.state.lastIndice / 2)
-        var positivePoints = this.state.positivePoints
-        
+        var nPositivePoints = 0
+        //var nPositivePoints = this.getPositivePredictedPoints(modelPredictionHistory, this.getIteration())
+        var positivePoints = this.state.positivePoints        
         positivePoints.push(nPositivePoints)
+
         var newState = {
             modelPredictionHistory: modelPredictionHistory,
             projectionHistory: projectionHistory,            
-            showLoading: false,
-            iteration: this.state.iteration + 1,
+            showLoading: false,            
             nIteration: this.state.nIteration + 1,
             allLabeledPoints: allLabeledPoints,
             isComputing: false,
@@ -610,8 +620,10 @@ class QueryTrace extends Component{
         
         if (this.state.useTSM){
                         
-            var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map(e => {
-                
+            var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map((e, i) => {
+                if ( 2000 <= i && i <=  2050){
+//                    console.log(e)
+                }
                 return {
                     'id': e.dataPoint.id,
                     'label': e.label.label
@@ -626,6 +638,7 @@ class QueryTrace extends Component{
             var TSMstats = this.computeTSMStats(TSMPredictionsOverGrid)
             var TSMStatsHistory = this.state.TSMStatsHistory
             TSMStatsHistory.push(TSMstats)
+            
             newState['TSMStatsHistory'] = TSMStatsHistory
         }
 

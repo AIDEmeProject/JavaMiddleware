@@ -4,10 +4,12 @@ import $ from "jquery";
 import {backend, webplatformApi} from '../../constants/constants'
 
 import ModelVisualization from '../visualisation/ModelVisualization'
+import ModelBehaviorControls from '../visualisation/ModelBehaviorControls'
 
 import PointLabelisation from '../PointLabelisation'
 import InitialSampling from './InitialSampling/InitialSampling'
 import ModelBehavior from '../visualisation/ModelBehavior'
+import LabelInfos from '../visualisation/LabelInfos'
 
 import DataPoints from '../DataPoints'
 
@@ -38,14 +40,18 @@ class Exploration extends Component{
             fakePointGridabelHistory: [],
             projectionHistory: [],
             fakePointGrid: [],
-            modelPredictionHistory: []
+            modelPredictionHistory: [],
+            iteration: 0,
+            nIteration: 0
         }
     }
 
     render(){
 
-        console.log(this.props.chosenColumns)
+        console.log(this.state.nIteration)
+        console.log(this.state.iteration)
                     
+        const iteration = this.getIteration()
         if (this.state.initialLabelingSession){
             return (
                 <InitialSampling 
@@ -154,16 +160,31 @@ class Exploration extends Component{
 
                 { 
                     this.state.showModelBehavior && 
+                    <div>
 
-                    <ModelBehavior                        
-                        labeledPoints={this.state.allLabeledPoints}
-                        datasetInfos={this.props.datasetInfos}
-                        availableVariables={this.props.chosenColumns}
-                        projectionHistory={this.state.projectionHistory}
-                        fakePointGrid={this.state.fakePointGrid}
-                        modelPredictionHistory={this.state.modelPredictionHistory}
-                        hasTSM={false}
-                    />
+                        <ModelBehaviorControls         
+                            iteration={iteration}          
+                            nIteration={this.state.nIteration}
+                            onPreviousIteration={this.onPreviousIteration.bind(this)}
+                            onNextIteration={this.onNextIteration.bind(this)}
+                        />
+
+                        <LabelInfos
+                            iteration={this.state.iteration}
+                            labeledPoints={this.state.allLabeledPoints}                                            
+                        />
+
+                        <ModelBehavior   
+                            iteration={iteration}                     
+                            labeledPoints={this.state.allLabeledPoints}
+                            datasetInfos={this.props.datasetInfos}
+                            availableVariables={this.props.chosenColumns}
+                            projectionHistory={this.state.projectionHistory}
+                            fakePointGrid={this.state.fakePointGrid}
+                            modelPredictionHistory={this.state.modelPredictionHistory}
+                            hasTSM={false}
+                        />
+                    </div>
                 }
 
                 {
@@ -209,6 +230,32 @@ class Exploration extends Component{
         this.setState({
             pointsToLabel: pointsToLabel
         })       
+    }
+
+    getNumberOfIterations(){
+        return this.state.nIteration
+    }
+
+    getIteration(){
+        return this.state.iteration
+    }     
+    
+    onPreviousIteration(){
+
+        var iteration = this.getIteration() - 1
+        this.setState({
+            iteration: Math.max(iteration, 0)
+        })    
+    }
+
+    onNextIteration(){
+
+        const nIteration = this.getNumberOfIterations()
+        var iteration = this.getIteration() + 1
+
+        this.setState({
+            iteration: Math.min(iteration, nIteration - 1)
+        })        
     }
 
 
@@ -305,9 +352,19 @@ class Exploration extends Component{
         }
     }
 
+    
     getModelBehaviorData(){
 
-    
+        this.setState({
+            isFetchingPrediction: true,
+            isFetchingProjection: true,
+            nIteration: this.state.nIteration + 1
+        }, this._getModelBehaviorData.bind(this))    
+                
+    }
+
+    _getModelBehaviorData(){
+
         if ( this.state.fakePointGrid.length === 0){
             getGridPoints(points => {                                                
                 this.setState({
@@ -319,16 +376,18 @@ class Exploration extends Component{
 
         if ( ! this.state.initialLabelingSession){
 
-            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+            getDecisionBoundaryData(this.projectionDataWasReceived.bind(this))
             getModelPredictionsOverGridPoints(predictedLabels => {
                                                             
                 var history = this.state.modelPredictionHistory
                 history.push(predictedLabels)                
+                console.log(history)
                 this.setState({
-                    modelPredictionHistory: history
+                    modelPredictionHistory: history,
+                    isFetchingProjection: false
                 })
             }, false)
-        }        
+        }
     }
 
     labelForInitialSession(labeledPoints, pointsToLabel){
@@ -428,12 +487,13 @@ class Exploration extends Component{
         this.dataWasLabeled(dataIndex, 0)                      
     }
 
-    dataWasReceived(boundaryData){
+    projectionDataWasReceived(boundaryData){
         
         let history = this.state.projectionHistory
         history.push(JSON.parse(boundaryData))
         
         this.setState({
+            isFetchingProjection: false,
             projectionHistory: history
         })        
     }   

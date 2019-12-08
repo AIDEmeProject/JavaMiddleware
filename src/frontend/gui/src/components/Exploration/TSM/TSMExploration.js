@@ -7,6 +7,8 @@ import SpecificPointToLabel from '../InitialSampling/SpecificPointToLabel'
 import DataPoints from './DataPoints'
 import GroupedPointTableHead from './GroupedPointTableHead'
 import ModelBehavior from '../../visualisation/ModelBehavior'
+import ModelBehaviorControls from '../../visualisation/ModelBehaviorControls'
+import LabelInfos from '../../visualisation/LabelInfos'
 import getDecisionBoundaryData from '../../../actions/getDecisionBoundaryData'
 import getGridPoints from '../../../actions/getGridPoints'
 
@@ -40,7 +42,9 @@ class TSMExploration extends Component{
             fakePointGrid:[],
             TSMPredictionHistory: [],
             modelPredictionHistory: [],
-            projectionHistory: []
+            projectionHistory: [],
+            nIteration: 0,
+            iteration: 0
         }        
     }
 
@@ -259,16 +263,35 @@ class TSMExploration extends Component{
                 {
                     this.state.showModelBehavior && 
                     
-                    <ModelBehavior                   
-                        labeledPoints={this.state.allLabeledPoints}
-                        datasetInfos={this.props.datasetInfos}
-                        availableVariables={this.props.chosenColumns}
-                        fakePointGrid={this.state.fakePointGrid}
-                        TSMPredictionHistory={this.state.TSMPredictionHistory}
-                        modelPredictionHistory={this.state.modelPredictionHistory}                        
-                        projectionHistory={this.state.projectionHistory}
-                        hasTSM={this.state.TSMPredictionHistory.length > 0}
-                    />
+                    <div>
+
+                      
+
+                        <ModelBehaviorControls         
+                            iteration={this.getIteration()}          
+                            nIteration={this.state.nIteration}
+                            onPreviousIteration={this.onPreviousIteration.bind(this)}
+                            onNextIteration={this.onNextIteration.bind(this)}
+                        />
+
+                        <LabelInfos
+                            iteration={this.state.iteration}
+                            labeledPoints={this.state.allLabeledPoints}                                            
+                        />
+
+                        <ModelBehavior     
+                            iteration={this.getIteration()}              
+                            labeledPoints={this.state.allLabeledPoints}
+                            datasetInfos={this.props.datasetInfos}
+                            availableVariables={this.props.chosenColumns}
+                            fakePointGrid={this.state.fakePointGrid}
+                            TSMPredictionHistory={this.state.TSMPredictionHistory}
+                            modelPredictionHistory={this.state.modelPredictionHistory}                        
+                            projectionHistory={this.state.projectionHistory}
+                            hasTSM={this.state.TSMPredictionHistory.length > 0}
+                        />
+
+                    </div>
                 }
 
                 {
@@ -469,22 +492,32 @@ class TSMExploration extends Component{
          }   
     }
 
-
-
     getModelBoundaries(){
+
+        this.setState({
+            isFetchingModelPrediction: true,
+            isFetchingTSMPrediction: true,
+            isFetchingProjection: true,
+            nIteration: this.state.nIteration + 1
+        }, this._getModelBoundaries.bind(this))    
+                
+    }
+
+    _getModelBoundaries(){
 
         this.getGridPoints()
 
         if ( ! this.state.initialLabelingSession){
 
-            getDecisionBoundaryData(this.dataWasReceived.bind(this))
+            getDecisionBoundaryData(this.projectionDataWasReceived.bind(this))
             getTSMPredictions(predictedLabels => {
                                             
                 var TSMPredictionHistory = this.state.TSMPredictionHistory
                 TSMPredictionHistory.push(predictedLabels)
                 
                 this.setState({
-                    'TSMPredictionHistory': TSMPredictionHistory
+                    'TSMPredictionHistory': TSMPredictionHistory,
+                    'isFetchingTSMPrediction': false
                 })
             })
 
@@ -493,23 +526,49 @@ class TSMExploration extends Component{
 
                 history.push(predictions)                
                 this.setState({
-                    'modelPredictionHistory': history
+                    'modelPredictionHistory': history,
+                    'isFetchingModelPrediction': false
                 })
             }, true)
         }        
     }
 
-    dataWasReceived(boundaryData){
+    getNumberOfIterations(){
+        return this.state.nIteration
+    }
+
+    getIteration(){
+        return this.state.iteration
+    }     
+    
+    onPreviousIteration(){
+
+        var iteration = this.getIteration() - 1
+        this.setState({
+            iteration: Math.max(iteration, 0)
+        })    
+    }
+
+    onNextIteration(){
+
+        const nIteration = this.getNumberOfIterations()
+        var iteration = this.getIteration() + 1
+
+        this.setState({
+            iteration: Math.min(iteration, nIteration - 1)
+        })        
+    }
+
+    projectionDataWasReceived(boundaryData){
         
         let history = this.state.projectionHistory
         history.push(JSON.parse(boundaryData))
         
         this.setState({
-            projectionHistory: history
+            projectionHistory: history,
+            isFetchingProjection: false
         })        
     }
-
-
 
     getGridPoints(){
 

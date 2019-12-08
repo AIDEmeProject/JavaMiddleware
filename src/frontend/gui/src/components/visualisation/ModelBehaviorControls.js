@@ -9,11 +9,11 @@ class ModelBehaviorControls extends Component{
     render(){
 
         const iteration = this.props.iteration
-
+        const nIteration = this.props.nIteration
         return (
             <div id="iteration-control">
 
-                <div>Iteration <span className="iteration-number">{iteration + 1}</span></div>
+                <div>Iteration <span className="iteration-number">{iteration + 1} / {nIteration} </span></div>
                 <button
                     className="btn btn-primary btn-raised"
                     onClick={this.props.onPreviousIteration}

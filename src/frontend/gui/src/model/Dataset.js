@@ -22,10 +22,27 @@ class Dataset{
         }
         else{
             this.selected_columns_for_exploration = names.map( e => e)
-        }           
-        
-        
+        }                           
     }
+
+    set_column_as_index(name){
+        this.index = name
+    }
+
+    get_point_with_index(id){
+
+        if (! this.index){
+            throw new Error("specify the column index before using this method")
+        }
+
+        var fetchedRow = this.dataset.filter(row => {
+            return row[this.index] == id
+        })
+
+        return fetchedRow
+    }
+
+
 
     get_raw_col_by_name(name){
         return this.dataset.map(e => e[name])
@@ -77,8 +94,6 @@ class Dataset{
         return this.get_parsed_column_by_name(name)
     }
 
-
-    
 
     parse_string_column(name){
 
@@ -137,6 +152,12 @@ class Dataset{
         
         return d
     }
+
+    get_all_rows_with_selected_columns_by_user(){
+
+        return this.dataset.map((e, i) => this.get_selected_columns_point(i))
+    }
+    
 
     get_point(id){
         
