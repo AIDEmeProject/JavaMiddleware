@@ -79,7 +79,7 @@ class TraceResultsComputer{
         dto.jsonProjectionPredictions = json;
 
         if (manager.useTSM()){
-            dto.TSMPredictionsOverGrid = manager.computeTSMPredictionOverRealDataset();
+            dto.TSMPredictionsOverGrid = manager.getTSMPredictionOnRealData();
         }
 
         return dto;
@@ -144,7 +144,7 @@ public class TraceComputationServlet extends HttpServlet {
         LabeledPointsDTO dtoManager = new LabeledPointsDTO();
         ArrayList<LabeledPoint> labeledPoints;
 
-        if (manager.useTSM()){
+        if (manager.useTSM() || manager.useFactorizationInformation()){
              labeledPoints = (ArrayList<LabeledPoint>) dtoManager.getTSMLabeledPoints(strLabelData);
         }
         else{

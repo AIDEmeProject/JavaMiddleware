@@ -265,6 +265,7 @@ class App extends Component {
 
     fileUploaded(response){
 
+        console.log(response)
         this.setState({
             step: SESSION_OPTIONS,
             datasetInfos: response,
@@ -279,7 +280,8 @@ class App extends Component {
         const chosenColumns = options.chosenColumns
         console.log('COLUMNS')
         console.log(chosenColumns)
-        this.state.dataset.set_columns_selected_by_users(chosenColumns)
+        this.state.dataset.set_column_names_selected_by_user(chosenColumns)
+        console.log()
         this.setState({
             options: newOptions
         })
@@ -292,7 +294,7 @@ class App extends Component {
             groups: groups,            
         }
         
-        this.state.dataset.set_columns_selected_by_users(chosenColumns)
+        this.state.dataset.set_column_names_selected_by_user(chosenColumns)
 
         var newOptions = Object.assign({}, this.state.options, options)
         

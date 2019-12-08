@@ -65,14 +65,16 @@ public final class ExperimentConfiguration {
     }
 
     public static class TsmConfiguration {
-        private boolean hasTsm = true;
+
+        //private boolean hasTsm = true;
+        private boolean hasTsm;
         private double searchUnknownRegionProbability = 0D;
         private List<boolean[]> flags = new ArrayList<>();
         private List<String[]> featureGroups = new ArrayList<>();
         private String[] columns = new String[0];
 
         public TsmConfiguration() {
-            this(true);
+            //this(true);
         }
 
         public TsmConfiguration(boolean hasTsm) {

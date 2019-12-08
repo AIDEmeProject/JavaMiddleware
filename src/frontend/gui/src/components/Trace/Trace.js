@@ -18,7 +18,7 @@ import ModelBehavior from '../visualisation/ModelBehavior'
 import initializeBackend from '../../actions/trace/initializeBackend'
 import sendPointBatch from '../../actions/trace/sendPointBatch'
 
-import carColumns from './carColumns'
+import carDatasetMetadata from './carColumns'
 
 import buildTSMConfiguration from '../../lib/buildTSMConfiguration'
 import {simpleMarginConfiguration, 
@@ -266,8 +266,8 @@ class QueryTrace extends Component{
 
     learnerChanged(algorithm){
 
-        var useTSM = algorithm === "simplemargintsm" || 
-                     algorithm === "factorizedversionspace"
+        var useTSM = algorithm === "simplemargintsm"
+                     
                 
         this.setState({
             useTSM: useTSM,
@@ -333,8 +333,8 @@ class QueryTrace extends Component{
             var ext = getFileExtension('trace')
             const isCsv = ext === "csv"
             const useTSM = this.state.useTSM
-            
-            if (useTSM){
+            const isFactorizedVersionSpace = (this.state.algorithm == "factorizedversionspace")
+            if (useTSM || isFactorizedVersionSpace){
                 var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
             }
             else{
@@ -389,14 +389,38 @@ class QueryTrace extends Component{
         
         var configuration = configurations[this.state.algorithm]
 
-        if (this.state.useTSM){
+        
+        if (this.state.useTSM || this.state.algorithm == "factorizedversionspace"){
 
-            var allColumns = this.props.carColumns            
+            var datasetMetadata = this.props.datasetMetadata
+            var allColumns = this.props.datasetMetadata.columnNames            
             const factorizationGroups = this.state.traceColumns.factorizationGroups  
             const usedColumns = this.state.traceColumns.encodedDataset.map (e => allColumns[e])            
-            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, allColumns)            
+            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, datasetMetadata)            
+
+            if (this.state.algorithm == "factorizedversionspace") {
+                configuration = this.buildFactorizedVersionSpaceGroup(configuration)
+                console.log(configuration)
+            }
         }
         
+        return configuration
+    }
+
+    buildFactorizedVersionSpaceGroup(configuration){
+
+        var flags = configuration.multiTSM.flags
+        var categorical = []
+        flags.forEach((flag,i)  => {
+            if (flag[1]){
+                categorical.push(i)
+            }
+        })
+        console.log(categorical)
+
+        configuration["activeLearner"].repeat = this.state.traceColumns.factorizationGroups.length
+        configuration["activeLearner"].categorical = categorical
+        configuration["multiTSM"]["hasTsm"] = false
         return configuration
     }
 
@@ -458,7 +482,16 @@ class QueryTrace extends Component{
                 
         var projectionHistory = this.state.projectionHistory
         var projectionData = JSON.parse(response.jsonProjectionPredictions)
-        
+        console.log(projectionData.embedding[0])
+        console.log(projectionData.embedding[1])
+        //console.log(projectionData.embedding.filter(e => e[2] == 1)[0])
+        const nonPositiveProjections = projectionData.embedding.filter(e => e[2] != 1)
+        console.log(nonPositiveProjections[0])
+        console.log(nonPositiveProjections[1])
+        console.log(nonPositiveProjections[2])
+        console.log(nonPositiveProjections[3])
+        console.log(nonPositiveProjections[4])
+
         projectionHistory.push(
             projectionData
         )
@@ -487,13 +520,22 @@ class QueryTrace extends Component{
         }
         
         if (this.state.useTSM){
-            var TSMPredictionHistory = this.state.TSMPredictionHistory
+            var nonZero = response.TSMPredictionsOverGrid.filter( e => e.label.label != 0)
+            var positives = response.TSMPredictionsOverGrid.filter( e => e.label.label == 1)
+            console.log(nonZero.length, positives.length)
+            console.log(response.TSMPredictionsOverGrid[0])
             var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map(e => {
+
+                //console.log(e)
                 return {
                     'id': e.dataPoint.id,
                     'label': e.label.label
                 }
             })
+
+            
+
+            var TSMPredictionHistory = this.state.TSMPredictionHistory
             TSMPredictionHistory.push(TSMPredictionsOverGrid)
             newState['TSMPredictionHistory'] = TSMPredictionHistory
             
@@ -539,7 +581,7 @@ function backendPredToFrontendFormat(rawPoints, useTSM){
 }
 
 QueryTrace.defaultProps = {
-    carColumns: carColumns
+    datasetMetadata: carDatasetMetadata
 }
 
 export default QueryTrace

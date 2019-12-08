@@ -40,7 +40,7 @@ class PointLabelisation extends Component{
                     
                 {
                     this.props.pointsToLabel.map((point, key) => {
-                        const pointData = this.props.dataset.get_point(point.id)
+                        const pointData = this.props.dataset.get_selected_columns_point(point.id)
                         return (
 
                             <tr key={key}>

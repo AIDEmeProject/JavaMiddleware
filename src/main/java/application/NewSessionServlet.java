@@ -142,6 +142,10 @@ public class NewSessionServlet extends HttpServlet {
             e.printStackTrace();
         }
 
+        System.out.println("");
+        System.out.println("---New Session---");
+        System.out.println("");
+
     }
 }
 

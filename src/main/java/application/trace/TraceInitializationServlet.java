@@ -68,6 +68,11 @@ public class TraceInitializationServlet extends HttpServlet {
         System.out.println(json.toJson(configuration));
         System.out.println("");
 
+        System.out.println("Is TSM enabled");
+        System.out.println(configuration.hasMultiTSM());
+        System.out.println("");
+
+
         Learner learner = (new LearnerFactory()).buildLearner(algorithmName, configuration);
         //System.out.println(learner.getClass().toString());
         /*

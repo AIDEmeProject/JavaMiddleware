@@ -1,19 +1,29 @@
 import {backend, webplatformApi, defaultConfiguration} from '../constants/constants'
+import buildTSMConfiguration from '../lib/buildTSMConfiguration'
 
 import $ from "jquery";
 
 
-function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
+function sendVariableGroups(tokens, chosenVariables, groups, datasetMetadata, onSuccess){
 
     var endPoint = backend + "/choose-options"
 
     var configuration = defaultConfiguration
-    configuration['useFakePoint'] = false
 
+    var usedColumnNames = chosenVariables.map( e => e.name)
+    console.log(groups)
+    var groupsWithIds = groups.map( variables => {return variables.map(v => v['id'])})
+
+    configuration = buildTSMConfiguration(configuration, groupsWithIds, usedColumnNames, datasetMetadata)
+
+
+
+    //configuration['useFakePoint'] = false
+    /*
     var tsmJson = {
         hasTSM: true,                
         searchUnknownRegionProbability: 0.5,                
-        columns: chosenVariables.map( e => e.name),
+        columns: usedColumnNames,
         decompose: true
     }
      
@@ -31,13 +41,13 @@ function sendVariableGroups(tokens, chosenVariables, groups, onSuccess){
         flags: flags,
         featureGroups: groups,                   
     })
-
-    configuration["multiTSM"] = tsmJson
+    */
+    //configuration["multiTSM"] = tsmJson
 
 
     $('#conf').val(JSON.stringify(configuration))
       
-    var payload = $('#choose-columns').serialize()
+    //var payload = $('#choose-columns').serialize()
 
     $.ajax({
 

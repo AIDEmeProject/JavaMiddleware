@@ -30,6 +30,7 @@ class SessionOptions extends Component{
         })            
 
         this.state = {
+            columnTypes: chosenColumns.map(e => e['type']),
             checkboxes: datasetInfos.columns.map (c => false),
             chosenColumns: chosenColumns,
             showAdvancedOptions: false,
@@ -295,10 +296,24 @@ class SessionOptions extends Component{
         //var chosenColumns = this.state.chosenColumns //.filter(e => e.isUsed)      
         
         this.computeVariableColumnIndices(groups)
+
+
+        var datasetMetadata = this.buildDatasetMetadata()
         
         this.props.groupsWereValidated(chosenColumns, groups, ()=> {
-            actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, this.props.sessionWasStarted)    
+            actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, datasetMetadata, this.props.sessionWasStarted)    
         })                                  
+    }
+
+    buildDatasetMetadata(){
+    
+        var metadata = {
+            'types': this.state.columnTypes.map( e => e == "categorical"),
+            'columnNames': this.state.chosenColumns.map( e => e['name'])
+        }
+        console.log(metadata)
+
+        return metadata
     }
 
     computeVariableColumnIndices(groups){

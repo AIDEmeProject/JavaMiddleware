@@ -161,7 +161,7 @@ class TSMExploration extends Component{
                             {
                             this.state.pointsToLabel.map((point, i) => {
                                 console.log(point, dataset.get_point(point.id))
-                                const pointData = dataset.get_point(point.id)
+                                const pointData = dataset.get_selected_columns_point(point.id)
                                 return (
 
                                     <tr 

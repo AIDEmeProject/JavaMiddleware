@@ -80,8 +80,14 @@ public class ExplorationManager {
         this.configuration = configuration;
         this.learner = learner;
 
+
         this.rawDataset = dataset;
         IndexedDataset scaledDataset = this.scaleDataset(rawDataset);
+
+        if (configuration.hasFactorizationInformation()){
+            scaledDataset.setFactorizationStructure(configuration.getTsmConfiguration().getColumnPartitionIndexes());
+        }
+
         this.partitionedDataset = getPartitionedDataset(scaledDataset);
 
     }
@@ -104,26 +110,6 @@ public class ExplorationManager {
         }
         return rawDataset.sample(sampleSize).toList();
     }
-
-    public ArrayList<DataPoint> getPointByRowId(int id){
-        DataPoint point = this.rawDataset.get(id);
-
-        ArrayList<DataPoint> points = new ArrayList<>();
-        points.add(point);
-        return points;
-    }
-
-
-    //public ConfusionMatrix computeConfusionMatrix(){
-
-
-    //    UserStub userStub = new UserStub();
-    //    ConfusionMatrixCalculator calculator = new ConfusionMatrixCalculator(this.learner);
-
-    //    return calculator.compute(partitionedDataset, );
-
-
-    //}
 
 
     public void addLabeledPointToDataset(LabeledPoint point){
@@ -160,12 +146,6 @@ public class ExplorationManager {
             return Collections.singletonList(this.runExploreIteration(scaledLabeledPoints));
         }
     }
-
-
-    public DataPoint getPoint(long index){
-        return this.partitionedDataset.getAllPoints().get((int) index);
-    }
-
 
     protected boolean hasPositiveAndNegativeExamples(){
 
@@ -288,7 +268,9 @@ public class ExplorationManager {
 
         Matrix scaledFakePoints = this.scaler.transform(this.gridOfFakePoints.getData());
         this.scaledGridOfFakePoints = this.gridOfFakePoints.copyWithSameIndexes(scaledFakePoints);
-
+        System.out.println("scaled fake point grid number and unscaled");
+        System.out.println(this.scaledGridOfFakePoints.length());
+        System.out.println(this.gridOfFakePoints.length());
     }
 
     protected IndexedDataset getScaledGridOfFakePoints(){
@@ -312,27 +294,24 @@ public class ExplorationManager {
 
 
     public ArrayList<LabeledPoint> computeTSMPredictionsOverFakeGridPoints(){
-
+        System.out.println("GRID POINT ?");
+        System.out.println(this.getScaledGridOfFakePoints().length());
+        System.out.println("-------");
         return this.TSMPrediction(this.getScaledGridOfFakePoints());
     }
+
 
     public ArrayList<LabeledPoint> computeModelPredictionsOverFakeGridPoints(){
 
         return this.labelPoints(this.getScaledGridOfFakePoints(), this.getGridOfFakePoints(), false);
     }
 
-    public ArrayList<LabeledPoint> computeTSMPredictionOverRealDataset(){
-        return this.TSMPrediction(partitionedDataset.getAllPoints());
-    }
 
     public ArrayList<LabeledPoint> computeModelPredictionsOverRealDataset(){
 
         return this.labelPoints(this.partitionedDataset.getAllPoints(), this.rawDataset, false);
     }
 
-    public boolean useTSM(){
-        return configuration.hasMultiTSM();
-    }
 
     public ArrayList<LabeledPoint> computeLabelOfFakeGridPoint(){
 
@@ -354,6 +333,20 @@ public class ExplorationManager {
         IndexedDataset datasetToLabel = this.partitionedDataset.getAllPoints();
         return this.TSMPrediction(datasetToLabel);
     }
+
+
+    public ArrayList<LabeledPoint> getTSMPredictionOnRealData(){
+        return this.TSMPrediction(this.partitionedDataset.getAllPoints());
+    }
+
+    public ArrayList<LabeledPoint> getModelPredictionWithTSMOnRealData(){
+        return this.getModelPredictionWithTSM(this.partitionedDataset.getAllPoints());
+    }
+
+    public ArrayList<LabeledPoint> computeTSMPredictionOverRealDataset(){
+        return this.TSMPrediction(partitionedDataset.getAllPoints());
+    }
+
 
     public ArrayList<LabeledPoint> getModelPredictionWithTSM(IndexedDataset datasetToLabel){
 
@@ -388,6 +381,9 @@ public class ExplorationManager {
 
         ExtendedLabel[] labels = this.partitionedDataset.getTSMClassifier().predict(datasetToLabel);
 
+        System.out.println("LALALA");
+        System.out.println(datasetToLabel.length());
+        System.out.println(labels.length);
         ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
 
         for (int i=0; i < labels.length; i++)
@@ -437,6 +433,29 @@ public class ExplorationManager {
         return lowerBound;
 
     }
+
+    public boolean useFactorizationInformation(){
+        return configuration.hasFactorizationInformation();
+    }
+
+    public boolean useTSM(){
+        return configuration.hasMultiTSM();
+    }
+
+    public ArrayList<DataPoint> getPointByRowId(int id){
+        DataPoint point = this.rawDataset.get(id);
+
+        ArrayList<DataPoint> points = new ArrayList<>();
+        points.add(point);
+        return points;
+    }
+
+
+    public DataPoint getPoint(long index){
+        return this.partitionedDataset.getAllPoints().get((int) index);
+    }
+
+
 }
 
 

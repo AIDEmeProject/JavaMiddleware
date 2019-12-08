@@ -17,12 +17,13 @@ class Dataset{
 
     set_column_names_selected_by_user(names){
         
-        if ( ! Array.isArray(names)){
+        if ( ! (typeof names[0] === "string")){
             this.selected_columns_for_exploration = names.map(e => e['name'])
         }
         else{
             this.selected_columns_for_exploration = names.map( e => e)
         }           
+        
         
     }
 
@@ -140,12 +141,8 @@ class Dataset{
     get_point(id){
         
         const row = this.dataset[id]
-
-
     }
-
     
-
     get_columns(ids, aliases){
 
         const names = this.get_column_names()

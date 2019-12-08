@@ -29,7 +29,7 @@ class DataPoints extends Component{
                         {
                             this.props.labeledPoints.map((point, i) => {
                                                                 
-                                const data = dataset.get_point(point.id)
+                                const data = dataset.get_selected_columns_point(point.id)
                                 
                                 return (
                                     <tr 

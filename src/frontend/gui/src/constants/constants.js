@@ -5,11 +5,11 @@ var factorizedVersionSpaceConfiguration ={
             "sampleSize": 8,
             "versionSpace": {
                 "addIntercept": true, 
-                "decompose": true,
+                "decompose": false,
                 "hitAndRunSampler": {
                     "cache": true,
                     "rounding": true, 
-                    "roundingCache": true, 
+                    "roundingCache": false, 
                     "selector": {
                         "name": "WarmUpAndThin",
                         "thin": 64,
@@ -21,12 +21,12 @@ var factorizedVersionSpaceConfiguration ={
                     "gamma": 0, 
                     "name": "gaussian" 
                 },
-                "solver": "gurobi" 
+                "solver": "ojalgo" 
             } 
         }, 
         "lossFunctionId": "GREEDY", 
         "name": "SubspatialSampler", 
-        "repeat": 5 
+      
     },
     "subsampleSize": 50000, 
     "task": "sdss_overlapping_0.1%", 

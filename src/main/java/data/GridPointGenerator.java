@@ -82,7 +82,11 @@ public class GridPointGenerator{
 
         int iValue;
 
-        int nPoint = Math.min(this.getNPointsToCompute(), 200);
+        int nPoint = Math.min(this.getNPointsToCompute(), 3000);
+
+        System.out.println("N POINT GENERATE");
+        System.out.println(nPoint);
+        System.out.println("-----");
         for (int iPoint = 0; iPoint < nPoint ; iPoint++){
 
             double[] data = new double[nColumn];

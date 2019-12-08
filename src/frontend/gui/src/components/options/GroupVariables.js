@@ -68,7 +68,7 @@ class GroupEditor extends Component{
     onVariableAddedClick(e){
         
         const dataset = e.target.dataset
-        const iVariable = dataset.variableid
+        const iVariable = parseInt(dataset.variableid)
         
         const iGroup = this.props.iGroup
         const isChecked = e.target.checked
@@ -246,6 +246,7 @@ class GroupVariables extends Component {
         var modifiedGroup = newGroupsState[groupId]
         
         variable['realId'] = variableId
+        variable['id'] = variableId
 
         if ( ! this.isVariableInGroup(modifiedGroup, variable)){
 
@@ -306,30 +307,5 @@ class GroupVariables extends Component {
     }
 }
 
-GroupVariables.defaultProps = {
-    
-    chosenColumns: [
-        {
-            'idx': 0,
-            'isUsed': true,
-            'name': 'test1',
-            'type': 'numerical'
-        },
-        {
-            'idx': 1,
-            'isUsed': true,
-            'name': 'test2',
-            'type': 'numerical'
-        },
-     
-        {
-            'idx': 3,
-            'isUsed': true,
-            'name': 'test4',
-            'type': 'numerical'
-        },
-    ]
-    
-}
 
 export default GroupVariables

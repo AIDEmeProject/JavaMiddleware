@@ -1,17 +1,17 @@
 
 
-
-function buildTSMConfiguration(baseConfiguration, groupsWithIds, usedColumnNames, allColumns){
+function buildTSMConfiguration(baseConfiguration, groupsWithIds, usedColumnNames, datasetMetadata){
     
     var tsmJson = {
-        hasTSM: true,                
+        hasTsm: true,                
         searchUnknownRegionProbability: 0.5,                
         columns: usedColumnNames,
         decompose: true
     }
-
-    var groups = buildGroupsFromJson(groupsWithIds, allColumns)
-    var flags =  groups.map(g => {return [true, false]})        
+        
+    var groups = buildGroupsFromJson(groupsWithIds, datasetMetadata.columnNames)
+    //var flags =  groups.map(g => {return [true, false]})        
+    var flags = buildFlagsFromColumnTypes(groupsWithIds,  datasetMetadata.types)
     
     Object.assign(tsmJson, {
         flags: flags,
@@ -23,6 +23,28 @@ function buildTSMConfiguration(baseConfiguration, groupsWithIds, usedColumnNames
     return baseConfiguration
 }
 
+function isGroupCategorical(group, columnTypes){
+    var result = true
+    group.forEach( variableId => {
+                
+        var isColCategorical = columnTypes[variableId]
+        
+        if ( ! isColCategorical){
+            
+            result = false
+        }
+    })
+
+    return result
+}
+
+function buildFlagsFromColumnTypes(groups, columnTypes){
+    
+    return groups.map(group => {
+        const isCategorical = isGroupCategorical(group, columnTypes)
+        return [true, isCategorical]
+    })
+}
 
 function buildGroupsFromJson(factorizationGroupByIds, encodedColumnNames){
         
@@ -35,9 +57,5 @@ function buildGroupsFromJson(factorizationGroupByIds, encodedColumnNames){
     
     return groupWithNames
 }
-
-
-
-
 
 export default buildTSMConfiguration
