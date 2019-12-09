@@ -8,6 +8,7 @@ import explore.user.User;
 import io.FolderManager;
 import io.json.JsonConverter;
 import utils.RandomState;
+import config.ExperimentConfiguration;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

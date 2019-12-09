@@ -1,13 +1,10 @@
 package io;
 
+import config.TsmConfiguration;
 import data.IndexedDataset;
-
-
-import explore.ExperimentConfiguration;
 import explore.sampling.FixedSampler;
 import explore.sampling.InitialSampler;
 import explore.sampling.StratifiedSampler;
-
 import utils.Validator;
 
 import java.util.*;
@@ -44,15 +41,11 @@ public class TaskReader {
         return reader.readKeys(datasetConfig.table, datasetConfig.key, taskConfig.predicate);
     }
 
-
-    public List<Set<Long>> readFactorizedTargetSetKeys(ExperimentConfiguration.TsmConfiguration tsmConfiguration){
-
-
+    public List<Set<Long>> readFactorizedTargetSetKeys(TsmConfiguration tsmConfiguration){
         // set factorization structure specified in tasks.ini
         tsmConfiguration.setColumns(taskConfig.columns);
         tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);
         tsmConfiguration.setFlags(taskConfig.tsmFlags);
-
 
         System.out.println(tsmConfiguration);
 
@@ -64,7 +57,6 @@ public class TaskReader {
                 .map(subPredicate -> reader.readKeys(datasetConfig.table, datasetConfig.key, subPredicate))
                 .collect(Collectors.toList());
     }
-
 
     /**
      * This class holds the task configuration properties

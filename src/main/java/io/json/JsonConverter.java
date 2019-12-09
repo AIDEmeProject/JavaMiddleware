@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import config.TsmConfiguration;
 import data.LabeledPoint;
 import exceptions.JsonDeserializationFailedException;
-import explore.ExperimentConfiguration;
 import explore.metrics.MetricCalculator;
 import explore.sampling.InitialSampler;
 import explore.user.UserLabel;
@@ -57,12 +57,9 @@ public class JsonConverter {
 
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
 
-
-        // TODO: add TSM metrics
-
-
         builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
 
+        builder.registerTypeAdapter(TsmConfiguration.class, new TSMConfigurationAdapter());
 
         return builder.create();
     }

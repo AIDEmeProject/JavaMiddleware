@@ -8,6 +8,8 @@ import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
 import machinelearning.active.learning.QueryByDisagreement;
+import config.ExperimentConfiguration;
+
 
 public final class Experiment {
     private final FolderManager experimentFolder;
@@ -47,9 +49,7 @@ public final class Experiment {
     }
 
     private User getUser(ExperimentConfiguration configuration, TaskReader reader) {
-
         if (configuration.hasFactorizationInformation() || configuration.hasMultiTSM()) {
-
             return new FactoredUser(reader.readFactorizedTargetSetKeys(configuration.getTsmConfiguration()));
         } else {
             return new UserStub(reader.readTargetSetKeys());

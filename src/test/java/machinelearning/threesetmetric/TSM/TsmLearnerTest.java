@@ -65,21 +65,6 @@ class TsmLearnerTest {
         tsmLearner_neg.updateNegRatio(negLabeledPoints);
     }
 
-
-    @Test
-    void updatePosRatio() {
-        System.out.println(tsmLearner.convexPolytopeToString());
-        System.out.println("----------------------------");
-        System.out.println(tsmLearner.convexConesToString());
-    }
-
-    @Test
-    void updateNegRatio() {
-        System.out.println(tsmLearner_neg.convexPolytopeToString());
-        System.out.println("----------------------------");
-        System.out.println(tsmLearner_neg.convexConesToString());
-    }
-
     @Test
     void isUsefulSample_true() {
         DataPoint dataPoint = new DataPoint(0, new double[]{733, 1096});
@@ -174,14 +159,12 @@ class TsmLearnerTest {
     void getConvexConesVertices() {
         HashSet<double[]> vertices = new HashSet<>();
         tsmLearner.getConvexConesVertices(tsmLearner.getConcaveRegion(), vertices);
-        System.out.println(Arrays.deepToString(vertices.toArray()));
     }
 
     @Test
     void getConvexHullVertices() {
         HashSet<double[]> vertices = new HashSet<>();
         tsmLearner.getConvexHullVertices(tsmLearner.getConvexRegion(), vertices);
-        System.out.println(Arrays.deepToString(vertices.toArray()));
     }
 
 }

@@ -1,8 +1,6 @@
 package data;
 
-
 import explore.user.UserLabel;
-
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.threesetmetric.ExtendedClassifier;
@@ -88,10 +86,13 @@ public final class PartitionedDataset {
      * @param point
      */
     public void addLabeledPointToDataset(LabeledPoint point){
+        // TODO: check this method
 
         this.points.add(point.getData());
 
         int nPoints = this.points.length();
+
+        //TODO: not used
         ExtendedLabel[] newLabels = new ExtendedLabel[nPoints + 1];
         for (int i = 0; i < nPoints; i++ ){
             newLabels[i] = this.labels[i];
@@ -116,6 +117,7 @@ public final class PartitionedDataset {
     }
 
     public DataPoint get(int i){
+        // TODO: check this method
         return this.getAllPoints().get(findPosition(i));
     }
 
@@ -152,6 +154,10 @@ public final class PartitionedDataset {
      */
     public IndexedDataset getUnknownPoints() {
         return points.getRange(unknownStart, points.length());
+    }
+
+    public int getUnknownSize() {
+        return points.length() - unknownStart;
     }
 
     /**
@@ -196,8 +202,10 @@ public final class PartitionedDataset {
             predictedLabels[i] = labels[i].toLabel();
         }
 
-        Label[] classifierLabels = classifier.predict(getUnknownPoints());
-        System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
+        if (hasUnknownPoints()) {
+            Label[] classifierLabels = classifier.predict(getUnknownPoints());
+            System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
+        }
 
         return predictedLabels;
     }

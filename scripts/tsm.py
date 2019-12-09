@@ -7,5 +7,5 @@ class MultipleTSM(Printable):
         super().__init__(add_name=False)
 
         assert_in_range("UNCERTAIN_SET_SAMPLE_PROBABILITY", sample_from_unknown_region_probability, 0, 1)
-
+        self.hasTSM = True
         self.searchUnknownRegionProbability = sample_from_unknown_region_probability

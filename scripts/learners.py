@@ -2,7 +2,7 @@ from .printable import *
 from .validation import *
 
 
-LINPROG_SOLVERS = ['apache', 'ojalgo', 'gurobi']
+LINPROG_SOLVERS = ['apache', 'ojalgo']
 KERNELS = ['linear', 'gaussian', 'diagonal']
 SAMPLE_SELECTORS = ['single', 'independent']
 
