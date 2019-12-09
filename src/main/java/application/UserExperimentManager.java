@@ -4,7 +4,7 @@ import data.*;
 
 import explore.ExploreIteration;
 import explore.InitialIteration;
-import explore.ExperimentConfiguration;
+import config.ExperimentConfiguration;
 
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;

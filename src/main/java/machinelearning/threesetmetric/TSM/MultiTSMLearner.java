@@ -98,7 +98,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
             TsmLearner backupTsm = new TsmLearner(selected_set.length);
             backupTsmSet.add(backupTsm);
         }
-        System.out.println( "the number of tsms: " + tsmSet.size());
     }
 
     /**
@@ -191,7 +190,6 @@ public class MultiTSMLearner implements ExtendedClassifier {
 
 
         if(isInPosRegion(point)){
-            System.out.println("POSITVE YAAAH");
             return ExtendedLabel.POSITIVE;
         }else if(isInNegRegion(point)){
             return ExtendedLabel.NEGATIVE;

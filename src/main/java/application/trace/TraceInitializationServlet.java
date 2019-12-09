@@ -4,7 +4,7 @@ import application.ExplorationManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import data.IndexedDataset;
-import explore.ExperimentConfiguration;
+import config.ExperimentConfiguration;
 import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.active.LearnerFactory;

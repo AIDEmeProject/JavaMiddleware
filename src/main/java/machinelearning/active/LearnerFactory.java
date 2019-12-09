@@ -1,6 +1,6 @@
 package machinelearning.active;
 
-import explore.ExperimentConfiguration;
+import config.ExperimentConfiguration;
 import machinelearning.active.learning.SubspatialActiveLearner;
 import machinelearning.active.learning.UncertaintySampler;
 import machinelearning.classifier.Learner;

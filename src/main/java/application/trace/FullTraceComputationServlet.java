@@ -1,10 +1,9 @@
 package application.trace;
 
 import application.ExplorationManager;
-import application.trace.*;
 import com.google.gson.Gson;
+import config.ExperimentConfiguration;
 import data.IndexedDataset;
-import explore.ExperimentConfiguration;
 import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.active.LearnerFactory;

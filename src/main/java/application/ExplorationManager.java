@@ -1,27 +1,19 @@
 package application;
 
+import config.ExperimentConfiguration;
 import data.*;
-
-import explore.ExperimentConfiguration;
-import explore.metrics.ConfusionMatrix;
-import explore.metrics.ConfusionMatrixCalculator;
+import data.preprocessing.StandardScaler;
 import explore.metrics.MetricStorage;
 import explore.metrics.ThreeSetMetricCalculator;
-
-import data.preprocessing.StandardScaler;
-
 import explore.statistics.Statistics;
 import explore.user.GuiUserLabel;
-import explore.user.UserStub;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
-
 import machinelearning.threesetmetric.ExtendedLabel;
 import utils.RandomState;
 import utils.linalg.Matrix;
-
 
 import java.util.ArrayList;
 import java.util.Collections;

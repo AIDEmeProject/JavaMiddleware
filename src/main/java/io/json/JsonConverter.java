@@ -59,8 +59,6 @@ public class JsonConverter {
 
         builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
 
-        builder.registerTypeAdapter(TsmConfiguration.class, new TSMConfigurationAdapter());
-
         return builder.create();
     }
 

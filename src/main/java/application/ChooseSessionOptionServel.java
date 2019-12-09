@@ -1,12 +1,11 @@
 package application;
 
-import com.google.gson.reflect.TypeToken;
-import io.CSVParser;
-import explore.ExperimentConfiguration;
 import com.google.gson.Gson;
-
-import data.DataPoint;
+import com.google.gson.reflect.TypeToken;
+import config.ExperimentConfiguration;
+import config.TsmConfiguration;
 import data.IndexedDataset;
+import io.CSVParser;
 import io.json.JsonConverter;
 import machinelearning.active.learning.SimpleMargin;
 import machinelearning.active.learning.UncertaintySampler;
@@ -19,12 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -51,7 +46,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(jsonConfiguration, ExperimentConfiguration.class);
-        ExperimentConfiguration.TsmConfiguration tsmConf = configuration.getTsmConfiguration();
+        TsmConfiguration tsmConf = configuration.getTsmConfiguration();
 
 
 
