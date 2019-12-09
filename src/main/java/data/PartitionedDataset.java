@@ -82,10 +82,13 @@ public final class PartitionedDataset {
      * @param point
      */
     public void addLabeledPointToDataset(LabeledPoint point){
+        // TODO: check this method
 
         this.points.add(point.getData());
 
         int nPoints = this.points.length();
+
+        //TODO: not used
         ExtendedLabel[] newLabels = new ExtendedLabel[nPoints + 1];
         for (int i = 0; i < nPoints; i++ ){
             newLabels[i] = this.labels[i];

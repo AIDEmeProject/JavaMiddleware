@@ -16,11 +16,13 @@ public final class TsmConfiguration {
     private List<String[]> featureGroups = new ArrayList<>();
     private String[] columns = new String[0];
 
+    private TsmConfiguration() {
+        // avoid instantiation
+    }
+
     public TsmConfiguration(boolean hasTSM) {
         this.hasTsm = hasTSM;
     }
-
-
 
     public boolean hasTsm() {
         return hasTsm;
@@ -48,10 +50,6 @@ public final class TsmConfiguration {
 
     public void setColumns(String[] columns) {
         this.columns = columns;
-    }
-
-    public boolean hasEmptyFactorizationStructure() {
-        return flags.isEmpty();
     }
 
     public Optional<ExtendedClassifier> getMultiTsmModel() {
@@ -84,6 +82,15 @@ public final class TsmConfiguration {
             i++;
         }
         throw new IllegalArgumentException("Column " + column + " not in columns list " + Arrays.toString(columns));
+    }
+
+    public int[][] getColumnPartitionIndexes() {
+        int[][] partition = new int[featureGroups.size()][];
+
+        for (int i = 0; i < partition.length; i++) {
+            partition[i] = getColumnIndex(featureGroups.get(i));
+        }
+        return partition;
     }
 
     @Override

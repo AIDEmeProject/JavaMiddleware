@@ -1,7 +1,7 @@
 package io;
 
+import config.TsmConfiguration;
 import data.IndexedDataset;
-import explore.ExperimentConfiguration;
 import explore.sampling.FixedSampler;
 import explore.sampling.InitialSampler;
 import explore.sampling.StratifiedSampler;
@@ -41,7 +41,7 @@ public class TaskReader {
         return reader.readKeys(datasetConfig.table, datasetConfig.key, taskConfig.predicate);
     }
 
-    public List<Set<Long>> readFactorizedTargetSetKeys(ExperimentConfiguration.TsmConfiguration tsmConfiguration){
+    public List<Set<Long>> readFactorizedTargetSetKeys(TsmConfiguration tsmConfiguration){
         // set factorization structure specified in tasks.ini
         tsmConfiguration.setColumns(taskConfig.columns);
         tsmConfiguration.setFeatureGroups(taskConfig.featureGroups);

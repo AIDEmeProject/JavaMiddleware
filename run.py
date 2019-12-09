@@ -8,7 +8,7 @@ from scripts import *
 # task id, as defined in the tasks.ini file
 TASKS = [
     #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    "sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
     #"sdss_Q3_0.1%",  #sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
     #"sdss_Q4_0.1%", #"sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
     #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
@@ -24,14 +24,14 @@ TASKS = [
 
 TASKS.extend(
     ['user_study_' + s for s in [
-        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
+        '01', #'02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
         #'01',  #'03', '06', '07'
         #'06','07'
     ]]
 )
 
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 50000 #float('inf')
+SUBSAMPLE_SIZE = float('inf')
 
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
@@ -48,7 +48,7 @@ NUM_RUNS = 1
 
 
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 80
+BUDGET = 20
 
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
@@ -80,7 +80,6 @@ USE_CATEGORICAL = True
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 #ACTIVE_LEARNER = RandomSampler()
 #ACTIVE_LEARNER = SubspatialSampler(
 #     [
@@ -110,20 +109,20 @@ USE_CATEGORICAL = True
 
 THREADS = 0  # how many threads to use in subspatial algorithms
 
-lnr = MajorityVote(
-    num_samples=32,
-    warmup=1000, thin=100, chain_length=100, selector="single",
-    rounding=False, max_iter=0, cache=True, rounding_cache=False,  # hit-and-run
-    kernel='gaussian', gamma=0, jitter=1e-9, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
-    decompose=False, sphere=True, add_intercept=True, solver="gurobi"  # extra
-)
+# lnr = MajorityVote(
+#     num_samples=32,
+#     warmup=1000, thin=100, chain_length=100, selector="single",
+#     rounding=False, max_iter=0, cache=True, rounding_cache=False,  # hit-and-run
+#     kernel='gaussian', gamma=0, jitter=1e-9, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
+#     decompose=False, sphere=True, add_intercept=True, solver="gurobi"  # extra
+# )
 
-#lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
+lnr = SVM(C=1024, kernel='gaussian', gamma=0)
 
 #ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY", threads=THREADS)
-ACTIVE_LEARNER = UncertaintySampler(lnr)
+#ACTIVE_LEARNER = UncertaintySampler(lnr)
 #ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
-#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
 
 # Evaluation metrics. Necessary for EVAL and AVERAGE modes.
 # Check the scripts/metrics.py file for all possibilities
@@ -133,7 +132,7 @@ METRICS = [
     #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False, threads=THREADS))
     #VersionSpaceThreeSetMetric(lower_bound_mv),
     #LabeledSetConfusionMatrix(lnr),
-    #ThreeSetMetric(),
+    ThreeSetMetric(),
     #ConfusionMatrix(lnr),
     # ConfusionMatrix(SubspatialLearner(
     #     [

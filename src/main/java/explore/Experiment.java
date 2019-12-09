@@ -8,6 +8,8 @@ import explore.user.UserStub;
 import io.FolderManager;
 import io.TaskReader;
 import machinelearning.active.learning.QueryByDisagreement;
+import config.ExperimentConfiguration;
+
 
 public final class Experiment {
     private final FolderManager experimentFolder;
