@@ -113,10 +113,5 @@ class LinearVersionSpaceTest {
                 inverse.set(i, j, -sum / inverse.get(i, i));
             }
         }
-
-        System.out.println(decompositionStore);
-        System.out.println(inverse);
-        System.out.println(decompositionStore.matrixMultiply(inverse));
-        System.out.println(inverse.matrixMultiply(decompositionStore));
     }
 }

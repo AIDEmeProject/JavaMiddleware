@@ -11,7 +11,6 @@ public class TSMConfigurationAdapter  implements com.google.gson.JsonDeserialize
 
     public TsmConfiguration deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 
-        System.out.println(json);
         JsonObject object = json.getAsJsonObject();
 
         boolean hasTSM = object.getAsJsonPrimitive("hasTSM").getAsBoolean();
@@ -20,53 +19,45 @@ public class TSMConfigurationAdapter  implements com.google.gson.JsonDeserialize
         TsmConfiguration  configuration = new TsmConfiguration(hasTSM);
         configuration.setSearchUnknownRegionProbability(probability);
 
-
-        JsonArray columns = object.getAsJsonArray("columns");
-        String[] columnNames = new String[columns.size()];
-        for (int i = 0; i< columns.size(); i++){
-
-            columnNames[i] = columns.get(i).getAsString();
+        if (object.has("columns")) {
+            JsonArray columns = object.getAsJsonArray("columns");
+            String[] columnNames = new String[columns.size()];
+            for (int i = 0; i < columns.size(); i++) {
+                columnNames[i] = columns.get(i).getAsString();
+            }
+            configuration.setColumns(columnNames);
         }
-        configuration.setColumns(columnNames);
 
+        if (object.has("featureGroups")) {
+            JsonArray jsonFeatureGroups = object.getAsJsonArray("featureGroups");
 
-        JsonArray jsonFeatureGroups = object.getAsJsonArray("featureGroups");
-        System.out.println("coiucou");
-        System.out.println(jsonFeatureGroups);
+            ArrayList<String[]> featureGroups = new ArrayList<>();
+            for (int i = 0; i < jsonFeatureGroups.size(); i++) {
+                JsonArray jsonFeatureGroup = jsonFeatureGroups.get(i).getAsJsonArray();
 
-        ArrayList<String[]> featureGroups = new ArrayList();
-        for (int i = 0; i < jsonFeatureGroups.size(); i++){
+                String[] featureGroup = new String[jsonFeatureGroup.size()];
 
+                for (int iVar = 0; iVar < jsonFeatureGroup.size(); iVar++) {
+                    featureGroup[iVar] = jsonFeatureGroup.get(iVar).getAsString();
+                }
 
-            JsonArray jsonFeatureGroup = jsonFeatureGroups.get(i).getAsJsonArray();
-            String[] featureGroup = new String[jsonFeatureGroup.size()];
-            for (int iVar = 0; iVar < jsonFeatureGroup.size(); iVar ++){
-
-
-                featureGroup[iVar] = jsonFeatureGroup.get(iVar).getAsString();
+                featureGroups.add(featureGroup);
             }
 
-            featureGroups.add(featureGroup);
-
+            configuration.setFeatureGroups(featureGroups);
         }
 
-        System.out.println("coucou2");
-        configuration.setFeatureGroups(featureGroups);
+        if (object.has("flags")) {
+            JsonArray jsonFlags = object.getAsJsonArray("flags");
 
+            ArrayList<boolean[]> flags = new ArrayList<>();
+            for (int i = 0; i < jsonFlags.size(); i++) {
+                boolean[] flag = {true, false};
+                flags.add(flag);
+            }
 
-        JsonArray jsonFlags = object.getAsJsonArray("flags");
-
-        System.out.println("coucou3");
-        ArrayList<boolean[]> flags = new ArrayList();
-        for (int i = 0; i < jsonFlags.size(); i++){
-            boolean[] flag = {true, false};
-            flags.add(flag);
+            configuration.setFlags(flags);
         }
-
-        System.out.println("coucou4");
-        configuration.setFlags(flags);
-
-
 
         return configuration;
 

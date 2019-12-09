@@ -1,16 +1,9 @@
 package application.data;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import config.ExperimentConfiguration;
-import data.DataPoint;
 import data.LabeledPoint;
-import io.json.JsonConverter;
-import machinelearning.classifier.Label;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class ConfigurationTest {
 

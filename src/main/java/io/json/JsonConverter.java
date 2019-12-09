@@ -60,7 +60,7 @@ public class JsonConverter {
         builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
 
         builder.registerTypeAdapter(TsmConfiguration.class, new TSMConfigurationAdapter());
-        // TODO: add TSM metrics
+
         return builder.create();
     }
 

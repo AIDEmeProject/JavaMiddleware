@@ -25,12 +25,6 @@ class OneDimTSMTest {
         }
     }
 
-    public static void PrintArrayList(ArrayList<double[]> array){
-        for(double[] item : array){
-            System.out.println(Arrays.toString(item));
-        }
-    }
-
     @BeforeEach
     void setUp() {
         // -Infinity < a < b < +Infinity
@@ -46,22 +40,15 @@ class OneDimTSMTest {
             }
         }
 
-        System.out.println("--------------------------------------");
         RandomizeArray(samplesWithLabel);
         samplesWithLabel.add(0, new double[]{-3.5, 1});
         samplesWithLabel.add(1, new double[]{1.5, -1});
-//        PrintArrayList(samplesWithLabel);
-        System.out.println("--------------------------------------");
 
         oneDimTSM = new OneDimTSM();
 
         //test the final result of all updates
         for(int i=0; i<samplesWithLabel.size(); i++){
             oneDimTSM.updatePos(samplesWithLabel.get(i)[0], samplesWithLabel.get(i)[1]);
-            System.out.println("number of samples: " + (i+1) + " new sample: " + Arrays.toString(samplesWithLabel.get(i)));
-            System.out.println("Convex line segment: " + Arrays.toString(oneDimTSM.getConvexLineSeg().toArray()));
-            System.out.println("Concave rays: " + Arrays.toString(oneDimTSM.getConcaveRay().toArray()));
-            System.out.println("--------------------------------------");
         }
 
     }

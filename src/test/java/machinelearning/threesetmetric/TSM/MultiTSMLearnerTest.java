@@ -97,11 +97,6 @@ class MultiTSMLearnerTest {
     }
 
     @Test
-    void update() {
-        System.out.println(multiTSMLearner.toString());
-    }
-
-    @Test
     void predict_positive() {
         assertEquals(1, multiTSMLearner.predict(new DataPoint(0, new double[]{6,1.7,2.25,2016,69390,0,0,1,0})).asSign());
     }
