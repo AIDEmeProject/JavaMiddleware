@@ -48,11 +48,22 @@ public class TraceInitializationServlet extends HttpServlet {
         System.out.println("");
         System.out.println(algorithmName);
 
+        System.out.println("");
+        System.out.println(encodedDatasetName);
+        System.out.println("");
+
+
+
+
         ArrayList<Integer> columnIds = json.fromJson(
                                             strColumnIds,
                                             new TypeToken< ArrayList<Integer>>(){}.getType());
 
         columnIds.sort(Comparator.comparingInt((Integer n) -> n));
+
+
+        System.out.println("Load csv " + encodedDatasetName);
+        System.out.println("It should be at the root of the project");
 
         CSVParser parser = new CSVParser();
         IndexedDataset carDataset = parser.buildIndexedDataset(encodedDatasetName, columnIds);

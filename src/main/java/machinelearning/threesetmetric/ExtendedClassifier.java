@@ -42,6 +42,10 @@ public interface ExtendedClassifier {
      * @return the predicted labels for each point in the input collection
      */
     default ExtendedLabel[] predict(IndexedDataset points) {
+
+        System.out.println("---predict---");
+        System.out.println(toString());
+
         return points.stream()
                 .map(this::predict)
                 .toArray(ExtendedLabel[]::new);

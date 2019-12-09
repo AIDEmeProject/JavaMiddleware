@@ -135,6 +135,9 @@ public class TraceComputationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        System.out.println("");
+        System.out.println("--Step starting--");
+        System.out.println("");
         Gson json = new Gson();
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
@@ -159,5 +162,7 @@ public class TraceComputationServlet extends HttpServlet {
 
         resp.setContentType("application/json");
         resp.getWriter().println(json.toJson(result));
+
+        System.out.println("---Step finished---");
     }
 }

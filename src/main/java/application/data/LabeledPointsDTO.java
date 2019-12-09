@@ -85,7 +85,7 @@ public class LabeledPointsDTO {
                 Label label = Label.fromSign((double) point.labels[i]);
                 partialLabels[i] = label;
 
-                System.out.println(label.toString());
+
             }
 
             LabelGroup labelGroup = new LabelGroup(partialLabels);

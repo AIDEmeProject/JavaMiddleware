@@ -123,13 +123,43 @@ public class ExplorationManager {
         List<LabeledPoint> scaledLabeledPoints = new ArrayList<>(labeledPoints.size());
 
         for (LabeledPoint point : labeledPoints) {
-            long id = point.getId();
+            long rowId = point.getId(); // No +1 or -1
 
-            scaledLabeledPoints.add(new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(id), point.getLabel()));
+
+            LabeledPoint lblPoint = new LabeledPoint(partitionedDataset.getAllPoints().getFromIndex(rowId), point.getLabel());
+            /*
+            System.out.println("---datapoint---");
+            System.out.println(lblPoint.getLabel());
+            System.out.println(lblPoint.getData());
+            System.out.println("");
+            */
+            //LabeledPoint rawlblPoint = new LabeledPoint(rawDataset.getFromIndex(rowId), point.getLabel());
+
+            System.out.println("--row ids --");
+            System.out.println(rowId);
+
+            /*
+            System.out.println("--raw datapoint --");
+            System.out.println(rawlblPoint.getId());
+            System.out.println(rawlblPoint.getLabel());
+            System.out.println(rawlblPoint.getData());
+            System.out.println("");
+            */
+
+            System.out.println("--scaled dataset --");
+            System.out.println(lblPoint.getId());
+            System.out.println(lblPoint.getLabel());
+            System.out.println(lblPoint.getData());
+
+            System.out.println("");
+
+            scaledLabeledPoints.add(lblPoint);
         }
 
         this.partitionedDataset.update(scaledLabeledPoints);
-
+        System.out.println("--IS INITIAL SAMPLING--");
+        System.out.print(this.isInitialSamplingStep);
+        System.out.println("");
         if (this.isInitialSamplingStep){
 
             if (this.hasPositiveAndNegativeExamples()){
@@ -229,8 +259,14 @@ public class ExplorationManager {
 
         for (int i=0;i < datasetToLabel.length(); i++)
         {
+
+
             DataPoint point = datasetToLabel.get(i);
+
             DataPoint rawPoint = rawPoints.get(i);
+
+            long pointId = point.getId();
+
 
             Label label = classifier.predict(point.getData());
             LabeledPoint labeledPoint = new LabeledPoint(rawPoint, label);
@@ -327,17 +363,15 @@ public class ExplorationManager {
     public ArrayList<LabeledPoint> computeModelPredictionForProjection(){
 
         if (! this.configuration.hasMultiTSM()){
-            return this.labelWholeDataset();
+            return this.labelPoints(partitionedDataset.getAllPoints().sample(2), rawDataset.sample(2), false);
         }
 
         IndexedDataset datasetToLabel = this.partitionedDataset.getAllPoints();
-        return this.TSMPrediction(datasetToLabel);
+        System.out.println("TOBE REMOVED AFTER DBG");
+        return this.TSMPrediction(datasetToLabel.sample(2));
     }
 
 
-    public ArrayList<LabeledPoint> getTSMPredictionOnRealData(){
-        return this.TSMPrediction(this.partitionedDataset.getAllPoints());
-    }
 
     public ArrayList<LabeledPoint> getModelPredictionWithTSMOnRealData(){
         return this.getModelPredictionWithTSM(this.partitionedDataset.getAllPoints());
@@ -345,6 +379,77 @@ public class ExplorationManager {
 
     public ArrayList<LabeledPoint> computeTSMPredictionOverRealDataset(){
         return this.TSMPrediction(partitionedDataset.getAllPoints());
+    }
+
+
+    public ArrayList<LabeledPoint> getTSMPredictionOnRealData(){
+
+        return this.TSMPrediction(this.checkPositivePointPrediction());
+        //return this.TSMPrediction(this.partitionedDataset.getAllPoints());
+    }
+
+    public ArrayList<LabeledPoint> TSMPrediction(IndexedDataset datasetToLabel){
+
+        ExtendedLabel[] labels = this.partitionedDataset.getTSMClassifier().predict(datasetToLabel);
+
+        ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
+
+
+        boolean hasPositive = false;
+
+        for (int i=0; i < labels.length; i++)
+        {
+            ExtendedLabel label = labels[i];
+
+            DataPoint rawPoint = datasetToLabel.get(i);
+
+            GuiUserLabel guiLabel = GuiUserLabel.fromExtendedLabel(label);
+            LabeledPoint labeledPoint = new LabeledPoint(rawPoint, guiLabel);
+
+            if (label.isPositive()){
+                hasPositive = true;
+                System.out.println("--POSITIVE LABEL--");
+                System.out.print(labeledPoint);
+                System.out.print(label);
+                System.out.println("");
+            }
+
+            labeledDataset.add(labeledPoint);
+        }
+
+        System.out.println("HAD POSITIVE ? ");
+        System.out.println(hasPositive);
+
+        return labeledDataset;
+    }
+
+    public IndexedDataset checkPositivePointPrediction(){
+
+
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+        builder.add(0, this.partitionedDataset.get(2554).getData().toArray());
+        builder.add(1, this.partitionedDataset.get(2555).getData().toArray());
+        builder.add(2, this.partitionedDataset.get(2556).getData().toArray());
+
+        builder.add(3, this.partitionedDataset.get(1457).getData().toArray());
+        builder.add(4, this.partitionedDataset.get(1458).getData().toArray());
+        builder.add(5, this.partitionedDataset.get(1459).getData().toArray());
+
+
+        builder.add(6, this.partitionedDataset.get(2561).getData().toArray());
+        builder.add(7, this.partitionedDataset.get(2562).getData().toArray());
+        builder.add(8, this.partitionedDataset.get(2563).getData().toArray());
+
+        builder.add(9, this.partitionedDataset.get(1454).getData().toArray());
+        builder.add(10, this.partitionedDataset.get(1455).getData().toArray());
+        builder.add(11, this.partitionedDataset.get(1456).getData().toArray());
+
+
+        IndexedDataset positivePoints = builder.build();
+
+        System.out.println(positivePoints.get(10));
+        return positivePoints;
+
     }
 
 
@@ -377,29 +482,7 @@ public class ExplorationManager {
 
     }
 
-    public ArrayList<LabeledPoint> TSMPrediction(IndexedDataset datasetToLabel){
 
-        ExtendedLabel[] labels = this.partitionedDataset.getTSMClassifier().predict(datasetToLabel);
-
-        System.out.println("LALALA");
-        System.out.println(datasetToLabel.length());
-        System.out.println(labels.length);
-        ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
-
-        for (int i=0; i < labels.length; i++)
-        {
-            ExtendedLabel label = labels[i];
-
-            DataPoint rawPoint = datasetToLabel.get(i);
-
-            GuiUserLabel guiLabel = GuiUserLabel.fromExtendedLabel(label);
-            LabeledPoint labeledPoint = new LabeledPoint(rawPoint, guiLabel);
-
-            labeledDataset.add(labeledPoint);
-        }
-
-        return labeledDataset;
-    }
 
     public ArrayList<LabeledPoint> labelWholeDataset(int n){
 

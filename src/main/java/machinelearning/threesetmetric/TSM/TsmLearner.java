@@ -91,7 +91,14 @@ public class TsmLearner extends CatTSM {
     public void updatePosRatio(Collection<LabeledPoint> labeledSamples) {
         for (LabeledPoint t : labeledSamples) {
             double[] point = t.getData().toArray();
+
+
+
             if(dim==1) {
+                System.out.println("--in LEARNER--");
+                System.out.println(t.getData());
+                System.out.println(t.getLabel().asSign());
+                System.out.println("");
                 oneDimTSM.updatePos(point[0], t.getLabel().asSign());
             }else {
                 // check the label on a subspace
