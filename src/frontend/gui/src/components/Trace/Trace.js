@@ -184,7 +184,7 @@ class QueryTrace extends Component{
                                 
                                 <div className="row">
 
-                                    <div className="col col-lg-5">
+                                    <div className="col col-lg-4">
                                                                                                                        
                                         <ModelBehaviorControls       
                                             iteration={iteration}          
@@ -224,7 +224,7 @@ class QueryTrace extends Component{
 
                                     </div>
                                   
-                                        <div className="col col-lg-7">
+                                        <div className="col col-lg-8">
                                             
                                             <ModelBehavior                     
                                                 labeledPoints={this.state.allLabeledPoints}                        
