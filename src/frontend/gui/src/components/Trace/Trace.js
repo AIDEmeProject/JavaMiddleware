@@ -132,7 +132,7 @@ class QueryTrace extends Component{
 
                         <div className="row">
 
-                            <div className="col col-lg-12">
+                            <div className="col col-lg-6 offset-lg-3">
 
                                 <h4>
                                     Algorithm : {algorithm} 
@@ -235,7 +235,8 @@ class QueryTrace extends Component{
                                                 hasTSM={this.state.useTSM}     
                                                 realDataset={true}   
                                                 iteration={iteration}  
-                                                TSMPredictionHistory={this.state.TSMPredictionHistory}              
+                                                TSMPredictionHistory={this.state.TSMPredictionHistory}   
+                                                plotLabels={false}           
                                             />
                                         </div>
                                     </div>                                    
@@ -253,30 +254,38 @@ class QueryTrace extends Component{
                             }
                     </div>
                 }
+                <div className="row">
+                    <div className="col col-lg-6 offset-lg-3 card">
 
-                <a 
-                    onClick={this.saveTrace.bind(this)}
-                    id="download-trace" download="trace.json" type="application/json"
-                    className="btn btn-raised"
-                >
-                    Save trace
-                </a>
-               
-                <label htmlFor="load-trace">
-                   Trace file (json)
-                </label>
-                <input 
-                    id="load-trace"
-                    name="load-trace"
-                    type="file"
-                />
+                        <p>                        
+                            <a 
+                                onClick={this.saveTrace.bind(this)}
+                                id="download-trace" 
+                                download="trace.json" type="application/json"
+                                className="btn btn-raised"
+                            >
+                                Save trace
+                            </a>
+                        </p>
+                        <p>
+                            <label htmlFor="load-trace">
+                            Select Trace file (json)
+                            </label>
+                            <input 
+                                id="load-trace"
+                                name="load-trace"
+                                type="file"
+                            />
 
-                <button 
-                    className="btn btn-raised"
-                    onClick={this.loadTrace.bind(this)}    
-                >
-                    Load
-                </button>
+                            <button 
+                                className="btn btn-raised"
+                                onClick={this.loadTrace.bind(this)}    
+                            >
+                                Load
+                            </button>
+                        </p>
+                    </div>
+                    </div>
                 </div>
             </div>           
         )

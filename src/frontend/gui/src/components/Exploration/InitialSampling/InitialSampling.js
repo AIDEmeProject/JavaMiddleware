@@ -57,12 +57,12 @@ class InitialSampling extends Component{
                         </p>
 
                         {
-                            this.state.labelingInitialSampling && 
-
+                            //this.state.labelingInitialSampling && 
+                            false &&
+                            
                             <SpecificPointToLabel 
                                 onNewPointsToLabel={this.props.onNewPointsToLabel}                        
                             />
-
                         }
                     
                     </div>

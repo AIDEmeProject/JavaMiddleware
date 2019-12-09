@@ -8,23 +8,6 @@ import ModelBehaviorControls from './ModelBehaviorControls'
 
 class ModelBehavior extends Component{
 
-    constructor(props){
-
-        super(props)    
-        
-        this.state = {
-            
-            modelIteration: 0,            
-            firstVariable: 0,
-            secondVariable: 1,
-            scale: {
-                xMin: -5,
-                xMax: 5,
-                yMin: -5,
-                yMax: 5
-            }
-        }
-    }
 
     render(){
         
@@ -32,14 +15,6 @@ class ModelBehavior extends Component{
         const labeledPoints =  this.getHumanLabeledPoints()
         
 
-        //const hasBehaviorData = this.props.history.length > 0 &&
-        //                        this.props.gridHistory.labelHistory.length > 0
-
-        //if ( ! hasBehaviorData){
-        //    return (<div>Please label at least one point after the initial sampling phase. If it was done, please wait while vizualization data is computed</div>)
-        //}
-
-        
         var iteration = this.getIteration()
 
         return (
@@ -188,29 +163,50 @@ class ModelBehavior extends Component{
                 
             </div>
             
-            <div className="row">
-                
-                <div className="col-lg-12">
+            {
+                 this.props.plotProjection && 
+                <div className="row">
                     
-                    {
-                        this.props.hasTSM &&
-                        <h4>Polytope model Predictions over projected dataset</h4>
-                    }
+                    <div className="col-lg-12">
+                        
+                        {
+                            this.props.hasTSM &&
+                            <h4>Polytope model Predictions over projected dataset</h4>
+                        }
 
-                    {
-                        ! this.props.hasTSM &&
-                        <h4>Predictions over projected dataset</h4>
-                    }
+                        {
+                            ! this.props.hasTSM &&
+                            <h4>Predictions over projected dataset</h4>
+                        }
 
-                    <svg id="projection"></svg>                
-                </div>        
-            </div>
+                        <svg id="projection"></svg>                
+                    </div>        
+                </div>
+            }
         </div>
             
         
         )
     }
     
+    constructor(props){
+
+        super(props)    
+        
+        this.state = {
+            
+            modelIteration: 0,            
+            firstVariable: 0,
+            secondVariable: 1,
+            scale: {
+                xMin: -5,
+                xMax: 5,
+                yMin: -5,
+                yMax: 5
+            }
+        }
+    }
+
     componentWillMount(){
         
         const hasBehaviorData = this.props.modelPredictionHistory.length > 0 
@@ -236,14 +232,17 @@ class ModelBehavior extends Component{
             
             this.modelPredictionPlotter = new ModelBehaviorPlotter(columnNames)
             this.modelPredictionPlotter.createPlot('#model-predictions-grid-point', this.state.scale)
+            this.modelPredictionPlotter.setPlotLabels(this.props.plotLabels)
         }
         
         this.projectionPlotter = new ModelBehaviorPlotter(['X', 'Y'])
         this.projectionPlotter.createPlot("#projection", this.state.scale)
+        this.projectionPlotter.setPlotLabels(this.props.plotLabels)
 
         if (this.props.hasTSM){
             this.tsmPlotter = new ModelBehaviorPlotter(columnNames)
             this.tsmPlotter.createPlot("#tsm-plot", this.state.scale)
+            this.tsmPlotter.setPlotLabels(this.props.plotLabels)
         }
         
         this.plotAll()   
@@ -263,8 +262,11 @@ class ModelBehavior extends Component{
         if (this.props.hasTSM){
             this.plotTSMPredictionsOnGridPoints()
         }
+        if (this.props.plotProjection){
+            this.plotDataEmbbedingPlot()
+        }
 
-        this.plotDataEmbbedingPlot()
+        
     }
 
     plotTSMPredictionsOnGridPoints(){
@@ -488,7 +490,7 @@ class ModelBehavior extends Component{
 }
 
 ModelBehavior.defaultProps = {
-
+    plotProjection: true
 }
 
 export default ModelBehavior

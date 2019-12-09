@@ -13,6 +13,9 @@ import Trace from './components/Trace/Trace'
 import MicroModal from 'micromodal'
 import ModelBehavior from './components/visualisation/ModelBehavior'
 
+
+import Welcome from './components/Welcome'
+
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
 import logo from './AIDEME.png'
@@ -28,7 +31,7 @@ const SESSION_OPTIONS = "SessionOptions"
 const TSM_EXPLORATION = "TSMExploration"
 const AUTHENTICATION = "Authentication"
 const TRACE = 'Trace'
-
+const WELCOME = 'Welcome'
 
 class AnimatedText extends Component{
 
@@ -65,7 +68,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            step : NEW_SESSION,
+            step : WELCOME,
             columns: [],
             
             initialLabelingSession: true,
@@ -141,6 +144,10 @@ class App extends Component {
     var View;
     switch(this.state.step){
         
+        case WELCOME:
+            View = Welcome
+            break
+
         case AUTHENTICATION: 
             View = Authentication
             break
@@ -208,6 +215,8 @@ class App extends Component {
                             }}
                             groupsWereValidated={this.groupsWereValidated.bind(this)}
                             onDatasetLoaded={this.onDatasetLoaded.bind(this)}
+                            onTraceClick={this.onTraceClick.bind(this)}
+                            onInteractiveSessionClick={this.onInteractiveSessionClick.bind(this)}
                         />            
                     </div>
                 </div>
@@ -220,19 +229,18 @@ class App extends Component {
                 <div id="pandas-profiling">
                 </div>
 
-                {
-                    this.state.step == NEW_SESSION && 
                 
-                    <button
-                        className="btn btn-raised"
-                        onClick={(e) => this.setState({'step': TRACE}) }
-                        >
-                        Trace
-                    </button>
-                }
             </div>
       </div>
     );
+  }
+
+  onTraceClick(e){
+    this.setState({'step': TRACE}) 
+  }
+
+  onInteractiveSessionClick(){
+      this.setState({'step': NEW_SESSION})
   }
 
   onShowModalClick(e){
@@ -269,7 +277,7 @@ class App extends Component {
 
     fileUploaded(response){
 
-        console.log(response)
+        
         this.setState({
             step: SESSION_OPTIONS,
             datasetInfos: response,
@@ -282,10 +290,9 @@ class App extends Component {
         var newOptions = Object.assign({}, this.state.options, options)
 
         const chosenColumns = options.chosenColumns
-        console.log('COLUMNS')
-        console.log(chosenColumns)
+        
         this.state.dataset.set_column_names_selected_by_user(chosenColumns)
-        console.log()
+        
         this.setState({
             options: newOptions
         })

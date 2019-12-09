@@ -5,6 +5,11 @@ class ModelBehaviorPlotter{
     constructor(columnNames){
         
         this.columnNames = columnNames
+        this.plotLabels = true
+    }
+
+    setPlotLabels(plotLabels){
+        this.plotLabels = plotLabels
     }
 
     createPlot(svgId, scale){
@@ -159,28 +164,30 @@ class ModelBehaviorPlotter{
             .style("stroke", "white") 
 
 
-
-        var updateHumanLabels = this.gLabels
-            .selectAll("circle")
-            .data(humanLabeledPoints)
-                 
-        const var1 = chosenVariables[0],
-              var2 = chosenVariables[1]
-        
-        updateHumanLabels
-            .enter()
-            .append("circle")
-            .merge(updateHumanLabels)
+        if (this.plotLabels){
             
-            .attr("cx", function(d) { return x(d[var1]) } )
-            .attr("cy", function(d) { return y(d[var2]) } )
-            .attr("r", 7)
-            .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
-            .style("stroke", function(d){
-                    return d[2] == 1 ? "green" : 'red'
-            })
+            var updateHumanLabels = this.gLabels
+                .selectAll("circle")
+                .data(humanLabeledPoints)
                     
-        updateHumanLabels.exit().remove()                     
+            const var1 = chosenVariables[0],
+                var2 = chosenVariables[1]
+            
+            updateHumanLabels
+                .enter()
+                .append("circle")
+                .merge(updateHumanLabels)
+                
+                .attr("cx", function(d) { return x(d[var1]) } )
+                .attr("cy", function(d) { return y(d[var2]) } )
+                .attr("r", 7)
+                .style("fill", function(d){ return d[2] == 1 ? "green" : 'red'})           
+                .style("stroke", function(d){
+                        return d[2] == 1 ? "green" : 'red'
+                })
+                        
+            updateHumanLabels.exit().remove()
+        }
     }
 
     updateAxis(x, y, scale, chosenColumns){

@@ -128,19 +128,22 @@ class TSMExploration extends Component{
                     this.state.initialLabelingSession && 
                     
                     <div>
-                        The first phase of labeling continues until we obtain 
-                        a positive example and a negative example.        
- 
+                        <p>                            
+                            The first phase of labeling continues until we obtain 
+                            a positive example and a negative example.        
+                        </p>
 
                         <p>
                             Grouped variable exploration. If you chose no, 
                             you will be asked to label each subgroups
                             independantly                    
                         </p>
-
-                        <SpecificPointToLabel 
-                            onNewPointsToLabel={this.newPointsToLabel.bind(this)}                            
-                        />            
+                        {
+                            false && 
+                            <SpecificPointToLabel 
+                                onNewPointsToLabel={this.newPointsToLabel.bind(this)}                            
+                            />         
+                        }   
                     </div>                
                 }
             
@@ -263,34 +266,37 @@ class TSMExploration extends Component{
                 {
                     this.state.showModelBehavior && 
                     
-                    <div>
+                    <div className="row">
 
+                        <div className="col col-lg-4">
                       
+                            <ModelBehaviorControls         
+                                iteration={this.getIteration()}          
+                                nIteration={this.state.nIteration}
+                                onPreviousIteration={this.onPreviousIteration.bind(this)}
+                                onNextIteration={this.onNextIteration.bind(this)}
+                            />
 
-                        <ModelBehaviorControls         
-                            iteration={this.getIteration()}          
-                            nIteration={this.state.nIteration}
-                            onPreviousIteration={this.onPreviousIteration.bind(this)}
-                            onNextIteration={this.onNextIteration.bind(this)}
-                        />
+                            <LabelInfos
+                                iteration={this.state.iteration}
+                                labeledPoints={this.state.allLabeledPoints}                                            
+                            />
 
-                        <LabelInfos
-                            iteration={this.state.iteration}
-                            labeledPoints={this.state.allLabeledPoints}                                            
-                        />
-
-                        <ModelBehavior     
-                            iteration={this.getIteration()}              
-                            labeledPoints={this.state.allLabeledPoints}
-                            datasetInfos={this.props.datasetInfos}
-                            availableVariables={this.props.chosenColumns}
-                            fakePointGrid={this.state.fakePointGrid}
-                            TSMPredictionHistory={this.state.TSMPredictionHistory}
-                            modelPredictionHistory={this.state.modelPredictionHistory}                        
-                            projectionHistory={this.state.projectionHistory}
-                            hasTSM={this.state.TSMPredictionHistory.length > 0}
-                        />
-
+                        </div>
+                        <div className="col col-lg-8">
+                            <ModelBehavior     
+                                iteration={this.getIteration()}              
+                                labeledPoints={this.state.allLabeledPoints}
+                                datasetInfos={this.props.datasetInfos}
+                                availableVariables={this.props.chosenColumns}
+                                fakePointGrid={this.state.fakePointGrid}
+                                TSMPredictionHistory={this.state.TSMPredictionHistory}
+                                modelPredictionHistory={this.state.modelPredictionHistory}                        
+                                projectionHistory={this.state.projectionHistory}
+                                hasTSM={this.state.TSMPredictionHistory.length > 0}
+                                plotProjection={false}
+                            />
+                        </div>
                     </div>
                 }
 

@@ -214,8 +214,8 @@ class DataExploration extends Component{
         const iFirstVariable = this.state.firstVariable
         const iSecondVariable = this.state.secondVariable
 
-        const cols = this.props.chosenColumns
-        return [cols[iFirstVariable].name, cols[iSecondVariable].name]
+        return  this.props.chosenColumns.map(e => e.name)
+        
     }
 
     uniqueValues(arr){

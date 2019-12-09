@@ -113,9 +113,9 @@ class SessionOptions extends Component{
                                     Start session
                                 </button>
 
-                                <p>
+                                <h3>
                                     Column name
-                                </p>
+                                </h3>
 
                             {                
                                 columns.map((column, key) => (
@@ -199,7 +199,6 @@ class SessionOptions extends Component{
     
     onVariableGrouping(){
 
-
         this.setState({
             showAdvancedOptions: false,
             showColumns: false,
@@ -240,9 +239,10 @@ class SessionOptions extends Component{
     }
 
     onCheckedColumn(e){
-                    
-        var checkboxes = this.state.checkboxes.map (e => e)
+        
         var idx = e.target.value
+        var checkboxes = this.state.checkboxes.map (e => e)
+        
 
         var newChosenColumns = this.state.chosenColumns.map(e => e)
         newChosenColumns[idx].isUsed = e.target.checked      
@@ -312,8 +312,7 @@ class SessionOptions extends Component{
             'types': this.state.columnTypes.map( e => e == "categorical"),
             'columnNames': this.state.chosenColumns.map( e => e['name'])
         }
-        console.log(metadata)
-
+        
         return metadata
     }
 

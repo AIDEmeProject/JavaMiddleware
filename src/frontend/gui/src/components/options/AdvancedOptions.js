@@ -56,7 +56,7 @@ class AdvancedOptions extends Component{
                                 value="UncertaintySampler"
                                 defaultValue
                             >
-                                Uncertainty Sampling
+                                Simple Margin
                             </option>
                             <option value="versionSpace">
                                 Version Space
