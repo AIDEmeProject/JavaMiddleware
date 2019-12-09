@@ -45,8 +45,9 @@ class DataExploration extends Component{
         return (
             <div id="data-exploration">    
               
-
+                { false &&
                 <div>
+                    
                     <label htmlFor="min">Min</label>
                     <input 
                         className="form-input"
@@ -66,8 +67,10 @@ class DataExploration extends Component{
                         type="number"
                         value={this.state.max} 
                         onChange={e => {this.setState({max: e.target.value}) } } 
-                    />                                                    
+                    />        
+                
                 </div>
+                }
 
                <VectorStatistics 
                     data={firstVariable}
@@ -191,6 +194,29 @@ class DataExploration extends Component{
 
         this.plotAll()
     }
+    
+    plotAll(){
+        const iFirstVariable = this.state.firstVariable
+        const iSecondVariable = this.state.secondVariable
+
+        const data = this.getVariable(iFirstVariable)        
+        const dataset = this.props.dataset
+        this.histogramPlotter.plot_histogram(data, this.state.nBins)
+    
+        const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
+        var axisNames = this.getColumnNames()
+        console.log(axisNames)        
+        this.twoDimensionHeatmapPlotter.plot(heatmapData, axisNames)
+    }
+
+    getColumnNames(){
+
+        const iFirstVariable = this.state.firstVariable
+        const iSecondVariable = this.state.secondVariable
+
+        const cols = this.props.chosenColumns
+        return [cols[iFirstVariable].name, cols[iSecondVariable].name]
+    }
 
     uniqueValues(arr){
 
@@ -200,19 +226,6 @@ class DataExploration extends Component{
         }
 
         return counts
-    }
-
-    plotAll(){
-        const iFirstVariable = this.state.firstVariable
-        const iSecondVariable = this.state.secondVariable
-
-        const data = this.getVariable(iFirstVariable)        
-        const dataset = this.props.dataset
-        this.histogramPlotter.plot_histogram(data, this.state.nBins)
-
-        
-        const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
-        this.twoDimensionHeatmapPlotter.plot(heatmapData)
     }
 
     componentDidUpdate(){

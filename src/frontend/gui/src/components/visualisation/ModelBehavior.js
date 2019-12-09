@@ -162,6 +162,18 @@ class ModelBehavior extends Component{
             </div>
             </div>
 
+            {  
+                    this.props.hasTSM &&
+                        <div className="row">
+                            <div className="col col-lg-12">
+                                                                               
+                            <h3>Polytope Model</h3>
+                            <svg id="tsm-plot"></svg>                         
+                        </div>
+                    
+                    </div>            
+                }
+
             <div className="row">
                                              
                 <div className="col col-lg-12">
@@ -175,18 +187,7 @@ class ModelBehavior extends Component{
                 </div>
                 
             </div>
-            <div className="row">
-                <div className="col col-lg-12">
-                { 
-                    this.props.hasTSM &&
-                    
-                    <div className="col col-lg-6">
-                        <h3>Polytope Model</h3>
-                        <svg id="tsm-plot"></svg>                         
-                    </div>
-                }
-                </div>
-            </div>
+            
             <div className="row">
                 
                 <div className="col-lg-12">
@@ -200,6 +201,7 @@ class ModelBehavior extends Component{
                         ! this.props.hasTSM &&
                         <h4>Predictions over projected dataset</h4>
                     }
+
                     <svg id="projection"></svg>                
                 </div>        
             </div>
@@ -406,11 +408,11 @@ class ModelBehavior extends Component{
         })
         
         const labeledEmbeddings = labeledPoints.map(e => {            
-            console.log(e)
+    
             return embeddings[e.id]
         }).filter( e => {return ( typeof e !== "undefined")} )
 
-        console.log(labeledEmbeddings)
+    
         
         return labeledEmbeddings
     }
@@ -483,6 +485,10 @@ class ModelBehavior extends Component{
             }, this.plotGridPointPlot)                   
         }                                          
     } 
+}
+
+ModelBehavior.defaultProps = {
+
 }
 
 export default ModelBehavior

@@ -5,9 +5,9 @@ class HistogramPlotter{
     prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 30, left: 40}
+        var margin = {top: 10, right: 30, bottom: 70, left: 50}
         var width = 800 - margin.left - margin.right
-        var height = 400 - margin.top - margin.bottom
+        var height = 600 - margin.top - margin.bottom
 
         // append the svg object to the body of the page
         var svg = d3.select(svgid)                
@@ -32,7 +32,8 @@ class HistogramPlotter{
 
         this.xAxis = svg.append("g")
            .attr("transform", "translate(0," + height + ")")
-           .call(d3.axisBottom(x));
+           .call(d3.axisBottom(x))
+           
 
         this.svg = svg
         this.x = x
@@ -68,6 +69,12 @@ class HistogramPlotter{
         this.xAxis.transition()
             .duration(1000)
             .call(d3.axisBottom(x))
+            .selectAll('text')
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)")
+           
              
         y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
         yAxis

@@ -163,6 +163,7 @@ class SessionOptions extends Component{
                                 firstVariable={this.state.firstVariable}
                                 secondVariable={this.state.secondVariable}
                                 show={this.state.showExploration}
+                                chosenColumns={this.state.chosenColumns}
                             />
                                                                                                                       
                         </div>

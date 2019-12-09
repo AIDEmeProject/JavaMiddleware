@@ -10,8 +10,8 @@ class ModelBehaviorPlotter{
     createPlot(svgId, scale){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 40, right: 20, bottom: 50, left: 50},
-        width = 500 - margin.left - margin.right,
+        var margin = {top: 40, right: 20, bottom: 50, left: 70},
+        width = 600 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
@@ -56,7 +56,7 @@ class ModelBehaviorPlotter{
           // text label for the y axis
         this.yLabel = svg.append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left - 10)
+                .attr("y", 0 - margin.left + 20)
                 .attr("x",0 - (height / 2))
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
@@ -150,7 +150,7 @@ class ModelBehaviorPlotter{
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)              
-            .transition(500)            
+              
             .attr("cx", function (d) { return x(d[0]); } )
             .attr("cy", function (d) { return y(d[1]); } )
             .attr("r", 4)
@@ -171,8 +171,7 @@ class ModelBehaviorPlotter{
             .enter()
             .append("circle")
             .merge(updateHumanLabels)
-            .transition()
-            .delay(500)    
+            
             .attr("cx", function(d) { return x(d[var1]) } )
             .attr("cy", function(d) { return y(d[var2]) } )
             .attr("r", 7)

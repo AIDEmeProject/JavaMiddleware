@@ -7,7 +7,7 @@ class TwoDimensionHeatmapPlotter{
     prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 30, left: 40}
+        var margin = {top: 10, right: 30, bottom: 60, left: 80}
         var width = 650 - margin.left - margin.right
         var height = 500 - margin.top - margin.bottom
 
@@ -40,6 +40,25 @@ class TwoDimensionHeatmapPlotter{
                         .attr("stroke", "#000")
                         .attr("stroke-opacity", 0.1)
 
+        this.xLabel = svg
+                        .append("text")             
+                            .attr("transform", "translate(" + (width/2) + " ," + 
+                                 (height + margin.top + 30) + ")")
+                            .style("text-anchor", "middle")
+                            .style('fill', 'black')
+            
+
+          // text label for the y axis
+        this.yLabel = svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left + 20)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style('fill', 'black')
+            
+        
+
         this.svg = svg
         this.margin = margin
         this.x = x
@@ -48,7 +67,7 @@ class TwoDimensionHeatmapPlotter{
         this.width = width        
     }
  
-    plot(data){
+    plot(data, axisNames){
 
         var margin = this.margin,
             height = this.height,
@@ -66,6 +85,12 @@ class TwoDimensionHeatmapPlotter{
             .transition()
             .duration(1000)
             .call(d3.axisBottom(x))
+
+
+        var xLabel = axisNames[0]
+        var yLabel = axisNames[1]
+        this.xLabel.transition().text(xLabel)
+        this.yLabel.transition().text(yLabel)
 
         this.yAxis
             .transition()
@@ -125,8 +150,6 @@ class TwoDimensionHeatmapPlotter{
            .attr("transform", d => `translate(${d.x},${d.y})`)
            .attr("fill", d => color(d.length));  
     }
-
-    
 }
 
 
