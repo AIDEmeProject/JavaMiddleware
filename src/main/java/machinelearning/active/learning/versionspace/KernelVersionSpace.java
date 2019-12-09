@@ -15,7 +15,7 @@ import utils.linalg.Matrix;
  *
  *  \( y_i  \left(b + \sum_i \alpha_i^t k(x_i, x_j) \right) &gt; 0 \)
  *
- * Note that its dimension equals the number of support vectors (which increases as an Active Learning algorighm runs).
+ * Note that its dimension equals the number of support vectors (which increases as an Active Learning algorithm runs).
  * Sampling from this version space can be done in the same way as for the {@link LinearVersionSpace}, the only difference
  * is we need to construct the Kernel Matrix of the labeled data beforehand.
  *

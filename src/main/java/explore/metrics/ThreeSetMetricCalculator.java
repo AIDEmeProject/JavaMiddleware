@@ -12,7 +12,7 @@ public class ThreeSetMetricCalculator implements MetricCalculator {
                 .filter(ExtendedLabel::isPositive)
                 .count();
 
-        double numUncertainPoints = data.getUnknownPoints().length();
+        double numUncertainPoints = data.getUnknownSize();
 
         return new ThreeSetMetric(numPositivePoints, numUncertainPoints);
     }

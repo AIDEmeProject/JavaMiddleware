@@ -126,6 +126,10 @@ public final class PartitionedDataset {
         return points.getRange(unknownStart, points.length());
     }
 
+    public int getUnknownSize() {
+        return points.length() - unknownStart;
+    }
+
     /**
      * @return whether the UNKNOWN partition is not empty
      */
@@ -168,8 +172,10 @@ public final class PartitionedDataset {
             predictedLabels[i] = labels[i].toLabel();
         }
 
-        Label[] classifierLabels = classifier.predict(getUnknownPoints());
-        System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
+        if (hasUnknownPoints()) {
+            Label[] classifierLabels = classifier.predict(getUnknownPoints());
+            System.arraycopy(classifierLabels, 0, predictedLabels, unknownStart, classifierLabels.length);
+        }
 
         return predictedLabels;
     }
