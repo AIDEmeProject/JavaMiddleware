@@ -43,8 +43,13 @@ public class ExploreIteration extends Iteration {
 
     @Override
     public List<DataPoint> getNextPointsToLabel(PartitionedDataset partitionedDataset, User user, Ranker ranker) {
-        IndexedDataset unlabeledData = RandomState.newInstance().nextDouble() <= searchUnknownRegionProbability ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
+        IndexedDataset unlabeledData = getUnlabeledData(partitionedDataset);
         IndexedDataset sample = unlabeledData.sample(subsampleSize);
         return Collections.singletonList(ranker.top(sample));
+    }
+
+    private IndexedDataset getUnlabeledData(PartitionedDataset dataset) {
+        boolean useUnknown = dataset.hasUnknownPoints() && RandomState.newInstance().nextDouble() <= searchUnknownRegionProbability;
+        return useUnknown ? dataset.getUnknownPoints() : dataset.getUnlabeledPoints();
     }
 }

@@ -220,7 +220,8 @@ public class ExplorationManager {
         ranker = configuration.getActiveLearner().fit(partitionedDataset.getLabeledPoints());
 
         // select new point to be labeled
-        IndexedDataset unlabeledData = RandomState.newInstance().nextDouble() <= configuration.getTsmConfiguration().getSearchUnknownRegionProbability() ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
+        boolean useUnknown = partitionedDataset.hasUnknownPoints() && RandomState.newInstance().nextDouble() <= configuration.getTsmConfiguration().getSearchUnknownRegionProbability();
+        IndexedDataset unlabeledData = useUnknown ? partitionedDataset.getUnknownPoints() : partitionedDataset.getUnlabeledPoints();
         IndexedDataset sample = unlabeledData.sample(configuration.getSubsampleSize());
         return ranker.top(sample);
     }
@@ -376,8 +377,8 @@ public class ExplorationManager {
 
     public ArrayList<LabeledPoint> getTSMPredictionOnRealData(){
 
-        return this.TSMPrediction(this.checkPositivePointPrediction());
-        //return this.TSMPrediction(this.partitionedDataset.getAllPoints());
+        //return this.TSMPrediction(this.checkPositivePointPrediction());
+        return this.TSMPrediction(this.partitionedDataset.getAllPoints());
     }
 
     public ArrayList<LabeledPoint> TSMPrediction(IndexedDataset datasetToLabel){
@@ -386,8 +387,9 @@ public class ExplorationManager {
 
         ArrayList<LabeledPoint> labeledDataset = new ArrayList<>();
 
-
-        boolean hasPositive = false;
+        System.out.println("-----------------TSM----------------");
+        System.out.println(new ThreeSetMetricCalculator().compute(this.partitionedDataset, null).getMetrics());
+        System.out.println();
 
         for (int i=0; i < labels.length; i++)
         {
@@ -398,19 +400,8 @@ public class ExplorationManager {
             GuiUserLabel guiLabel = GuiUserLabel.fromExtendedLabel(label);
             LabeledPoint labeledPoint = new LabeledPoint(rawPoint, guiLabel);
 
-            if (label.isPositive()){
-                hasPositive = true;
-                System.out.println("--POSITIVE LABEL--");
-                System.out.print(labeledPoint);
-                System.out.print(label);
-                System.out.println("");
-            }
-
             labeledDataset.add(labeledPoint);
         }
-
-        System.out.println("HAD POSITIVE ? ");
-        System.out.println(hasPositive);
 
         return labeledDataset;
     }
