@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -47,6 +48,17 @@ public class Validator {
     }
 
     /**
+     * Raises an exception if data vector is emtpy
+     * @param data: data vector
+     * @throws IllegalArgumentException if data vector is empty
+     */
+    public static void assertNotEmpty(long[] data){
+        if (data.length == 0){
+            throw new IllegalArgumentException("Array must contain at least one element.");
+        }
+    }
+
+    /**
      * Raises an exception if data vector is null or emtpy
      * @param data: data vector
      * @throws IllegalArgumentException if data is null or empty
@@ -77,6 +89,40 @@ public class Validator {
     public static void assertEquals(int val1, int val2){
         if(val1 != val2) {
             throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
+     * Throws exception is values are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(double val1, double val2){
+        assertEquals(val1, val2, 1e-15);
+    }
+
+    /**
+     * Throws exception is values are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(double val1, double val2, double eps){
+        if(Math.abs(val1 - val2) > eps) {
+            throw new IllegalArgumentException("Values " + val1 + " and " + val2 + " are not equal.");
+        }
+    }
+
+    /**
+     * Throws exception is arrays are different.
+     * @param val1: first value
+     * @param val2: second value
+     * @throws IllegalArgumentException if values are distinct
+     */
+    public static void assertEquals(int[][] val1, int[][] val2){
+        if(!Arrays.deepEquals(val1, val2)) {
+            throw new IllegalArgumentException("Values " + Arrays.toString(val1) + " and " + Arrays.toString(val2) + " are not equal.");
         }
     }
 

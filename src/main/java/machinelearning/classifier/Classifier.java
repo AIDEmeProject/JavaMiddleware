@@ -1,7 +1,7 @@
 package machinelearning.classifier;
 
 
-import data.DataPoint;
+import data.IndexedDataset;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -30,12 +30,8 @@ public interface Classifier {
         return Vector.FACTORY.make(probas);
     }
 
-    /**
-     * @param point: a data point
-     * @return probability of data point belonging to the positive class
-     */
-    default double probability(DataPoint point){
-        return probability(point.getData());
+    default Vector probability(IndexedDataset dataset) {
+        return probability(dataset.getData());
     }
 
     /**
@@ -58,11 +54,7 @@ public interface Classifier {
         return labels;
     }
 
-    /**
-     * @param point: data point
-     * @return predicted label for the input data point.
-     */
-    default Label predict(DataPoint point){
-        return predict(point.getData());
+    default Label[] predict(IndexedDataset dataset) {
+        return predict(dataset.getData());
     }
 }

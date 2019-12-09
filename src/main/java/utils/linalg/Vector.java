@@ -43,6 +43,12 @@ public class Vector extends Tensor<Vector> {
         public static Vector zeroslike(Vector vector) {
             return zeros(vector.dim());
         }
+
+        public static Vector fill(int dim, double value) {
+            double[] values = new double[dim];
+            Arrays.fill(values, value);
+            return new Vector(values);
+        }
     }
 
     Vector(double[] vector) {
@@ -63,6 +69,15 @@ public class Vector extends Tensor<Vector> {
      */
     public double get(int index) {
         return super.get(index);
+    }
+
+    /**
+     * @param index: index to set
+     * @param value: new value to set
+     * @throws IllegalArgumentException if index is out of bounds
+     */
+    public void set(int index, double value) {
+        super.set(value, index);
     }
 
     @Override
@@ -101,6 +116,16 @@ public class Vector extends Tensor<Vector> {
      * @throws IllegalArgumentException if newNorm is not positive, or {@code this} is the zero vector
      */
     public Vector normalize(double newNorm) {
+        return copy().iNormalize(newNorm);
+    }
+
+    /**
+     * @param newNorm norm of output vector
+     * @return a Vector parallel to the original one, but of specified norm
+     * @throws IllegalArgumentException if newNorm is not positive
+     * @throws IllegalStateException if {@code this} is the zero vector
+     */
+    public Vector iNormalize(double newNorm) {
         Validator.assertPositive(newNorm);
 
         double norm = norm();
@@ -108,7 +133,7 @@ public class Vector extends Tensor<Vector> {
             throw new IllegalStateException("Cannot normalize zero vector");
         }
 
-        return copy().iScalarMultiply(newNorm / norm);
+        return this.iScalarMultiply(newNorm / norm);
     }
 
     /**
@@ -159,10 +184,35 @@ public class Vector extends Tensor<Vector> {
     }
 
     /**
+     * @return the index of the minimum element in this Vector
+     */
+    public int argmin() {
+        int minIndex = 0;
+        double minValue = array[0];
+
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < minValue) {
+                minIndex = i;
+                minValue = array[i];
+            }
+        }
+
+        return minIndex;
+    }
+
+    /**
      * @return an array copy of {@code this}'s content
      */
     public double[] toArray() {
         return Arrays.copyOf(array, dim());
+    }
+
+    public boolean hasNaN() {
+        for (double x : array) {
+            if (Double.isNaN(x)) return true;
+        }
+
+        return false;
     }
 
     @Override

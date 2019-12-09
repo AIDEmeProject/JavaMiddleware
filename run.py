@@ -2,99 +2,226 @@ import subprocess
 
 from scripts import *
 
-
 #############################
 # EXPERIMENT CONFIGURATIONS
 #############################
 # task id, as defined in the tasks.ini file
 TASKS = [
-    "sdss_Q1_0.1%",
-    #"sdss_Q1_0.1%", "sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
-    #"sdss_Q2_circle_0.1%", "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
-    #"sdss_Q3_0.1%", "sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
-    #"sdss_Q4_0.1%", "sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
-    #"sdss_Q2_circle_10%_Q3_rect_1%", "sdss_Q2_circle_1%_Q3_rect_1%",  # 4D
+    #"sdss_Q1_0.1%", #"sdss_Q1_1%", "sdss_Q1_10%",  # rowc, colc
+    "sdss_Q2_circle_0.1%", # "sdss_Q2_circle_1%", "sdss_Q2_circle_10%",  # rowc, colc
+    #"sdss_Q3_0.1%",  #sdss_Q3_1%", "sdss_Q3_10%",  # ra, dec
+    #"sdss_Q4_0.1%", #"sdss_Q4_1%", "sdss_Q4_10%",  # rowv, colv
+    #"sdss_Q2_circle_1%_Q3_rect_1%",  # "sdss_Q2_circle_10%_Q3_rect_1%",  # 4D
     #"sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%",  # 6D
+    #'sdss_log_7.8%',
+    #'sdss_log_squared',
+    #"sdss_overlapping_5.5%",
+    #"sdss_overlapping_1.5%",
+    #"sdss_overlapping_0.5%",
+    #"sdss_overlapping_0.1%",
+    #"sdss_overlapping_5.5%_tsm", "sdss_overlapping_1.5%_tsm", "sdss_overlapping_0.5%_tsm",
 ]
 
+TASKS.extend(
+    ['user_study_' + s for s in [
+        #'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11','12', '13', '14', '15', '16', '17', '18'
+        #'01',  #'03', '06', '07'
+        #'06','07'
+    ]]
+)
+
 # size of unlabeled sample. Use float('inf') if no sub-sampling is to be performed
-SUBSAMPLE_SIZE = 5000  # float('inf')
+SUBSAMPLE_SIZE = 50000 #float('inf')
+
 
 # Run modes to perform. There are four kinds: NEW, RESUME, EVAL, and AVERAGE
 MODES = [
-    #'NEW',       # run new exploration
+    'NEW',  # run new exploration
     #'RESUME',    # resume a previous exploration
-    #'EVAL',      # run evaluation procedure over finished runs
-    # 'AVERAGE'    # average all evaluation file for a given metric
+    'EVAL',      # run evaluation procedure over finished runs
+    #'AVERAGE'    # average all evaluation file for a given metric
 ]
+
 
 # Number of new explorations to run. Necessary for the NEW mode only
 NUM_RUNS = 1
 
+
 # Maximum number of new points to be labeled by the user. Necessary for NEW and RESUME modes
-BUDGET = 50
+BUDGET = 80
+
 
 # Runs to perform evaluation. Necessary for RESUME and EVAL modes
-# RUNS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-RUNS = [1]
+RUNS = []
+if len(RUNS) == 0 and ('RESUME' in MODES or 'EVAL' in MODES):
+    RUNS = [x + 1 for x in range(NUM_RUNS)]
 
-# Evaluation metrics. Necessary for EVAL and AVERAGE modes.
-# Check the scripts/metrics.py file for all possibilities
-METRICS = [
-    #ConfusionMatrix(SVM(C=1024, kernel='gaussian')),
-    #LabeledSetConfusionMatrix(SVM(C=1e7, kernel='gaussian')),
-    #ThreeSetMetric(),
-    # ConfusionMatrix(MajorityVote(
-    #     num_samples=8,
-    #     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
-    #     kernel='gaussian', gamma=0.005,  # kernel
-    #     add_intercept=True, solver="ojalgo")  # extra
-    # ),
-]
-
-# you can override the default feature_groups, is_convex_region, and is_categorical configs by specifying them here
-# note that must override all the three configurations at once
-FEATURE_GROUPS = [
-    #['rowc', 'colc'], ['ra', 'dec']
-]
-
-IS_CONVEX_POSITIVE = [
-    #True, True
-]
-
-IS_CATEGORICAL = [
-   #False, False
-]
 
 # Probability of sampling from the uncertain set instead of the entire unlabeled set.
 SAMPLE_UNKNOWN_REGION_PROBABILITY = 0.5
 
+
 # Multiple TSM configuration. Set as None if you do now want it to be used.
 mTSM = None
-# mTSM = MultipleTSM(FEATURE_GROUPS, IS_CONVEX_POSITIVE, IS_CATEGORICAL, SAMPLE_UNKNOWN_REGION_PROBABILITY)
+#mTSM = MultipleTSM(SAMPLE_UNKNOWN_REGION_PROBABILITY)
+
+
+# INITIAL SAMPLING
+# Default behavior (= None): try to read initial samples from tasks.ini; if none are found, use StratifiedSampling(1, 1)
+# You can override the default behavior below by choosing the method yourself
+INITIAL_SAMPLING = None
+#INITIAL_SAMPLING = StratifiedSampler(pos=1, neg=1, negative_in_all_subspaces=True)
+#INITIAL_SAMPLING = FixedSampler(posId=401695194, negIds=[200736144, 200736143, 200738016, 200736146, 200736148, 200736149, 200738013, 200736147, 401707487, 401598585])
+
+
+# Whether to use categorical variables information (if the algorithm supports)
+USE_CATEGORICAL = True
+
 
 # Active Learning algorithm to run. Necessary for NEW and RESUME modes.
 # Check the scripts/active_learners.py file for all possibilities
-# ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
-# ACTIVE_LEARNER = RandomSampler()
-# ACTIVE_LEARNER = UncertaintySampler(MajorityVote(
-#     num_samples=8,
-#     warmup=100, thin=10, chain_length=64, selector="single", rounding=True, cache=True,  # hit-and-run
-#     kernel='gaussian', gamma=0.005,  # kernel
-#     add_intercept=True, solver="ojalgo")  # extra
-# )
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+#ACTIVE_LEARNER = RandomSampler()
+#ACTIVE_LEARNER = SubspatialSampler(
+#     [
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         #SimpleMargin(C=1024, kernel="gaussian", gamma=0),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.5,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.05,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#         # UncertaintySampler(MajorityVote(
+#         #     num_samples=8,
+#         #     warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+#         #     kernel='gaussian', gamma=0.001,  # kernel
+#         #     add_intercept=True, solver="gurobi"  # extra
+#         # )),
+#     ]
+#)
 
+THREADS = 0  # how many threads to use in subspatial algorithms
+
+lnr = MajorityVote(
+    num_samples=32,
+    warmup=1000, thin=100, chain_length=100, selector="single",
+    rounding=False, max_iter=0, cache=True, rounding_cache=False,  # hit-and-run
+    kernel='gaussian', gamma=0, jitter=1e-9, diagonal=(0.5, 0.5, 0.005, 0.005),  # kernel
+    decompose=False, sphere=True, add_intercept=True, solver="gurobi"  # extra
+)
+
+#lnr = SVM(C=1e3, kernel='gaussian', gamma=0)
+
+#ACTIVE_LEARNER = SubspatialSampler(lnr, loss="GREEDY", threads=THREADS)
+ACTIVE_LEARNER = UncertaintySampler(lnr)
+#ACTIVE_LEARNER = QueryByDisagreement(lnr, sample_size=200, samples_weight=1e-5)
+#ACTIVE_LEARNER = SimpleMargin(C=1024, kernel="gaussian", gamma=0)
+
+# Evaluation metrics. Necessary for EVAL and AVERAGE modes.
+# Check the scripts/metrics.py file for all possibilities
+METRICS = [
+    #ConfusionMatrix(SubspatialLearner(lnr, threads=THREADS)),
+    ConfusionMatrix(lnr),
+    #SubspatialConfusionMatrix(SubspatialLearner(lnr, use_categorical=False, threads=THREADS))
+    #VersionSpaceThreeSetMetric(lower_bound_mv),
+    #LabeledSetConfusionMatrix(lnr),
+    #ThreeSetMetric(),
+    #ConfusionMatrix(lnr),
+    # ConfusionMatrix(SubspatialLearner(
+    #     [
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.5,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.05,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #         MajorityVote(
+    #             num_samples=8,
+    #             warmup=100, thin=10, chain_length=500, selector="single", rounding=True, cache=True,  # hit-and-run
+    #             kernel='gaussian', gamma=0.001,  # kernel
+    #             add_intercept=True, solver="gurobi"  # extra
+    #         ),
+    #     ],
+    # )),
+]
 
 #############################
 # DO NOT CHANGE
 #############################
+
+CATEGORIES = {
+    'user_study_01': [2, 3, 4],
+    'user_study_02': [6, 7],
+    'user_study_03': [4, 5],
+    'user_study_04': [5],
+    'user_study_05': [2, 3, 4, 5],
+    'user_study_06': [2, 3],
+    'user_study_07': [3, 4, 5],
+    'user_study_08': [5, 6, 7],
+    'user_study_09': [3],
+    'user_study_10': [4, 5, 6, 7],
+    'user_study_11': [3, 4, 5],
+    'user_study_13': [7, 8, 9],
+    'user_study_14': [3, 4],
+    'user_study_15': [4, 5],
+    'user_study_16': [3],
+    'user_study_17': [4, 5],
+    'user_study_18': [4, 5],
+}
+
+NUM_PARTITIONS = {
+    'sdss_Q2_circle_1%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_1%': 2,
+    'sdss_Q2_circle_10%_Q3_rect_10%_Q4_1%': 3,
+    'sdss_log_squared': 2,
+    'sdss_log_7.8%': 2,
+    'sdss_overlapping_5.5%': 6,
+    'sdss_overlapping_1.5%': 4,
+    'sdss_overlapping_0.5%': 5,
+    'sdss_overlapping_0.1%': 5,
+    'sdss_overlapping_5.5%_tsm': 4,
+    'sdss_overlapping_1.5%_tsm': 1,
+    'sdss_overlapping_0.5%_tsm': 1,
+    'user_study_01': 5,
+    'user_study_02': 8,
+    'user_study_03': 6,
+    'user_study_04': 6,
+    'user_study_05': 6,
+    'user_study_06': 4,
+    'user_study_07': 6,
+    'user_study_08': 8,
+    'user_study_09': 4,
+    'user_study_10': 8,
+    'user_study_11': 6,
+    'user_study_12': 4,
+    'user_study_13': 10,
+    'user_study_14': 5,
+    'user_study_15': 6,
+    'user_study_16': 4,
+    'user_study_17': 6,
+    'user_study_18': 6,
+}
+
 # PRINTS
 print("TASKS =", TASKS)
 print("SUBSAMPLE_SIZE =", SUBSAMPLE_SIZE)
 print("MODES =", MODES)
 if 'NEW' in MODES:
     print("NUM_RUNS =", NUM_RUNS)
-if 'NEW' in MODES or 'RESUME' in MODES:
     print("BUDGET =", BUDGET)
     print('ACTIVE LEARNER =', ACTIVE_LEARNER)
 if 'RESUME' in MODES or 'EVAL' in MODES:
@@ -103,6 +230,7 @@ if 'EVAL' in MODES or 'AVERAGE' in MODES:
     print('METRICS =', METRICS)
 if mTSM:
     print("TSM =", mTSM)
+print("INITIAL_SAMPLER =", INITIAL_SAMPLING)
 
 # PARAMETER VALIDATION
 for mode in MODES:
@@ -116,19 +244,33 @@ if SUBSAMPLE_SIZE < float('inf'):
     folder_elems.append('ss=%d' % SUBSAMPLE_SIZE)
 if mTSM:
     folder_elems.append(str(mTSM))
+if INITIAL_SAMPLING is not None:
+    folder_elems.append(str(INITIAL_SAMPLING))
 folder = '_'.join(folder_elems)
+
+if 'EVAL' in MODES and not ACTIVE_LEARNER.is_factorized():
+    for m in METRICS:
+        if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
+            raise RuntimeError("Metric {0} uses a factorized classifier, but {1} is a non-factorized Active Learner.".format(m, ACTIVE_LEARNER))
 
 # BUILD EXPERIMENT
 for TASK in TASKS:
-    print(TASK)
-    experiment_dir = os.path.join('experiment', TASK, folder, str(ACTIVE_LEARNER))
-    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM)
+    cat_indexes = CATEGORIES.get(TASK, None) if USE_CATEGORICAL else None
+    cat_suffix = "" if TASK not in CATEGORIES else "_cat=true" if USE_CATEGORICAL else "_cat=false"
+    experiment_dir = os.path.join('experiment', TASK, folder + cat_suffix, str(ACTIVE_LEARNER))
+
+    if ACTIVE_LEARNER.is_factorized():
+        ACTIVE_LEARNER.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+        ACTIVE_LEARNER.set_categorical(cat_indexes)
+
+    experiment = Experiment(task=TASK, subsample=SUBSAMPLE_SIZE, active_learner=ACTIVE_LEARNER, mTSM=mTSM,
+                            initial_sampler=INITIAL_SAMPLING)
     experiment.dump_to_config_file(os.path.join(experiment_dir, 'Runs'))
 
     # BUILD COMMAND LINE ARGUMENTS
     command_line = [
         "java -cp target/data_exploration-1.0-SNAPSHOT-jar-with-dependencies.jar RunExperiment",
-        "--experiment_dir", experiment_dir,
+        "--experiment_dir", "\"" + experiment_dir + "\"",
         "--mode", ' '.join(MODES),
         "--num_runs", str(NUM_RUNS),
         "--budget", str(BUDGET),
@@ -142,6 +284,15 @@ for TASK in TASKS:
         command_line.append("--metrics")
         for m in METRICS:
             assert_is_instance(m, Metric)
+
+            if hasattr(m, 'learner') and isinstance(m.learner, SubspatialLearner):
+                m.learner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+                m.learner.set_categorical(cat_indexes)
+
+            if hasattr(m, 'subspatialLearner') and isinstance(m.subspatialLearner, SubspatialLearner):
+                m.subspatialLearner.set_repeat(NUM_PARTITIONS.get(TASK, 1))
+                m.subspatialLearner.set_categorical(cat_indexes)
+
             command_line.append(str(m))
             m.dump_to_config_file(experiment_dir, add_name=True)
 

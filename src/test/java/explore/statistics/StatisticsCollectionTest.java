@@ -39,7 +39,7 @@ class StatisticsCollectionTest {
         collection.update("metric1", 5.0);
         Statistics statistics = collection.get("metric1");
         assertEquals(3, statistics.getMean(), 1e-10);
-        assertEquals(8, statistics.getVariance(), 1e-10);
+        assertEquals(4, statistics.getVariance(), 1e-10);
         assertEquals(2, statistics.getSampleSize());
     }
 }

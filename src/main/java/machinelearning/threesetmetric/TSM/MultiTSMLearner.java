@@ -223,7 +223,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
             // for categorical variables, if the example is not on the truth lines, return false
             if(tsmFlags.get(i)[1]){
                 if(tsmSet.get(i) != null){
-                    catTruth.add(tsmSet.get(i).isOnTruthLines(sample));
+                    catTruth.add(tsmSet.get(i).isOnTruthLines(factorizeFeatures(sample, feaGroups.get(i))));
                 } else {
                     catTruth.add(false);
                 }
@@ -254,7 +254,7 @@ public class MultiTSMLearner implements ExtendedClassifier {
     public boolean isInNegRegion (DataPoint sample) {
         for(int i=0; i < tsmSet.size(); i++){
             if(tsmFlags.get(i)[1]){
-                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(sample)){
+                if(tsmSet.get(i) != null && tsmSet.get(i).isOnFalseLines(factorizeFeatures(sample, feaGroups.get(i)))){
                     return true;
                 }
             }else {

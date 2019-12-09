@@ -35,6 +35,21 @@ public class VectorTest {
     }
 
     @Test
+    void fill_zeroDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.fill(0, 0));
+    }
+
+    @Test
+    void fill_negativeDimension_throwsException() {
+        assertThrows(RuntimeException.class, () -> Vector.FACTORY.fill(-1, 0));
+    }
+
+    @Test
+    void fill_fiveDimensionVectorFilledWithOnes_returnsExpectedVector() {
+        assertEquals(Vector.FACTORY.make(1, 1, 1, 1, 1), Vector.FACTORY.fill(5, 1.0));
+    }
+
+    @Test
     void get_negativeIndex_throwsException() {
         assertThrows(RuntimeException.class, () -> vector1.get(-1));
     }
@@ -51,6 +66,34 @@ public class VectorTest {
         assertEquals(3, vector1.get(2));
         assertEquals(4, vector1.get(3));
         assertEquals(5, vector1.get(4));
+    }
+
+    @Test
+    void set_negativeIndex_throwsException() {
+        assertThrows(RuntimeException.class, () -> vector1.set(-1, 0));
+    }
+
+    @Test
+    void set_indexEqualsDim_throwsException() {
+        assertThrows(RuntimeException.class, () -> vector1.set(vector1.dim(), 0));
+    }
+
+    @Test
+    void set_indexFromZeroToDimMinusOne_correctValuesReturned() {
+        vector1.set(0, -1.0);
+        assertEquals(-1, vector1.get(0));
+
+        vector1.set(1, -2.0);
+        assertEquals(-2, vector1.get(1));
+
+        vector1.set(2, -3.0);
+        assertEquals(-3, vector1.get(2));
+
+        vector1.set(3, -4.0);
+        assertEquals(-4, vector1.get(3));
+
+        vector1.set(4, -5.0);
+        assertEquals(-5, vector1.get(4));
     }
 
     @Test
@@ -493,6 +536,19 @@ public class VectorTest {
     }
 
     @Test
+    void iNormalize_newNormEqualToOne_originalVectorModified() {
+        Vector vector = Vector.FACTORY.make(3, 4);
+        vector.iNormalize(1.0);
+        assertEquals(Vector.FACTORY.make(0.6, 0.8), vector);
+    }
+
+    @Test
+    void iNormalize_positiveNewNorm_returnsTheSameObject() {
+        Vector vector = Vector.FACTORY.make(3, 4);
+        assertSame(vector.iNormalize(1.0), vector);
+    }
+
+    @Test
     void squaredDistanceTo_vectorOfDifferentDimensions_throwsException() {
         assertThrows(RuntimeException.class, () -> vector1.squaredDistanceTo(Vector.FACTORY.zeros(3)));
     }
@@ -592,6 +648,16 @@ public class VectorTest {
         assertEquals(Vector.FACTORY.make(1, 1, 2, 3, 4, 5), vector1.addBias());
     }
 
+    @Test
+    void argmin_allDistinctValues_returnsTheIndexOfTheSmallestElement() {
+        assertEquals(2, Vector.FACTORY.make(5, 4, 1, 2, 3).argmin());
+    }
+
+    @Test
+    void argmin_allRepeatedValues_returnsTheIndexOfTheFirstAppearanceOfTheSmallestElement() {
+        assertEquals(2, Vector.FACTORY.make(5, 4, 1, 1, 2, 1, 3).argmin());
+    }
+
     /* *************************************
      *           UTILITY METHODS
      * *************************************
@@ -618,5 +684,16 @@ public class VectorTest {
         Vector clone = vector1.copy();
         clone.iScalarAdd(10);
         assertEquals(Vector.FACTORY.make(1, 2, 3, 4, 5), vector1);
+    }
+
+    @Test
+    void hasNaN_noNaN_returnsFalse() {
+        assertFalse(vector1.hasNaN());
+    }
+
+    @Test
+    void hasNaN_hasNaN_returnsFalse() {
+        vector1 = Vector.FACTORY.make(1, 2, Double.NaN, 4);
+        assertTrue(vector1.hasNaN());
     }
 }

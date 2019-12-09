@@ -4,10 +4,8 @@ import data.IndexedDataset;
 import data.LabeledDataset;
 import machinelearning.active.learning.versionspace.KernelVersionSpace;
 import machinelearning.active.learning.versionspace.LinearVersionSpace;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
-import machinelearning.active.learning.versionspace.convexbody.sampling.cache.SampleCache;
-import machinelearning.active.learning.versionspace.convexbody.sampling.direction.RandomDirectionAlgorithm;
-import machinelearning.active.learning.versionspace.convexbody.sampling.selector.WarmUpAndThinSelector;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.selector.WarmUpAndThinSelector;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
@@ -43,11 +41,8 @@ public class ClassifierBenchmark extends AbstractBenchmark {
         Learner learner = new MajorityVoteLearner(
                 new KernelVersionSpace(
                         new LinearVersionSpace(
-                                new HitAndRunSampler.Builder(
-                                        new RandomDirectionAlgorithm(),
-                                        new WarmUpAndThinSelector(64, 1)
-                                )
-                                        .cache(new SampleCache())
+                                new HitAndRunSampler.Builder(new WarmUpAndThinSelector(64, 1))
+                                        .addSampleCache()
                                         .build(),
                                 LinearProgramSolver.getFactory(LinearProgramSolver.LIBRARY.OJALGO)
                         ),

@@ -1,10 +1,9 @@
 package machinelearning.active.ranker;
 
-import data.DataPoint;
 import data.IndexedDataset;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.margin.MarginClassifier;
-import utils.LinearSearch;
+import utils.linalg.Vector;
 
 public class MarginRanker implements Ranker {
     private MarginClassifier marginClassifier;
@@ -14,7 +13,7 @@ public class MarginRanker implements Ranker {
     }
 
     @Override
-    public DataPoint top(IndexedDataset unlabeledSet) {
-        return LinearSearch.findMinimizer(unlabeledSet, pt -> Math.abs(marginClassifier.margin(pt)));
+    public Vector score(IndexedDataset unlabeledData) {
+        return marginClassifier.margin(unlabeledData.getData()).iApplyMap(Math::abs);
     }
 }

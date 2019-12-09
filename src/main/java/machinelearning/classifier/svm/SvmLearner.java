@@ -1,23 +1,21 @@
 package machinelearning.classifier.svm;
 
 import data.LabeledDataset;
-import data.LabeledPoint;
-import libsvm.*;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.margin.KernelClassifier;
+import smile.classification.SVM;
 import utils.Validator;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 /**
- * This module is responsible for training an SVM classifier over labeled data. Basically, it is a wrapper over the
- * well known libsvm library.
- *
- * <a href="https://www.csie.ntu.edu.tw/">libsvm homepage</a>
- * <a href="https://www.csie.ntu.edu.tw/~r94100/libsvm-2.8/README">svm training README</a>
+ * This module is responsible for training an SVM classifier over labeled data. Basically, it is a wrapper over Smile's
+ * SVM implementation
  */
 public class SvmLearner implements Learner {
-
     /**
      * SVM's penalty value
      */
@@ -28,10 +26,7 @@ public class SvmLearner implements Learner {
      */
     private final Kernel kernel;
 
-    // Disable libsvm training output
-    static {
-        svm.svm_set_print_string_function(s -> {});
-    }
+    private static final int NUM_ITERS = 10;
 
     /**
      * @param C: penalty parameter
@@ -45,24 +40,13 @@ public class SvmLearner implements Learner {
         this.kernel = kernel;
     }
 
-    private svm_parameter buildSvmParameter() {
-        svm_parameter parameter = new svm_parameter();
+    public SvmLearner(SvmLearner learner) {
+        this(learner.C, learner.kernel);
+    }
 
-        parameter.C = C;
-        kernel.setSvmParameters(parameter);
-
-        // probability estimates (no estimation by default)
-        parameter.probability = 0;
-
-        // DO NOT CHANGE THESE PARAMETERS
-        parameter.svm_type = svm_parameter.C_SVC;
-        parameter.cache_size = 40;  // cache size in MB
-        parameter.eps = 1e-3; // optimization tolerance
-        parameter.shrinking = 1;  // use shrinking optimization
-        parameter.nr_weight = 0;  // no class weights
-        parameter.weight = new double[0];
-
-        return parameter;
+    @Override
+    public KernelClassifier fit(LabeledDataset labeledPoints) {
+        return fit(labeledPoints, null);
     }
 
     /**
@@ -71,47 +55,59 @@ public class SvmLearner implements Learner {
      * @return fitted SVM model as a KernelClassifier instance
      */
     @Override
-    public KernelClassifier fit(LabeledDataset labeledPoints) {
-        svm_parameter param = buildSvmParameter();
-        svm_problem prob = buildSvmProblem(labeledPoints);
-        svm_parameter parameter = (svm_parameter) param.clone();
-
-        // use default gamma if needed
-        if(parameter.gamma <= 0){
-            parameter.gamma = 1.0 / prob.x[0].length;
+    public KernelClassifier fit(LabeledDataset labeledPoints, Vector sampleWeights) {
+        if (sampleWeights != null) {
+            Validator.assertEquals(labeledPoints.length(), sampleWeights.dim());
         }
 
-        return parseKernelClassifierFromSvmModel(svm.svm_train(prob, parameter), labeledPoints.dim());
+        SVM<double[]> svm = new SVM<>(kernel.getSmileKernel(labeledPoints.dim()), C);
 
-    }
+        double[][] data = labeledPoints.getData().toArray();
 
-    private svm_problem buildSvmProblem(LabeledDataset labeledPoints){
-        svm_problem prob = new svm_problem();
-
-        prob.l = labeledPoints.length();
-        prob.x = new svm_node[prob.l][];
-        prob.y = new double[prob.l];
-
-        int i = 0;
-        for (LabeledPoint point : labeledPoints) {
-            prob.x[i] = SvmNodeConverter.toSvmNode(point.getData());
-            prob.y[i] = point.getLabel().asSign();
-            i++;
+        int[] labels = new int[labeledPoints.length()];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = labeledPoints.get(i).getLabel().asBinary();
         }
 
-        return prob;
+        double[] weights = sampleWeights == null ? null : sampleWeights.toArray();
+
+        for (int i = 0; i < NUM_ITERS; i++) {
+            svm.learn(data, labels, weights);
+        }
+        svm.finish();
+
+        List<SVM<double[]>.SupportVector> supportVectors = svm.getSupportVectors();
+
+        // happens when all labels are identical. In this case, we set a single support vector with alpha = 0.
+        if (supportVectors.isEmpty()) {
+            supportVectors.add(svm.new SupportVector(new double[labeledPoints.dim()], 0, 0));
+        }
+
+        int size = supportVectors.size();
+
+        Vector alpha = Vector.FACTORY.zeros(size);
+        Matrix sv = Matrix.FACTORY.zeros(size, labeledPoints.dim());
+
+        for (int i=0; i < size; i++) {
+            SVM<double[]>.SupportVector supportVector = supportVectors.get(i);
+            alpha.set(i, supportVector.alpha);
+            sv.setRow(i, supportVector.x);
+        }
+
+        return new KernelClassifier(getBias(svm), alpha, sv, kernel);
     }
 
-    private KernelClassifier parseKernelClassifierFromSvmModel(svm_model model, int dim) {
-        double bias = -model.rho[0];
-        Vector alpha = Vector.FACTORY.make(model.sv_coef[0]);
-        Matrix sv = SvmNodeConverter.toMatrix(model.SV, dim);
-
-        return new KernelClassifier(bias, alpha, sv, kernel);
-    }
-
-    @Override
-    public String toString() {
-        return "SVM C = " + C + ", kernel = " + kernel;
+    private double getBias(SVM<double[]> svm) {
+        double bias;
+        try {
+            Field f = svm.getClass().getDeclaredField("svm");
+            f.setAccessible(true);
+            Field f2 = f.get(svm).getClass().getDeclaredField("b");
+            f2.setAccessible(true);
+            bias = (double) f2.get(f.get(svm));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return bias;
     }
 }

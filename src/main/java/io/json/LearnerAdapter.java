@@ -1,24 +1,65 @@
 package io.json;
 
+import com.google.gson.*;
 import exceptions.UnknownClassIdentifierException;
-import machinelearning.classifier.Learner;
+import machinelearning.active.learning.versionspace.VersionSpace;
+import machinelearning.classifier.*;
+import machinelearning.classifier.svm.Kernel;
+import machinelearning.classifier.svm.SvmLearner;
 
-class LearnerAdapter extends JsonDeserializedAdapter<Learner> {
+import java.lang.reflect.Type;
+
+public class LearnerAdapter implements JsonDeserializer<Learner> {
     @Override
-    public String getPackagePrefix() {
-        return "machinelearning.classifier" ;
+    public Learner deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+        String identifier = jsonObject.get("name").getAsString().toUpperCase();
+
+        switch (identifier) {
+            case "SVM":
+                double C = jsonObject.get("C").getAsDouble();
+                Kernel kernel = jsonDeserializationContext.deserialize(jsonObject.get("kernel"), Kernel.class);
+                return new SvmLearner(C, kernel);
+
+            case "MAJORITYVOTE":
+                int sampleSize = jsonObject.get("sampleSize").getAsInt();
+                VersionSpace versionSpace = jsonDeserializationContext.deserialize(jsonObject.get("versionSpace"), VersionSpace.class);
+                return new MajorityVoteLearner(versionSpace, sampleSize);
+
+            case "SUBSPATIALLEARNER":
+                Learner[] learners;
+
+                if (jsonObject.has("repeat")) {
+                    int repeat = jsonObject.get("repeat").getAsInt();
+
+                    learners = new Learner[repeat];
+                    for (int i = 0; i < repeat; i++) {
+                        learners[i] = jsonDeserializationContext.deserialize(jsonObject.get("subspaceLearners"), Learner.class);
+                    }
+                } else {
+                    learners = jsonDeserializationContext.deserialize(jsonObject.get("subspaceLearners"), Learner[].class);
+                }
+
+                int[] categoricalIndexes = jsonObject.has("categorical") ? convertJsonArray(jsonObject.get("categorical").getAsJsonArray()) : new int[0];
+                for (int index : categoricalIndexes) {
+                    learners[index] = new CategoricalLearner();
+                }
+
+                SubspatialWorker worker = jsonObject.has("numThreads") ? new SubspatialWorker(jsonObject.get("numThreads").getAsInt()) : new SubspatialWorker();
+
+                return new SubspatialLearner(learners, worker);
+            default:
+                throw new UnknownClassIdentifierException("ActiveLearner", identifier);
+        }
     }
 
-    public String getCanonicalName(String identifier){
-        switch (identifier.toUpperCase()) {
-            case "SVM":
-                return "svm.SvmLearner";
-            case "KNN":
-                return "neighbors.NearestNeighborsLearner";
-            case "MAJORITYVOTE":
-                return "MajorityVoteLearner";
-            default:
-                throw new UnknownClassIdentifierException("Learner ", identifier);
+    private static int[] convertJsonArray(JsonArray array) {
+        int size = array.size();
+        int[] values = new int[size];
+        for (int i = 0; i < size; i++) {
+            values[i] = array.get(i).getAsInt();
         }
+        return values;
     }
 }

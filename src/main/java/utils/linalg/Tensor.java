@@ -49,6 +49,10 @@ public class Tensor<T extends Tensor<T>> implements VectorSpace<T> {
         return array[shape.getPosition(indexes)];
     }
 
+    public void set(double value, int... indexes) {
+        array[shape.getPosition(indexes)] = value;
+    }
+
     private T cast(){
         return (T) this;
     }

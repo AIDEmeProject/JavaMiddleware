@@ -1,10 +1,9 @@
 package machinelearning.active.ranker;
 
-import data.DataPoint;
 import data.IndexedDataset;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
-import utils.LinearSearch;
+import utils.linalg.Vector;
 
 import java.util.Objects;
 
@@ -16,10 +15,10 @@ public class ProbabilityRanker implements Ranker {
     }
 
     /**
-     * @return the point in the collection whose predicted probability is the closest to 0.5
+     * @return |p(x) - 0.5|, for all x
      */
     @Override
-    public DataPoint top(IndexedDataset unlabeledSet) {
-        return LinearSearch.findMinimizer(unlabeledSet, pt -> Math.abs(classifier.probability(pt) - 0.5));
+    public Vector score(IndexedDataset unlabeledData) {
+        return classifier.probability(unlabeledData).iScalarSubtract(0.5).iApplyMap(Math::abs);
     }
 }

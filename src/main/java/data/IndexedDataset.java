@@ -21,12 +21,16 @@ public class IndexedDataset implements Iterable<DataPoint> {
     /**
      * The index of each data point
      */
-    private List<Long> indexes;
+    private final List<Long> indexes;
 
     /**
      * The underlying data (each row is a data point)
      */
-    private Matrix data;
+    private final Matrix data;
+
+    private Matrix[] partitionedData;
+
+    private int[][] partitionIndexes;
 
 
 
@@ -86,10 +90,17 @@ public class IndexedDataset implements Iterable<DataPoint> {
      * @throws IllegalArgumentException if indexes.size() is different from data.rows()
      */
     public IndexedDataset(List<Long> indexes, Matrix data) {
+        this(indexes, data, new Matrix[]{data}, new int[][] {IntStream.range(0, data.cols()).toArray()});
+    }
+
+    private IndexedDataset(List<Long> indexes, Matrix data, Matrix[] partitionedData, int[][] partitionIndexes) {
         Validator.assertEquals(indexes.size(), data.rows());
+        Validator.assertEqualLengths(partitionedData, partitionIndexes);
 
         this.indexes = indexes;
         this.data = data;
+        this.partitionedData = partitionedData;
+        this.partitionIndexes = partitionIndexes;
     }
 
 
@@ -160,6 +171,14 @@ public class IndexedDataset implements Iterable<DataPoint> {
     }
 
     /**
+     * @param index: index of data point to be retrieved
+     * @return the data point corresponding to the specified index
+     */
+    public DataPoint getFromIndex(long index) {
+        return get(indexes.indexOf(index));
+    }
+
+    /**
      * @param rows: rows to be retrieved
      * @return an IndexedDataset containing only the specified rows (data will be copied in this process)
      * @throws IllegalArgumentException if rows is empty
@@ -168,7 +187,11 @@ public class IndexedDataset implements Iterable<DataPoint> {
     IndexedDataset getRows(int... rows) {
         List<Long> sliceIndexes = new ArrayList<>(rows.length);
         Arrays.stream(rows).forEach(row -> sliceIndexes.add(indexes.get(row)));
-        return new IndexedDataset(sliceIndexes, data.getRows(rows));
+
+        Matrix filteredData = data.getRows(rows);
+        Matrix[] partition = partitionSize() == 1 ? new Matrix[] {filteredData} : Arrays.stream(partitionedData).map(x -> x.getRows(rows)).toArray(Matrix[]::new);
+
+        return new IndexedDataset(sliceIndexes, filteredData, partition, partitionIndexes);
     }
 
     /**
@@ -178,7 +201,9 @@ public class IndexedDataset implements Iterable<DataPoint> {
      * @throws IndexOutOfBoundsException if indexes are out-of-bounds or {@code from} is not smaller than {@code to}
      */
     IndexedDataset getRange(int from, int to) {
-        return new IndexedDataset(indexes.subList(from, to), data.getRowSlice(from, to));
+        Matrix filteredData = data.getRowSlice(from, to);
+        Matrix[] partition = partitionSize() == 1 ? new Matrix[] {filteredData} : Arrays.stream(partitionedData).map(x -> x.getRowSlice(from, to)).toArray(Matrix[]::new);
+        return new IndexedDataset(indexes.subList(from, to), filteredData, partition, partitionIndexes);
     }
 
     /**
@@ -190,6 +215,21 @@ public class IndexedDataset implements Iterable<DataPoint> {
     void swap(int row1, int row2) {
         Collections.swap(indexes, row1, row2);
         data.swapRows(row1, row2);
+        if (partitionSize() > 1)
+            Arrays.stream(partitionedData).forEach(x -> x.swapRows(row1, row2));
+    }
+
+    public IndexedDataset append(IndexedDataset data) {
+        Validator.assertEquals(dim(), data.dim());
+
+        Builder builder = new Builder();
+        for (DataPoint point: this) {
+            builder.add(point);
+        }
+        for (DataPoint point: data) {
+            builder.add(point);
+        }
+        return builder.build();
     }
 
     /**
@@ -220,7 +260,9 @@ public class IndexedDataset implements Iterable<DataPoint> {
      * @return a copy of this object
      */
     public IndexedDataset copy() {
-        return new IndexedDataset(new ArrayList<>(indexes), data.copy());
+        Matrix copiedData = data.copy();
+        Matrix[] partition = partitionSize() == 1 ? new Matrix[] {copiedData} : Arrays.stream(partitionedData).map(Matrix::copy).toArray(Matrix[]::new);
+        return new IndexedDataset(new ArrayList<>(indexes), copiedData, partition, partitionIndexes);
     }
 
     /**
@@ -265,5 +307,34 @@ public class IndexedDataset implements Iterable<DataPoint> {
         IndexedDataset that = (IndexedDataset) o;
         return Objects.equals(indexes, that.indexes) &&
                 Objects.equals(data, that.data);
+    }
+
+    public void setFactorizationStructure(int[][] partition) {
+        int size = partition.length;
+
+        if (size > 1) {
+            partitionedData = new Matrix[size];
+            for (int i = 0; i < size; i++) {
+                partitionedData[i] = data.getCols(partition[i]);
+            }
+
+            partitionIndexes = partition.clone();
+        }
+    }
+
+    public IndexedDataset[] getPartitionedData() {
+        return Arrays.stream(partitionedData).map(data -> new IndexedDataset(indexes, data)).toArray(IndexedDataset[]::new);
+    }
+
+    public int partitionSize() {
+        return partitionedData.length;
+    }
+
+    public int[][] getPartitionIndexes() {
+        return partitionIndexes;
+    }
+
+    public boolean hasFactorizationStructure() {
+        return partitionSize() > 1;
     }
 }

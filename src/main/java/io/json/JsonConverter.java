@@ -3,18 +3,18 @@ package io.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import config.TsmConfiguration;
 import data.LabeledPoint;
 import exceptions.JsonDeserializationFailedException;
 import explore.metrics.MetricCalculator;
+import explore.sampling.InitialSampler;
 import explore.user.UserLabel;
 import machinelearning.active.ActiveLearner;
 import machinelearning.active.learning.versionspace.VersionSpace;
-import machinelearning.active.learning.versionspace.convexbody.sampling.HitAndRunSampler;
-import machinelearning.active.learning.versionspace.convexbody.sampling.selector.SampleSelector;
+import machinelearning.active.learning.versionspace.manifold.HitAndRunSampler;
+import machinelearning.active.learning.versionspace.manifold.selector.SampleSelector;
 import machinelearning.classifier.Label;
 import machinelearning.classifier.Learner;
 import machinelearning.classifier.svm.Kernel;
@@ -56,6 +56,9 @@ public class JsonConverter {
         builder.registerTypeAdapter(VersionSpace.class, new VersionSpaceAdapter());
 
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
+
+        builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
+
         builder.registerTypeAdapter(TsmConfiguration.class, new TSMConfigurationAdapter());
         // TODO: add TSM metrics
         return builder.create();
@@ -72,7 +75,7 @@ public class JsonConverter {
         try {
             return gson.fromJson(json, type);
         } catch (JsonParseException ex) {
-            throw new JsonDeserializationFailedException(type);
+            throw new JsonDeserializationFailedException(type, ex);
         }
     }
 
@@ -86,8 +89,8 @@ public class JsonConverter {
     public static <T> T deserialize(Reader reader, Class<T> type) throws JsonDeserializationFailedException {
         try {
             return gson.fromJson(new JsonReader(reader), type);
-        } catch (JsonSyntaxException ex) {
-            throw new JsonDeserializationFailedException(type);
+        } catch (JsonParseException ex) {
+            throw new JsonDeserializationFailedException(type, ex);
         }
     }
 
@@ -100,8 +103,8 @@ public class JsonConverter {
         Type listType = new TypeToken<ArrayList<LabeledPoint>>(){}.getType();
         try {
             return gson.fromJson(json, listType);
-        } catch (JsonSyntaxException ex) {
-            throw new JsonDeserializationFailedException(listType);
+        } catch (JsonParseException ex) {
+            throw new JsonDeserializationFailedException(listType, ex);
         }
     }
 
@@ -115,7 +118,7 @@ public class JsonConverter {
         try {
             return gson.fromJson(json, mapType);
         } catch (JsonParseException ex) {
-            throw new JsonDeserializationFailedException(mapType);
+            throw new JsonDeserializationFailedException(mapType, ex);
         }
     }
 

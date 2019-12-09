@@ -1,6 +1,6 @@
 package machinelearning.classifier.svm;
 
-import libsvm.svm_parameter;
+import smile.math.kernel.MercerKernel;
 import utils.linalg.Matrix;
 import utils.linalg.Vector;
 
@@ -26,8 +26,8 @@ public class LinearKernel extends Kernel {
     }
 
     @Override
-    void setSvmParameters(svm_parameter parameters) {
-        parameters.kernel_type = svm_parameter.LINEAR;
+    MercerKernel<double[]> getSmileKernel(int dim) {
+        return new smile.math.kernel.LinearKernel();
     }
 
     @Override
