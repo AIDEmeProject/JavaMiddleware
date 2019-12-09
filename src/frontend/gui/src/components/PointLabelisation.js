@@ -32,9 +32,7 @@ class PointLabelisation extends Component{
                                 })
                             }
 
-                            <th>
-                                Label 
-                            </th>                                                    
+                                                                             
                         </tr>
                     </thead>
 
@@ -42,7 +40,7 @@ class PointLabelisation extends Component{
                     
                 {
                     this.props.pointsToLabel.map((point, key) => {
-                        
+                        const pointData = this.props.dataset.get_selected_columns_point(point.id)
                         return (
 
                             <tr key={key}>
@@ -53,7 +51,7 @@ class PointLabelisation extends Component{
                       
                                 {
 
-                                    point.data.map((value, valueKey) => {
+                                    pointData.map((value, valueKey) => {
                                         return (
                                             
                                             <td  key={valueKey}>
@@ -63,28 +61,52 @@ class PointLabelisation extends Component{
                                     })
                                 }
 
-                                <td>
-                                    <button
-                                        className="btn btn-raised btn-primary" 
-                                        data-key={key} 
-                                        onClick={this.props.onPositiveLabel}>
-                                        Yes
-                                    </button>
-
-                                    <button 
-                                        className="btn btn-raised btn-primary"  
-                                        data-key={key} 
-                                        onClick={this.props.onNegativeLabel}
-                                    >
-                                        No
-                                    </button>
-                                </td>
+                               
                             </tr>
                         )
                     })                    
                 }
                 </tbody>
 
+                </table>
+
+                <table className="table-control">
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {
+                        this.props.pointsToLabel.map((point, key) => {
+                            
+                            return (
+
+                                <tr key={key}>
+
+                                    
+                                    <td className="button-td">
+                                        <button
+                                            className="btn btn-raised btn-primary" 
+                                            data-key={key} 
+                                            onClick={this.props.onPositiveLabel}>
+                                            Yes
+                                        </button>
+
+                                        <button 
+                                            className="btn btn-raised btn-primary"  
+                                            data-key={key} 
+                                            onClick={this.props.onNegativeLabel}
+                                        >
+                                            No
+                                        </button>
+                                    </td>
+                                </tr>
+                            )
+                        })
+                    }
+                    </tbody>
                 </table>
             </div>
         )   

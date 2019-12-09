@@ -51,6 +51,10 @@ public class CatTSM {
                 }else if(t.getLabel().asSign() < 0 && t.get(index) > 0){
                     // check whether the false value is in true value list
                     if(truthLines.contains(index)){
+
+                        StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+                        Arrays.asList(ste).forEach(System.out::println);
+
                         throw new IllegalArgumentException("A true value: " + index + " cannot be false!");
                     }
                     falseLines.add(index);

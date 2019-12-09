@@ -30,6 +30,7 @@ class SessionOptions extends Component{
         })            
 
         this.state = {
+            columnTypes: chosenColumns.map(e => e['type']),
             checkboxes: datasetInfos.columns.map (c => false),
             chosenColumns: chosenColumns,
             showAdvancedOptions: false,
@@ -278,35 +279,55 @@ class SessionOptions extends Component{
     
     onSessionStartClick(e){
         
-        e.preventDefault()
-                       
+        e.preventDefault()                       
         var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)
-        const enableTSM = chosenColumns.length == 2
-
-        if (enableTSM){
-            var groups = [
-                [chosenColumns[0]],
-                [chosenColumns[1]]
-            ]
-            this.groupsWereValidated(groups)
-        }
-        else{
-
-            actions.sendColumns(this.props.tokens, this.state, this.props.sessionWasStarted)        
-
-            this.props.sessionOptionsWereChosen({            
-                chosenColumns: this.state.chosenColumns.filter(e => e.isUsed),                
-            })                
-        }        
+        //const enableTSM = chosenColumns.length == 2                           
+        actions.sendColumns(this.props.tokens, chosenColumns, this.props.sessionWasStarted)        
+        this.props.sessionOptionsWereChosen({            
+            chosenColumns: chosenColumns,                
+        })                            
     }
    
     groupsWereValidated(groups){
+        
+        var chosenColumns = groups.flatMap( g => {
+            return g.map( v => {return v} )
+        })
+        //var chosenColumns = this.state.chosenColumns //.filter(e => e.isUsed)      
+        
+        this.computeVariableColumnIndices(groups)
 
-        var chosenColumns = this.state.chosenColumns.filter(e => e.isUsed)      
+
+        var datasetMetadata = this.buildDatasetMetadata()
         
         this.props.groupsWereValidated(chosenColumns, groups, ()=> {
-            actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, this.props.sessionWasStarted)    
+            actions.sendVariableGroups(this.props.tokens, chosenColumns, groups, datasetMetadata, this.props.sessionWasStarted)    
         })                                  
+    }
+
+    buildDatasetMetadata(){
+    
+        var metadata = {
+            'types': this.state.columnTypes.map( e => e == "categorical"),
+            'columnNames': this.state.chosenColumns.map( e => e['name'])
+        }
+        console.log(metadata)
+
+        return metadata
+    }
+
+    computeVariableColumnIndices(groups){
+        
+        var i = 0;
+
+        groups.forEach( variables => {
+            
+            variables.forEach(variable => {
+                
+                variable['realId'] = i
+                i++
+            })  
+        })     
     }
 
     groupWasAdded(){
@@ -329,11 +350,5 @@ class SessionOptions extends Component{
     }      
 }
 
-SessionOptions.defaultProps = {
-    "classifiers": [
-        {value: "svm", label:"SVM"},
-        {value: "majorityVote", label:"Majority vote"},
-    ]
-}
 
 export default SessionOptions

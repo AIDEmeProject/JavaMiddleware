@@ -26,7 +26,7 @@ public class IndexedDataset implements Iterable<DataPoint> {
     /**
      * The underlying data (each row is a data point)
      */
-    private final Matrix data;
+    private Matrix data;
 
     private Matrix[] partitionedData;
 
@@ -166,9 +166,7 @@ public class IndexedDataset implements Iterable<DataPoint> {
         return new DataPoint(indexes.get(i), data.getRow(i));
     }
 
-    public DataPoint getFromIndex(long index) {
-        return get(indexes.indexOf(index));  // TODO: optimize this
-    }
+
 
     /**
      * @param index: index of data point to be retrieved

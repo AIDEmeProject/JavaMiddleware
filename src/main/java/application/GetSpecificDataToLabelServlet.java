@@ -1,27 +1,14 @@
 package application;
 
 import com.google.gson.Gson;
-import com.opencsv.CSVReader;
-import config.ExperimentConfiguration;
-import config.TsmConfiguration;
 import data.DataPoint;
-import data.IndexedDataset;
-import io.json.JsonConverter;
-import machinelearning.classifier.Learner;
-import machinelearning.classifier.svm.GaussianKernel;
-import machinelearning.classifier.svm.Kernel;
-import machinelearning.classifier.svm.SvmLearner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
 
 
 public class GetSpecificDataToLabelServlet extends HttpServlet {

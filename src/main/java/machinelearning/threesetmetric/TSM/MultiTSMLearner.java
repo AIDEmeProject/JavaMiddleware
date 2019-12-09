@@ -188,7 +188,10 @@ public class MultiTSMLearner implements ExtendedClassifier {
      */
     @Override
     public ExtendedLabel predict(DataPoint point) {
+
+
         if(isInPosRegion(point)){
+            System.out.println("POSITVE YAAAH");
             return ExtendedLabel.POSITIVE;
         }else if(isInNegRegion(point)){
             return ExtendedLabel.NEGATIVE;
@@ -233,10 +236,13 @@ public class MultiTSMLearner implements ExtendedClassifier {
                 boolean flag = tsmFlags.get(i)[0];
                 if(flag){
                     if(tsmSet.get(i) == null || !tsmSet.get(i).isInConvexRegion(newSample, true)){
+
+
                         return false;
                     }
                 }else {
                     if(backupTsmSet.get(i)==null || !backupTsmSet.get(i).isInConvexRegion(newSample, false)){
+
                         return false;
                     }
                 }

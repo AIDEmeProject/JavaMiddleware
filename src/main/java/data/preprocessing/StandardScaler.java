@@ -1,5 +1,6 @@
 package data.preprocessing;
 
+import data.IndexedDataset;
 import explore.statistics.Statistics;
 import utils.Validator;
 import utils.linalg.Matrix;
@@ -32,8 +33,7 @@ public class StandardScaler {
      * Compute the mean and standard deviation of each column in the input collection
      * @param points: collection of points to fit
      * @return a Standard Scaler object fitted on the input data
-     * @throws IllegalArgumentException if points is empty, or if any two points have different dimensions, or if
-     * standard deviation of any column is zero
+     * @throws IllegalArgumentException if standard deviation of any column is zero
      */
     public static StandardScaler fit(Matrix points){
         Statistics[] statistics = points.columnStatistics();
@@ -44,8 +44,23 @@ public class StandardScaler {
         return new StandardScaler(mean, std);
     }
 
+    /**
+     * Compute the mean and standard deviation of each column in dataset
+     * @param dataset: dataset to fit
+     * @return a Standard Scaler object fitted on the input data
+     * @throws IllegalArgumentException if standard deviation of any column is zero
+     */
+    public static StandardScaler fit(IndexedDataset dataset) {
+        return StandardScaler.fit(dataset.getData());
+    }
+
     public static Matrix fitAndTransform(Matrix points) {
         return fit(points).transform(points);
+    }
+
+    public static IndexedDataset fitAndTransform(IndexedDataset dataset) {
+        Matrix scaledData = StandardScaler.fitAndTransform(dataset.getData());
+        return dataset.copyWithSameIndexes(scaledData);
     }
 
     private static Vector getMeanFromStatistics(Statistics[] statistics) {
@@ -70,12 +85,20 @@ public class StandardScaler {
     }
 
     /**
-     * Standardize a given collection of data points.
      * @param dataPoints: data to standardize
      * @return a new standardized collection of points
      * @throws IllegalArgumentException if data points have different dimension from fitted data
      */
     public Matrix transform(Matrix dataPoints){
         return dataPoints.subtractRow(mean).divideRow(std);
+    }
+
+    /**
+     * @param dataset: data to standardize
+     * @return a new standardized IndexedDataset with same indexes, but standardized data
+     * @throws IllegalArgumentException if dataset has different dimension from fitted data
+     */
+    public IndexedDataset transform(IndexedDataset dataset){
+        return dataset.copyWithSameIndexes(transform(dataset.getData()));
     }
 }

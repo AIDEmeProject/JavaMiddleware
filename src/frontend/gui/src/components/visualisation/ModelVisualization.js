@@ -65,7 +65,7 @@ class ModelVisualization extends Component{
                                             {c.name}
                                         </th>
                                     )
-                                })                                
+                                })                     
                             }
                             <th>
                                 Predicted Label

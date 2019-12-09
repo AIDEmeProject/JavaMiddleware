@@ -1,5 +1,39 @@
+var factorizedVersionSpaceConfiguration ={ 
+    "activeLearner": {
+        "learners": {
+            "name": "MajorityVote",
+            "sampleSize": 8,
+            "versionSpace": {
+                "addIntercept": true, 
+                "decompose": false,
+                "hitAndRunSampler": {
+                    "cache": true,
+                    "rounding": true, 
+                    "roundingCache": false, 
+                    "selector": {
+                        "name": "WarmUpAndThin",
+                        "thin": 64,
+                        "warmUp": 256 
+                    } 
+                },
+                "jitter": 1e-09, 
+                "kernel": {
+                    "gamma": 0, 
+                    "name": "gaussian" 
+                },
+                "solver": "ojalgo" 
+            } 
+        }, 
+        "lossFunctionId": "GREEDY", 
+        "name": "SubspatialSampler", 
+      
+    },
+    "subsampleSize": 50000, 
+    "task": "sdss_overlapping_0.1%", 
+    "useFactorizationInformation": true
+} 
 
-var defautConfiguration = {
+var versionSpaceConfiguration = {
     "activeLearner": {
         "learner": {
             "name": "MajorityVote", // MajorityVote | SVM |
@@ -21,14 +55,47 @@ var defautConfiguration = {
                 "solver": "ojalgo"
             }
         },
-        "name": "UncertaintySampler"
+        "name": "UncertaintySampler" //Version space = uncertainty sampler
     },
     "subsampleSize": 50000,
     "task": "sdss_Q4_0.1%"
 }
 
+
+var simpleMarginConfiguration = {
+
+    "activeLearner": {
+        "name": "SimpleMargin",
+        "svmLearner": {
+            "C": 1024,
+            "kernel": {
+                "gamma": 0,
+                "name": "gaussian"
+            },
+            "name": "SVM"
+        }
+    },
+    "subsampleSize": 50000,    
+    "useFactorizationInformation": false
+}
+
+var algorithmNames = {
+    'simplemargin': 'Simple Margin (SVM)',
+    'simplemargintsm': 'Simple Margin (SVM) + TSM',
+    'versionspace': 'Version Space',
+    'factorizedversionspace': 'Factorized Version Space'
+}
+
 module.exports = {
     backend: "http://localhost:7060",
     webplatformApi: "http://localhost:8000/api",
-    defaultConfiguration: defautConfiguration
+    defaultConfiguration: versionSpaceConfiguration,
+
+    versionSpaceConfiguration: versionSpaceConfiguration,
+    
+    simpleMarginConfiguration: simpleMarginConfiguration,
+    
+    factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration,
+
+    algorithmNames: algorithmNames
 }

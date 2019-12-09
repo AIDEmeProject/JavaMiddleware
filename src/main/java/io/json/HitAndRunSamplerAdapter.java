@@ -18,8 +18,8 @@ class HitAndRunSamplerAdapter implements com.google.gson.JsonDeserializer<HitAnd
 
         boolean addCaching = jsonObject.getAsJsonPrimitive("cache").getAsBoolean();
         boolean addRounding = jsonObject.getAsJsonPrimitive("rounding").getAsBoolean();
-        boolean addRoundingCache = jsonObject.getAsJsonPrimitive("roundingCache").getAsBoolean();
-
+        //boolean addRoundingCache = jsonObject.getAsJsonPrimitive("roundingCache").getAsBoolean();
+        boolean addRoundingCache = false;
         HitAndRunSampler.Builder builder = new HitAndRunSampler.Builder(selector);
 
         if (addCaching) builder.addSampleCache();

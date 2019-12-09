@@ -72,12 +72,12 @@ public class LabeledPointsDTO {
         ArrayList<LabeledPoint> lblPoints = new ArrayList<>();
 
         for (TSMLabeledPointDTO point : points){
-            System.out.println(point.data.array[0]);System.out.println(point.id);
+
             DataPoint dataPoint = new DataPoint(point.id, point.data.array);
 
             int nPartialLabel = point.labels.length;
 
-            System.out.println(nPartialLabel);
+
             Label[] partialLabels = new Label[nPartialLabel];
 
             for (int i = 0; i < nPartialLabel; i++){
@@ -85,7 +85,7 @@ public class LabeledPointsDTO {
                 Label label = Label.fromSign((double) point.labels[i]);
                 partialLabels[i] = label;
 
-                System.out.println(label.toString());
+
             }
 
             LabelGroup labelGroup = new LabelGroup(partialLabels);
@@ -123,6 +123,7 @@ public class LabeledPointsDTO {
 
 
 class FakePointDTO{
+
     public double[] data;
 
     int label;

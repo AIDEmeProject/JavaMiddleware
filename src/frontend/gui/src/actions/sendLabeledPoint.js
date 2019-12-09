@@ -1,3 +1,5 @@
+
+
 function sendLabeledPoints(labeledPoints){
 
     labeledPoints.map (point => {

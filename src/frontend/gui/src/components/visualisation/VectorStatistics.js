@@ -18,7 +18,8 @@ class VectorStatistics extends Component{
               max = d3.max(data),
               std = d3.deviation(data),
               mean = d3.mean(data),
-              median = d3.median(data)
+              median = d3.median(data),
+              uniqueValues = d3.set(data).values().length
 
         return (
             <div>
@@ -41,16 +42,19 @@ class VectorStatistics extends Component{
                             </th>
                             <th>
                                 Standard deviation
-                            </th>                            
+                            </th>  
+                            <th>
+                                Unique values
+                            </th>                          
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>
-                                {max}
+                                {min}
                             </td>
                             <td>
-                                {min}
+                                {max}
                             </td>
                             <td>
                                 {mean}
@@ -60,10 +64,52 @@ class VectorStatistics extends Component{
                             </td>
                             <td>
                                 {std}
-                            </td>                            
+                            </td>  
+                            <td>
+                                {uniqueValues}
+                            </td>                          
                         </tr>
                     </tbody>
-                </table>    
+                </table>  
+
+                { 
+                    this.props.uniqueValues.length < 50 &&
+                    <div>
+                        <p>
+                            Unique value counts
+                        </p>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Value
+                                    </th>
+                                    <th>
+                                        Count
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {
+                                    this.props.uniqueValues.map(d => {
+                                    return (
+                                        <tr>
+                                            <td>
+                                                { d[0]}
+                                            </td>
+                                            <td>
+                                                { d[1] }
+                                            </td>
+                                        </tr>
+                                        )
+                                    })
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
         )
     }

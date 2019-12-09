@@ -1,5 +1,38 @@
 import React, { Component } from 'react';
 
+
+class ClassifierOption extends Component{
+
+    render(){
+        return(
+            <div>
+                 <div className="form-group">
+                        <label htmlFor="classifier">Classifier</label>
+                        <select 
+                            className="form-control" 
+                            id="classfier-selection"
+                            name="classifier"
+                        >
+                            <option 
+                                value="SVM"
+                                defaultValue
+                            >
+                                SVM
+                            </option>
+                            <option value="Majority Vote">
+                                Majority Vote
+                            </option>                             
+                        </select>
+                    </div>   
+            </div>
+        )
+    }
+}
+
+
+
+
+
 class AdvancedOptions extends Component{
 
     render(){
@@ -31,24 +64,7 @@ class AdvancedOptions extends Component{
                         </select>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="classifier">Classifier</label>
-                        <select 
-                            className="form-control" 
-                            id="classfier-selection"
-                            name="classifier"
-                        >
-                            <option 
-                                value="SVM"
-                                defaultValue
-                            >
-                                SVM
-                            </option>
-                            <option value="Majority Vote">
-                                Majority Vote
-                            </option>                             
-                        </select>
-                    </div>                        
+                                        
             </div>
         </div>
             

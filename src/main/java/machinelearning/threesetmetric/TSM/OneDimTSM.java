@@ -86,12 +86,17 @@ public class OneDimTSM {
      */
     public void updateConvexLineSeg(double point){
         // check whether the sample is in concave regions
+
+
         if (concaveRay.size() == 2 && isInConcaveRay(point)) {
             throw new IllegalArgumentException("A positive point is in negative rays");
         }
         if (!convexInitialized) {
             convexLineSeg.add(0, point);
             convexInitialized = true;
+
+            System.out.println("");
+
         } else if (convexLineSeg.size() == 1) {
             if (point > convexLineSeg.get(0)) {
                 convexLineSeg.add(1, point);
@@ -108,6 +113,14 @@ public class OneDimTSM {
         } else {
             throw new IllegalArgumentException("The extreme points of convex region should be 2 instead of " + convexLineSeg.size() + ": " + Arrays.toString(convexLineSeg.toArray()));
         }
+
+        System.out.println("--updateConvexLineSeg--");
+        System.out.println(point);
+        System.out.println(convexLineSeg);
+
+
+        //StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+        //Arrays.asList(ste).forEach(System.out::println);
     }
 
     /**
@@ -116,11 +129,24 @@ public class OneDimTSM {
      * @throws IllegalArgumentException if a positive point is in negative rays or a negative point is in positive interval
      */
     public void updateConcaveRay(double point){
+
+
+        System.out.println("----updateConcaveRay---");
+
+
+
+        //StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+        //Arrays.asList(ste).forEach(System.out::println);
+
+        System.out.println("");
+
         if ((convexLineSeg.size() == 2 && isInConvexSeg(point)) || (convexLineSeg.size() == 1 && point == convexLineSeg.get(0))) {
             throw new IllegalArgumentException("A negative point is in positive convex interval");
             //if the interval has not been defined, instead of defining the rays, only negative points will be recorded
         } else if (!convexInitialized) {
             concavePoints.add(point);
+
+
         } else {
             if (!concaveInitialized) {
                 // a convex extreme point must exist before adding concave extreme points
@@ -166,6 +192,11 @@ public class OneDimTSM {
                 }
             }
         }
+
+        System.out.println(point);
+        System.out.println(convexLineSeg);
+        System.out.println(concavePoints);
+        System.out.println("");
     }
 
 

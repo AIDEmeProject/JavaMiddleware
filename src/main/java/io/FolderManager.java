@@ -1,7 +1,7 @@
 package io;
 
 import data.LabeledPoint;
-import config.ExperimentConfiguration;
+import explore.ExperimentConfiguration;
 import explore.metrics.MetricCalculator;
 import io.json.JsonConverter;
 

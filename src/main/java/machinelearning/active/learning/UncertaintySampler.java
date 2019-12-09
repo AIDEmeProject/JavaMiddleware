@@ -27,4 +27,9 @@ public class UncertaintySampler implements ActiveLearner {
     public Ranker fit(LabeledDataset labeledPoints) {
         return new ProbabilityRanker(learner.fit(labeledPoints));
     }
+
+
+    public Learner getLearner() {
+        return learner;
+    }
 }

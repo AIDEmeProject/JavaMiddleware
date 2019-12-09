@@ -1,7 +1,7 @@
 package application;
 
-import org.eclipse.jetty.io.SelectChannelEndPoint;
-import org.eclipse.jetty.server.Connector;
+import application.trace.TraceComputationServlet;
+import application.trace.TraceInitializationServlet;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -45,7 +45,14 @@ public class ApplicationServerMain {
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
         handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
-        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/label-fake-points-for-grid");
+        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/get-decision-boundaries");
+        handler.addServlet(getFakePointGridServlet.class, "/get-fake-point-grid");
+        handler.addServlet(GetModelPredictionOverFakePointGridServlet.class, "/get-model-predictions-over-grid-point");
+        handler.addServlet(getTSMPredictionOverFakePointGridServlet.class, "/get-tsm-predictions-over-grid-point");
+        handler.addServlet(TraceInitializationServlet.class, "/start-trace");
+        handler.addServlet(TraceComputationServlet.class, "/get-next-traces");
+
+        //handler.addServlet(GetModelPredictionOverRealDatasetServlet.class, "/get-model-prediction-over-dataset");
 
 
         ResourceHandler resource_handler = new ResourceHandler();

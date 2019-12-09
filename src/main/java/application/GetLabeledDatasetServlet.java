@@ -18,6 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
+class LabeledDatasetBuilder{
+
+
+    public  ArrayList<LabeledPoint> getLabeledPoints(ExplorationManager manager){
+        ArrayList<LabeledPoint> labeledPoints = manager.labelWholeDataset();
+
+        return labeledPoints;
+    }
+
+    public void saveLabeledPointsAsCSV(ExplorationManager manager, String filePath){
+
+    }
+}
+
 public class GetLabeledDatasetServlet extends HttpServlet {
 
     @Override
@@ -31,19 +46,14 @@ public class GetLabeledDatasetServlet extends HttpServlet {
 
         ArrayList<LabeledPoint> labeledPoints = manager.labelWholeDataset();
 
-        CsvDatasetWriter writer = new CsvDatasetWriter();
-
         String sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
-        String filePath =  sessionPath + "/dataset.csv";
+        String filePath =  sessionPath + "/labeled_dataset.csv";
 
+        CsvDatasetWriter writer = new CsvDatasetWriter();
         writer.savedLabeledPointsAsCsv(labeledPoints, filePath);
 
-        resp.setContentType("application/json");
-        //Envoyer le ficher.
 
-        String id = req.getParameter("id");
-
-
+        //Sending the file
         String contentType = "application/octet-stream";
         // Find this file id in database to get file name, and file type
 
@@ -53,9 +63,6 @@ public class GetLabeledDatasetServlet extends HttpServlet {
 
         // Make sure to show the download dialog
         resp.setHeader("Content-disposition","attachment; filename=labeled_dataset.csv");
-
-        // Assume file name is retrieved from database
-        // For example D:\\file\\test.pdf
 
         File my_file = new File(filePath);
 
@@ -69,7 +76,6 @@ public class GetLabeledDatasetServlet extends HttpServlet {
         }
         in.close();
         out.flush();
-
 
     }
 }

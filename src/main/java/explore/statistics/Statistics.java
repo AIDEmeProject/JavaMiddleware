@@ -1,5 +1,6 @@
 package explore.statistics;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -28,19 +29,39 @@ public class Statistics {
     private int sampleSize;
 
     /**
+     * Metric's minimum value
+     */
+    private double min;
+
+    /**
+     * Metric's maximum value
+     */
+    private double max;
+
+    private HashSet<Double> uniqueValues;
+
+    /**
      * Initializes the data structure with its name and value (equals to the mean).
      * @param name: metric's name
      * @param value: metric's initial value
      */
     public Statistics(String name, double value) {
-        this(name, value, 0D, 1);
+
+        this(name, value, 0D, value, value, 1);
+
+        this.uniqueValues = new HashSet<>();
+        this.uniqueValues.add(value);
     }
 
-    public Statistics(String name, double mean, double variance, int sampleSize) {
+    public Statistics(String name, double mean, double variance, double min, double max, int sampleSize) {
         this.name = name;
         this.mean = mean;
         this.variance = variance;
         this.sampleSize = sampleSize;
+        this.min = min;
+        this.max = max;
+
+
     }
 
     public String getName() {
@@ -63,6 +84,27 @@ public class Statistics {
         return Math.sqrt(getVariance());
     }
 
+    public double getMinimum() {
+        return min;
+    }
+
+    public double getMaximum() {
+        return max;
+    }
+
+    public boolean isNumeric(){
+
+        System.out.println("unique values and sample size");
+        System.out.println(this.uniqueValues.size());
+        System.out.println(this.sampleSize);
+        System.out.println(0.8 * this.sampleSize);
+
+        boolean hasMoreThan100UniqueValues = this.uniqueValues.size() > 100;
+
+        return hasMoreThan100UniqueValues || ((double) this.uniqueValues.size() > 0.8 * this.sampleSize);
+
+    }
+
     public int getSampleSize() {
         return sampleSize;
     }
@@ -77,6 +119,10 @@ public class Statistics {
         sampleSize++;
         mean += diff / sampleSize;
         variance += diff * (value - mean);
+        min = Math.min(min, value);
+        max = Math.max(max, value);
+        uniqueValues.add(value);
+
     }
 
     @Override
@@ -87,6 +133,8 @@ public class Statistics {
         return Double.compare(that.mean, mean) == 0 &&
                 Double.compare(that.variance, variance) == 0 &&
                 sampleSize == that.sampleSize &&
+                min == that.min &&
+                max == that.max &&
                 Objects.equals(name, that.name);
     }
 
@@ -95,6 +143,8 @@ public class Statistics {
      */
     @Override
     public String toString(){
-        return "{\"metric\": \"" + name + "\", \"mean\": " + mean + ", \"std\": " + getStandardDeviation() + ", \"n\": " + sampleSize + '}';
+        return "{\"metric\": \"" + name + "\", \"mean\": " + mean + ", \"std\": " + getStandardDeviation() +
+                ", \"min\": " + min + ", \"max\": " + max +
+                ", \"n\": " + sampleSize + '}';
     }
 }

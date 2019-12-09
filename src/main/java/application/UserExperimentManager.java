@@ -2,11 +2,9 @@ package application;
 
 import data.*;
 
-import config.ExperimentConfiguration;
 import explore.ExploreIteration;
 import explore.InitialIteration;
-import explore.Iteration;
-
+import explore.ExperimentConfiguration;
 
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
@@ -30,9 +28,7 @@ public class UserExperimentManager implements FacadeInterface {
     private boolean isFirstStep;
 
     /**
-     * @param folder: the exploration folder where results will be stored
-     * @param dataPoints: unlabeled pool of points
-     * @param user: the user for labeling points
+     *
      */
     public UserExperimentManager(ExperimentConfiguration configuration, IndexedDataset dataset) {
 

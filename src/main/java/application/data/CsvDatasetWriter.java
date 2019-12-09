@@ -34,9 +34,13 @@ public class CsvDatasetWriter {
 
     public void savedLabeledPointsAsCsv(ArrayList<LabeledPoint> labeledPoints, String filePath) throws IOException {
 
+
         try (
                 Writer writer = Files.newBufferedWriter(Paths.get(filePath));
-                CSVWriter csvWriter = new CSVWriter(writer);
+                CSVWriter csvWriter = new CSVWriter(writer, CSVWriter.DEFAULT_SEPARATOR,
+                        CSVWriter.NO_QUOTE_CHARACTER,
+                        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                        CSVWriter.RFC4180_LINE_END);
         ) {
 
 
@@ -53,7 +57,9 @@ public class CsvDatasetWriter {
                 for (int i = 0; i < data.length(); i++){
                     strings[i + 1] = String.valueOf(data.get(i));
                 }
-                strings[strings.length - 1] = point.getLabel().toString();
+
+                String label = Integer.toString(point.getLabel().asSign());
+                strings[strings.length - 1] = label;
                 csvWriter.writeNext(strings);
             }
         }

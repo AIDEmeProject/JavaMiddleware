@@ -22,8 +22,8 @@ class VersionSpaceAdapter implements com.google.gson.JsonDeserializer<VersionSpa
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         boolean addIntercept = jsonObject.getAsJsonPrimitive("addIntercept").getAsBoolean();
-        boolean decompose = jsonObject.getAsJsonPrimitive("decompose").getAsBoolean();
-
+        //boolean decompose = jsonObject.getAsJsonPrimitive("decompose").getAsBoolean();
+        boolean decompose = false;
         VersionSpace linearVersionSpace;
 
         if (jsonObject.has("hitAndRunSampler")) {

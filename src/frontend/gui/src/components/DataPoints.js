@@ -14,6 +14,9 @@ class DataPoints extends Component{
             if ( ! this.props.show){
                 return (<div></div>)
             }
+
+            const dataset = this.props.dataset
+        
             return (
 
                 <div>
@@ -50,7 +53,9 @@ class DataPoints extends Component{
                     
                     {
                         this.props.points.map((point, key) => {
-                        
+                            const data = dataset.get_selected_columns_point(point.id)
+                            
+                            
                             return (
 
                                 <tr key={key}>
@@ -61,7 +66,7 @@ class DataPoints extends Component{
                         
                                     {
 
-                                        point.data.map((value, valueKey) => {
+                                        data.map((value, valueKey) => {
                                             return (
                                                 
                                                 <td  key={valueKey}>

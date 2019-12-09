@@ -5,13 +5,13 @@ import $ from "jquery";
 import Authentication from './components/Authentication'
 import NewSession from './components/options/NewSession'
 import SessionOptions from './components/options/SessionOptions'
-import Exploration from './components/Exploration'
-import TSMExploration from './components/TSM/TSMExploration'
+import Exploration from './components/Exploration/Exploration'
+import TSMExploration from './components/Exploration/TSM/TSMExploration'
 import BreadCrumb from './components/BreadCrumb'
-import DataExploration from './components/visualisation/DataExploration'
-import MicroModalComponent from './components/MicroModalComponent'
-import MicroModal from 'micromodal'
+import Trace from './components/Trace/Trace'
 
+import MicroModal from 'micromodal'
+import ModelBehavior from './components/visualisation/ModelBehavior'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
@@ -20,12 +20,44 @@ import logo from './AIDEME.png'
 import * as d3 from "d3"
 import Dataset from './model/Dataset';
 
+import animate_html_element from './lib/animate_text'
+
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
 const SESSION_OPTIONS = "SessionOptions"
 const TSM_EXPLORATION = "TSMExploration"
 const AUTHENTICATION = "Authentication"
+const TRACE = 'Trace'
 
+
+class AnimatedText extends Component{
+
+    constructor(props){
+        super(props)
+    }
+    render(){
+        return (
+            <div>
+                
+                <img 
+                    src={logo}
+                    height={30}
+                    className="speaking-bot"
+                ></img>
+                <span 
+                    id={this.props.id} 
+                    className="animated-text"
+                    
+                >{this.props.text}</span>
+            </div>
+        )
+    }
+
+    componentDidMount(){
+        const elem = document.getElementById(this.props.id)
+        animate_html_element(elem, 10)
+    }
+}
 
 class App extends Component {
 
@@ -35,15 +67,18 @@ class App extends Component {
         this.state = {
             step : NEW_SESSION,
             columns: [],
-            labeledPoints: [],
-            pointsToLabel: [],
+            
             initialLabelingSession: true,
             hasYesAndNo: false,            
             hasYes: false,
             hasFalse: false,
             availableVariables: [],
             finalVariables: [],
-            bread: this.getBreadCrum(NEW_SESSION)
+            bread: this.getBreadCrum(NEW_SESSION),
+            labeledPoints: [],
+            pointsToLabel: [],
+            allLabeledPoints: [],
+            history: []
         }
     }
 
@@ -110,6 +145,10 @@ class App extends Component {
             View = Authentication
             break
 
+        case TRACE:
+            View = Trace
+            break
+
         case NEW_SESSION:
             View = NewSession
             break
@@ -153,19 +192,15 @@ class App extends Component {
            
             <div className="App container-fluid">                                    
                 <div className="row">
-
                     <div className="col col-lg-12">
-
-                        
-        
-                        <View 
-                            onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
+                                         
+                        <View                        
+                            {...this.state}
                             fileUploaded={this.fileUploaded.bind(this)} 
                             sessionWasStarted={this.sessionWasStarted.bind(this)}  
-                            onPositiveLabel={this.onPositiveLabel.bind(this)}
-                            onNegativeLabel={this.onNegativeLabel.bind(this)}
+                            
                             sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
-                            {...this.state}
+                            
                             onAuthenticationSuccess={this.onAuthenticationSuccess.bind(this)}
                             tokens={{
                                 authorizationToken: this.state.authorizationToken, 
@@ -184,6 +219,17 @@ class App extends Component {
 
                 <div id="pandas-profiling">
                 </div>
+
+                {
+                    this.state.step == NEW_SESSION && 
+                
+                    <button
+                        className="btn btn-raised"
+                        onClick={(e) => this.setState({'step': TRACE}) }
+                        >
+                        Trace
+                    </button>
+                }
             </div>
       </div>
     );
@@ -223,7 +269,7 @@ class App extends Component {
 
     fileUploaded(response){
 
-  
+        console.log(response)
         this.setState({
             step: SESSION_OPTIONS,
             datasetInfos: response,
@@ -234,6 +280,12 @@ class App extends Component {
     sessionOptionsWereChosen(options){
         
         var newOptions = Object.assign({}, this.state.options, options)
+
+        const chosenColumns = options.chosenColumns
+        console.log('COLUMNS')
+        console.log(chosenColumns)
+        this.state.dataset.set_column_names_selected_by_user(chosenColumns)
+        console.log()
         this.setState({
             options: newOptions
         })
@@ -243,8 +295,11 @@ class App extends Component {
 
         var options = {
             chosenColumns: chosenColumns,
-            groups: groups
+            groups: groups,            
         }
+        
+        this.state.dataset.set_column_names_selected_by_user(chosenColumns)
+
         var newOptions = Object.assign({}, this.state.options, options)
         
         this.setState({options: newOptions}, callback)
@@ -262,18 +317,13 @@ class App extends Component {
         })
         
         var finalVariables =  options.chosenColumns
-        var onlyTwoVariables = finalVariables.length == 2
-        var hasTSM = options.groups || onlyTwoVariables
+        //var onlyTwoVariables = finalVariables.length == 2
+        var hasTSM = options.groups
                 
         if (hasTSM){
-
-            if (onlyTwoVariables){
-                var groups = [[finalVariables[0]], [finalVariables[1]]]
-            }
-            else{
-                var groups = options.groups
-            }
-
+        
+            var groups = options.groups
+          
             this.setState({
                 step: TSM_EXPLORATION,
                 bread: this.getBreadCrum(TSM_EXPLORATION),
@@ -291,38 +341,7 @@ class App extends Component {
             })
         }        
     }
-    
-    onNewPointsToLabel(points){
-        
-        var pointsToLabel = this.state.pointsToLabel.map(e=>e)
-
-        var receivedPoints = points.map(e => {
-            return {
-                id: e.id,
-                data: e.data.array
-            }
-        })
-
-        for (var point of receivedPoints){
-            pointsToLabel.push(point)
-        }
-
-        this.setState({
-            pointsToLabel: pointsToLabel
-        })
-    }
-
-    onPositiveLabel(e){
-        
-        var dataIndex = e.target.dataset.key
-        this.dataWasLabeled(dataIndex, 1)
-    }
-
-    onNegativeLabel(e){
-        var dataIndex = e.target.dataset.key
-        this.dataWasLabeled(dataIndex, 0)                      
-    }
-
+   
     getTokens(){
 
         return {
@@ -330,118 +349,10 @@ class App extends Component {
             sessionToken: this.state.sessionToken
         }
     }
-
-    dataWasLabeled(dataIndex, label){
-
-        var tokens = this.getTokens()
-        var point = this.state.pointsToLabel[dataIndex]
-
-        point.label = label
-                
-        var labeledPoints = this.state.labeledPoints.map(e=>e)
-        labeledPoints.push(point)
-
-        var pointsToLabel = this.state.pointsToLabel.map(e => e)
-        pointsToLabel.splice(dataIndex, 1)
-                                        
-        this.setState({
-            pointsToLabel: pointsToLabel,
-            labeledPoints: labeledPoints
-        })
-        
-        if (this.state.initialLabelingSession){
-
-            if (label === 1){
-                this.setState({
-                    hasYes: true
-                }, () => {
-                    this.labelForInitialSession(labeledPoints, pointsToLabel)
-                })
-            }
-            else{
-                this.setState({
-                    hasNo: true
-                }, () => {
-                    this.labelForInitialSession(labeledPoints, pointsToLabel)
-                })
-            }                        
-        }
-        else{        
-            sendPointLabel({
-                data: labeledPoints,
-            }, tokens, this.onNewPointsToLabel.bind(this))
-        }
-    }
-
-
-    labelForInitialSession(labeledPoints, pointsToLabel){
-        
-        var tokens = this.getTokens()
-
-        if  (pointsToLabel.length === 0){
-
-            if (this.state.hasYes && this.state.hasNo ){
-
-                this.setState({
-                    hasYesAndNo: true,
-                    initialLabelingSession: false
-                }, ()=> {
-                    sendPointLabel({
-                        data: labeledPoints,
-                    }, tokens, this.onNewPointsToLabel.bind(this))
-                })
-            }
-            else{
-                sendPointLabel({
-                    data: labeledPoints,
-                }, tokens, this.onNewPointsToLabel.bind(this))
-            }
-        }
-    }
-
+   
     componentDidMount(){
         MicroModal.init()
     }
-}
-
-function sendPointLabel(data, tokens, onSuccess){
-    
-    var labeledPoints = data.data.map(e => {
-        return {
-            id: e.id,
-            label: e.label,
-            data: {
-                array: e.data
-            }
-        }
-    })
-    
-    var endPoint = backend + "/data-point-were-labeled"
-
-    $.ajax({
-        type: "POST",
-        dataType: 'JSON',
-        url: endPoint,
-        data: {
-            labeledPoints: JSON.stringify(labeledPoints)
-        },
-        
-        success: onSuccess
-    })
-    
-    var updateLabelData = webplatformApi + "/session/" + tokens.sessionToken + "/new-label"
-    
-    $.ajax({
-        type: "PUT", 
-        dataType: "JSON",
-        url: updateLabelData,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        },
-        data: {
-            number_of_labeled_points: data.data.length
-        }
-    })
 }
 
 

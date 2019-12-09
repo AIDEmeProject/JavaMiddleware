@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import MicroModalComponent from '../MicroModalComponent'
+import Group from './Group'
 
 function containsObject(obj, list) {
 
@@ -31,7 +32,7 @@ class GroupEditor extends Component{
     render(){
         const availableVariables = this.props.availableVariables
         const chosenColumns = this.props.chosenColumns
-
+        
         return (
             <div>
                                 
@@ -59,9 +60,7 @@ class GroupEditor extends Component{
                             </div>
                         )
                     })
-                }
-
-                <button className="btn btn-primary">Validate</button>
+                }                
             </div>
         )
     }
@@ -69,7 +68,7 @@ class GroupEditor extends Component{
     onVariableAddedClick(e){
         
         const dataset = e.target.dataset
-        const iVariable = dataset.variableid
+        const iVariable = parseInt(dataset.variableid)
         
         const iGroup = this.props.iGroup
         const isChecked = e.target.checked
@@ -78,93 +77,15 @@ class GroupEditor extends Component{
         if (isChecked){
             this.props.onVariableAddedToGroup(iGroup, iVariable)
         }
-        else{
-            this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-        }        
+        //else{
+        //    this.props.onVariableRemovedFromGroup(iGroup, iVariable)
+        //}        
     }
 }
 
-class Group extends Component {
-
-    constructor(props){
-
-        super(props)      
-        this.state = {}
-    }
-
-    render(){
-        
-        const availableVariables = this.props.availableVariables
-        const iGroup = this.props.iGroup
-        const group = this.props.group
-        console.log(group)
-        
-        return (
-
-            <div>
-            
-                { 
-                    this.props.group.map((variable, iVariable) => {
-
-                   
-                    return ( 
-                        <div                                    
-                            className=""
-                            key={iVariable}
-                        >
-                            <div>{/* required because bs theme removes inner div */}
-                            <div                                                            
-                                className=""
-                            >
-                                
-                                {variable.name}                                
-                                </div>        
-                            </div>      
-                        </div>                        
-                    )
-                    })
-            }
-            </div>
-        )
-    }
-
-    onVariableCheckboxClick(e){
-
-        var isChecked = e.target.checked
-        var iVariable = parseInt(e.target.dataset.variableorder)
-            
-        
-        var iGroup = parseInt(e.target.dataset.groupid)
-        
-        if (isChecked){
-            this.props.onVariableAddedToGroup(iGroup, iVariable)
-        }
-        else{
-            this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-        }        
-    }
-    
-}
 
 class GroupVariables extends Component {
-        
-    constructor(props){
-
-        super(props)        
-        
-        this.state = {
-            groups: [
-                [],
-                []
-            ],                        
-            variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
-        }
-    }
-
-    componentDidUpdate(){
-        window.$('input').bootstrapMaterialDesign()    
-    }
-    
+                
     render(){
 
         var availableVariables = this.state.variablesNotAlreadyInAGivenGroup
@@ -246,11 +167,12 @@ class GroupVariables extends Component {
                 </div>
 
                 {
-                    typeof this.state.editedGroupId !== "undefined" && 
+                    this.state.editedGroupId !== null && 
 
 
                     <MicroModalComponent
                         title={"Edition of group " + this.state.editedGroupId}
+                        onClose={this.closeFactorizationGroupEdition.bind(this)}
                     >
                         
                         <GroupEditor 
@@ -269,6 +191,29 @@ class GroupVariables extends Component {
         )
     }
 
+    constructor(props){
+
+        super(props)        
+        
+        this.state = {
+            groups: [
+                [],
+                []
+            ],   
+            editedGroupId: null,                     
+            variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)
+        }
+    }
+
+    componentDidUpdate(){
+        window.$('input').bootstrapMaterialDesign()    
+    }
+
+    closeFactorizationGroupEdition(e){
+        e.preventDefault()
+        this.setState({editedGroupId: null})
+    }
+
     onGroupEdit(e){
 
         const groupId = e.target.dataset.group
@@ -285,6 +230,13 @@ class GroupVariables extends Component {
         }, this.forceUpdate)
     }
 
+
+    isVariableInGroup(group, variable){
+        const names = group.map(e => e.name)
+
+        return names.includes(variable.name)
+    }
+
     onVariableAddedToGroup(groupId, variableId){
         
         var variable = this.props.chosenColumns[variableId]
@@ -294,8 +246,13 @@ class GroupVariables extends Component {
         var modifiedGroup = newGroupsState[groupId]
         
         variable['realId'] = variableId
-        modifiedGroup.push(variable)
-                
+        variable['id'] = variableId
+
+        if ( ! this.isVariableInGroup(modifiedGroup, variable)){
+
+            modifiedGroup.push(variable)
+        }
+                    
         newGroupsState[groupId] = modifiedGroup
                                 
         var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.filter(v => {
@@ -315,18 +272,19 @@ class GroupVariables extends Component {
         var newGroupsState = this.state.groups.map(e => e)
         var modifiedGroup = newGroupsState[groupId]
 
-        console.log(modifiedGroup, removedColumnId)
         
-        modifiedGroup = modifiedGroup.filter(variable => {
-            console.log(parseInt(variable.idx) !== parseInt(removedColumnId), variable.idx)
-            return parseInt(variable.idx) !== parseInt(removedColumnId)
+        /*
+        modifiedGroup = modifiedGroup.filter((variable, i) => {
+            
+            return i !== removedColumnId
         })
-
-        console.log(modifiedGroup, removedColumnId)
+        */
+        modifiedGroup.splice(removedColumnId, 1)
+        
 
         var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(e => e)
         variablesNotAlreadyInAGivenGroup.push(variable)
-        
+        newGroupsState[groupId] = modifiedGroup
         this.setState({
             groups: newGroupsState,
             variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup
@@ -349,30 +307,5 @@ class GroupVariables extends Component {
     }
 }
 
-GroupVariables.defaultProps = {
-    
-    chosenColumns: [
-        {
-            'idx': 0,
-            'isUsed': true,
-            'name': 'test1',
-            'type': 'numerical'
-        },
-        {
-            'idx': 1,
-            'isUsed': true,
-            'name': 'test2',
-            'type': 'numerical'
-        },
-     
-        {
-            'idx': 3,
-            'isUsed': true,
-            'name': 'test4',
-            'type': 'numerical'
-        },
-    ]
-    
-}
 
 export default GroupVariables

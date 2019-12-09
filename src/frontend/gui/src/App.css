@@ -10,10 +10,23 @@
 }
 
 .table-label{
+  display:inline-block;
   margin:auto;
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 80vw;
 }
 
-.predicted td, .predicted th, .table-label td, .table-label th {
+.table-control{
+  display:inline-block;
+  
+}
+
+.table-label td{
+  height: 41px;
+}
+
+.predicted td, .predicted th, .table-label td, .table-label th, .table-control td, .table-control th {
     border: 1px solid black;
     min-width: 200px;
     text-align: center;
@@ -143,14 +156,6 @@
   }
   
   
-
-
-svg {
-  width: 500px;
-  height: 500px;
-}
-
-
 /**************************\
   Demo Animation Style
 \**************************/
@@ -310,4 +315,75 @@ h4, h3{
   border-radius: 5px;
   padding: 10px;
   width: 200px;
+}
+
+
+#model-behavior-tooltip{
+  
+    position: absolute;
+    text-align: center;
+    min-width: 60px;
+    min-height: 28px;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+
+#iteration-control{
+  margin-top: 20px;
+}
+
+#iteration-labels > div, #iteration-control{
+  text-align: center;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  max-width: 250px;
+  margin-left: 25%;
+}
+
+#tsm-pred-stats, #prediction-stats{
+  margin-top: 20px;
+  padding: 15px;
+  margin: 20px;
+}
+
+#tsm-pred-stats, #prediction-stats > h5{
+  text-align: center;
+}
+
+#f1-score{
+  text-align: center;
+}
+
+
+/*
+.iteration-number{
+  color:white;
+  background-color: red;
+  border-radius: 40%;
+  padding: 2px;
+  font-size: 0.8em;
+}
+*/
+
+.animated-text{
+  display:none;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-left: 5px;
+  
+  max-width: 200px; 
+}
+
+.speaking-bot{
+  border-radius: 5px;
+}
+
+.iteration-number{
+  font-weight: bold;
 }

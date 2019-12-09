@@ -107,27 +107,18 @@ public class CsvDatasetReader {
         return json.toJson(dataset);
     }
 
-
-    protected int[] computeUniqueValueNumbers(){
-        int nCols = this.uniqueValues.size();
-
-        int[] uniqueValueNumbers = new int[nCols];
-
-        for (int iCol = 0; iCol < nCols ; iCol++ ){
-            uniqueValueNumbers[iCol] = this.uniqueValues.get(iCol).size();
-        }
-
-        return uniqueValueNumbers;
-
-    }
-
     protected void parseInfo(String[] dataRow, int iRow){
 
         double val = 0;
 
         for(int iCol = 0; iCol < dataRow.length; iCol++){
 
-            val = Double.parseDouble(dataRow[iCol]);
+            try{
+                val = Double.parseDouble(dataRow[iCol]);
+            }
+            catch (NumberFormatException e){
+                val = 0;
+            }
             if (this.maximums[iCol] <= val){
                 this.maximums[iCol] = val;
             }
@@ -145,4 +136,20 @@ public class CsvDatasetReader {
             }
         }
     }
+
+
+    protected int[] computeUniqueValueNumbers(){
+        int nCols = this.uniqueValues.size();
+
+        int[] uniqueValueNumbers = new int[nCols];
+
+        for (int iCol = 0; iCol < nCols ; iCol++ ){
+            uniqueValueNumbers[iCol] = this.uniqueValues.get(iCol).size();
+        }
+
+        return uniqueValueNumbers;
+
+    }
+
+
 }
