@@ -30,9 +30,9 @@ class TraceDataset extends Dataset{
 
     parse_trace(){
         
-        this.labels = this.get_raw_col_by_name('labels').flatMap(e => {
-            var cleanedStr = e.replace("0.", "0").replace("1.", "1").replace(' ', ',')
-            
+        this.labels = this.get_raw_col_by_name('labels').flatMap(s => {
+            //var cleanedStr = e.replace("0.", "0").replace("1.", "1").replace(' ', ',')
+            var cleanedStr = s
             return JSON.parse(cleanedStr)
             //return parseFloat(e.replace(/[\[\]']/g,'' ))                
         })
