@@ -88,9 +88,7 @@ class HistogramPlotter{
 
             var barSize = width / data.length
             var total = data.reduce((a, e) => a + e[1], 0)
-
-            console.log(barSize, total)
-
+            
             y.domain([0, total]);   
 
             var r = svg.selectAll("rect")
