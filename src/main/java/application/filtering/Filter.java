@@ -1,6 +1,8 @@
 package application.filtering;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * Interface for all possible filters
@@ -14,19 +16,19 @@ public interface Filter {
 
 
 /**
- * Filters for numerical attributes. They represents predicates on the form:
+ * Filters for numerical attributes. They represents filters on the form:
  *                          min <= column <= max
  */
-class NumericalPredicate implements Filter {
+class RangeFilter implements Filter {
     private double min = Double.NEGATIVE_INFINITY;
     private double max = Double.POSITIVE_INFINITY;
     private final String columnName;
 
-    public NumericalPredicate(String columnName) {
+    public RangeFilter(String columnName) {
         this.columnName = columnName;
     }
 
-    public NumericalPredicate(String columnName, double min, double max) {
+    public RangeFilter(String columnName, double min, double max) {
         this(columnName);
         setMin(min);
         setMax(max);
@@ -63,14 +65,14 @@ class NumericalPredicate implements Filter {
 }
 
 /**
- * Filters for categorical attributes. They represents predicates on the form:
- *                     column IN (value1, value2, ...)
+ * Filters for categorical attributes. They represents filters on the form:
+ *                  column IN (value1, value2, ...)
  */
-class CategoricalPredicate implements Filter {
+class CategoricalFilter implements Filter {
     private final String[] filterValues;
     private final String columnName;
 
-    public CategoricalPredicate(String columnName, String[] filterValues) {
+    public CategoricalFilter(String columnName, String[] filterValues) {
         this.filterValues = filterValues;
         this.columnName = columnName;
     }
@@ -80,7 +82,12 @@ class CategoricalPredicate implements Filter {
         if (filterValues.length == 0) {
             return "";
         }
-        return "(" + columnName + " IN (" + String.join(", ", filterValues) + "))";
+
+        String list = Arrays.stream(filterValues)
+                .map(x -> "'" + x + "'")
+                .collect(Collectors.joining(", ", "(", ")"));
+
+        return "(" + columnName + " IN " + list + ")";
     }
 }
 
