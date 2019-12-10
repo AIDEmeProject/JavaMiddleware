@@ -31,7 +31,7 @@ public class DatabaseFiltering {
         return reader.readKeys(table, id, buildPredicate(filters));
     }
 
-    private String buildPredicate(Filter[] filters) {
+    public String buildPredicate(Filter[] filters) {
         return Arrays.stream(filters)
                 .map(Filter::buildPredicate)
                 .filter(x -> !x.isEmpty())

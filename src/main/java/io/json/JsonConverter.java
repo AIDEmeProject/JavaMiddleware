@@ -1,11 +1,11 @@
 package io.json;
 
+import application.filtering.Filter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import config.TsmConfiguration;
 import data.LabeledPoint;
 import exceptions.JsonDeserializationFailedException;
 import explore.metrics.MetricCalculator;
@@ -58,6 +58,8 @@ public class JsonConverter {
         builder.registerTypeAdapter(MetricCalculator.class, new MetricCalculatorAdapter());
 
         builder.registerTypeAdapter(InitialSampler.class, new InitialSamplerAdapter());
+
+        builder.registerTypeAdapter(Filter.class, new FilterAdapter());
 
         return builder.create();
     }
