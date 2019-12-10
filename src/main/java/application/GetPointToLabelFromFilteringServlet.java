@@ -5,6 +5,7 @@ import application.filtering.Filter;
 import com.google.gson.Gson;
 import config.DatasetConfiguration;
 import data.DataPoint;
+import io.json.JsonConverter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,31 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-
-/*
-class FilterDTO{
-    int colId;
-
-    String columnName;
-}
-
-
-class NumericalFilterDTO extends FilterDTO{
-
-
-    double min;
-    double max;
-
-}
-
-class CategoricalFilterDTO extends FilterDTO{
-
-    String[] chosenCategoriesRawValues;
-
-}
-
-
-*/
 
 
 public class GetPointToLabelFromFilteringServlet extends HttpServlet {
@@ -57,8 +33,7 @@ public class GetPointToLabelFromFilteringServlet extends HttpServlet {
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
         // parse filters
-        Gson gson = new Gson();
-        Filter[] filters = gson.fromJson(jsonFilters, Filter[].class);
+        Filter[] filters = JsonConverter.deserialize(jsonFilters, Filter[].class);
 
         // run query on DB
         Set<Long> indexes = filtering.getElementsMatchingFilter(filters);
@@ -66,6 +41,7 @@ public class GetPointToLabelFromFilteringServlet extends HttpServlet {
 
         // send results
         resp.setContentType("application/json");
+        Gson gson = new Gson();
         resp.getWriter().write(gson.toJson(specificPoints));
 
     }
