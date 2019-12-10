@@ -47,13 +47,15 @@ class HistogramPlotter{
     }
  
 
-    plot_histogram(data, nBins){
+
+    plot_histogram(data, nBins, isCategorical){
 
         var svg = this.svg
         var x = this.x,
             y = this.y,
             yAxis = this.yAxis
-        var height = this.height
+        var height = this.height,
+            width = this.width
         x.domain([d3.min(data) - 1, d3.max(data) + 1])
         
         // set the parameters for the histogram
@@ -64,7 +66,7 @@ class HistogramPlotter{
 
         // And apply this function to data to get the bins
         var bins = histogram(data);
-        
+        console.log(bins)
         
         this.xAxis.transition()
             .duration(1000)
@@ -82,6 +84,43 @@ class HistogramPlotter{
             .duration(1000)
             .call(d3.axisLeft(y))
 
+        if (isCategorical){
+
+            var barSize = width / data.length
+            var total = data.reduce((a, e) => a + e[1], 0)
+
+            console.log(barSize, total)
+
+            y.domain([0, total]);   
+
+            var r = svg.selectAll("rect")
+                       .data(data)
+
+            r.enter()
+             .append("rect")
+             .merge(r)
+             .transition()
+             .duration(1000)
+                .attr("x", 1)
+                
+                .attr("transform", (d, i) => { 
+                    var barHeight = y(d[1])
+                    var xTranslate = i  * barSize,
+                        yTranslate = height - barHeight
+
+                    console.log(d[1], total, d[1]/total, barHeight, height)
+                    
+                    return "translate(" + xTranslate + "," + yTranslate + ")"; 
+                })
+                .attr("width", function(d) { return barSize ; })
+                .attr("height", function(d) { return y(d[1]); })
+                .style("fill", "#69b3a2")
+                .style('stroke', 'white')
+        
+            r.exit().remove()
+
+            return
+        }
 
         // append the bar rectangles to the svg element
         var r = svg.selectAll("rect")

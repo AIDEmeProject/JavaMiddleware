@@ -57,7 +57,9 @@ class MicroModalComponent extends Component{
   }
 
   componentDidMount(){
-      MicroModal.init()
+      MicroModal.init({
+        onClose: () => {MicroModal.close('modal-1'); this.props.onClose()}
+      })
       MicroModal.show('modal-1')
   }
 

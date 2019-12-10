@@ -60,17 +60,25 @@ class SessionOptions extends Component{
                     <li className="nav-item">
                         <a 
                            className="nav-link" 
-                           href="#basic-options"
+                           
                            onClick={this.onBasicOptionClick.bind(this)}
                         >
                             Attribute selection
+                        </a>                    
+                    </li>
+                    <li>
+                        <a 
+                            className="nav-link"                        
+                            onClick={this.onSessionStartClick.bind(this)}
+                        >        
+                                Start session
                         </a>
                     </li>
 
                     <li className="nav-item">
                         <a 
                            className="nav-link" 
-                           href="#basic-options"
+                           
                            onClick={this.onVariableGrouping.bind(this)}
                         >
                             Factorization structure
@@ -106,13 +114,7 @@ class SessionOptions extends Component{
 
                         <div className="row">
                             <div className="col col-lg-3"  id="column-picker">
-                                <button 
-                                    className="btn btn-success btn-raised"                        
-                                    onClick={this.onSessionStartClick.bind(this)}
-                                >        
-                                    Start session
-                                </button>
-
+                               
                                 <h3>
                                     Column name
                                 </h3>

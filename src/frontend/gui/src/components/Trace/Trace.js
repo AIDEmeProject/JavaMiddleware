@@ -141,7 +141,7 @@ class QueryTrace extends Component{
                                     <h4>
                                         Algorithm : {algorithm} 
                                     </h4>
-                                    <div>
+                                    <div className="center">
 
                                         {
                                             ! this.state.loadMode &&

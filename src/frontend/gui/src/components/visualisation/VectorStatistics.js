@@ -23,7 +23,7 @@ class VectorStatistics extends Component{
 
         return (
             <div>
-                <h5>Descriptive statistics</h5>
+                <h4>Descriptive statistics</h4>
                         
                 <table className="table">
                     <thead>
@@ -75,9 +75,9 @@ class VectorStatistics extends Component{
                 { 
                     this.props.uniqueValues.length < 50 &&
                     <div>
-                        <p>
+                        <h4>
                             Unique value counts
-                        </p>
+                        </h4>
                         <table className="table">
                             <thead>
                                 <tr>
@@ -92,9 +92,9 @@ class VectorStatistics extends Component{
 
                             <tbody>
                                 {
-                                    this.props.uniqueValues.map(d => {
+                                    this.props.uniqueValues.map((d,i) => {
                                     return (
-                                        <tr>
+                                        <tr key={i}>
                                             <td>
                                                 { d[0]}
                                             </td>

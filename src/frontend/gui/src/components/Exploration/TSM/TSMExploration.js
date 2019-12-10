@@ -127,7 +127,7 @@ class TSMExploration extends Component{
                 { 
                     this.state.initialLabelingSession && 
                     
-                    <div>
+                    <div className="card">
                         <p>                            
                             The first phase of labeling continues until we obtain 
                             a positive example and a negative example.        

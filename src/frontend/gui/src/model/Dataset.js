@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { iif } from 'rxjs';
+
 
 class Dataset{
 
@@ -15,6 +15,11 @@ class Dataset{
         this.parsedColumns = {}
     }
 
+
+    set_column_as_index(name){
+        this.index = name
+    }
+
     set_column_names_selected_by_user(names){
         
         if ( ! (typeof names[0] === "string")){
@@ -25,9 +30,6 @@ class Dataset{
         }                           
     }
 
-    set_column_as_index(name){
-        this.index = name
-    }
 
     get_point_with_index(id){
 
@@ -42,29 +44,12 @@ class Dataset{
         return fetchedRow
     }
 
-    min(column_name){
-        return d3.min(this.get_parsed_column_by_name(column_name))
-    }
-
-    max(column_name){
-        return d3.max(this.get_parsed_column_by_name(column_name))
-    }
-
+  
     get_raw_col_by_name(name){
         return this.dataset.map(e => e[name])
     }
 
-    get_column_name(name){
-        
-        const firstValue = parseFloat(this.dataset[0][name])
-        const isValueNan = Number.isNaN(firstValue)
-        
-        if (isValueNan ){
-            return this.get_parsed_column_by_name(name)
-        }
-
-        return this.dataset.map( e => parseFloat(e[name]))
-    }
+   
 
     get_parsed_columns_by_names(names){
         var columns = names.map(name => {
@@ -126,11 +111,37 @@ class Dataset{
         return this.dataset.columns[id]        
     }
 
+    get_raw_column_by_id(id){
+        
+        var col_name =  this.get_column_names()[id]        
+        var col = this.get_raw_col_by_name(col_name)
+        
+        return col
+    }
+
+    get_raw_column_by_name(name){
+        
+        return this.dataset.map( e => e[name])
+    }
+
     get_column_id(id){
         
         var name = this.dataset.columns[id]
         return this.get_column_name(name)
     }
+
+    get_column_name(name){
+        
+        const firstValue = parseFloat(this.dataset[0][name])
+        const isValueNan = Number.isNaN(firstValue)
+        
+        if (isValueNan ){
+            return this.get_parsed_column_by_name(name)
+        }
+
+        return this.dataset.map( e => parseFloat(e[name]))
+    }
+
 
     get_column_names(){
         return this.dataset.columns
@@ -186,6 +197,16 @@ class Dataset{
             return d            
         })
     }   
+
+
+    min(column_name){
+        return d3.min(this.get_parsed_column_by_name(column_name))
+    }
+
+    max(column_name){
+        return d3.max(this.get_parsed_column_by_name(column_name))
+    }
+
 }
 
 

@@ -106,8 +106,7 @@ class GroupVariables extends Component {
                     speed can be improved. 
                 </p>
                 <p>
-                    Please put the variable in subgroups (at least 2). Left out variables 
-                    will be put in their own subgroups
+                    Group variable by click on "edit" on a given group                    
                 </p>
                 
                 <div>
@@ -197,8 +196,7 @@ class GroupVariables extends Component {
         
         this.state = {
             groups: [
-                [],
-                []
+                [],                
             ],   
             editedGroupId: null,                     
             variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map(e => e)

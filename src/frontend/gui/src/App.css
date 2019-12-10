@@ -387,3 +387,7 @@ h4, h3{
 .iteration-number{
   font-weight: bold;
 }
+
+.center{
+  text-align:center;
+}

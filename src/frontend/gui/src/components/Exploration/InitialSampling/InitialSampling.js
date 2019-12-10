@@ -51,7 +51,7 @@ class InitialSampling extends Component{
                             </ul>
                         
 
-                        <p>                            
+                        <p className="card">                            
                             The first phase of labeling continues until we obtain 
                             a positive example and a negative example. 
                         </p>

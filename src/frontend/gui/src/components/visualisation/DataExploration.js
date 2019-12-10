@@ -11,18 +11,7 @@ import VectorStatistics from './VectorStatistics';
 
 class DataExploration extends Component{
     
-    constructor(props){
-
-        super(props)
-        this.state = {
-            firstVariable: props.firstVariable || 0,
-            secondVariable: props.secondVariable || 1,
-            nBins: 10,
-            min:0,
-            max: 10
-        }
-    }
-
+   
     render(){
                 
         const iFirstVariable = this.state.firstVariable
@@ -31,17 +20,11 @@ class DataExploration extends Component{
         const dataset = this.props.dataset
         
         const variables = dataset.get_column_names()
-        
-        const parsedFirstVariable = dataset.get_parsed_column_by_id(iFirstVariable)
+            
         const firstVariable = dataset.get_column_id(iFirstVariable)
 
-        var uniqueValues = Object.entries(this.uniqueValues(parsedFirstVariable))
-        const rawUniqueValues = Object.entries(this.uniqueValues(dataset.get_column_id(iFirstVariable)))
+        const uniqueValues = this.computeUniqueValues()
 
-        uniqueValues = d3.zip(rawUniqueValues, uniqueValues).map(e => {
-            return [e[0][0], e[1][1]]
-        })
-        
         return (
             <div id="data-exploration">    
               
@@ -72,10 +55,14 @@ class DataExploration extends Component{
                 </div>
                 }
 
+                <h4>
+                    {variables[iFirstVariable]} column
+                </h4>
+
                <VectorStatistics 
                     data={firstVariable}
                     uniqueValues={uniqueValues}
-                    rawUniqueValues={rawUniqueValues}
+                    
                />
                                
                 <div className="one-dimensional-plot">
@@ -144,6 +131,50 @@ class DataExploration extends Component{
         )
     }
 
+    constructor(props){
+
+        super(props)
+        this.state = {
+            firstVariable: props.firstVariable || 0,
+            secondVariable: props.secondVariable || 1,
+            nBins: 10,
+            min:0,
+            max: 10
+        }
+    }
+
+
+
+    computeUniqueValues(){
+
+        const dataset = this.props.dataset
+        const iFirstVariable = this.state.firstVariable
+        
+        const rawColumn = dataset.get_raw_column_by_id(iFirstVariable)
+        const parsedFirstVariable = dataset.get_parsed_column_by_id(iFirstVariable)
+        
+
+        var uniqueValues = Object.entries(this.uniqueValuesAsObject(parsedFirstVariable))        
+        const rawUniqueValues = Object.entries(this.uniqueValuesAsObject(rawColumn))
+        
+        uniqueValues = d3.zip(rawUniqueValues, uniqueValues).map(e => {
+            return [e[0][0], e[1][1]]
+        }).sort((a, b) => b[1] - a[1])
+        
+        return uniqueValues
+    }
+
+    uniqueValuesAsObject(arr){
+
+        var counts = {};
+        for (var i = 0; i < arr.length; i++) {
+            counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+        }
+
+        return counts
+    }
+
+
     componentWillReceiveProps(nextProps){
         
         this.setState({
@@ -195,17 +226,33 @@ class DataExploration extends Component{
         this.plotAll()
     }
     
+    isVariableCategorical(){
+        console.log(this.props.chosenColumns)
+        return this.props.chosenColumns[this.state.firstVariable].type == "categorical"
+    }
+
     plotAll(){
         const iFirstVariable = this.state.firstVariable
         const iSecondVariable = this.state.secondVariable
 
-        const data = this.getVariable(iFirstVariable)        
+                
         const dataset = this.props.dataset
-        this.histogramPlotter.plot_histogram(data, this.state.nBins)
+
+        if (this.isVariableCategorical(iFirstVariable)){
+
+            const histData = this.computeUniqueValues()
+            console.log(histData)
+            this.histogramPlotter.plot_histogram(histData, this.state.nBins, true)
+        }
+        else{
+            const histData = this.getVariable(iFirstVariable)
+            this.histogramPlotter.plot_histogram(histData, this.state.nBins, false)
+        }
+        
     
         const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
         var axisNames = this.getColumnNames()
-        console.log(axisNames)        
+
         this.twoDimensionHeatmapPlotter.plot(heatmapData, axisNames)
     }
 
@@ -218,15 +265,7 @@ class DataExploration extends Component{
         
     }
 
-    uniqueValues(arr){
-
-        var counts = {};
-        for (var i = 0; i < arr.length; i++) {
-            counts[arr[i]] = 1 + (counts[arr[i]] || 0);
-        }
-
-        return counts
-    }
+    
 
     componentDidUpdate(){
 
