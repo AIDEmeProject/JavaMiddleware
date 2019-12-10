@@ -1,6 +1,5 @@
 package application;
 
-import application.filtering.Filter;
 import config.ExperimentConfiguration;
 import data.*;
 import data.preprocessing.StandardScaler;
@@ -20,6 +19,7 @@ import utils.RandomState;
 import utils.linalg.Matrix;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -231,12 +231,8 @@ public class ExplorationManager {
     }
 
 
-    public ArrayList<DataPoint> getPointsFromFilters(ArrayList<Filter> filters){
-
-        ArrayList<DataPoint> matchedPoints = new ArrayList<>();
-        //TODO : plug with Luciano's class
-        return matchedPoints;
-
+    public List<DataPoint> getPointsFromFilters(Collection<Long> indexes){
+        return rawDataset.getFromSecondaryIndex(indexes);
     }
 
     public void printF1Score(){

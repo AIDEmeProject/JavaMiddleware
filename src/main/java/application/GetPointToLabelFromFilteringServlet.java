@@ -1,8 +1,9 @@
 package application;
 
+import application.filtering.DatabaseFiltering;
 import application.filtering.Filter;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import config.DatasetConfiguration;
 import data.DataPoint;
 
 import javax.servlet.ServletException;
@@ -10,7 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /*
 class FilterDTO{
@@ -40,28 +42,38 @@ class CategoricalFilterDTO extends FilterDTO{
 
 public class GetPointToLabelFromFilteringServlet extends HttpServlet {
 
+    private DatabaseFiltering filtering = null;
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        if (filtering == null) {
+            initialize();
+        }
 
         String jsonFilters = req.getParameter("filters");
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
+        // parse filters
         Gson gson = new Gson();
+        Filter[] filters = gson.fromJson(jsonFilters, Filter[].class);
 
-        ArrayList<Filter> filters = gson.fromJson(jsonFilters, new TypeToken<ArrayList<Filter>>(){}.getType());
+        // run query on DB
+        Set<Long> indexes = filtering.getElementsMatchingFilter(filters);
+        List<DataPoint> specificPoints = manager.getPointsFromFilters(indexes);
 
-        ArrayList<DataPoint> specificPoints = manager.getPointsFromFilters(filters);
-
-
+        // send results
         resp.setContentType("application/json");
         resp.getWriter().write(gson.toJson(specificPoints));
 
     }
 
-
+    private void initialize() {
+        DatasetConfiguration configuration = new DatasetConfiguration("cars_raw");
+        this.filtering = configuration.buildFilter();
+    }
 }
 
 

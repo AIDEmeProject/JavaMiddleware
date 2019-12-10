@@ -119,14 +119,10 @@ public class IndexedDataset implements Iterable<DataPoint> {
      * @param indexes: secondary indexes to retrieve
      * @return an IndexedDataset containing all points matching the secondary indexes in the input collection.
      */
-    public IndexedDataset getFromSecondaryIndex(Collection<Long> indexes) {
-        Builder builder = new Builder();
-
-        for (Long index : indexes) {
-            builder.add(getFromSecondaryIndex(index));
-        }
-
-        return builder.build();
+    public List<DataPoint> getFromSecondaryIndex(Collection<Long> indexes) {
+        return indexes.stream()
+                .map(this::getFromSecondaryIndex)
+                .collect(Collectors.toList());
     }
 
     /**
