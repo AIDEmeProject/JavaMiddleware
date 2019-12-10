@@ -19,74 +19,78 @@ class DataPoints extends Component{
         
             return (
 
-                <div>
+                <div className="row">
+                    <div className="col col-lg-12">
+
+                    
                     <hr />
                     <h3>
                         Labeled Points
                     </h3>
                 
-                <table className="table-label">
-                    <thead>                        
-                        <tr>                    
-                            <th>
-                                Row id
-                            </th>
+                    <table className={this.props.normal ? "table": "table-label"}>
+                        <thead>                        
+                            <tr>                    
+                                <th>
+                                    Row id
+                                </th>
 
-                            {
-                                this.props.chosenColumns.map((column, key) => {
-                                    
-                                    return (
-                                        <th key={key} >
-                                            {column.name} 
-                                        </th>
-                                    )
-                                })
-                            }
+                                {
+                                    this.props.chosenColumns.map((column, key) => {
+                                        
+                                        return (
+                                            <th key={key} >
+                                                {column.name} 
+                                            </th>
+                                        )
+                                    })
+                                }
 
-                            <th>
-                                Label 
-                            </th>                                                    
-                        </tr>
-                    </thead>
+                                <th>
+                                    Label 
+                                </th>                                                    
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                    
-                    {
-                        this.props.points.map((point, key) => {
-                            
-                            const data = dataset.get_selected_columns_point(point.id)
-                            
-                            
-                            return (
-
-                                <tr key={key}>
-
-                                    <td >
-                                            {point.id}
-                                    </td>
+                        <tbody>
                         
-                                    {
+                        {
+                            this.props.points.map((point, key) => {
+                                
+                                const data = dataset.get_selected_columns_point(point.id)
+                                
+                                
+                                return (
 
-                                        data.map((value, valueKey) => {
-                                            return (
-                                                
-                                                <td  key={valueKey}>
-                                                    {value}
-                                                </td>
-                                            )
-                                        })
-                                    }
+                                    <tr key={key}>
 
-                                    <td>
-                                        { point.label }
-                                    </td>
-                                </tr>
-                            )
-                        })                    
-                    }
-                </tbody>
+                                        <td >
+                                                {point.id}
+                                        </td>
+                            
+                                        {
+
+                                            data.map((value, valueKey) => {
+                                                return (
+                                                    
+                                                    <td  key={valueKey}>
+                                                        {value}
+                                                    </td>
+                                                )
+                                            })
+                                        }
+
+                                        <td>
+                                            { point.label }
+                                        </td>
+                                    </tr>
+                                )
+                            })                    
+                        }
+                    </tbody>
                 
                 </table>
+                </div>
             </div>
         )     
     }            

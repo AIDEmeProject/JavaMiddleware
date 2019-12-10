@@ -132,44 +132,48 @@ class QueryTrace extends Component{
 
                         <div className="row">
 
-                            <div className="col col-lg-6 offset-lg-3">
+                            <div className="col col-lg-12">
 
-                                <h4>
-                                    Algorithm : {algorithm} 
-                                </h4>
-                                <div>
+                            <div className="row">
 
-                                    {
-                                        ! this.state.loadMode &&
-                                    
-                                        <button 
-                                            className="btn btn-primary btn-raised"
-                                            onClick={this.sendLabelDataForComputation.bind(this)}
-                                            disabled={this.state.isComputing ? true:false}
-                                        >
-                                            Compute next iteration
-                                        </button>
-                                    }
-                                    <button
-                                        className="btn btn-primary btn-raised"
-                                        onClick={e => this.setState({
-                                            showModelBehavior: false,
-                                            showDataPoints: true
-                                        })}
+                                <div className="col col-lg-6 offset-lg-3">
+
+                                    <h4>
+                                        Algorithm : {algorithm} 
+                                    </h4>
+                                    <div>
+
+                                        {
+                                            ! this.state.loadMode &&
                                         
-                                    >
-                                        Show labeled points
-                                    </button>
+                                            <button 
+                                                className="btn btn-primary btn-raised"
+                                                onClick={this.sendLabelDataForComputation.bind(this)}
+                                                disabled={this.state.isComputing ? true:false}
+                                            >
+                                                Compute next iteration
+                                            </button>
+                                        }
+                                        <button
+                                            className="btn btn-primary btn-raised"
+                                            onClick={e => this.setState({
+                                                showModelBehavior: false,
+                                                showDataPoints: true
+                                            })}
+                                            
+                                        >
+                                            Show labeled points
+                                        </button>
 
-                                    <button
-                                        className="btn btn-primary btn-raised"
-                                        onClick={e => this.setState({
-                                            showModelBehavior: true,
-                                            showDataPoints: false
-                                        })}
-                                    >
-                                        Show Model Behavior
-                                    </button>
+                                        <button
+                                            className="btn btn-primary btn-raised"
+                                            onClick={e => this.setState({
+                                                showModelBehavior: true,
+                                                showDataPoints: false
+                                            })}
+                                        >
+                                            Show Model Behavior
+                                        </button>
 
                                 </div>
 
@@ -178,7 +182,9 @@ class QueryTrace extends Component{
                                     <p>Backend is computing please wait</p>
                                 }
                             </div>
-                        
+                        </div>
+
+
                             { 
                                 this.state.showModelBehavior && 
                                 
@@ -255,9 +261,14 @@ class QueryTrace extends Component{
                                     chosenColumns={this.state.availableVariables}
                                     show={true}
                                     dataset={this.state.dataset}
+                                    normal={true}
                                 />
                             }
                     </div>
+                
+
+                </div>
+                
                 }
                 <div className="row">
                     <div className="col col-lg-6 offset-lg-3 card">
@@ -290,9 +301,11 @@ class QueryTrace extends Component{
                             </button>
                         </p>
                     </div>
-                    </div>
-                </div>
-            </div>           
+            </div>
+            
+            
+            </div>
+        </div>     
         )
     }
 
