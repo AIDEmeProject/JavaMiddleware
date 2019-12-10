@@ -60,7 +60,6 @@ public class TraceInitializationServlet extends HttpServlet {
                                             strColumnIds,
                                             new TypeToken< ArrayList<Integer>>(){}.getType());
 
-        columnIds.sort(Comparator.comparingInt((Integer n) -> n));
 
 
         System.out.println("Load csv " + encodedDatasetName);

@@ -155,6 +155,7 @@ public class TraceComputationServlet extends HttpServlet {
         }
 
 
+
         TraceResultsComputer traceResultComputer = new TraceResultsComputer();
         manager.getNextPointsToLabel(labeledPoints);
         TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
