@@ -1,12 +1,16 @@
 package application;
 
+import application.filtering.Filter;
 import config.ExperimentConfiguration;
 import data.*;
 import data.preprocessing.StandardScaler;
+import explore.metrics.ConfusionMatrix;
+import explore.metrics.ConfusionMatrixCalculator;
 import explore.metrics.MetricStorage;
 import explore.metrics.ThreeSetMetricCalculator;
 import explore.statistics.Statistics;
 import explore.user.GuiUserLabel;
+import explore.user.UserLabel;
 import machinelearning.active.Ranker;
 import machinelearning.classifier.Classifier;
 import machinelearning.classifier.Label;
@@ -227,6 +231,34 @@ public class ExplorationManager {
     }
 
 
+    public ArrayList<DataPoint> getPointsFromFilters(ArrayList<Filter> filters){
+
+        ArrayList<DataPoint> matchedPoints = new ArrayList<>();
+        //TODO : plug with Luciano's class
+        return matchedPoints;
+
+    }
+
+    public void printF1Score(){
+
+        UserLabel[] trueLabels = partitionedDataset.getLabeledPoints().getLabels();
+        ArrayList<LabeledPoint> predictedLabels = this.labelPoints(partitionedDataset.getLabeledPoints().getDataset(), rawDataset, false);
+
+        UserLabel[] userPredictedLabels = new UserLabel[trueLabels.length];
+
+        for (int i= 0; i<trueLabels.length; i++){
+
+            LabeledPoint point = predictedLabels.get(i);
+            UserLabel label = new GuiUserLabel(point.getLabel().asSign());
+            userPredictedLabels[i] = label;
+        }
+        ConfusionMatrix matrix = ConfusionMatrixCalculator.compute(trueLabels, userPredictedLabels);
+
+        System.out.println("---f1 score---");
+        System.out.println(matrix.fscore());
+    }
+
+
     protected IndexedDataset scaleDataset(IndexedDataset dataset){
         this.scaler = StandardScaler.fit(dataset.getData());
         return scaler.transform(dataset);
@@ -269,6 +301,7 @@ public class ExplorationManager {
 
         return labeledDataset;
     }
+
 
     public ArrayList<LabeledPoint> labelWholeDataset(){
         //add user labeled points

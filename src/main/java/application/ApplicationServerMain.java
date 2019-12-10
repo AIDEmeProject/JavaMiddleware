@@ -52,6 +52,8 @@ public class ApplicationServerMain {
         handler.addServlet(TraceInitializationServlet.class, "/start-trace");
         handler.addServlet(TraceComputationServlet.class, "/get-next-traces");
 
+
+        handler.addServlet(GetPointToLabelFromFilteringServlet.class, "/get-points-by-filtering");
         //handler.addServlet(GetModelPredictionOverRealDatasetServlet.class, "/get-model-prediction-over-dataset");
 
 

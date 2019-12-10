@@ -168,4 +168,8 @@ public class LabeledDataset implements Iterable<LabeledPoint> {
     public int[][] getPartitionIndexes() {
         return dataset.getPartitionIndexes();
     }
+
+    public IndexedDataset getDataset() {
+        return dataset;
+    }
 }

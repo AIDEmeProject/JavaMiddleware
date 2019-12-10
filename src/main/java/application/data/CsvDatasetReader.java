@@ -82,7 +82,6 @@ public class CsvDatasetReader {
             HashSet<Double> set = new HashSet<Double>();
 
             uniqueValues.add(set);
-
         }
 
         this.maximums = new double[columns.length];
