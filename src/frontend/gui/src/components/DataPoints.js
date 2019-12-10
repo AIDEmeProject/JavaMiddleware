@@ -53,6 +53,7 @@ class DataPoints extends Component{
                     
                     {
                         this.props.points.map((point, key) => {
+                            
                             const data = dataset.get_selected_columns_point(point.id)
                             
                             

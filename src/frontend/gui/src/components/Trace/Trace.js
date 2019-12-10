@@ -719,7 +719,13 @@ class QueryTrace extends Component{
 
     loadTrace(){
         loadFileFromInputFile("load-trace", event => {
-            this.setState(JSON.parse(event.target.result))
+
+            var state = JSON.parse(event.target.result)
+            var dataset = state.dataset            
+            Object.setPrototypeOf(dataset, Dataset.prototype) //prototype is not saved in state so we need to reaffect it
+
+            state.dataset = dataset
+            this.setState(state)
 
         })
     } 
