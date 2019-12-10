@@ -482,7 +482,7 @@ class QueryTrace extends Component{
             var ext = getFileExtension('trace')
             const isCsv = ext === "csv"
             const useFactorizedInformation = this.state.useFactorizedInformation
-            
+            console.log(useFactorizedInformation)
             if (useFactorizedInformation){
                 var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
             }
@@ -490,8 +490,9 @@ class QueryTrace extends Component{
                 var trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv)                
             }
             
-            var encodedColumnNames = trace.get_column_names_from_ids(this.state.traceColumns.encodedDataset)
-            trace.set_column_names_selected_by_user(encodedColumnNames)
+            //var encodedColumnNames = trace.get_column_names_from_ids(this.state.traceColumns.rawDataset)
+            //console.log(encodedColumnNames, this.state.traceColumns.encodedDataset)
+            //trace.set_column_names_selected_by_user(encodedColumnNames)
          
             this.setState({ 
                 'traceDataset': trace                
