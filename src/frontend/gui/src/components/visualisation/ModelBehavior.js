@@ -203,8 +203,18 @@ class ModelBehavior extends Component{
                 xMax: 5,
                 yMin: -5,
                 yMax: 5
+            },
+            nextScale: {
+                xMin: -5,
+                xMax: -5,
+                yMin: -5,
+                yMax: -5
             }
         }
+    }
+
+    updateScale(){
+        this.setState({scale: Object.assign({}, this.state.newScale)})
     }
 
     componentWillMount(){
@@ -254,6 +264,8 @@ class ModelBehavior extends Component{
     }
 
     plotAll(){
+
+        
         
         if (this.props.availableVariables.length <= 4 || this.props.realDataset){
             this.plotPredictionOnGridPoints()
@@ -262,11 +274,10 @@ class ModelBehavior extends Component{
         if (this.props.hasTSM){
             this.plotTSMPredictionsOnGridPoints()
         }
+
         if (this.props.plotProjection){
             this.plotDataEmbbedingPlot()
-        }
-
-        
+        }        
     }
 
     plotTSMPredictionsOnGridPoints(){
@@ -304,9 +315,6 @@ class ModelBehavior extends Component{
     }
 
     plotDataEmbbedingPlot(){
-
-        console.log(this.getIteration(), this.props.projectionHistory)
-        console.log(this.getEmbbedings())
         
         var colors = {
             '-1': 'red',
@@ -355,8 +363,7 @@ class ModelBehavior extends Component{
 
         const iteration = this.getIteration()
         const modelPredictions = this.props.modelPredictionHistory[iteration]  
-        console.log(this.props.modelPredictionHistory.length)      
-
+        
         const grid = this.props.fakePointGrid        
 
         const vars = this.getChosenVariables()
@@ -392,11 +399,7 @@ class ModelBehavior extends Component{
             v.push(e.label)            
             return v
         })
-
-        console.log(this.props.labeledPoints)
-        console.log(labeledPoints)
-        
-        
+            
         return labeledPoints
     }
 
@@ -413,8 +416,6 @@ class ModelBehavior extends Component{
     
             return embeddings[e.id]
         }).filter( e => {return ( typeof e !== "undefined")} )
-
-    
         
         return labeledEmbeddings
     }
@@ -423,8 +424,12 @@ class ModelBehavior extends Component{
     computeMinMaxOfRawData(){
                 
         const grid = this.getModelPredictionOverGridPoints()
-        const offset = {x: 2, y:1}
-        return this.computeMinAndMaxScale(grid.map(e => e[0]), grid.map(e => e[1]), offset)
+        
+        const offset = {
+            x: 0, y:0
+        }
+        var scale =  this.computeMinAndMaxScale(grid.map(e => e[0]), grid.map(e => e[1]), offset)
+        return scale
     }
 
     computeMinAndMaxScale(xValues, yValues, offset ={x: 0, y:0}){
@@ -446,26 +451,30 @@ class ModelBehavior extends Component{
     }
 
     firstVariableChanged(e){
-        var firstVariable = parseInt(e.target.value) 
-        
-        
-        var newState = {
-            firstVariable: firstVariable,
-            scale: this.computeMinMaxOfRawData()
-        }         
-        this.setState(newState, this.plotAll) 
-    }
 
+        var firstVariable = parseInt(e.target.value) 
+                
+        var newState = {
+            firstVariable: firstVariable,            
+        }         
+
+        this.setState(newState, this.variableToDisplayChanged) 
+    }
+    
     secondVariableChanged(e){
                     
-        var secondVariable = parseInt(e.target.value) 
-        
+        var secondVariable = parseInt(e.target.value)         
         var newState = {
-            secondVariable: secondVariable,
-            scale: this.computeMinMaxOfRawData()
+            secondVariable: secondVariable,            
         }         
 
-        this.setState(newState, this.plotAll) 
+        this.setState(newState, this.variableToDisplayChanged) 
+    }
+
+    variableToDisplayChanged(){
+        this.setState({
+            scale: this.computeMinMaxOfRawData()
+        }, this.plotAll)
     }
 
     onChangeScale(e){

@@ -42,7 +42,13 @@ class Dataset{
         return fetchedRow
     }
 
+    min(column_name){
+        return d3.min(this.get_parsed_column_by_name(column_name))
+    }
 
+    max(column_name){
+        return d3.max(this.get_parsed_column_by_name(column_name))
+    }
 
     get_raw_col_by_name(name){
         return this.dataset.map(e => e[name])
