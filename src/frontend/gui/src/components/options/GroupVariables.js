@@ -177,7 +177,7 @@ class GroupVariables extends Component {
                         <GroupEditor 
                             group={this.state.groups[this.state.editedGroupId]}
                             iGroup={this.state.editedGroupId}
-                            chosenColumns={this.props.chosenColumns}
+                            chosenColumns={this.props.chosenColumns.filter(e => e.isUsed)}
                             availableVariables={availableVariables}
                             onVariableAddedToGroup={this.onVariableAddedToGroup.bind(this)}
                             onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(this)}
