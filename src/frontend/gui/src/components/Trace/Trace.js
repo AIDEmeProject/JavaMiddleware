@@ -23,6 +23,8 @@ import initializeBackend from '../../actions/trace/initializeBackend'
 import sendPointBatch from '../../actions/trace/sendPointBatch'
 
 import carDatasetMetadata from './carColumns'
+import jobDatasetMetadata from './jobColumns'
+
 
 import buildTSMConfiguration from '../../lib/buildTSMConfiguration'
 import {simpleMarginConfiguration, 
@@ -395,8 +397,6 @@ class QueryTrace extends Component{
         var useTSM = algorithm === "simplemargintsm"
         var useFactorizedInformation = algorithm === "simplemargintsm" ||
                                        algorithm === "factorizedversionspace"
-
-        console.log(useFactorizedInformation)
                 
         this.setState({
             useTSM: useTSM,
@@ -442,8 +442,15 @@ class QueryTrace extends Component{
             var fileContent = event.target.result 
             var dataset = Dataset.buildFromLoadedInput(fileContent)
            
+
+            const filename =  $("#dataset").val(); 
+            
+            const isCarDataset = filename.toLowerCase().indexOf('car') !== -1
+            console.log(isCarDataset)
+
             this.setState({
-                'dataset': dataset
+                'dataset': dataset,
+                'isCarDataset': isCarDataset
             }, this.loadTraceScenario)
         })
     }
@@ -482,7 +489,7 @@ class QueryTrace extends Component{
             var ext = getFileExtension('trace')
             const isCsv = ext === "csv"
             const useFactorizedInformation = this.state.useFactorizedInformation
-            console.log(useFactorizedInformation)
+
             if (useFactorizedInformation){
                 var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv)
             }
@@ -532,11 +539,17 @@ class QueryTrace extends Component{
         
         if (this.state.useFactorizedInformation){
 
-            var datasetMetadata = this.props.datasetMetadata
-            var allColumns = this.props.datasetMetadata.columnNames            
-            const factorizationGroups = this.state.traceColumns.factorizationGroups  
-            const usedColumns = this.state.traceColumns.encodedDataset.map (e => allColumns[e])            
-            configuration = buildTSMConfiguration(configuration, factorizationGroups, usedColumns, datasetMetadata)            
+            const datasetMetadata = this.getDatasetMetadata()
+            const allColumns = datasetMetadata.columnNames
+            const columnsUsedInTrace = this.state.traceColumns
+            
+            const factorizationGroups = columnsUsedInTrace.factorizationGroups  
+            const usedColumnNames = this.state.traceColumns.encodedDataset.map(e => allColumns[e])   
+
+            configuration = buildTSMConfiguration(configuration, 
+                                                  factorizationGroups, 
+                                                  usedColumnNames, 
+                                                  datasetMetadata)            
 
             if (this.state.algorithm == "factorizedversionspace") {
                 configuration = this.buildFactorizedVersionSpaceGroup(configuration)                
@@ -544,6 +557,17 @@ class QueryTrace extends Component{
         }
         
         return configuration
+    }
+
+    getDatasetMetadata(){
+
+        if (this.state.isCarDataset){
+            return carDatasetMetadata
+        }
+        else{
+            return jobDatasetMetadata
+        }
+
     }
 
     buildFactorizedVersionSpaceGroup(configuration){
@@ -762,8 +786,5 @@ function backendPredToFrontendFormat(rawPoints, useTSM){
     })
 }
 
-QueryTrace.defaultProps = {
-    datasetMetadata: carDatasetMetadata
-}
 
 export default QueryTrace

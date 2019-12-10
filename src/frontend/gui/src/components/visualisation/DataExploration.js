@@ -143,8 +143,6 @@ class DataExploration extends Component{
         }
     }
 
-
-
     computeUniqueValues(){
 
         const dataset = this.props.dataset
@@ -153,7 +151,6 @@ class DataExploration extends Component{
         const rawColumn = dataset.get_raw_column_by_id(iFirstVariable)
         const parsedFirstVariable = dataset.get_parsed_column_by_id(iFirstVariable)
         
-
         var uniqueValues = Object.entries(this.uniqueValuesAsObject(parsedFirstVariable))        
         const rawUniqueValues = Object.entries(this.uniqueValuesAsObject(rawColumn))
         
@@ -199,7 +196,6 @@ class DataExploration extends Component{
         const data = this.props.dataset.get_column_id(iVariable)
         return data
     }
-
    
     getParsedVariable(iVariable){
         return this.props.dataset.get_parsed_column_by_id(iVariable)
@@ -227,8 +223,11 @@ class DataExploration extends Component{
     }
     
     isVariableCategorical(){
-        console.log(this.props.chosenColumns)
-        return this.props.chosenColumns[this.state.firstVariable].type == "categorical"
+        
+        const variableId = this.state.firstVariable
+        console.log(variableId, this.props.chosenColumns)
+
+        return this.props.chosenColumns[variableId].type == "categorical"
     }
 
     plotAll(){
@@ -241,15 +240,14 @@ class DataExploration extends Component{
         if (this.isVariableCategorical(iFirstVariable)){
 
             const histData = this.computeUniqueValues()
-            console.log(histData)
+            
             this.histogramPlotter.plot_histogram(histData, this.state.nBins, true)
         }
         else{
             const histData = this.getVariable(iFirstVariable)
             this.histogramPlotter.plot_histogram(histData, this.state.nBins, false)
         }
-        
-    
+            
         const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
         var axisNames = this.getColumnNames()
 
@@ -257,15 +255,9 @@ class DataExploration extends Component{
     }
 
     getColumnNames(){
-
-        const iFirstVariable = this.state.firstVariable
-        const iSecondVariable = this.state.secondVariable
-
-        return  this.props.chosenColumns.map(e => e.name)
-        
+      
+        return this.props.chosenColumns.map(e => e.name)        
     }
-
-    
 
     componentDidUpdate(){
 

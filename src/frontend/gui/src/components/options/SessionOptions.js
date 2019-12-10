@@ -10,45 +10,6 @@ import DataExploration from '../visualisation/DataExploration'
 
 class SessionOptions extends Component{
     
-    constructor(props){
-
-        super(props)
-
-        var datasetInfos = this.props.datasetInfos
-       
-        const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
-            return e > 10 || datasetInfos.hasFloats[i] ? "numerical": "categorical"
-        })
-        
-        var chosenColumns = datasetInfos.columns.map( (col, idx) => {
-            return {
-                'name': col,
-                'idx': idx,
-                'isUsed': false,
-                'type': columnTypes[idx]
-            }
-        })            
-
-        this.state = {
-            columnTypes: chosenColumns.map(e => e['type']),
-            checkboxes: datasetInfos.columns.map (c => false),
-            chosenColumns: chosenColumns,
-            showAdvancedOptions: false,
-            showVariableGroups: false,
-            availableVariables: [],            
-            variableGroups: [
-                [],
-                []
-            ],  
-            finalVariables: [],            
-
-            learner: "Uncertainty sampling",
-            classifier: "SVM",
-            showColumns: true,
-            showExploration: false
-        }
-    }
-
     render(){
 
         const datasetInfos = this.props.datasetInfos
@@ -191,6 +152,48 @@ class SessionOptions extends Component{
                 </form>
             </div>
         )
+    }
+
+
+    constructor(props){
+
+        super(props)
+
+        var datasetInfos = this.props.datasetInfos
+       
+        const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
+            return e > 10 || datasetInfos.hasFloats[i] ? "numerical": "categorical"
+        })
+        
+        var chosenColumns = datasetInfos.columns.map( (col, idx) => {
+            return {
+                'name': col,
+                'idx': idx,
+                'isUsed': false,
+                'type': columnTypes[idx]
+            }
+        })            
+
+        this.state = {
+            firstVariable: 0,
+            secondVariable: 1,
+            columnTypes: chosenColumns.map(e => e['type']),
+            checkboxes: datasetInfos.columns.map (c => false),
+            chosenColumns: chosenColumns,
+            showAdvancedOptions: false,
+            showVariableGroups: false,
+            availableVariables: [],            
+            variableGroups: [
+                [],
+                []
+            ],  
+            finalVariables: [],            
+
+            learner: "Uncertainty sampling",
+            classifier: "SVM",
+            showColumns: true,
+            showExploration: false
+        }
     }
 
     componentDidMount(){

@@ -24,6 +24,7 @@ import * as d3 from "d3"
 import Dataset from './model/Dataset';
 
 import animate_html_element from './lib/animate_text'
+import PointFiltering from './components/Exploration/InitialSampling/FilteringPoints';
 
 const EXPLORATION = "Exploration"
 const NEW_SESSION = "NewSession"
@@ -200,7 +201,7 @@ class App extends Component {
             <div className="App container-fluid">                                    
                 <div className="row">
                     <div className="col col-lg-12">
-                                         
+                                                                 
                         <View                        
                             {...this.state}
                             fileUploaded={this.fileUploaded.bind(this)} 

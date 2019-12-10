@@ -198,6 +198,20 @@ class Dataset{
         })
     }   
 
+    uniqueValues(column_name){
+        
+        function uniqueValuesAsObject(arr){
+
+            var counts = {};
+            for (var i = 0; i < arr.length; i++) {
+                counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+            }
+    
+            return counts
+        }
+
+        return uniqueValuesAsObject(this.get_raw_column_by_name(column_name))
+    }
 
     min(column_name){
         return d3.min(this.get_parsed_column_by_name(column_name))

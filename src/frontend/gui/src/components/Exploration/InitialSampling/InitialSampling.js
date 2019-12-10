@@ -5,6 +5,8 @@ import {backend, webplatformApi} from '../../../constants/constants'
 
 import SpecificPointToLabel from './SpecificPointToLabel'
 import FakePointSampling from './FakePointSampling'
+import FilteringPoints from './FilteringPoints'
+
 import PointLabelisation from '../../PointLabelisation'
 import sendFakePoint from '../../../actions/sendFakePoint'
 
@@ -15,7 +17,8 @@ class InitialSampling extends Component{
         super(props)       
 
         this.state = {
-            labelingInitialSampling: true
+            showLabeling: true,
+            showFilterBasedSampling: false
         }
     }
     
@@ -33,7 +36,11 @@ class InitialSampling extends Component{
                                     <a 
                                     className="nav-link active" 
                                     href="#"
-                                    onClick={() => this.setState({labelingInitialSampling: true})}
+                                    onClick={() => this.setState({
+                                        showLabeling: true,
+                                        showFakePointSampling: false,
+                                        showFilterBasedSampling: false
+                                    })}
                                     >
                                         Labeling initial sampling
                                     </a>
@@ -43,7 +50,24 @@ class InitialSampling extends Component{
                                     <a 
                                     className="nav-link active" 
                                     href="#"
-                                    onClick={() => this.setState({labelingInitialSampling: false})}
+                                    onClick={() => this.setState({
+                                        showLabeling: false,
+                                        showFakePointSampling: false,
+                                        showFilterBasedSampling: true
+                                    })}
+                                    >
+                                        Filter base sampling
+                                    </a>
+                                </li>    
+
+                                <li className="nav-item">
+                                    <a 
+                                    className="nav-link active" 
+                                    href="#"
+                                    onClick={() => this.setState({
+                                        showLabeling: false,
+                                        showFakePointSampling: false
+                                    })}
                                     >
                                         Fake point initial sampling
                                     </a>
@@ -57,7 +81,7 @@ class InitialSampling extends Component{
                         </p>
 
                         {
-                            //this.state.labelingInitialSampling && 
+                            //this.state.showLabeling && 
                             false &&
                             
                             <SpecificPointToLabel 
@@ -70,7 +94,7 @@ class InitialSampling extends Component{
                         
 
                     {
-                        this.state.labelingInitialSampling && 
+                        this.state.showLabeling && 
 
                         <div>
                                             
@@ -83,7 +107,19 @@ class InitialSampling extends Component{
 
                  
                     {
-                        ! this.state.labelingInitialSampling && 
+                        this.state.showFilterBasedSampling && 
+                        <div className="row">
+                            <div className="col col-lg-8 offset-lg-2">
+                                <FilteringPoints
+                                    chosenVariables={this.buildChosenVariableForFiltering()}
+                                />
+                            </div>
+                        </div>
+
+                    }
+
+                    {
+                        this.state.showFakePointSampling && 
 
                         <div>
                             <FakePointSampling 
@@ -97,6 +133,31 @@ class InitialSampling extends Component{
                 </div>                                                  
             </div>
         )
+    }
+
+    buildChosenVariableForFiltering(){
+        
+        var chosenVariables = this.props.chosenColumns
+
+        chosenVariables = this.props.chosenColumns.map(e => {
+            const dataset = this.props.dataset
+
+            if (e.type == "numerical"){
+                
+                //compute min and max
+                var min = dataset.min(e.name)
+                var max = dataset.max(e.name)
+                return Object.assign(e, {min:min, max:max})
+
+            }
+            else{
+                var uniqueValues = Object.entries(dataset.uniqueValues(e.name)).map (e => e[0])
+                return Object.assign(e, {values: uniqueValues})
+            }
+
+        })
+
+        return chosenVariables
     }
 
     fakePointWasValidated(fakePointData){

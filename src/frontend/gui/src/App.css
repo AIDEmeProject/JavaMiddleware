@@ -391,3 +391,16 @@ h4, h3{
 .center{
   text-align:center;
 }
+
+.inline-block{
+  display:inline-block;
+}
+
+.filter{
+  height: 250px; 
+  vertical-align: top;
+}
+
+.categorical-filter{
+  overflow: auto;
+}
