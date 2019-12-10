@@ -32,8 +32,6 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
     private int[][] partitionIndexes;
 
-
-
     /**
      * This Builder is a utility class for incrementally building an IndexedDataset object.
      */
@@ -103,6 +101,15 @@ public class IndexedDataset implements Iterable<DataPoint> {
         this.partitionIndexes = partitionIndexes;
     }
 
+    private List<Long> secondaryIndex;
+
+    public void setSecondaryIndex(List<Long> secondaryIndex) {
+        this.secondaryIndex = secondaryIndex;
+    }
+
+    public DataPoint getFromSecondaryIndex(long index) {
+        return get(secondaryIndex.indexOf(index));
+    }
 
     /**
      * Add datapoint to Matrix
@@ -334,5 +341,14 @@ public class IndexedDataset implements Iterable<DataPoint> {
 
     public boolean hasFactorizationStructure() {
         return partitionSize() > 1;
+    }
+
+    @Override
+    public String toString() {
+        return "IndexedDataset{" +
+                "indexes=" + indexes + '\n' +
+                ", secondaryIndex=" + secondaryIndex + '\n' +
+                ", data=" + data +
+                '}';
     }
 }

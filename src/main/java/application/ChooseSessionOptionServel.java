@@ -44,6 +44,9 @@ public class ChooseSessionOptionServel extends HttpServlet {
         System.out.println("column ids");
         System.out.println(jsonColumnIds);
 
+        //TODO: get id column index from req. '0' works for the cars dataset.
+        int keyColumnId = 0;
+
 
         ExperimentConfiguration configuration = JsonConverter.deserialize(jsonConfiguration, ExperimentConfiguration.class);
         TsmConfiguration tsmConf = configuration.getTsmConfiguration();
@@ -52,7 +55,7 @@ public class ChooseSessionOptionServel extends HttpServlet {
 
         CSVParser parser = new CSVParser();
 
-        IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", columnIds);
+        IndexedDataset dataset = parser.buildIndexedDataset(sessionPath + "/data.csv", columnIds, keyColumnId);
 
         Learner learner;
         if  (configuration.getActiveLearner() instanceof SimpleMargin){

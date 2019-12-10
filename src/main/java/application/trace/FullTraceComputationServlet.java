@@ -35,8 +35,11 @@ public class FullTraceComputationServlet extends HttpServlet {
         ColumnDTO dto = json.fromJson(strColumnIds, ColumnDTO.class);
         dto.columnIds.sort(Comparator.comparingInt((Integer n) -> n));
 
+        //TODO: get id column index from req. '0' works for the cars dataset.
+        int keyColumnId = 0;
+
         CSVParser parser = new CSVParser();
-        IndexedDataset carDataset = parser.buildIndexedDataset(encodedDatasetName, dto.columnIds);
+        IndexedDataset carDataset = parser.buildIndexedDataset(encodedDatasetName, dto.columnIds, keyColumnId);
 
         System.out.println(carDataset.length());
 

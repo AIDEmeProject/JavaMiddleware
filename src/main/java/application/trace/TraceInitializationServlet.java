@@ -53,7 +53,8 @@ public class TraceInitializationServlet extends HttpServlet {
         System.out.println("");
 
 
-
+        //TODO: get id column index from req. '0' works for the cars dataset.
+        int keyColumnId = 0;
 
         ArrayList<Integer> columnIds = json.fromJson(
                                             strColumnIds,
@@ -66,7 +67,7 @@ public class TraceInitializationServlet extends HttpServlet {
         System.out.println("It should be at the root of the project");
 
         CSVParser parser = new CSVParser();
-        IndexedDataset carDataset = parser.buildIndexedDataset(encodedDatasetName, columnIds);
+        IndexedDataset carDataset = parser.buildIndexedDataset(encodedDatasetName, columnIds, keyColumnId);
 
 
         System.out.println("Dataset. Col and rows");

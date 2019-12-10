@@ -1,115 +1,48 @@
 package io;
 
-
 import com.opencsv.CSVReader;
 import data.DataPoint;
 import data.IndexedDataset;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 public class CSVParser{
 
-
-    public IndexedDataset buildIndexedDataset(String filePath, ArrayList<Integer> columnIds) throws IOException{
-
-        Reader in = new FileReader(filePath);
-        CSVReader reader = new CSVReader(in);
-
-        ArrayList<Double> rowValues = new ArrayList();
-        ArrayList<String> rowRawValues = new ArrayList();
-
-
-        ArrayList<DataPoint> dataPoints = new ArrayList<>();
-
-        Integer rowNumber = 0;
-        String [] nextLine;
-
-        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+    public IndexedDataset buildIndexedDataset(String filePath, ArrayList<Integer> columnIds, int keyColumnId) throws IOException{
+        CSVReader reader = new CSVReader(new FileReader(filePath));
         reader.readNext();
 
-        ValueParser parser = new ValueParser((columnIds.size()));
+        IndexedDataset.Builder builder = new IndexedDataset.Builder();
+        ValueParser parser = new ValueParser(columnIds.size());
+
+        int rowNumber = 0;
+        String [] nextLine;
+        List<Long> secondaryIndex = new ArrayList<>();
+
         while ((nextLine = reader.readNext()) != null) {
-            // nextLine[] is an array of values from the line
+            // read secondary index
+            secondaryIndex.add(Long.parseLong(nextLine[keyColumnId]));
 
-            rowValues.removeAll(rowValues);
-            rowRawValues.removeAll(rowRawValues);
-            int i = 0;
-            for (Integer id : columnIds){
+            // read data point
+            double[] rowValues = new double[columnIds.size()];
 
-
-                String rawValue = nextLine[id];
-                Double value = parser.parseValue(nextLine[id], i);
-
-                rowValues.add(value);
-                rowRawValues.add(rawValue);
-                i++;
+            for (int i = 0; i < columnIds.size(); i++) {
+                rowValues[i] = parser.parseValue(nextLine[columnIds.get(i)], i);
             }
 
-            double[] doubleRowValues = this.doubleConversion(rowValues);
-            DataPoint dataPoint = new DataPoint(rowNumber, doubleRowValues);
-
-            dataPoints.add(dataPoint);
-
+            DataPoint dataPoint = new DataPoint(rowNumber, rowValues);
             builder.add(dataPoint);
+
             rowNumber++;
         }
 
         IndexedDataset dataset = builder.build();
+        dataset.setSecondaryIndex(secondaryIndex);
         return dataset;
     }
-
-
-
-    public IndexedDataset buildIndexedDataset(String filePath, Map<String, String[]> postData)
-            throws IOException {
-
-
-        ArrayList<Integer> columnIds = this.loadColumnIds(postData);
-        columnIds.sort(Comparator.comparingInt((Integer n) -> n));
-        return this.buildIndexedDataset(filePath, columnIds);
-
-    }
-
-    public double[] doubleConversion(ArrayList<Double> values){
-
-        double[] convertedValues = new double[values.size()];
-        int index = 0;
-        for(Double value: values){
-
-            convertedValues[index] = value;
-            index++;
-        }
-
-        return convertedValues;
-    }
-
-
-    protected ArrayList<Integer> loadColumnIds(Map<String, String[]> postData){
-
-        Integer columnId;
-        ArrayList<Integer> columnIds = new ArrayList<>();
-
-        for (Map.Entry<String, String[]> entry : postData.entrySet()){
-
-            if (entry.getKey().indexOf("column") != -1){
-
-                String strColumnId = String.join(",", entry.getValue());
-
-                columnId = Integer.parseInt(strColumnId);
-
-                columnIds.add(columnId);
-            }
-        }
-
-        return columnIds;
-    }
-
 }
 
 
@@ -123,10 +56,10 @@ class ValueParser{
     public ValueParser(int nColumns){
 
         this.nColumns = nColumns;
-        this.columns = new ArrayList<HashMap<String, Integer>>();
+        this.columns = new ArrayList<>();
 
         for (int i = 0; i<nColumns; i++){
-            columns.add(new HashMap<String, Integer>());
+            columns.add(new HashMap<>());
         }
     }
 
