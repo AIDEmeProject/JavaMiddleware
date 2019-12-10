@@ -230,8 +230,7 @@ class ModelBehavior extends Component{
         })       
     }
     
-    getIteration(){
-        console.log(this.props.iteration)
+    getIteration(){    
         return this.props.iteration
     }
 

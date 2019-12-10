@@ -13,8 +13,9 @@ class LabelInfos extends Component{
 
     render(){
 
-        //const iteration = this.props.iteration
-        const labeledPoints = this.props.labeledPoints
+        
+        const iteration = this.props.iteration
+        const labeledPoints = this.props.labeledPoints.filter((e, i) => { return i <= iteration})
         
         const negativeSamples = labeledPoints.filter(e => e.label === 0)
         const positiveSamples = labeledPoints.filter(e => e.label === 1)
