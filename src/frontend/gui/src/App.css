@@ -22,8 +22,8 @@
   
 }
 
-.table-label td{
-  height: 41px;
+.table-label tr, .table-control th{
+  height: 44px;
 }
 
 .predicted td, .predicted th, .table-label td, .table-label th, .table-control td, .table-control th {
@@ -404,3 +404,4 @@ h4, h3{
 .categorical-filter{
   overflow: auto;
 }
+

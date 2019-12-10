@@ -104,7 +104,6 @@ class InitialSampling extends Component{
                             />
                         </div>
                     }
-
                  
                     {
                         this.state.showFilterBasedSampling && 
@@ -112,6 +111,9 @@ class InitialSampling extends Component{
                             <div className="col col-lg-8 offset-lg-2">
                                 <FilteringPoints
                                     chosenVariables={this.buildChosenVariableForFiltering()}
+                                    dataset={this.props.dataset}
+                                    onPositiveLabel={this.props.onPositiveLabel}
+                                    onNegativeLabel={this.props.onNegativeLabel}
                                 />
                             </div>
                         </div>

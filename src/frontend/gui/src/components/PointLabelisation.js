@@ -90,14 +90,14 @@ class PointLabelisation extends Component{
                                         <button
                                             className="btn btn-raised btn-primary" 
                                             data-key={key} 
-                                            onClick={this.props.onPositiveLabel}>
+                                            onClick={e => this.props.onPositiveLabel(e)}>
                                             Yes
                                         </button>
 
                                         <button 
                                             className="btn btn-raised btn-primary"  
                                             data-key={key} 
-                                            onClick={this.props.onNegativeLabel}
+                                            onClick={e => this.props.onNegativeLabel(e)}
                                         >
                                             No
                                         </button>
