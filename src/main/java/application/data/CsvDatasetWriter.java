@@ -2,16 +2,15 @@ package application.data;
 
 import com.opencsv.CSVWriter;
 import data.LabeledPoint;
-import explore.user.UserLabel;
 import machinelearning.classifier.Label;
 import utils.linalg.Vector;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CsvDatasetWriter {
 
@@ -32,7 +31,7 @@ public class CsvDatasetWriter {
 
     }
 
-    public void savedLabeledPointsAsCsv(ArrayList<LabeledPoint> labeledPoints, String filePath) throws IOException {
+    public void savedLabeledPointsAsCsv(List<LabeledPoint> labeledPoints, String filePath) throws IOException {
 
 
         try (

@@ -1,71 +1,19 @@
 package application.trace;
 
 import application.ExplorationManager;
-
 import application.data.LabeledPointsDTO;
 import com.google.gson.Gson;
-import data.DataPoint;
 import data.LabeledPoint;
-import machinelearning.classifier.Label;
-import machinelearning.threesetmetric.ExtendedLabel;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 
 class TraceResultsComputer{
-/*
-
-    public void pointsWereLabeled(ExplorationManager manager, ArrayList<LabelDTO> labeledPointData) throws IOException{
-
-
-        for (LabelDTO point:labeledPointData
-             ) {
-
-            LabeledPoint labeledPoint = this.getLabeledPoint(manager, point.id, point.label);
-            ArrayList<LabeledPoint> points = new ArrayList<>();
-            points.add(labeledPoint);
-            manager.getNextPointsToLabel(points);
-        }
-    }
-
-    public void pointsWereLabeled(ExplorationManager manager, ArrayList<TSMLabelDTO> labeledPointData) throws IOException{
-
-
-        for (TSMLabelDTO point:labeledPointData
-        ) {
-
-            LabeledPoint labeledPoint = this.getLabeledPoint(manager, point.id, point.labels);
-            ArrayList<LabeledPoint> points = new ArrayList<>();
-            points.add(labeledPoint);
-            manager.getNextPointsToLabel(points);
-        }
-    }
-
-*/
-
-    protected LabeledPoint getLabeledPoint(ExplorationManager manager, long index, int intLabel){
-
-
-        DataPoint dataPoint = new DataPoint(index, manager.getPoint(index).getData());
-
-        Label label = Label.fromSign((double) intLabel);
-        LabeledPoint lblPoint = new LabeledPoint(dataPoint, label);
-        return lblPoint;
-
-        //DataPoint point = manager.getPoint(index);
-        //serLabel userLabel = new GuiUserLabel(label);
-
-        //LabeledPoint labeledPoint = new LabeledPoint(point, userLabel);
-
-        //return labeledPoint;
-    }
-
     TraceResultDTO computeTraceResults(ExplorationManager manager) throws IOException{
 
         TraceResultDTO dto = new TraceResultDTO();
@@ -85,59 +33,40 @@ class TraceResultsComputer{
         return dto;
     }
 
+    TraceResultDTO computeJobsTraceResult(ExplorationManager manager, PredictionReader reader, int iteration) throws IOException {
+        // TODO: check logic
+        TraceResultDTO dto = new TraceResultDTO();
 
-}
+        List<LabeledPoint> labeledPoints = manager.getLabeledPointFromIteration(reader, iteration);
 
-class TraceResultDTO{
+        dto.labeledPointsOverGrid = labeledPoints;
 
-    protected ArrayList<LabeledPoint> labeledPointsOverGrid;
+        String filePath = "./labeled_points_java.csv";
+        ModelProjectionComputer computer = new ModelProjectionComputer();
+        dto.jsonProjectionPredictions = computer.getEmbeddingAsJson(filePath, labeledPoints);
 
-    protected ArrayList<LabeledPoint> TSMPredictionsOverGrid;
-
-    protected String jsonProjectionPredictions;
-
-}
-
-class QueryTraceLoader{
-
-    public ArrayList<LabeledPoint> getNextLabeledsPoints(){
-        return new ArrayList<>();
-
+        return dto;
     }
 }
 
 
-class LabelDTO{
+class TraceResultDTO{
+    List<LabeledPoint> labeledPointsOverGrid;
 
-    long id;
+    List<LabeledPoint> TSMPredictionsOverGrid;
 
-    int label;
-}
-
-class TSMLabelDTO{
-
-    long id;
-
-    int[] labels;
-}
-
-class TSMLabelsDTO{
-    public ArrayList<TSMLabelDTO> data;
-}
-
-class LabelsDto{
-    public ArrayList<LabelDTO> data;
+    String jsonProjectionPredictions;
 }
 
 public class TraceComputationServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    private PredictionReader predictionReader = null;
 
-        System.out.println("");
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        System.out.println();
         System.out.println("--Step starting--");
-        System.out.println("");
+        System.out.println();
         Gson json = new Gson();
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
@@ -154,16 +83,33 @@ public class TraceComputationServlet extends HttpServlet {
             labeledPoints = (ArrayList<LabeledPoint>) dtoManager.getLabeledPoints(strLabelData);
         }
 
-
-
-        TraceResultsComputer traceResultComputer = new TraceResultsComputer();
         manager.getNextPointsToLabel(labeledPoints);
-        TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
 
+        TraceResultDTO result = getTraceResult(req, manager);
 
         resp.setContentType("application/json");
         resp.getWriter().println(json.toJson(result));
 
         System.out.println("---Step finished---");
     }
+
+    private TraceResultDTO getTraceResult(HttpServletRequest req, ExplorationManager manager) throws IOException {
+        TraceResultsComputer traceResultComputer = new TraceResultsComputer();
+
+        // TODO: add "dataset" parameter to request with the name of the dataset being used in the trace ("jobs" vs "cars")
+        if (!"jobs".equals(req.getParameter("dataset"))) {
+            return traceResultComputer.computeTraceResults(manager);
+        }
+
+        // TODO: add "algorithm" parameter to request with the name of the algorithm being used ("sm", "vs", "dsm", "factvs")
+        if (predictionReader == null) {
+            String algorithm = req.getParameter("algorithm");
+            predictionReader = new PredictionReader(algorithm);
+        }
+
+        // TODO: add "iteration" parameter to request with the current iteration (0 = right after initial sampling)
+        int iteration = Integer.parseInt(req.getParameter("iteration"));
+        return traceResultComputer.computeJobsTraceResult(manager, predictionReader, iteration);
+    }
 }
+

@@ -6,24 +6,18 @@ import config.ExperimentConfiguration;
 import data.IndexedDataset;
 import io.CSVParser;
 import io.json.JsonConverter;
-import machinelearning.active.LearnerFactory;
-import machinelearning.classifier.Learner;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 
 
 public class FullTraceComputationServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Gson json = new Gson();
 
         String clientJson = req.getParameter("configuration");
@@ -48,24 +42,13 @@ public class FullTraceComputationServlet extends HttpServlet {
         System.out.println("configuration");
         System.out.println(json.toJson(configuration));
 
-
-        Learner learner = (new LearnerFactory()).buildLearner(algorithmName, configuration);
-
-
-
-
-
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
         String strLabelData = req.getParameter("labelData");
         System.out.println(strLabelData);
-        ArrayList<LabelDTO> labeledPointsData = json.fromJson(strLabelData, LabelsDto.class).data;
-
 
         TraceResultsComputer traceResultComputer = new TraceResultsComputer();
-        //traceResultComputer.pointsWereLabeled(manager, labeledPointsData);
         TraceResultDTO result = traceResultComputer.computeTraceResults(manager);
-
 
         resp.setContentType("application/json");
         resp.getWriter().println(json.toJson(result));

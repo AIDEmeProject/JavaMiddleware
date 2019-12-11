@@ -10,7 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class ModelProjectionComputer{
 
@@ -23,14 +23,13 @@ public class ModelProjectionComputer{
     }
 
     public String getEmbbeddingAsJson(String filePath, ExplorationManager manager) throws IOException{
+        return getEmbeddingAsJson(filePath, manager.computeModelPredictionForProjection());
+    }
 
+    public String getEmbeddingAsJson(String filePath, List<LabeledPoint> labeledPoints) throws IOException{
         CsvDatasetWriter writer = new CsvDatasetWriter();
-        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionForProjection();
         writer.savedLabeledPointsAsCsv(labeledPoints, filePath);
-
-        String jsonEmbedding = this.getModelBoundary();
-        return jsonEmbedding;
-
+        return this.getModelBoundary();
     }
 }
 

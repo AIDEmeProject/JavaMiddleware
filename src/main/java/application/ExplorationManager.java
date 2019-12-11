@@ -1,5 +1,6 @@
 package application;
 
+import application.trace.PredictionReader;
 import config.ExperimentConfiguration;
 import data.*;
 import data.preprocessing.StandardScaler;
@@ -368,6 +369,10 @@ public class ExplorationManager {
     public ArrayList<LabeledPoint> computeModelPredictionsOverRealDataset(){
 
         return this.labelPoints(this.partitionedDataset.getAllPoints(), this.rawDataset, false);
+    }
+
+    public List<LabeledPoint> getLabeledPointFromIteration(PredictionReader reader, int iteration) {
+        return reader.getPredictionsForIteration(rawDataset, iteration);
     }
 
 
