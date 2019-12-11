@@ -11,8 +11,7 @@ class PointLabelisation extends Component{
                         <p>
                             Please label the following examples
                         </p>
-                    </div>
-                </div>
+                  
 
                 <table className="table-label">
                     <thead>                        
@@ -109,6 +108,9 @@ class PointLabelisation extends Component{
                     </tbody>
                 </table>
             </div>
+
+            </div>
+                </div>
         )   
     }        
 }

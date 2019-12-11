@@ -150,7 +150,7 @@ class TSMExploration extends Component{
                 {
                     this.state.showLabelView && 
                 
-                    <div>
+                    <div className='center'>
 
                        <p>
                             Grouped variable exploration. If you chose no, 
@@ -167,7 +167,7 @@ class TSMExploration extends Component{
                             <tbody>                
                             {
                             this.state.pointsToLabel.map((point, i) => {
-                                console.log(point, dataset.get_point(point.id))
+                                
                                 const pointData = dataset.get_selected_columns_point(point.id)
                                 return (
 

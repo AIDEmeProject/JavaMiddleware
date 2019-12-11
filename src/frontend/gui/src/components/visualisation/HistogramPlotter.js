@@ -108,7 +108,7 @@ class HistogramPlotter{
                 })
                 .attr("width", function(d) { return barSize ; })
                 .attr("height", function(d) { return y(d[1]); })
-                .style("fill", "#69b3a2")
+                .style("fill", "#2574b5")
                 .style('stroke', 'white')
         
             r.exit().remove()
@@ -163,7 +163,7 @@ class HistogramPlotter{
                 .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
                 .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
                 .attr("height", function(d) { return height - y(d.length); })
-                .style("fill", "#69b3a2")
+                .style("fill", "#2574b5")
             
             r.exit().remove()
         }

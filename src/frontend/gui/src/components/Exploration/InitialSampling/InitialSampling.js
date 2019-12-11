@@ -60,18 +60,21 @@ class InitialSampling extends Component{
                                     </a>
                                 </li>    
 
-                                <li className="nav-item">
-                                    <a 
-                                    className="nav-link active" 
-                                    href="#"
-                                    onClick={() => this.setState({
-                                        showLabeling: false,
-                                        showFakePointSampling: false
-                                    })}
-                                    >
-                                        Fake point initial sampling
-                                    </a>
-                                </li>                     
+                                { 
+                                    false && 
+                                    <li className="nav-item">
+                                        <a 
+                                        className="nav-link active" 
+                                        href="#"
+                                        onClick={() => this.setState({
+                                            showLabeling: false,
+                                            showFakePointSampling: false
+                                        })}
+                                        >
+                                            Fake point initial sampling
+                                        </a>
+                                    </li>      
+                                }               
                             </ul>
                         
 

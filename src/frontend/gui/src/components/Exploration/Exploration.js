@@ -123,7 +123,8 @@ class Exploration extends Component{
                 { 
                     this.state.showLabelView && 
 
-                        <div>
+                        <div className="row">
+                            <div className="col col-lg-12">
                             <PointLabelisation                                                           
                                 chosenColumns={this.props.chosenColumns}
                                 pointsToLabel={this.state.pointsToLabel}
@@ -131,6 +132,7 @@ class Exploration extends Component{
                                 onNegativeLabel={this.onNegativeLabel.bind(this)}
                                 dataset={this.props.dataset}
                             />
+                        </div>
                         </div>
                 }
 
@@ -181,14 +183,18 @@ class Exploration extends Component{
 
                 {
                     this.state.showLabelHistory && 
-
-                    <DataPoints                             
-                        availableVariables={this.props.finalVariables}
-                        points={this.state.allLabeledPoints}
-                        chosenColumns={this.props.chosenColumns}
-                        show={true}
-                        dataset={this.props.dataset}
-                    />
+                        <div className="row">
+                            <div className="col col-lg-8 offset-lg-2">
+                                <DataPoints                             
+                                    availableVariables={this.props.finalVariables}
+                                    points={this.state.allLabeledPoints}
+                                    chosenColumns={this.props.chosenColumns}
+                                    show={true}
+                                    normal={true}
+                                    dataset={this.props.dataset}
+                                />
+                            </div>
+                        </div>
                 }                
             </div>
         )

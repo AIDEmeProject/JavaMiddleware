@@ -42,7 +42,7 @@ class MicroModalComponent extends Component{
                 <footer className="modal__footer">
                 
                 <button
-                    className="modal__btn" 
+                    className="btn btn-primary" 
                     onClick={this.props.onClose}
                     role="button"
                     type="button"
