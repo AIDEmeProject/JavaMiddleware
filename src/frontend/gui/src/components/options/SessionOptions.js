@@ -139,7 +139,13 @@ class SessionOptions extends Component{
                         show={this.state.showVariableGroups}         
                         chosenColumns={this.state.chosenColumns}                        
                         groupWasAdded={this.groupWasAdded.bind(this)}                        
-                        groupsWereValidated={this.groupsWereValidated.bind(this)}                        
+                        groupsWereValidated={this.groupsWereValidated.bind(this)}   
+                        
+                        availableVariables={this.props.chosenColumns}
+                        points={this.sampledPoints()}
+                        
+                        show={true}
+                        dataset={this.props.dataset}
                     />
 
                     <input 
@@ -154,7 +160,6 @@ class SessionOptions extends Component{
         )
     }
 
-
     constructor(props){
 
         super(props)
@@ -162,7 +167,7 @@ class SessionOptions extends Component{
         var datasetInfos = this.props.datasetInfos
        
         const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
-            return e > 10 || datasetInfos.hasFloats[i] ? "numerical": "categorical"
+            return e > 0.6 * this.props.dataset.lenght || datasetInfos.hasFloats[i] ? "numerical": "categorical"
         })
         
         var chosenColumns = datasetInfos.columns.map( (col, idx) => {
@@ -194,6 +199,17 @@ class SessionOptions extends Component{
             showColumns: true,
             showExploration: false
         }
+    }
+
+    sampledPoints(){
+        return [
+            {
+                'id': 243
+            },
+            {
+                'id': 666
+            }
+        ]
     }
 
     componentDidMount(){
