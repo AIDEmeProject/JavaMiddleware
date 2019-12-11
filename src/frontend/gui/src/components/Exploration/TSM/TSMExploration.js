@@ -179,9 +179,7 @@ class TSMExploration extends Component{
                                         key={i}
                                         className="variable-group">
 
-                                        <td>
-                                            {point.id}
-                                        </td>
+                                       
                                         {
                                             this.props.groups.map((g, iGroup) => {
                                                 console.log(g)

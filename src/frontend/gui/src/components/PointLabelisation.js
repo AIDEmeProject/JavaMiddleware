@@ -16,9 +16,7 @@ class PointLabelisation extends Component{
                 <table className="table-label">
                     <thead>                        
                         <tr>                        
-                            <th>
-                                Row id
-                            </th>
+                            
 
                             {
                                 this.props.chosenColumns.map((column, key) => {
@@ -44,9 +42,7 @@ class PointLabelisation extends Component{
 
                             <tr key={key}>
 
-                                <td >
-                                        {point.id}
-                                </td>
+                               
                       
                                 {
 

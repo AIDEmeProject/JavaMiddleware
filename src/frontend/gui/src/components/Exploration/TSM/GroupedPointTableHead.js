@@ -7,7 +7,7 @@ class GroupedPointTableHead extends Component{
             
             <thead>
                 <tr>
-                    <td>Row id</td>
+                    
                     {
                         
                         this.props.groups.map((g, i) => {
