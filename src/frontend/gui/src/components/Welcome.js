@@ -13,7 +13,7 @@ class Welcome extends Component{
 
             <div className="center">
 
-                <h1>AIDEme</h1>
+                <h1>Welcome to AIDEme</h1>
 
                 <p>                
                     <img src={welcomeImg} width="600" />
