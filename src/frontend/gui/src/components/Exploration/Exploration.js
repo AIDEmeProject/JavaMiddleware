@@ -52,7 +52,7 @@ class Exploration extends Component{
                             <li className="nav-item">
                                 <a 
                                     className={this.state.showLabelView ? "nav-link active": "nav-link"} 
-                                    href="#basic-options"
+                                    
                                     onClick={() => this.setState({
                                         'showModelVisualisation': false,
                                         'showLabelView': true,
@@ -68,7 +68,7 @@ class Exploration extends Component{
                             <li className="nav-item">
                                 <a 
                                     className={this.state.showLabelHistory ? "nav-link active": "nav-link"} 
-                                    href="#advanced-options"
+                                    
                                     onClick={() => this.setState({
                                         'showModelVisualisation': false, 
                                         'showLabelView': false, 
@@ -84,7 +84,7 @@ class Exploration extends Component{
                             <li className="nav-item">
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
-                                    href="#advanced-options"
+                                    
                                     onClick={this.onModelBehaviorClick.bind(this)}
                                 >
                                     Model Behavior
@@ -95,7 +95,7 @@ class Exploration extends Component{
                             <li className="nav-item">
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
-                                    href="#advanced-options"
+                                    
                                     onClick={() => this.setState({
                                         'showModelVisualisation': true, 
                                         'showLabelView': false,  

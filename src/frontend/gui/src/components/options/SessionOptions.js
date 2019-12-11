@@ -20,8 +20,7 @@ class SessionOptions extends Component{
                 <ul className="nav nav-tabs bg-primary">
                     <li className="nav-item">
                         <a 
-                           className="nav-link" 
-                           
+                           className={ this.state.showColumns ? "nav-link active": "nav-link"}
                            onClick={this.onBasicOptionClick.bind(this)}
                         >
                             Attribute selection
@@ -38,8 +37,7 @@ class SessionOptions extends Component{
 
                     <li className="nav-item">
                         <a 
-                           className="nav-link" 
-                           
+                           className={this.state.showVariableGroups ? "nav-link active" : "nav-link" }                           
                            onClick={this.onVariableGrouping.bind(this)}
                         >
                             Factorization structure
@@ -48,8 +46,7 @@ class SessionOptions extends Component{
 
                     <li className="nav-item">
                         <a 
-                            className="nav-link" 
-                            href="#advanced-options"
+                            className={this.state.showAdvancedOptions ? "nav-link active" : "nav-link"}
                             onClick={this.onAdvancedOptionClick.bind(this)}
                         >
                             Algorithm selection

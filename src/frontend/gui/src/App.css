@@ -428,3 +428,8 @@ h4, h3{
 .navbar, .navbar-dark, .bg-primary{
   background-color: #2574b5 !important;  
 }
+
+
+a.active{
+  background-color: #5580cc !important;
+}

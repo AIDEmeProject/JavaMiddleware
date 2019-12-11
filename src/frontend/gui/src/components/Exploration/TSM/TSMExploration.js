@@ -63,13 +63,12 @@ class TSMExploration extends Component{
                         <li className="nav-item">
 
                             <a 
-                            className="nav-link" 
-                            href="#basic-options"
-                            onClick={() => this.setState({
-                                'showModelPerformance': false, 
-                                'showLabelView': true,
-                                'showLabelHistory': false,
-                                'showModelBehavior': false
+                                className={ this.state.showLabelView ? "nav-link active": "nav-link"}
+                                onClick={() => this.setState({
+                                    'showModelPerformance': false, 
+                                    'showLabelView': true,
+                                    'showLabelHistory': false,
+                                    'showModelBehavior': false
                                 })}
                             >
                                 Labeleling
@@ -78,8 +77,8 @@ class TSMExploration extends Component{
 
                         <li className="nav-item">
                             <a 
-                                className="nav-link" 
-                                href="#advanced-options"
+                                className={ this.state.showLabelHistory ? "nav-link active": "nav-link"}
+                               
                                 onClick={() => this.setState({
                                     'showModelPerformance': false, 
                                     'showLabelView': false,  
@@ -94,13 +93,16 @@ class TSMExploration extends Component{
                         <li className="nav-item">
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
-                                    href="#advanced-options"
+                                   
                                     onClick={this.onModelBehaviorClick.bind(this)}
                                 >
                                     Model Behavior
                                 </a>
                             </li>   
 
+                        {
+                            false && 
+                        
 
                         <li className="nav-item">
                             <a 
@@ -116,6 +118,7 @@ class TSMExploration extends Component{
                                 Assess model Performance
                             </a>
                         </li>      
+                        }
                         <li className="nav-item">
                                 <a
                                     className="nav-link"
