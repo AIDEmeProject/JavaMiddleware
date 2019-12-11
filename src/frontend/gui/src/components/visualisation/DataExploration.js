@@ -260,7 +260,7 @@ class DataExploration extends Component{
             
         const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
         var axisNames = this.getColumnNames()
-
+        axisNames = [axisNames[iFirstVariable], axisNames[iSecondVariable]]
         this.twoDimensionHeatmapPlotter.plot(heatmapData, axisNames)
     }
 
