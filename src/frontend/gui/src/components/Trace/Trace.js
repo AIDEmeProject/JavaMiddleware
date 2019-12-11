@@ -227,7 +227,7 @@ class QueryTrace extends Component{
                                         </div>
 
                                         <div id="f1-score-img">
-                                            <img src={this.state.f1ScoreImg} />
+                                            <img width="450" src={this.state.f1ScoreImg} />
                                         </div>
 
                                     </div>

@@ -481,7 +481,7 @@ class ModelBehavior extends Component{
         var key = e.target.dataset.name
         var value = e.target.value
                 
-        if ( ! Number.isInteger(parseInt(value))){
+        if ( !isNaN(value) && value.toString().indexOf('.') != -1){
             var newScale = Object.assign({}, this.state.scale, {[key]: value})    
             this.setState({
                 scale: newScale    

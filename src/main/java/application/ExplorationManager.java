@@ -368,7 +368,12 @@ public class ExplorationManager {
 
     public ArrayList<LabeledPoint> computeModelPredictionsOverRealDataset(){
 
-        return this.labelPoints(this.partitionedDataset.getAllPoints(), this.rawDataset, false);
+        if (! this.configuration.hasMultiTSM()){
+            return this.labelPoints(partitionedDataset.getAllPoints(), rawDataset, false);
+        }
+
+        IndexedDataset datasetToLabel = this.partitionedDataset.getAllPoints();
+        return this.getModelPredictionWithTSM(datasetToLabel);
     }
 
     public List<LabeledPoint> getLabeledPointFromIteration(PredictionReader reader, int iteration) {

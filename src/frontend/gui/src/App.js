@@ -182,7 +182,7 @@ class App extends Component {
 
         <div>       
                                      
-            <ul className="navbar navbar-dark bg-dark box-shadow ">                 
+            <ul className="navbar navbar-dark box-shadow ">                 
                 
                 <li className="nav-item">
                     <a className="navbar-brand" href="/">                    

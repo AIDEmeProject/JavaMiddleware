@@ -11,8 +11,7 @@ class PointLabelisation extends Component{
                         <p>
                             Please label the following examples
                         </p>
-                    </div>
-                </div>
+                  
 
                 <table className="table-label">
                     <thead>                        
@@ -90,14 +89,14 @@ class PointLabelisation extends Component{
                                         <button
                                             className="btn btn-raised btn-primary" 
                                             data-key={key} 
-                                            onClick={this.props.onPositiveLabel}>
+                                            onClick={e => this.props.onPositiveLabel(e)}>
                                             Yes
                                         </button>
 
                                         <button 
                                             className="btn btn-raised btn-primary"  
                                             data-key={key} 
-                                            onClick={this.props.onNegativeLabel}
+                                            onClick={e => this.props.onNegativeLabel(e)}
                                         >
                                             No
                                         </button>
@@ -109,6 +108,9 @@ class PointLabelisation extends Component{
                     </tbody>
                 </table>
             </div>
+
+            </div>
+                </div>
         )   
     }        
 }

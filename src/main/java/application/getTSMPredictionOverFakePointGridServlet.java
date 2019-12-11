@@ -20,7 +20,7 @@ public class getTSMPredictionOverFakePointGridServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        ArrayList<LabeledPoint> labeledPoints = manager.computeTSMPredictionsOverFakeGridPoints();
+        ArrayList<LabeledPoint> labeledPoints = manager.computeTSMPredictionOverRealDataset();
 
         Gson gson = new Gson();
 

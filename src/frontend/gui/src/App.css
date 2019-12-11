@@ -14,16 +14,17 @@
   margin:auto;
   overflow-x: auto;
   white-space: nowrap;
-  max-width: 80vw;
+  max-width: 70%;
+  vertical-align: top;
 }
 
 .table-control{
   display:inline-block;
-  
+  vertical-align: top;  
 }
 
-.table-label td{
-  height: 41px;
+.table-label tr, .table-control th{
+  height: 44px;
 }
 
 .predicted td, .predicted th, .table-label td, .table-label th, .table-control td, .table-control th {
@@ -43,6 +44,8 @@
 .navbar{
     margin-bottom: 40px;
 }
+
+
 
 
 .col-selector > * {
@@ -236,6 +239,7 @@
  align-items:initial;
  justify-content:center;
  margin-bottom: 0;
+ 
 }
 
 
@@ -298,6 +302,7 @@ h4, h3{
 .btn-explore{
   margin-left: 50px;
 }
+
 
 
 .column-name-label{
@@ -403,4 +408,14 @@ h4, h3{
 
 .categorical-filter{
   overflow: auto;
+}
+
+
+.btn-primary{
+  background-color: #2574b5 !important;
+  color: white !important;
+}
+
+.navbar, .navbar-dark, .bg-primary{
+  background-color: #2574b5 !important;  
 }

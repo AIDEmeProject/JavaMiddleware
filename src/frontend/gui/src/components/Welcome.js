@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import welcomeImg from  "../resources/welcome.png"
+
 class Welcome extends Component{
 
   render(){
@@ -9,46 +11,29 @@ class Welcome extends Component{
 
             <div className="col col-lg-6 offset-lg-3">
 
+            <div className="center">
+                
                 <h1>Welcome to Aideme</h1>
 
-
-                <p>
-                    Content from the poster
-                    You can edit the file Wecome.js if you want                    
+                <p>                
+                    <img src={welcomeImg} width="600" />
                 </p>
-
-
-                <p>
-                    Content from the poster
-                    You can edit the file Wecome.js if you want                    
+                <p className="">
+                    <button
+                        className="btn btn-raised"
+                        onClick={this.props.onTraceClick}
+                    >
+                        Trace session
+                    </button>
+                    <button
+                        className="btn btn-raised"
+                        onClick={this.props.onInteractiveSessionClick}
+                    >
+                        Interactive session
+                    </button>
                 </p>
-
-
-                <p>
-                    Content from the poster
-                    You can edit the file Wecome.js if you want                    
-                </p>
-
-
-                <p>
-                    Content from the poster
-                    You can edit the file Wecome.js if you want                    
-                </p>
-
-                <button
-                    className="btn btn-raised"
-                    onClick={this.props.onTraceClick}
-                >
-                    Trace session
-                </button>
-                <button
-                    className="btn btn-raised"
-                    onClick={this.props.onInteractiveSessionClick}
-                >
-                    Interactive session
-                </button>
             </div>
-
+            </div>
         </div>
     )
 

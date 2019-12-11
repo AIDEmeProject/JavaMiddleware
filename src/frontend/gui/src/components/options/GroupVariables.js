@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import MicroModalComponent from '../MicroModalComponent'
 import Group from './Group'
 
+import DataPoints from '../DataPoints'
+
 function containsObject(obj, list) {
 
     var i;
@@ -108,6 +110,12 @@ class GroupVariables extends Component {
                 <p>
                     Group variable by click on "edit" on a given group                    
                 </p>
+
+                <p>
+                    Below are display some data points to help you in the process of grouping variables
+                </p>
+
+                
                 
                 <div>
                 

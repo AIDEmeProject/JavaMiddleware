@@ -25,7 +25,16 @@ class ModelBehaviorPlotter{
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")");
+                        "translate(" + margin.left + "," + margin.top + ")")
+
+        svg.append("defs").append("clipPath")
+                        .attr("id", "clip")
+                      .append("rect")
+                        .attr("width", width)
+                        .attr("height", height)
+        //                .attr('x', margin.left)
+          //              .attr('y', margin.top)
+                        ;
 
         this.svg = svg
         this.width = width
@@ -81,6 +90,7 @@ class ModelBehaviorPlotter{
 
         this.gPredictions = svg.append('g')
             .attr('class', 'predictions')
+            .attr("clip-path", "url(#clip)")
             
         this.tooltip = this.svg
             .append("g")

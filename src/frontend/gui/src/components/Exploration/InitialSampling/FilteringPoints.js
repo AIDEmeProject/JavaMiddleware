@@ -10,6 +10,7 @@ class NumericalFilter extends Component{
         const variable = this.props.variable
         const min = this.props.min,
               max = this.props.max
+
         return (
             <div className="card filter inline-block">
 
@@ -23,8 +24,8 @@ class NumericalFilter extends Component{
                             value={this.state.minValue}
                             onChange={this.minChanged.bind(this)}
                             type="range"
-                            min={min}
-                            max={max}
+                            min={-1000}
+                            max={100000}
                         />
                     </label>
 
@@ -36,8 +37,8 @@ class NumericalFilter extends Component{
                             value={this.state.maxValue}
                             onChange={this.maxChanged.bind(this)}
                             type="range"
-                            min={min}
-                            max={max}
+                            min={-1000}
+                            max={100000}
                         />
                     </label>
             </div>
@@ -49,7 +50,7 @@ class NumericalFilter extends Component{
         this.state = {
             
             minValue: 0,
-            maxValue: 10
+            maxValue: 100000
         }
     }
 
@@ -176,6 +177,8 @@ class PointFiltering extends Component{
                         chosenColumns={this.props.chosenVariables}
                         dataset={this.props.dataset}
                         pointsToLabel={this.state.points}
+                        onPositiveLabel={this.onPositiveLabel.bind(this)}
+                        onNegativeLabel={this.onNegativeLabel.bind(this)}
                     />
                 </div>
             </div>
@@ -193,6 +196,30 @@ class PointFiltering extends Component{
             }),
             points: []
         }        
+    }
+
+    onPositiveLabel(e){
+        var iPoint = e.target.dataset.key
+
+        var points = this.state.points
+        points.splice(iPoint, 1)
+        this.setState({
+            points
+        })
+
+        this.props.onPositiveLabel(e)
+    }
+
+    onNegativeLabel(e){
+
+        var iPoint = e.target.dataset.key
+
+        var points = this.state.points
+        points.splice(iPoint, 1)
+        this.setState({
+            points
+        })
+        this.props.onNegativeLabel(e)
     }
 
     filterChanged(iFilter, change){
@@ -231,7 +258,7 @@ class PointFiltering extends Component{
                 id: e.id,
                 data: e.data.array
             }
-        })
+        }).filter((e, i) => { return i < 25})
         this.setState({
             points: receivedPoints
         })

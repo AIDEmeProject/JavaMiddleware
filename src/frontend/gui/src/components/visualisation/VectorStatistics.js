@@ -18,8 +18,8 @@ class VectorStatistics extends Component{
               max = d3.max(data),
               std = d3.deviation(data),
               mean = d3.mean(data),
-              median = d3.median(data),
-              uniqueValues = d3.set(data).values().length
+              median = d3.median(data)
+              //uniqueValues = d3.set(data).values().length
 
         return (
             <div>
@@ -66,7 +66,7 @@ class VectorStatistics extends Component{
                                 {std}
                             </td>  
                             <td>
-                                {uniqueValues}
+                                {this.props.uniqueValues.length}
                             </td>                          
                         </tr>
                     </tbody>

@@ -5,6 +5,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import data.DataPoint;
 import data.LabeledPoint;
+import io.CSVParser;
+import io.ValueParser;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -89,15 +91,17 @@ public class CsvDatasetReader {
         this.hasFloats = new boolean[columns.length];
 
         String[] dataRow;
+        ValueParser parser = new ValueParser(columns.length);
+
         int iRow = 1;
         while ((dataRow = csvReader.readNext()) != null) {
-           this.parseInfo(dataRow, iRow);
+           this.parseInfo(dataRow, iRow, parser);
            iRow++;
         }
 
         dataset.minimums = minimums;
         dataset.maximums = maximums;
-        dataset.uniqueValueNumbers = this.computeUniqueValueNumbers();
+        dataset.uniqueValueNumbers = parser.getUniqueValueCount();
         dataset.hasFloats = this.hasFloats;
         dataset.nRows = iRow;
 
@@ -106,18 +110,19 @@ public class CsvDatasetReader {
         return json.toJson(dataset);
     }
 
-    protected void parseInfo(String[] dataRow, int iRow){
+
+
+    protected void parseInfo(String[] dataRow, int iRow, ValueParser parser){
+
+        int nCol = dataRow.length;
+
 
         double val = 0;
 
-        for(int iCol = 0; iCol < dataRow.length; iCol++){
+        for(int iCol = 0; iCol < nCol; iCol++){
 
-            try{
-                val = Double.parseDouble(dataRow[iCol]);
-            }
-            catch (NumberFormatException e){
-                val = 0;
-            }
+            val = parser.parseValue(dataRow[iCol], iCol);
+
             if (this.maximums[iCol] <= val){
                 this.maximums[iCol] = val;
             }
@@ -130,14 +135,15 @@ public class CsvDatasetReader {
                 this.hasFloats[iCol] = true;
             }
 
-            if (iRow < 100){
-                this.uniqueValues.get(iCol).add(val);
-            }
+
+            this.uniqueValues.get(iCol).add(val);
+
         }
     }
 
 
     protected int[] computeUniqueValueNumbers(){
+
         int nCols = this.uniqueValues.size();
 
         int[] uniqueValueNumbers = new int[nCols];
