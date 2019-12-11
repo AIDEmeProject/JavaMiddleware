@@ -143,8 +143,7 @@ class SessionOptions extends Component{
                         
                         availableVariables={this.props.chosenColumns}
                         points={this.sampledPoints()}
-                        
-                        show={true}
+                                                
                         dataset={this.props.dataset}
                     />
 
@@ -165,10 +164,24 @@ class SessionOptions extends Component{
         super(props)
 
         var datasetInfos = this.props.datasetInfos
-       
+        
         const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
-            return e > 0.6 * this.props.dataset.lenght || datasetInfos.hasFloats[i] ? "numerical": "categorical"
+            
+            var nRow = this.props.dataset.getLength()
+            
+            var uniqueValues = datasetInfos.uniqueValueNumbers[i]
+            var hasFloats = datasetInfos.hasFloats[i]
+            var hasMoreThanXPercentOfUniqueValues = uniqueValues > 0.2 * nRow
+            
+            var hasMaxOverNRow = datasetInfos.maximums[i] > nRow
+
+            var shouldBeNumeric = hasFloats || hasMoreThanXPercentOfUniqueValues || hasMaxOverNRow
+        
+            return shouldBeNumeric ? "numerical" : "categorical"
+            
         })
+
+        
         
         var chosenColumns = datasetInfos.columns.map( (col, idx) => {
             return {

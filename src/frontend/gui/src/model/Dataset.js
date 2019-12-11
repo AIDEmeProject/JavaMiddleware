@@ -49,7 +49,9 @@ class Dataset{
         return this.dataset.map(e => e[name])
     }
 
-   
+    getLength(){
+        return this.dataset.length
+    }
 
     get_parsed_columns_by_names(names){
         var columns = names.map(name => {

@@ -12,8 +12,8 @@ class Welcome extends Component{
             <div className="col col-lg-6 offset-lg-3">
 
             <div className="center">
-                
-                <h1>Welcome to Aideme</h1>
+
+                <h1>Aideme</h1>
 
                 <p>                
                     <img src={welcomeImg} width="600" />

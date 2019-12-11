@@ -156,7 +156,7 @@ class Exploration extends Component{
 
                         </div>
                         
-                        <div className="col col-lg-7">
+                        <div className="col col-lg-8">
                             <ModelBehavior   
                                 iteration={iteration}                     
                                 labeledPoints={this.state.allLabeledPoints}

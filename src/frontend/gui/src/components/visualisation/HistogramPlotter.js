@@ -57,6 +57,8 @@ class HistogramPlotter{
         var height = this.height,
             width = this.width
         
+
+        console.log(isCategorical)
         if (isCategorical){
             
             data = data.filter((e, i ) => i < nBins)
