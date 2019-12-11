@@ -18,7 +18,7 @@ import Welcome from './components/Welcome'
 
 import {backend, webplatformApi} from './constants/constants'
 import './App.css';
-import logo from './AIDEME.png'
+import logo from './resources/logo.png'
 
 import * as d3 from "d3"
 import Dataset from './model/Dataset';
