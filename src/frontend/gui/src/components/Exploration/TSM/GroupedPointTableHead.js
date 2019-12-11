@@ -18,13 +18,16 @@ class GroupedPointTableHead extends Component{
                                 <th 
                                     key ={i}
                                     colSpan={g.length}
+                                    
                                 >
                                     {columnNames.join(", ")}
                                 </th>
                             )
                         })
                     }
-                    <th>
+                    <th
+                        className="label-col"
+                    >
                         Label    
                     </th>                
                 </tr>

@@ -21,6 +21,11 @@
 .table-control{
   display:inline-block;
   vertical-align: top;  
+  background-color: #f3f3f3;
+}
+
+.label-col{
+  background-color: #f3f3f3;
 }
 
 .table-label tr, .table-control th{

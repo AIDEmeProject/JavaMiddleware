@@ -152,15 +152,17 @@ class TSMExploration extends Component{
                 {
                     this.state.showLabelView && 
                 
-                    <div className='center'>
-
+                    <div className='center card'>
+                        <div className="row">
+                        <div className="col col-lg-8 offset-lg-2">
+                            
                        <p>
                             Grouped variable exploration. If you chose no, 
                             you will be asked to label each subgroups
                             independantly                    
                         </p>
 
-                    <table className="group-variable">
+                       <table className="group-variable">
 
                         <GroupedPointTableHead 
                             groups={this.props.groups}
@@ -221,7 +223,9 @@ class TSMExploration extends Component{
                                                 )
                                             })
                                         }
-                                        <td>
+                                        <td
+                                        className="label-col"
+                                        >
                                         
                                             <button 
                                                 style={{display: typeof point.labels === "undefined" ? "inherit": "none"}}
@@ -256,6 +260,8 @@ class TSMExploration extends Component{
                         }
                             </tbody>
                         </table>                                                               
+                        </div>
+                        </div>
                     </div>
                 }                           
                 {
