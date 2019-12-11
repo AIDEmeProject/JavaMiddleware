@@ -142,7 +142,9 @@ class ModelBehavior extends Component{
                         <div className="row">
                             <div className="col col-lg-12">
                                                                                
-                            <h3>Polytope Model</h3>
+                            <h4
+                                className="left-title"
+                            >Polytope Model</h4>
                             <svg id="tsm-plot"></svg>                         
                         </div>
                     
@@ -153,7 +155,9 @@ class ModelBehavior extends Component{
                                              
                 <div className="col col-lg-12">
                     
-                    <h4>
+                    <h4
+                        className="left-title"
+                    >
                         Model predictions
                     </h4>
                     
@@ -171,12 +175,16 @@ class ModelBehavior extends Component{
                         
                         {
                             this.props.hasTSM &&
-                            <h4>Polytope model Predictions over projected dataset</h4>
+                            <h4
+                            className="left-title"
+                            >Polytope model Predictions over projected dataset</h4>
                         }
 
                         {
                             ! this.props.hasTSM &&
-                            <h4>Predictions over projected dataset</h4>
+                            <h4
+                            className="left-title"
+                            >Predictions over projected dataset</h4>
                         }
 
                         <svg id="projection"></svg>                

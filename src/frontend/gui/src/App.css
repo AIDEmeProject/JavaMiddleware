@@ -433,3 +433,7 @@ h4, h3{
 a.active{
   background-color: #5580cc !important;
 }
+
+.left-title{
+  text-align: left;
+}
