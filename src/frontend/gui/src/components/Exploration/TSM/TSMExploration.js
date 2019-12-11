@@ -127,19 +127,11 @@ class TSMExploration extends Component{
                     </ul>
                 }
                 { 
-                    this.state.initialLabelingSession && 
-                    
+                    //this.state.initialLabelingSession && 
+                    false && 
                     <div className="card">
-                        <p>                            
-                            The first phase of labeling continues until we obtain 
-                            a positive example and a negative example.        
-                        </p>
-
-                        <p>
-                            Grouped variable exploration. If you chose no, 
-                            you will be asked to label each subgroups
-                            independantly                    
-                        </p>
+                       
+                       
                         {
                             false && 
                             <SpecificPointToLabel 
@@ -156,6 +148,14 @@ class TSMExploration extends Component{
                         <div className="row">
                         <div className="col col-lg-8 offset-lg-2">
                             
+                        {
+                             this.state.initialLabelingSession && 
+                            <p>                            
+                                The first phase of labeling continues until we obtain 
+                                a positive example and a negative example.        
+                            </p>
+                        }
+
                        <p>
                             Grouped variable exploration. If you chose no, 
                             you will be asked to label each subgroups

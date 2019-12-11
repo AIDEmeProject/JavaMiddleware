@@ -2,6 +2,10 @@
 .container-fluid{
   width: 100%;
 }
+
+.group-variable{
+  margin: auto;
+}
 .group-variable td, .group-variable th {
     border: 1px solid black;
     min-width: 200px;
