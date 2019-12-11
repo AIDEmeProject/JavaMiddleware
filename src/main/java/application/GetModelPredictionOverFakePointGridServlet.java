@@ -28,7 +28,8 @@ public class GetModelPredictionOverFakePointGridServlet extends HttpServlet {
 
         ExplorationManager manager = (ExplorationManager) this.getServletContext().getAttribute("experimentManager");
 
-        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionsOverFakeGridPoints();
+        //use real dataset currently
+        ArrayList<LabeledPoint> labeledPoints = manager.computeModelPredictionsOverRealDataset();
 
         Gson gson = new Gson();
 

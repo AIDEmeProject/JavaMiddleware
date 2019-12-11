@@ -15,6 +15,8 @@ import getGridPoints from '../../../actions/getGridPoints'
 import getTSMPredictions from '../../../actions/getTSMPredictionsOverGridPoints';
 import getModelPredictionsOverGridPoints from '../../../actions/getModelPredictionsOverGridPoints';
 
+import buildRealDatasetGrid from '../../../lib/buildRealDatasetGrid'
+
 import {backend, webplatformApi} from '../../../constants/constants'
 
 class TSMExploration extends Component{
@@ -515,7 +517,7 @@ class TSMExploration extends Component{
 
         if ( ! this.state.initialLabelingSession){
 
-            getDecisionBoundaryData(this.projectionDataWasReceived.bind(this))
+            //getDecisionBoundaryData(this.projectionDataWasReceived.bind(this))
             getTSMPredictions(predictedLabels => {
                                             
                 var TSMPredictionHistory = this.state.TSMPredictionHistory
@@ -578,13 +580,25 @@ class TSMExploration extends Component{
 
     getGridPoints(){
 
-        if ( this.state.fakePointGrid.length === 0){
-            getGridPoints(points => {
-                
-                this.setState({
-                    fakePointGrid: points
-                })
+        if (this.props.useRealData){
+            //var grid = buildRealDatasetGrid(this.props.dataset)
+            const usedColumnNames = this.props.chosenColumns.map(e => e['name'])
+            console.log(usedColumnNames)
+            var grid = this.props.dataset.get_parsed_columns_by_names(usedColumnNames)
+            this.setState({
+                fakePointGrid: grid
             })
+        }
+        else{
+
+            if ( this.state.fakePointGrid.length === 0){
+                getGridPoints(points => {
+                    
+                    this.setState({
+                        fakePointGrid: points
+                    })
+                })
+            }
         }
     }
 
@@ -679,15 +693,8 @@ function sendLabels(labeledPoints, onSuccess){
 
 
 TSMExploration.defaultProps = {
+    useRealData: true
     
-    pointsToLabel: [
-        {
-            'id': 4,
-            'data': {
-                'array': [1, 7, 2]
-            }
-        }
-    ]
 }
 
 export default TSMExploration

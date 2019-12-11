@@ -373,13 +373,22 @@ class Exploration extends Component{
 
     _getModelBehaviorData(){
 
-        if ( this.state.fakePointGrid.length === 0){
-            getGridPoints(points => {                                                
-                this.setState({
-                    fakePointGrid: points
-                })
-
+        if (this.props.useRealData){
+            const usedColumnNames = this.props.chosenColumns.map(e => e['name'])            
+            var grid = this.props.dataset.get_parsed_columns_by_names(usedColumnNames)
+            this.setState({
+                fakePointGrid: grid
             })
+        }
+        else{
+            if ( this.state.fakePointGrid.length === 0){
+                getGridPoints(points => {                                                
+                    this.setState({
+                        fakePointGrid: points
+                    })
+
+                })
+            }
         }
 
         if ( ! this.state.initialLabelingSession){
@@ -507,5 +516,8 @@ class Exploration extends Component{
     }   
 }
 
+Exploration.defaultProps = {
+    useRealData: true
+}
 
 export default Exploration

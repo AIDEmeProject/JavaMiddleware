@@ -39,21 +39,29 @@ public class ApplicationServerMain {
         handler.addServlet(NewSessionServlet.class, "/new-session");
         handler.addServlet(ChooseSessionOptionServel.class, "/choose-options");
 
+        //initial sampling
         handler.addServlet(GetSpecificDataToLabelServlet.class, "/get-specific-point-to-label");
+        handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
+        handler.addServlet(GetPointToLabelFromFilteringServlet.class, "/get-points-by-filtering");
+
+
         handler.addServlet(DataPointsWereLabeledServlet.class, "/data-point-were-labeled");
         handler.addServlet(TSMDataPointsWereLabeledServlet.class, "/tsm-data-point-were-labeled");
+
         handler.addServlet(GetLabeledDatasetServlet.class, "/get-labeled-dataset");
         handler.addServlet(ModelVisualizationServlet.class, "/get-visualization-data");
-        handler.addServlet(FakePointInitialSampling.class, "/fake-point-initial-sampling");
-        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/get-decision-boundaries");
+
+
         handler.addServlet(getFakePointGridServlet.class, "/get-fake-point-grid");
+        handler.addServlet(LabelPointForDecisionBoundaryServlet.class, "/get-decision-boundaries");
+
         handler.addServlet(GetModelPredictionOverFakePointGridServlet.class, "/get-model-predictions-over-grid-point");
         handler.addServlet(getTSMPredictionOverFakePointGridServlet.class, "/get-tsm-predictions-over-grid-point");
         handler.addServlet(TraceInitializationServlet.class, "/start-trace");
         handler.addServlet(TraceComputationServlet.class, "/get-next-traces");
 
 
-        handler.addServlet(GetPointToLabelFromFilteringServlet.class, "/get-points-by-filtering");
+
         //handler.addServlet(GetModelPredictionOverRealDatasetServlet.class, "/get-model-prediction-over-dataset");
 
 
