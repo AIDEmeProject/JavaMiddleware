@@ -25,6 +25,9 @@ class DataExploration extends Component{
 
         const uniqueValues = this.computeUniqueValues()
 
+        const isVarCategorical = this.isVariableCategorical(iFirstVariable)
+        console.log(isVarCategorical)
+
         return (
             <div id="data-exploration">    
               
@@ -44,7 +47,7 @@ class DataExploration extends Component{
                         Max
                     </label>
 
-                        <input 
+                    <input 
                         className="form-input"
                         id="max"
                         type="number"
@@ -59,11 +62,14 @@ class DataExploration extends Component{
                     {variables[iFirstVariable]} column
                 </h4>
 
-               <VectorStatistics 
-                    data={firstVariable}
-                    uniqueValues={uniqueValues}
-                    
-               />
+                { ! isVarCategorical &&
+
+                    <VectorStatistics 
+                            data={firstVariable}
+                            uniqueValues={uniqueValues}
+                            
+                    />
+                }
                                
                 <div className="one-dimensional-plot">
                     <div>
@@ -192,6 +198,10 @@ class DataExploration extends Component{
         })
     }
 
+
+    isVariableCategorical(iVar){
+        return this.props.chosenColumns[iVar].type === "categorical"
+    }
     getVariable(iVariable){
         const data = this.props.dataset.get_column_id(iVariable)
         return data

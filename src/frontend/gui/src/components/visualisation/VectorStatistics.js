@@ -73,7 +73,7 @@ class VectorStatistics extends Component{
                 </table>  
 
                 { 
-                    this.props.uniqueValues.length < 50 &&
+                    false &&
                     <div>
                         <h4>
                             Unique value counts

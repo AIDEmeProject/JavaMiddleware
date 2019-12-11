@@ -66,7 +66,7 @@ class HistogramPlotter{
             var nBars = Math.min(data.length, nBins)
             var barSize = width / nBars
             var total = data.reduce((a, e) => a + e[1], 0)
-            
+            console.log(total)
             //var domain = d3.extent(data.map(e => e[1]))
             
             console.log(nBars)
@@ -87,8 +87,11 @@ class HistogramPlotter{
                     .style('dx', '.75em')
                     .attr("transform", "rotate(-65)");
 
-
-            y.domain([0, total]);   
+            y.domain([total, 0]);  
+            yAxis
+                .transition()
+                .duration(1000)
+                .call(d3.axisLeft(y)) 
 
             var r = svg.selectAll("rect")
                        .data(data)
@@ -101,15 +104,21 @@ class HistogramPlotter{
                 .attr("x", 1)
                 
                 .attr("transform", (d, i) => { 
-                    var barHeight = y(d[1])
-                    var xTranslate = i  * barSize,
-                        yTranslate = height - barHeight
+                    
+                    var barHeight = d[1] 
+                    
+                    var xTranslate = i * barSize,
+                        yTranslate = height - y(barHeight)
+                        
 
                     
                     return "translate(" + xTranslate + "," + yTranslate + ")"; 
                 })
                 .attr("width", function(d) { return barSize ; })
-                .attr("height", function(d) { return y(d[1]); })
+                .attr("height", function(d) { 
+                    
+                    return y(d[1]); 
+                })
                 .style("fill", "#2574b5")
                 .style('stroke', 'white')
         
