@@ -258,7 +258,7 @@ class PointFiltering extends Component{
                 id: e.id,
                 data: e.data.array
             }
-        })
+        }).filter((e, i) => { return i < 25})
         this.setState({
             points: receivedPoints
         })
