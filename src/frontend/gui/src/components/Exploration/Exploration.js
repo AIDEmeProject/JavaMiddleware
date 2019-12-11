@@ -91,7 +91,7 @@ class Exploration extends Component{
                                 </a>
                             </li>       
 
-
+                            { false && 
                             <li className="nav-item">
                                 <a 
                                     className={this.state.showModelVisualisation ? "nav-link active": "nav-link"} 
@@ -107,7 +107,7 @@ class Exploration extends Component{
                                     Model Performance
                                 </a>
                             </li>       
-
+                            }
                             <li className="nav-item">
                                 <a
                                     className="nav-link"
@@ -173,8 +173,8 @@ class Exploration extends Component{
                 }
 
                 {
-                    this.state.showModelVisualisation && 
-                                        
+                    //this.state.showModelVisualisation && 
+                    false &&                  
                     <ModelVisualization 
                         {...this.props}
                         {...this.state}
