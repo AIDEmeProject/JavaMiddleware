@@ -45,7 +45,6 @@ public class CsvDatasetWriter {
 
             for (LabeledPoint point: labeledPoints) {
 
-                point.getData();
 
                 String[] strings = new String[point.getData().length() + 2];
 

@@ -302,8 +302,7 @@ public class ExplorationManager {
 
     public ArrayList<LabeledPoint> labelWholeDataset(){
         //add user labeled points
-        IndexedDataset pointsToLabel = this.partitionedDataset.getAllPoints();
-        return this.labelPoints(pointsToLabel, rawDataset,  false);
+        return this.computeModelPredictionsOverRealDataset();
     }
 
     protected void generateGridOfFakePoints(){

@@ -49,6 +49,8 @@ public class GetLabeledDatasetServlet extends HttpServlet {
         String sessionPath = (String) this.getServletContext().getAttribute("sessionPath");
         String filePath =  sessionPath + "/labeled_dataset.csv";
 
+
+        labeledPoints.removeIf(s -> s.getLabel().asSign() != 1);
         CsvDatasetWriter writer = new CsvDatasetWriter();
         writer.savedLabeledPointsAsCsv(labeledPoints, filePath);
 
