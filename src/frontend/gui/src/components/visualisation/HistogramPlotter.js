@@ -124,7 +124,7 @@ class HistogramPlotter{
                     .style('dx', '.75em')
                     .attr("transform", "rotate(-65)");
 
-            y.domain([total, 0]);  
+            y.domain([0, total]);  
             yAxis
                 .transition()
                 .duration(1000)
@@ -146,14 +146,14 @@ class HistogramPlotter{
                     
                     var barHeight = d[1]                     
                     var xTranslate = i * barSize,
-                        yTranslate = height - y(barHeight)
-                        yTranslate = 0                                    
+                        yTranslate = y(barHeight)
+                        //yTranslate = 0                                    
                     return "translate(" + xTranslate + "," + yTranslate + ")"; 
                 })
                 .attr("width", function(d) { return barSize ; })
                 .attr("height", function(d) { 
                     
-                    return y(d[1]); 
+                    return height - y(d[1]); 
                 })
                 .style("fill", "#2574b5")
                 .style('stroke', 'white')
