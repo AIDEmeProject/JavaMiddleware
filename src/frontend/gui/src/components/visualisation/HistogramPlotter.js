@@ -100,8 +100,6 @@ class HistogramPlotter{
                     .style("opacity", 0)
             }
     
-
-            
             data = data.filter((e, i ) => i < nBins)
             
             var nBars = Math.min(data.length, nBins)
@@ -139,8 +137,8 @@ class HistogramPlotter{
              .append("rect")
              .merge(r)
              .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave) 
+             .on("mousemove", mousemove)
+             .on("mouseleave", mouseleave) 
              .transition()
              .duration(1000)
                 .attr("x", 1)
@@ -149,7 +147,7 @@ class HistogramPlotter{
                     var barHeight = d[1]                     
                     var xTranslate = i * barSize,
                         yTranslate = height - y(barHeight)
-                                        
+                        yTranslate = 0                                    
                     return "translate(" + xTranslate + "," + yTranslate + ")"; 
                 })
                 .attr("width", function(d) { return barSize ; })
