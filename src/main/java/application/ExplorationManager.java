@@ -394,12 +394,12 @@ public class ExplorationManager {
     public ArrayList<LabeledPoint> computeModelPredictionForProjection(){
 
         if (! this.configuration.hasMultiTSM()){
-            return this.labelPoints(partitionedDataset.getAllPoints().sample(2), rawDataset.sample(2), false);
+            return this.labelPoints(partitionedDataset.getAllPoints(), rawDataset, false);
         }
 
         IndexedDataset datasetToLabel = this.partitionedDataset.getAllPoints();
         System.out.println("TOBE REMOVED AFTER DBG");
-        return this.TSMPrediction(datasetToLabel.sample(2));
+        return this.TSMPrediction(datasetToLabel);
     }
 
 
