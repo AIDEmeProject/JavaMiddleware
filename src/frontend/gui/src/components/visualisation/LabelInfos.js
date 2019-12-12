@@ -25,19 +25,19 @@ class LabelInfos extends Component{
             <div id="iteration-labels">
                 <div>
                     Labeled sample {
-                        labeledPoints.length
+                        labeledPoints.length + 2
                     }
                 </div>
 
                 <div>
                     Positive labels {
-                        positiveSamples.length
+                        positiveSamples.length + 1
                     }
                 </div>
 
                 <div>
                     Negative labels {
-                        negativeSamples.length
+                        negativeSamples.length + 1
                     }
                 </div>
             </div>
