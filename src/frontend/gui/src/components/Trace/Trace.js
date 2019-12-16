@@ -223,7 +223,8 @@ class QueryTrace extends Component{
 
                                         <LabelInfos
                                             iteration={this.state.iteration}
-                                            labeledPoints={this.state.allLabeledPoints}                                            
+                                            labeledPoints={this.state.allLabeledPoints}   
+                                            live={false}                                         
                                         />
 
 
