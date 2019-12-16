@@ -34,7 +34,7 @@ Install java and maven
 Launch the Jetty web server
 
 ```bash
-mvn cean compile && mvn -e exec:java -Dexec.mainClass="application.ApplicationServerMain"
+mvn clean compile && mvn -e exec:java -Dexec.mainClass="application.ApplicationServerMain"
 ```
 
 Launch the web interface

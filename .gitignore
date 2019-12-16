@@ -13,3 +13,5 @@ session/*
 
 build/*
 !build/.gitkeep
+
+*.csv
