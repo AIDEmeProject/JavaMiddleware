@@ -35,6 +35,10 @@
 .table-label tr, .table-control th{
   height: 44px;
 }
+.table-label  td{
+  max-width: 350px;
+  overflow: hidden;
+}
 
 .predicted td, .predicted th, .table-label td, .table-label th, .table-control td, .table-control th {
     border: 1px solid black;
@@ -315,7 +319,7 @@ h4, h3{
 
 
 .column-name-label{
-  width: 100px;
+  min-width: 150px;
   height: 18px;
   vertical-align: middle;
   margin-bottom: 0;
@@ -436,4 +440,8 @@ a.active{
 
 .left-title{
   text-align: left;
+}
+
+.charbottalk > * {
+  display: inline-block;
 }

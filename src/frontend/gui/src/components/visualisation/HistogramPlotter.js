@@ -119,10 +119,7 @@ class HistogramPlotter{
             this.xAxis.transition()
                 .duration(1000)
                 .call(xAxis)
-                .selectAll('text')
-                    .style("text-anchor", "end")
-                    .style('dx', '.75em')
-                    .attr("transform", "rotate(-65)");
+                
 
             y.domain([0, total]);  
             yAxis

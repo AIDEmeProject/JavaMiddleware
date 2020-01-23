@@ -5,6 +5,8 @@ import Group from './Group'
 
 import DataPoints from '../DataPoints'
 
+import robot from '../../resources/robot.png'
+
 function containsObject(obj, list) {
 
     var i;
@@ -102,19 +104,17 @@ class GroupVariables extends Component {
                 <h4>
                     Variable subgroups
                 </h4>
+                
+                <p className="card">   
 
-                 <p>
-                    By grouping variable in formal subgroups, the convergence
-                    speed can be improved. 
+                    <span className="chatbot-talk">
+                        <img src={robot} width="70" />
+                        <q>
+                            By grouping variable in formal subgroups, the convergence speed can be improved. 
+                            Group variable by click on "edit" on a given group
+                        </q>
+                    </span>
                 </p>
-                <p>
-                    Group variable by click on "edit" on a given group                    
-                </p>
-
-                <p>
-                    Below are display some data points to help you in the process of grouping variables
-                </p>
-
                 
                 
                 <div>
@@ -308,6 +308,15 @@ class GroupVariables extends Component {
     }
 
     validateGroups(){
+
+
+        const nVariableInGroups = this.state.groups.reduce((a, acc) => {
+            return a.length + acc
+        })
+
+        if (nVariableInGroups == 0){
+            alert('please put at least variable in a group')
+        }
         
         this.props.groupsWereValidated(this.state.groups)
     }

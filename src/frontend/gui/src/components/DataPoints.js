@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Dataset from '../model/Dataset'
+
 
 class DataPoints extends Component{
 
@@ -71,10 +73,18 @@ class DataPoints extends Component{
                                         {
 
                                             data.map((value, valueKey) => {
+
+
                                                 return (
                                                     
-                                                    <td  key={valueKey}>
-                                                        {value}
+                                                    <td 
+                                                        key={valueKey}
+                                                        data-toggle="tooltip"
+                                                        data-placement="top" 
+                                                        title={value}
+                                                        key={valueKey}
+                                                    >
+                                                        {Dataset.displayValue(value)}
                                                     </td>
                                                 )
                                             })

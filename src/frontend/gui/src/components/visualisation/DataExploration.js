@@ -17,16 +17,17 @@ class DataExploration extends Component{
         const iFirstVariable = this.state.firstVariable
         const iSecondVariable = this.state.secondVariable
     
+        const histogramVariable = this.state.histogramVariable
+
         const dataset = this.props.dataset
         
         const variables = dataset.get_column_names()
             
-        const firstVariable = dataset.get_column_id(iFirstVariable)
+        const firstVariable = dataset.get_column_id(histogramVariable)
 
-        const uniqueValues = this.computeUniqueValues()
-
-        const isVarCategorical = this.isVariableCategorical(iFirstVariable)
-        console.log(isVarCategorical)
+        const uniqueValues = this.computeUniqueValues(histogramVariable)
+        const isVarCategorical = this.isVariableCategorical(histogramVariable)
+        
 
         return (
             <div id="data-exploration">    
@@ -58,8 +59,20 @@ class DataExploration extends Component{
                 </div>
                 }
 
+                <select
+                    className="form-control"
+                    onChange={this.onHistogramVariableChange.bind(this)}>
+
+                    {
+                        this.props.dataset.get_column_names().map((name, i) => {
+                            return (<option key={i} value={i}>{name}</option>)
+                        })
+                    }
+                </select>
+
+
                 <h4>
-                    {variables[iFirstVariable]} column
+                    {variables[histogramVariable]} column
                 </h4>
 
                 { ! isVarCategorical &&
@@ -141,6 +154,7 @@ class DataExploration extends Component{
 
         super(props)
         this.state = {
+            histogramVariable: 0,
             firstVariable: props.firstVariable || 0,
             secondVariable: props.secondVariable || 1,
             nBins: 10,
@@ -149,13 +163,18 @@ class DataExploration extends Component{
         }
     }
 
-    computeUniqueValues(){
+
+    onHistogramVariableChange(e){
+        this.setState({ histogramVariable: e.target.value})
+    }
+
+    computeUniqueValues(iVariable){
 
         const dataset = this.props.dataset
-        const iFirstVariable = this.state.firstVariable
         
-        const rawColumn = dataset.get_raw_column_by_id(iFirstVariable)
-        const parsedFirstVariable = dataset.get_parsed_column_by_id(iFirstVariable)
+        
+        const rawColumn = dataset.get_raw_column_by_id(iVariable)
+        const parsedFirstVariable = dataset.get_parsed_column_by_id(iVariable)
         
         var uniqueValues = Object.entries(this.uniqueValuesAsObject(parsedFirstVariable))        
         const rawUniqueValues = Object.entries(this.uniqueValuesAsObject(rawColumn))
@@ -213,7 +232,7 @@ class DataExploration extends Component{
     
     componentDidMount(){
         
-        const data = this.getVariable(this.state.firstVariable)
+        const data = this.getVariable(this.state.histogramVariable)
         const dataset = this.props.dataset
         
         this.histogramPlotter = new HistogramPlotter()
@@ -232,11 +251,9 @@ class DataExploration extends Component{
         this.plotAll()
     }
     
-    isVariableCategorical(){
+    isVariableCategorical(variableId){
         
-        const variableId = this.state.firstVariable
-        console.log(variableId, this.props.chosenColumns)
-
+                
         return this.props.chosenColumns[variableId].type == "categorical"
     }
 
@@ -244,24 +261,28 @@ class DataExploration extends Component{
         const iFirstVariable = this.state.firstVariable
         const iSecondVariable = this.state.secondVariable
 
+        const histogramVariable = this.state.histogramVariable
                 
         const dataset = this.props.dataset
 
-        if (this.isVariableCategorical(iFirstVariable)){
+        if (this.isVariableCategorical(histogramVariable)){
 
-            const histData = this.computeUniqueValues()
+            const histData = this.computeUniqueValues(histogramVariable)
             
             this.histogramPlotter.plot_histogram(histData, this.state.nBins, true)
         }
         else{
-            const histData = this.getVariable(iFirstVariable)
+            const histData = this.getVariable(histogramVariable)
             this.histogramPlotter.plot_histogram(histData, this.state.nBins, false)
         }
             
         const heatmapData = dataset.get_parsed_columns_by_id([iFirstVariable, iSecondVariable])        
         var axisNames = this.getColumnNames()
         axisNames = [axisNames[iFirstVariable], axisNames[iSecondVariable]]
-        this.twoDimensionHeatmapPlotter.plot(heatmapData, axisNames)
+
+        const rawData = [dataset.get_raw_column_by_id(iFirstVariable), dataset.get_raw_column_by_id(iSecondVariable)]
+
+        this.twoDimensionHeatmapPlotter.plot(heatmapData, axisNames, rawData)
     }
 
     getColumnNames(){

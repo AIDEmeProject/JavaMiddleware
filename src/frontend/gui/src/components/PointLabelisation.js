@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import Dataset from '../model/Dataset'
 
 class PointLabelisation extends Component{
     
     render(){
-        
+        const dataset = this.props.dataset
         return (
             <div className="">
                 <div className="row">
@@ -49,8 +50,13 @@ class PointLabelisation extends Component{
                                     pointData.map((value, valueKey) => {
                                         return (
                                             
-                                            <td  key={valueKey}>
-                                                {value}
+                                            <td
+                                                key={valueKey}
+                                                data-toggle="tooltip"
+                                                data-placement="top" 
+                                                title={value}
+                                            >
+                                                {Dataset.displayValue(value)}
                                             </td>
                                         )
                                     })

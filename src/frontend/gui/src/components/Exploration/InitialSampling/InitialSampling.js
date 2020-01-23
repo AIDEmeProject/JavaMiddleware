@@ -10,6 +10,8 @@ import FilteringPoints from './FilteringPoints'
 import PointLabelisation from '../../PointLabelisation'
 import sendFakePoint from '../../../actions/sendFakePoint'
 
+import robot from '../../../resources/robot.png'
+
 class InitialSampling extends Component{
 
     constructor(props){
@@ -17,7 +19,7 @@ class InitialSampling extends Component{
         super(props)       
 
         this.state = {
-            showLabeling: true,
+            showLabeling: false,
             showFilterBasedSampling: false
         }
     }
@@ -30,8 +32,28 @@ class InitialSampling extends Component{
                     <div className="row">
                         <div className="col col-lg-8 offset-lg-2">
 
+
+                        <p className="card">   
+
+                            <span className="chatbot-talk">
+                                <img src={robot} width="70" />
+                                <q>
+                                    The first phase of labeling continues until we obtain 
+                                    a positive example and a negative example. 
+                                </q>
+                            </span>
+                        </p>
+
+                        <p className="card">
+                            <span className="chatbot-talk">
+                            <img src={robot} width="70" />
+                            <q>
+                                To get the initial samples, would you like to go through initial sampling or attribute filtering
+                            </q>
+                            </span>
+                        </p>
                             
-                            <ul className="nav nav-tabs bg-primary">
+                        <ul className="nav nav-tabs bg-primary">
                                 <li className="nav-item">
                                     <a 
                                     className="nav-link active" 
@@ -77,12 +99,6 @@ class InitialSampling extends Component{
                                 }               
                             </ul>
                         
-
-                        <p className="card">                            
-                            The first phase of labeling continues until we obtain 
-                            a positive example and a negative example. 
-                        </p>
-
                         {
                             //this.state.showLabeling && 
                             false &&

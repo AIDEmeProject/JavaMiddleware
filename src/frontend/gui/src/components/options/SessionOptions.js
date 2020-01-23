@@ -100,7 +100,7 @@ class SessionOptions extends Component{
                                                 {column || "Not available"}
                                             </label>
                                             
-
+                                            { false && 
                                             <button
                                                 className="btn btn-primary btn-raised btn-explore"
                                                 role="button"
@@ -109,6 +109,7 @@ class SessionOptions extends Component{
                                                 onClick={this.onExploreClick.bind(this)}>
                                                 Explore
                                             </button>
+                                            }
                                         </div>
 
                                     </div>                                                    
