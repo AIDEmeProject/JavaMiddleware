@@ -39,19 +39,14 @@ class InitialSampling extends Component{
                                 <img src={robot} width="70" />
                                 <q>
                                     The first phase of labeling continues until we obtain 
-                                    a positive example and a negative example. 
+                                    a positive example and a negative example. <br />
+
+                                    To get the initial samples, would you like to go through initial sampling or attribute filtering
                                 </q>
                             </span>
                         </p>
 
-                        <p className="card">
-                            <span className="chatbot-talk">
-                            <img src={robot} width="70" />
-                            <q>
-                                To get the initial samples, would you like to go through initial sampling or attribute filtering
-                            </q>
-                            </span>
-                        </p>
+                      
                             
                         <ul className="nav nav-tabs bg-primary">
                                 <li className="nav-item">
@@ -64,7 +59,7 @@ class InitialSampling extends Component{
                                         showFilterBasedSampling: false
                                     })}
                                     >
-                                        Labeling initial sampling
+                                        Initial sampling
                                     </a>
                                 </li>
 
@@ -78,7 +73,7 @@ class InitialSampling extends Component{
                                         showFilterBasedSampling: true
                                     })}
                                     >
-                                        Filter base sampling
+                                        Faceted search
                                     </a>
                                 </li>    
 

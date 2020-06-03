@@ -72,7 +72,7 @@ class DataExploration extends Component{
 
 
                 <h4>
-                    {variables[histogramVariable]} column
+                    {variables[histogramVariable]}
                 </h4>
 
                 { ! isVarCategorical &&
@@ -85,20 +85,24 @@ class DataExploration extends Component{
                 }
                                
                 <div className="one-dimensional-plot">
-                    <div>
-                        <label htmlFor="bin-number">
-                        Bin number <input 
+                   
+                    {
+                        ! isVarCategorical && 
+                    
+                        <div>
+                            <label htmlFor="bin-number">
+                            Bin number <input 
 
-                                className="form-input"
-                                id="bin-number"
-                                type="number"
-                                value={this.state.nBins} 
-                                onChange={e => {this.setState({nBins: e.target.value}) } } 
-                            />
-                            
-                        </label>                        
-                    </div>
-
+                                    className="form-input"
+                                    id="bin-number"
+                                    type="number"
+                                    value={this.state.nBins} 
+                                    onChange={e => {this.setState({nBins: e.target.value}) } } 
+                                />
+                                
+                            </label>                        
+                        </div>
+                    }
                     <div>                
                         <svg id="histogram"></svg>                                   
                     </div>
