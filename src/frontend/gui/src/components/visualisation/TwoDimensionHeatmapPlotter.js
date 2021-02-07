@@ -7,7 +7,7 @@ class TwoDimensionHeatmapPlotter{
     prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 30, right: 30, bottom: 100, left: 120}
+        var margin = {top: 30, right: 30, bottom: 150, left: 150}
         var width = 700 - margin.left - margin.right
         var height = 600 - margin.top - margin.bottom
 
@@ -15,11 +15,14 @@ class TwoDimensionHeatmapPlotter{
         var svg = d3.select(svgid)
             .attr("width", width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
+
+        var g = svg
             .append("g")
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
-    
-
+        console.log(data)
+        
+     
         var x = d3.scaleLinear()
              .domain(d3.extent(data, d => d[0]))
              .range([0, width])
@@ -28,32 +31,41 @@ class TwoDimensionHeatmapPlotter{
               .domain(d3.extent(data, d => d[1]))
               .range([height, 0])
 
-       this.xAxis = svg.append("g")
-                       .attr("transform", "translate(0," + height + ")")
+       this.xAxis = g.append("g")
+                       .attr('id', 'x-axis')
+                       .attr("transform", "translate(0," + height+ ")")
                        .call(d3.axisBottom(x))
                        
-                    
+        g.append('defs').append('clipPath')
+                        .attr('id', 'clip')
+                        .append('rect')
+                        .attr('width', width)
+                        .attr('height', height)
 
         this.yAxis = svg.append("g")
-                        //.attr("transform", "translate(" + 25 + ", 0)")
+                        .attr('id', "y-axis")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`)
                         .call(d3.axisLeft(y))
 
-        this.gBins = svg.append("g")
+        this.gBins = g.append("g")
+                        .attr('clip-path', 'url(#clip)')
+                        .attr('id', "bins")
                         .attr("stroke", "#000")
                         .attr("stroke-opacity", 0.1)
 
         this.xLabel = svg
-                        .append("text")             
-                            .attr("transform", "translate(" + (width/2) + " ," + 
-                                 (height + margin.top + 30) + ")")
+                        .append("text")        
+                        .attr("transform", `translate(${width / 2 + margin.left}, ${height + 100})`)
                             .style("text-anchor", "middle")
-                            .style('fill', 'black')            
+                            .style('fill', 'black')         
+                            .attr("dy", "1em")   
 
           // text label for the y axis
         this.yLabel = svg.append("text")
+                
                 .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left + 20)
-                .attr("x",0 - (height / 2))
+                .attr("y", margin.left / 2)
+                .attr("x", -height / 2)
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
                 .style('fill', 'black')
@@ -63,7 +75,8 @@ class TwoDimensionHeatmapPlotter{
         this.x = x
         this.y = y
         this.height = height
-        this.width = width        
+        this.width = width       
+        this.g = g 
     }
 
  
@@ -161,7 +174,7 @@ class TwoDimensionHeatmapPlotter{
            .data(bins)           
 
         update.exit().remove()
-
+        
         update
            .enter()           
            .append('path')             
@@ -171,6 +184,9 @@ class TwoDimensionHeatmapPlotter{
            .attr("d", binner.hexagon())
            .attr("transform", d => `translate(${d.x},${d.y})`)
            .attr("fill", d => color(d.length));  
+
+
+          
     }
 }
 
