@@ -51,7 +51,7 @@ class InitialSampling extends Component{
                         <ul className="nav nav-tabs bg-primary">
                                 <li className="nav-item">
                                     <a 
-                                    className="nav-link active" 
+                                    className="nav-link" 
                                     href="#"
                                     onClick={() => this.setState({
                                         showLabeling: true,
@@ -65,7 +65,7 @@ class InitialSampling extends Component{
 
                                 <li className="nav-item">
                                     <a 
-                                    className="nav-link active" 
+                                    className="nav-link" 
                                     href="#"
                                     onClick={() => this.setState({
                                         showLabeling: false,

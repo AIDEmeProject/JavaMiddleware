@@ -429,6 +429,8 @@ h4, h3{
   color: white !important;
 }
 
+
+
 .navbar, .navbar-dark, .bg-primary{
   background-color: #2574b5 !important;  
 }
@@ -436,6 +438,11 @@ h4, h3{
 
 a.active{
   background-color: #5580cc !important;
+}
+
+a.nav-link:hover, .btn-primary:hover{
+  color:white;
+  background-color: #5580cc;
 }
 
 .left-title{
