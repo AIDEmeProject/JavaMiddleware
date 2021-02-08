@@ -30,6 +30,21 @@ class Dataset{
         return dataset
     }
 
+    static displayValue(value){
+        
+        const floatParsed = parseFloat(value)
+
+        if (Number.isNaN(floatParsed)){
+            
+            if (value.length > 50){
+                return value.substring(0, 300) + "..."
+            }
+            return value            
+        }
+
+        return floatParsed
+    }
+
     constructor(d3dataset){
         this.dataset = d3dataset
         this.parsedColumns = {}
@@ -86,6 +101,15 @@ class Dataset{
         
         var columns = ids.map(id => {
             return this.get_parsed_column_by_id(id)
+        })
+        
+        return d3.zip(...columns)
+    }
+
+    get_raw_columns_by_id(ids){
+        
+        var columns = ids.map(id => {
+            return this.get_raw_column_by_id(id)
         })
         
         return d3.zip(...columns)

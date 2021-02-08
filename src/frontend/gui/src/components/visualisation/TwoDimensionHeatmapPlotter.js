@@ -27,19 +27,22 @@ class TwoDimensionHeatmapPlotter{
     prepare_plot(svgid, data){
 
         // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 60, left: 80}
-        var width = 650 - margin.left - margin.right
-        var height = 500 - margin.top - margin.bottom
+        var margin = {top: 30, right: 30, bottom: 150, left: 150}
+        var width = 700 - margin.left - margin.right
+        var height = 600 - margin.top - margin.bottom
 
         // append the svg object to the body of the page
         var svg = d3.select(svgid)
             .attr("width", width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
+
+        var g = svg
             .append("g")
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
-    
-
+        console.log(data)
+        
+     
         var x = d3.scaleLinear()
              .domain(d3.extent(data, d => d[0]))
              .range([0, width])
@@ -48,46 +51,64 @@ class TwoDimensionHeatmapPlotter{
               .domain(d3.extent(data, d => d[1]))
               .range([height, 0])
 
-       this.xAxis = svg.append("g")
-                       .attr("transform", "translate(0," + height + ")")
+       this.xAxis = g.append("g")
+                       .attr('id', 'x-axis')
+                       .attr("transform", "translate(0," + height+ ")")
                        .call(d3.axisBottom(x))
+                       
+        g.append('defs').append('clipPath')
+                        .attr('id', 'clip')
+                        .append('rect')
+                        .attr('width', width)
+                        .attr('height', height)
 
         this.yAxis = svg.append("g")
-                        //.attr("transform", "translate(" + 25 + ", 0)")
+                        .attr('id', "y-axis")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`)
                         .call(d3.axisLeft(y))
 
-        this.gBins = svg.append("g")
+        this.gBins = g.append("g")
+                        .attr('clip-path', 'url(#clip)')
+                        .attr('id', "bins")
                         .attr("stroke", "#000")
                         .attr("stroke-opacity", 0.1)
 
         this.xLabel = svg
-                        .append("text")             
-                            .attr("transform", "translate(" + (width/2) + " ," + 
-                                 (height + margin.top + 30) + ")")
+                        .append("text")        
+                        .attr("transform", `translate(${width / 2 + margin.left}, ${height + 100})`)
                             .style("text-anchor", "middle")
-                            .style('fill', 'black')
-            
+                            .style('fill', 'black')         
+                            .attr("dy", "1em")   
 
           // text label for the y axis
         this.yLabel = svg.append("text")
+                
                 .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left + 20)
-                .attr("x",0 - (height / 2))
+                .attr("y", margin.left / 2)
+                .attr("x", -height / 2)
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
                 .style('fill', 'black')
-            
-        
-
+                    
         this.svg = svg
         this.margin = margin
         this.x = x
         this.y = y
         this.height = height
-        this.width = width        
+        this.width = width       
+        this.g = g 
     }
+
  
-    plot(data, axisNames){
+    configureAxisBuilder(axisBuilder, labelValues){
+        if (labelValues.length < 50){
+            axisBuilder
+                .tickValues(d3.range(labelValues.length))
+                .tickFormat((d, i) => labelValues[i])
+        }
+    }
+
+    plot(data, axisNames, rawData){
 
         var margin = this.margin,
             height = this.height,
@@ -96,15 +117,9 @@ class TwoDimensionHeatmapPlotter{
             x = this.x,
             y = this.y,
             radius = 20
-                             
-            
+                                                         
         x.domain(d3.extent(data, d => d[0]))
         y.domain(d3.extent(data, d => d[1]))
-
-        this.xAxis
-            .transition()
-            .duration(1000)
-            .call(d3.axisBottom(x))
 
 
         var xLabel = axisNames[0]
@@ -112,10 +127,31 @@ class TwoDimensionHeatmapPlotter{
         this.xLabel.transition().text(xLabel)
         this.yLabel.transition().text(yLabel)
 
+
+        const xLabels = d3.set(rawData[0]).values().sort((a, b)=>  a - b)
+        const yLabels = d3.set(rawData[1]).values().sort((a, b)=>  a - b)
+                
+        var xAxisBuilder = d3.axisBottom(x)
+        var yAxisBuilder = d3.axisLeft(y)
+        
+        this.configureAxisBuilder(yAxisBuilder, yLabels)
+        this.configureAxisBuilder(xAxisBuilder, xLabels)
+
+
+        this.xAxis
+            .transition()
+            .duration(1000)
+            .call(xAxisBuilder)
+              .selectAll('text')
+              .style("text-anchor", "end")
+              .attr("dx", "-.8em")
+              .attr("dy", ".15em")
+              .attr("transform", "rotate(-65)")
+    
         this.yAxis
             .transition()
             .duration(1000)
-            .call(d3.axisLeft(y))
+            .call(yAxisBuilder)
               
         var yAxis = g => g
                 .attr("transform", `translate(${margin.left},0)`)
@@ -129,7 +165,6 @@ class TwoDimensionHeatmapPlotter{
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "start")
                     .text(data.y))
-
 
         var xAxis = g => g
                 .attr("transform", `translate(0,${height - margin.bottom})`)
@@ -159,7 +194,7 @@ class TwoDimensionHeatmapPlotter{
            .data(bins)           
 
         update.exit().remove()
-
+        
         update
            .enter()           
            .append('path')             
@@ -169,10 +204,10 @@ class TwoDimensionHeatmapPlotter{
            .attr("d", binner.hexagon())
            .attr("transform", d => `translate(${d.x},${d.y})`)
            .attr("fill", d => color(d.length));  
+
+
+          
     }
 }
-
-
-
 
 export default TwoDimensionHeatmapPlotter

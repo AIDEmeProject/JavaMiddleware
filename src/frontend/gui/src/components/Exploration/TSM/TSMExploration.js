@@ -39,6 +39,8 @@ import buildRealDatasetGrid from '../../../lib/buildRealDatasetGrid'
 
 import {backend, webplatformApi} from '../../../constants/constants'
 
+import robot from '../../../resources/robot.png'
+
 class TSMExploration extends Component{
 
     constructor(props){
@@ -173,16 +175,30 @@ class TSMExploration extends Component{
                             
                         {
                              this.state.initialLabelingSession && 
-                            <p>                            
-                                The first phase of labeling continues until we obtain 
-                                a positive example and a negative example.        
-                            </p>
+
+
+                        <p className="card">   
+                            <span className="chatbot-talk">
+                                <img src={robot} width="70" />
+                                <q>
+                                    The first phase of labeling continues until we obtain 
+                                    a positive example and a negative example. 
+                                </q>
+                            </span>
+                        </p>
                         }
 
-                       <p>
-                            Grouped variable exploration. If you chose no, 
-                            you will be asked to label each subgroups
-                            independantly                    
+
+                        <p className="card">   
+
+                            <span className="chatbot-talk">
+                                <img src={robot} width="70" />
+                                <q>
+                                    Grouped variable exploration. If you chose no, 
+                                    you will be asked to label each subgroups
+                                    independantly                    
+                                </q>
+                            </span>
                         </p>
 
                        <table className="group-variable">

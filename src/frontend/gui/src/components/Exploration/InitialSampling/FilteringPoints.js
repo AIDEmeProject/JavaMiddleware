@@ -22,15 +22,21 @@ import React, { Component } from 'react';
 import sendFilters from '../../../actions/sendFilters';
 import PointLabelisation from '../../PointLabelisation';
 
+import * as  d3 from "d3"
+
+import robot from '../../../resources/robot.png'
 
 class NumericalFilter extends Component{
 
     render(){
 
-        const variable = this.props.variable
-        const min = this.props.min,
-              max = this.props.max
+        const variable = this.props.variable        
+        const values = this.props.dataset.get_column_name(variable.name)        
+        const extend = d3.extent(values)
 
+        const min = extend[0],
+              max = extend[1]
+        
         return (
             <div className="card filter inline-block">
 
@@ -44,8 +50,8 @@ class NumericalFilter extends Component{
                             value={this.state.minValue}
                             onChange={this.minChanged.bind(this)}
                             type="range"
-                            min={-1000}
-                            max={100000}
+                            min={min}
+                            max={max}
                         />
                     </label>
 
@@ -57,8 +63,8 @@ class NumericalFilter extends Component{
                             value={this.state.maxValue}
                             onChange={this.maxChanged.bind(this)}
                             type="range"
-                            min={-1000}
-                            max={100000}
+                            min={min}
+                            max={max}
                         />
                     </label>
             </div>
@@ -67,10 +73,19 @@ class NumericalFilter extends Component{
 
     constructor(props){
         super(props)
+        const variable = this.props.variable
+        const values = this.props.dataset.get_column_name(variable.name)        
+        const extend = d3.extent(values)
+
+        const min = extend[0],
+              max = extend[1]
+        
+        
+
         this.state = {
             
-            minValue: 0,
-            maxValue: 100000
+            minValue: min,
+            maxValue: max
         }
     }
 
@@ -165,6 +180,26 @@ class PointFiltering extends Component{
     render(){
         return (
             <div>
+
+                    <p className="card">
+                        <span className="chatbot-talk">
+                        <img src={robot} width="70" />
+                        <q>
+                            Filter positive points and click on get Points
+                        </q>
+                        </span>
+                    </p>
+
+
+                <p>                
+                    <button
+                        className="btn btn-raised"
+                        onClick={this.getPoints.bind(this)}
+                    >
+                        Get Points
+                    </button>
+                </p>
+
                 {
                     this.props.chosenVariables.map( (variable, i) => {
 
@@ -175,7 +210,8 @@ class PointFiltering extends Component{
                                 iFilter={i}   
                                 filterChanged={this.filterChanged.bind(this)}
                                 key={i}
-                                variable={variable}                                
+                                variable={variable}   
+                                dataset={this.props.dataset}                             
                             />                            
                         )
                     })
@@ -190,17 +226,19 @@ class PointFiltering extends Component{
                     </button>
                 </p>
 
+                { 
+                    this.state.points.length > 0 && 
+                    <div>
 
-                <div>
-
-                    <PointLabelisation
-                        chosenColumns={this.props.chosenVariables}
-                        dataset={this.props.dataset}
-                        pointsToLabel={this.state.points}
-                        onPositiveLabel={this.onPositiveLabel.bind(this)}
-                        onNegativeLabel={this.onNegativeLabel.bind(this)}
-                    />
-                </div>
+                        <PointLabelisation
+                            chosenColumns={this.props.chosenVariables}
+                            dataset={this.props.dataset}
+                            pointsToLabel={this.state.points}
+                            onPositiveLabel={this.onPositiveLabel.bind(this)}
+                            onNegativeLabel={this.onNegativeLabel.bind(this)}
+                        />
+                    </div>
+                }
             </div>
         )
     }

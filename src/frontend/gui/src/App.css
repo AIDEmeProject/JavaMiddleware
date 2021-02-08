@@ -55,6 +55,10 @@
 .table-label tr, .table-control th{
   height: 44px;
 }
+.table-label  td{
+  max-width: 350px;
+  overflow: hidden;
+}
 
 .predicted td, .predicted th, .table-label td, .table-label th, .table-control td, .table-control th {
     border: 1px solid black;
@@ -335,7 +339,7 @@ h4, h3{
 
 
 .column-name-label{
-  width: 100px;
+  min-width: 150px;
   height: 18px;
   vertical-align: middle;
   margin-bottom: 0;
@@ -445,6 +449,8 @@ h4, h3{
   color: white !important;
 }
 
+
+
 .navbar, .navbar-dark, .bg-primary{
   background-color: #2574b5 !important;  
 }
@@ -454,6 +460,15 @@ a.active{
   background-color: #5580cc !important;
 }
 
+a.nav-link:hover, .btn-primary:hover{
+  color:white;
+  background-color: #5580cc;
+}
+
 .left-title{
   text-align: left;
+}
+
+.charbottalk > * {
+  display: inline-block;
 }
