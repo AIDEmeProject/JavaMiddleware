@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='session',
             name='user',
-            field=models.ForeignKey(null=True, on_delete='cascade', to='user.Profile'),
+            field=models.ForeignKey(null=True, on_delete=models.CASCADE, to='user.Profile'),
         ),
     ]

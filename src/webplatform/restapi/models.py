@@ -15,7 +15,7 @@ class Session(models.Model):
     token = models.CharField(max_length=100)
     column_number = models.IntegerField(null=True)
     row_number = models.IntegerField(null=True)
-    user = models.ForeignKey(Profile, on_delete="cascade", null=True)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
 
 
     classifier = models.CharField(null=True, max_length=50)
