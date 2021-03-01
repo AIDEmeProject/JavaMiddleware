@@ -18,28 +18,41 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-import {backend, webplatformApi, defaultConfiguration} from '../constants/constants'
-import buildTSMConfiguration from '../lib/buildTSMConfiguration'
+import {
+  backend,
+  webplatformApi,
+  defaultConfiguration,
+} from "../constants/constants";
+import buildTSMConfiguration from "../lib/buildTSMConfiguration";
 
 import $ from "jquery";
 
+function sendVariableGroups(
+  tokens,
+  chosenVariables,
+  groups,
+  datasetMetadata,
+  onSuccess
+) {
+  var endPoint = backend + "/choose-options";
 
-function sendVariableGroups(tokens, chosenVariables, groups, datasetMetadata, onSuccess){
+  var configuration = defaultConfiguration;
 
-    var endPoint = backend + "/choose-options"
+  var usedColumnNames = chosenVariables.map((e) => e.name);
+  console.log(groups);
+  var groupsWithIds = groups.map((variables) => {
+    return variables.map((v) => v["id"]);
+  });
 
-    var configuration = defaultConfiguration
+  configuration = buildTSMConfiguration(
+    configuration,
+    groupsWithIds,
+    usedColumnNames,
+    datasetMetadata
+  );
 
-    var usedColumnNames = chosenVariables.map( e => e.name)
-    console.log(groups)
-    var groupsWithIds = groups.map( variables => {return variables.map(v => v['id'])})
-
-    configuration = buildTSMConfiguration(configuration, groupsWithIds, usedColumnNames, datasetMetadata)
-
-
-
-    //configuration['useFakePoint'] = false
-    /*
+  //configuration['useFakePoint'] = false
+  /*
     var tsmJson = {
         hasTSM: true,                
         searchUnknownRegionProbability: 0.5,                
@@ -62,101 +75,99 @@ function sendVariableGroups(tokens, chosenVariables, groups, datasetMetadata, on
         featureGroups: groups,                   
     })
     */
-    //configuration["multiTSM"] = tsmJson
+  //configuration["multiTSM"] = tsmJson
 
+  $("#conf").val(JSON.stringify(configuration));
 
-    $('#conf').val(JSON.stringify(configuration))
-      
-    //var payload = $('#choose-columns').serialize()
+  //var payload = $('#choose-columns').serialize()
 
-    $.ajax({
-
-        type: "POST",
-        url: endPoint,
-        data: {
-            'configuration': JSON.stringify(configuration),
-            'columnIds': JSON.stringify(chosenVariables.map(e => e.idx))
-        },        
-        success: (response) =>  {onSuccess(response)},
-        
-    });    
-
+  $.ajax({
+    type: "POST",
+    url: endPoint,
+    data: {
+      configuration: JSON.stringify(configuration),
+      columnIds: JSON.stringify(chosenVariables.map((e) => e.idx)),
+    },
+    success: (response) => {
+      onSuccess(response);
+    },
+  });
 }
 
+function sendColumns(tokens, chosenColumns, onSuccess) {
+  var endPoint = backend + "/choose-options";
 
-function sendColumns(tokens, chosenColumns, onSuccess){
-    
-    var endPoint = backend + "/choose-options"    
+  var configuration = defaultConfiguration;
+  //configuration['useFakePoint'] = state.useFakePoint || false
 
-    var configuration = defaultConfiguration
-    //configuration['useFakePoint'] = state.useFakePoint || false
-                          
-    //$('#conf').val(JSON.stringify(configuration))
-      
-    //var payload = $('#choose-columns').serialize()
+  //$('#conf').val(JSON.stringify(configuration))
 
-    $.ajax({
+  //var payload = $('#choose-columns').serialize()
 
-        type: "POST",
-        url: endPoint,
-        data: {
-            configuration: JSON.stringify(configuration),
-            columnIds: JSON.stringify(chosenColumns.map(e => e.idx))
-        },
-        success: (response) =>  {onSuccess(response)},
-        
-    });    
-              
+  $.ajax({
+    type: "POST",
+    url: endPoint,
+    xhrFields: {
+      withCredentials: true,
+    },
+    data: {
+      configuration: JSON.stringify(configuration),
+      columnIds: JSON.stringify(chosenColumns.map((e) => e.idx)),
+    },
+    success: (response) => {
+      onSuccess(response);
+    },
+  });
 }
 
-function sendDataToWebPlateform(availableVariables, options, hasTSM, featureGroups,  sessionOptionsUrl, tokens){
+function sendDataToWebPlateform(
+  availableVariables,
+  options,
+  hasTSM,
+  featureGroups,
+  sessionOptionsUrl,
+  tokens
+) {
+  var sessionOptionsUrl =
+    webplatformApi + "/session/" + tokens.sessionToken + "/options";
 
+  var numberOfNumerical = availableVariables.reduce((e, acc) => {
+    return acc + 1 * e.type == "numerical";
+  }, 0);
 
-    var sessionOptionsUrl = webplatformApi + "/session/" + tokens.sessionToken + "/options"
+  var numberOfCategorical = availableVariables.reduce((e, acc) => {
+    return acc + 1 * e.type == "categorical";
+  }, 0);
 
-    var numberOfNumerical = availableVariables.reduce((e, acc) => {
-        return acc + 1 * e.type == "numerical"
-    }, 0)
+  var statisticData = {
+    column_number: availableVariables.length,
+    numberOfCategorical: numberOfCategorical,
+    numberOfNumerical: numberOfNumerical,
+    has_tsm: hasTSM,
+    learner: options.learner,
+    classifier: options.classifier,
+  };
 
-    var numberOfCategorical = availableVariables.reduce((e, acc) => {
-        return acc + 1 * e.type == "categorical"
-    }, 0)
-
-    
-    var statisticData = {
-        column_number: availableVariables.length,
-        numberOfCategorical: numberOfCategorical,
-        numberOfNumerical: numberOfNumerical,
-        has_tsm: hasTSM,
-        learner: options.learner,
-        classifier: options.classifier,
-       
+  if (hasTSM) {
+    if (availableVariables.length == 2) {
+      var nGroups = 2;
+    } else {
+      var nGroups = featureGroups.length;
     }
-    
-    if (hasTSM){
-        if  (availableVariables.length == 2){
-            var nGroups = 2
-        }
-        else{
-            var nGroups = featureGroups.length
-        }     
-        statisticData['number_of_variable_groups'] = nGroups
-    }
-    
+    statisticData["number_of_variable_groups"] = nGroups;
+  }
 
-    $.ajax({
-        type: "PUT",
-        url: sessionOptionsUrl,
-        data: statisticData,
-        headers: {
-            Authorization: "Token " + tokens.authorizationToken
-        }
-    })
+  $.ajax({
+    type: "PUT",
+    url: sessionOptionsUrl,
+    data: statisticData,
+    headers: {
+      Authorization: "Token " + tokens.authorizationToken,
+    },
+  });
 }
-
 
 export default {
-    sendColumns: sendColumns,
-    sendVariableGroups: sendVariableGroups
-}
-
+  sendColumns: sendColumns,
+  sendVariableGroups: sendVariableGroups,
+};
