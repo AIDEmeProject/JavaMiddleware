@@ -22,3 +22,5 @@ build/*
 .settings/
 
 src/webplatform/venv/
+
+.vscode/

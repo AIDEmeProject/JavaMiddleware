@@ -77,6 +77,7 @@ class NewSession extends Component {
                   id="dataset"
                   name="dataset"
                   type="file"
+                  accept=".csv"
                 />
               </div>
 
