@@ -84,6 +84,9 @@ function sendVariableGroups(
   $.ajax({
     type: "POST",
     url: endPoint,
+    xhrFields: {
+      withCredentials: true,
+    },
     data: {
       configuration: JSON.stringify(configuration),
       columnIds: JSON.stringify(chosenVariables.map((e) => e.idx)),
