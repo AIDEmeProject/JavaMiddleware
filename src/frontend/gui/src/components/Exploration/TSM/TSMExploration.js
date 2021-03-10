@@ -674,11 +674,14 @@ function sendLabels(labeledPoints, onSuccess) {
     };
   });
 
-  var endPoint = backend + "/tsm-data-point-were-labeled";
+  var endPoint = backend + "/data-point-were-labeled"; // /tsm-data-point-were-labeled
   $.ajax({
     type: "POST",
     dataType: "JSON",
     url: endPoint,
+    xhrFields: {
+      withCredentials: true,
+    },
     data: {
       labeledPoints: JSON.stringify(labeledPoints),
     },
