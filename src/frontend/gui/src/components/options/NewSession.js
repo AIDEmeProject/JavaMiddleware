@@ -83,17 +83,19 @@ class NewSession extends Component {
 
               <h6>2. Choose the separator</h6>
               <p>CSV, TSV and Semi-colon separator are supported.</p>
-              <div className="form-group ">
-                <label htmlFor="separator">Separator</label>
-                <select
-                  className="form-control"
-                  id="csv-separator"
-                  name="separator"
-                >
-                  <option value=",">Comma ","</option>
-                  <option value="\t">Tab</option>
-                  <option value=";">Semi-colon ";"</option>
-                </select>
+              <div className="row g-2 align-items-center">
+                <div className="col-auto">
+                  <label htmlFor="separator" className="col-form-label">
+                    Separator
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <select id="csv-separator" name="separator">
+                    <option value=",">Comma ","</option>
+                    <option value="\t">Tab</option>
+                    <option value=";">Semi-colon ";"</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-group bmd-form-group">
