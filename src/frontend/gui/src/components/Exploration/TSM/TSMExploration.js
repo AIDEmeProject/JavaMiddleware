@@ -22,20 +22,15 @@ import React, { Component } from "react";
 
 import $ from "jquery";
 
-import TSMModelVisualization from "./TSMModelVisualization";
-import SpecificPointToLabel from "../InitialSampling/SpecificPointToLabel";
 import DataPoints from "./DataPoints";
 import GroupedPointTableHead from "./GroupedPointTableHead";
 import ModelBehavior from "../../visualisation/ModelBehavior";
 import ModelBehaviorControls from "../../visualisation/ModelBehaviorControls";
 import LabelInfos from "../../visualisation/LabelInfos";
-import getDecisionBoundaryData from "../../../actions/getDecisionBoundaryData";
 import getGridPoints from "../../../actions/getGridPoints";
 
 import getTSMPredictions from "../../../actions/getTSMPredictionsOverGridPoints";
 import getModelPredictionsOverGridPoints from "../../../actions/getModelPredictionsOverGridPoints";
-
-import buildRealDatasetGrid from "../../../lib/buildRealDatasetGrid";
 
 import { backend, webplatformApi } from "../../../constants/constants";
 
@@ -46,17 +41,18 @@ class TSMExploration extends Component {
     super(props);
 
     this.state = {
+      initialLabelingSession: true,
+
+      showLabelView: true,
+      showLabelHistory: false,
+      showModelBehavior: false,
+
       pointsToLabel: this.props.pointsToLabel.map((e) => e),
       noPoints: [],
       allLabeledPoints: [],
       labeledPoints: [],
-      initialLabelingSession: true,
       hasYes: false,
       hasNo: false,
-      showModelPerformance: false,
-      showLabelView: true,
-      showLabelHistory: false,
-      showModelBehavior: false,
       visualizationData: {
         TSMBound: null,
       },
@@ -83,7 +79,6 @@ class TSMExploration extends Component {
                 }
                 onClick={() =>
                   this.setState({
-                    showModelPerformance: false,
                     showLabelView: true,
                     showLabelHistory: false,
                     showModelBehavior: false,
@@ -101,7 +96,6 @@ class TSMExploration extends Component {
                 }
                 onClick={() =>
                   this.setState({
-                    showModelPerformance: false,
                     showLabelView: false,
                     showLabelHistory: true,
                     showModelBehavior: false,
@@ -115,9 +109,7 @@ class TSMExploration extends Component {
             <li className="nav-item">
               <a
                 className={
-                  this.state.showModelVisualisation
-                    ? "nav-link active"
-                    : "nav-link"
+                  this.state.showModelBehavior ? "nav-link active" : "nav-link"
                 }
                 onClick={this.onModelBehaviorClick.bind(this)}
               >
@@ -125,24 +117,6 @@ class TSMExploration extends Component {
               </a>
             </li>
 
-            {false && (
-              <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="#advanced-options"
-                  onClick={() =>
-                    this.setState({
-                      showModelPerformance: true,
-                      showLabelView: false,
-                      showLabelHistory: false,
-                      showModelBehavior: false,
-                    })
-                  }
-                >
-                  Assess model Performance
-                </a>
-              </li>
-            )}
             <li className="nav-item">
               <a
                 className="nav-link"
@@ -152,16 +126,6 @@ class TSMExploration extends Component {
               </a>
             </li>
           </ul>
-        )}
-        {//this.state.initialLabelingSession &&
-        false && (
-          <div className="card">
-            {false && (
-              <SpecificPointToLabel
-                onNewPointsToLabel={this.newPointsToLabel.bind(this)}
-              />
-            )}
-          </div>
         )}
 
         {this.state.showLabelView && (
@@ -292,11 +256,6 @@ class TSMExploration extends Component {
             </div>
           </div>
         )}
-        {this.state.showModelPerformance && (
-          <TSMModelVisualization
-            TSMBound={this.state.visualizationData.TSMBound}
-          />
-        )}
 
         {this.state.showModelBehavior && (
           <div className="row">
@@ -356,7 +315,7 @@ class TSMExploration extends Component {
       });
     } else {
       alert(
-        "Please label at least one more point or wait for computation to finish"
+        "Please label at least one more point or wait for computation to finish."
       );
     }
   }
@@ -528,7 +487,6 @@ class TSMExploration extends Component {
     this.getGridPoints();
 
     if (!this.state.initialLabelingSession) {
-      //getDecisionBoundaryData(this.projectionDataWasReceived.bind(this))
       getTSMPredictions((predictedLabels) => {
         var TSMPredictionHistory = this.state.TSMPredictionHistory;
         TSMPredictionHistory.push(predictedLabels);

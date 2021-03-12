@@ -27,7 +27,6 @@ import loadCSVFromInputFile from "../../lib/data_utils";
 
 function uploadFile(event, onSuccess) {
   var endPoint = backend + "/new-session";
-  var formData = new FormData();
 
   var file = document.querySelector("form input[type=file]").files[0];
 
@@ -35,6 +34,8 @@ function uploadFile(event, onSuccess) {
     alert("Please select a file");
     return;
   }
+
+  var formData = new FormData();
   formData.append("dataset", file);
   formData.append("separator", document.getElementById("csv-separator").value);
 
@@ -65,7 +66,7 @@ class NewSession extends Component {
     return (
       <div className="row">
         <div className="col col-lg-6 offset-3 card">
-          <h1>New Session</h1>
+          <h1>New session</h1>
 
           <div>
             <form onSubmit={this.handleSubmit.bind(this)}>

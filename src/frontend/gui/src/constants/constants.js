@@ -18,104 +18,101 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-var factorizedVersionSpaceConfiguration ={
-    "activeLearner": {
-        "learners": {
-            "name": "MajorityVote",
-            "sampleSize": 8,
-            "versionSpace": {
-                "addIntercept": true, 
-                "decompose": false,
-                "hitAndRunSampler": {
-                    "cache": true,
-                    "rounding": true, 
-                    "roundingCache": false, 
-                    "selector": {
-                        "name": "WarmUpAndThin",
-                        "thin": 64,
-                        "warmUp": 256 
-                    } 
-                },
-                "jitter": 1e-09, 
-                "kernel": {
-                    "gamma": 0, 
-                    "name": "gaussian" 
-                },
-                "solver": "ojalgo" 
-            } 
-        }, 
-        "lossFunctionId": "GREEDY", 
-        "name": "SubspatialSampler", 
-      
+var factorizedVersionSpaceConfiguration = {
+  activeLearner: {
+    learners: {
+      name: "MajorityVote",
+      sampleSize: 8,
+      versionSpace: {
+        addIntercept: true,
+        decompose: false,
+        hitAndRunSampler: {
+          cache: true,
+          rounding: true,
+          roundingCache: false,
+          selector: {
+            name: "WarmUpAndThin",
+            thin: 64,
+            warmUp: 256,
+          },
+        },
+        jitter: 1e-9,
+        kernel: {
+          gamma: 0,
+          name: "gaussian",
+        },
+        solver: "ojalgo",
+      },
     },
-    "subsampleSize": 50000, 
-    "task": "sdss_overlapping_0.1%", 
-    "useFactorizationInformation": true
-} 
+    lossFunctionId: "GREEDY",
+    name: "SubspatialSampler",
+  },
+  subsampleSize: 50000,
+  task: "sdss_overlapping_0.1%",
+  useFactorizationInformation: true,
+};
 
 var versionSpaceConfiguration = {
-    "activeLearner": {
-        "learner": {
-            "name": "MajorityVote", // MajorityVote | SVM |
-            "sampleSize": 8, // Only for MajorityVote : >= 1
-            "versionSpace": {
-                "addIntercept": true,
-                "hitAndRunSampler": {
-                "cache": true,
-                "rounding": true,
-                "selector": {
-                    "name": "WarmUpAndThin", // Only For Majority Vote
-                    "thin": 10,
-                    "warmUp": 100
-                }
-                },
-                "kernel": {
-                    "name": "gaussian"
-                },
-                "solver": "ojalgo"
-            }
+  activeLearner: {
+    learner: {
+      name: "MajorityVote", // MajorityVote | SVM |
+      sampleSize: 8, // Only for MajorityVote : >= 1
+      versionSpace: {
+        addIntercept: true,
+        hitAndRunSampler: {
+          cache: true,
+          rounding: true,
+          selector: {
+            name: "WarmUpAndThin", // Only For Majority Vote
+            thin: 10,
+            warmUp: 100,
+          },
         },
-        "name": "UncertaintySampler" //Version space = uncertainty sampler
+        kernel: {
+          name: "gaussian",
+        },
+        solver: "ojalgo",
+      },
     },
-    "subsampleSize": 50000,
-    "task": "sdss_Q4_0.1%"
-}
-
+    name: "UncertaintySampler", //Version space = uncertainty sampler
+  },
+  subsampleSize: 50000,
+  task: "sdss_Q4_0.1%",
+};
 
 var simpleMarginConfiguration = {
-
-    "activeLearner": {
-        "name": "SimpleMargin",
-        "svmLearner": {
-            "C": 1024,
-            "kernel": {
-                "gamma": 0,
-                "name": "gaussian"
-            },
-            "name": "SVM"
-        }
+  activeLearner: {
+    name: "SimpleMargin",
+    svmLearner: {
+      C: 1024,
+      kernel: {
+        gamma: 0,
+        name: "gaussian",
+      },
+      name: "SVM",
     },
-    "subsampleSize": 50000,    
-    "useFactorizationInformation": false
-}
+  },
+  subsampleSize: 50000,
+  useFactorizationInformation: false,
+};
 
 var algorithmNames = {
-    'simplemargin': 'Simple Margin (SVM)',
-    'simplemargintsm': 'Simple Margin (SVM) + TSM',
-    'versionspace': 'Version Space',
-    'factorizedversionspace': 'Factorized Version Space'
-}
+  simplemargin: "Simple Margin (SVM)",
+  simplemargintsm: "Simple Margin (SVM) + TSM",
+  versionspace: "Version Space",
+  factorizedversionspace: "Factorized Version Space",
+};
 
 module.exports = {
-    backend: "http://localhost:7060",
-    webplatformApi: "http://localhost:8000/api",
-    defaultConfiguration: versionSpaceConfiguration,
+  backend: "http://localhost:7060",
+  webplatformApi: "http://localhost:8000/api",
+  defaultConfiguration: versionSpaceConfiguration,
 
-    versionSpaceConfiguration: versionSpaceConfiguration,
-    
-    simpleMarginConfiguration: simpleMarginConfiguration,
-    
-    factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration,
+  versionSpaceConfiguration: versionSpaceConfiguration,
 
-    algorithmNames: algorithmNames
-}
+  simpleMarginConfiguration: simpleMarginConfiguration,
+
+  factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration,
+
+  algorithmNames: algorithmNames,
+};

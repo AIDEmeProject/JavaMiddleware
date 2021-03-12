@@ -28,141 +28,6 @@ import AdvancedOptions from "./AdvancedOptions";
 import DataExploration from "../visualisation/DataExploration";
 
 class SessionOptions extends Component {
-  render() {
-    const datasetInfos = this.props.datasetInfos;
-    const columns = datasetInfos.columns;
-
-    return (
-      <div>
-        <ul className="nav nav-tabs bg-primary">
-          <li className="nav-item">
-            <a
-              className={
-                this.state.showColumns ? "nav-link active" : "nav-link"
-              }
-              onClick={this.onBasicOptionClick.bind(this)}
-            >
-              Attribute selection
-            </a>
-          </li>
-          <li>
-            <a
-              className="nav-link"
-              onClick={this.onSessionStartClick.bind(this)}
-            >
-              Start session
-            </a>
-          </li>
-
-          <li className="nav-item">
-            <a
-              className={
-                this.state.showVariableGroups ? "nav-link active" : "nav-link"
-              }
-              onClick={this.onVariableGrouping.bind(this)}
-            >
-              Factorization structure
-            </a>
-          </li>
-
-          <li className="nav-item">
-            <a
-              className={
-                this.state.showAdvancedOptions ? "nav-link active" : "nav-link"
-              }
-              onClick={this.onAdvancedOptionClick.bind(this)}
-            >
-              Algorithm selection
-            </a>
-          </li>
-        </ul>
-
-        <form id="choose-columns" className="card">
-          <div style={{ display: this.state.showColumns ? "initial" : "none" }}>
-            <div className="row">
-              <div className="col col-lg-12">
-                <p>
-                  Explore the dataset and pick the variables for the labeling
-                  phase.
-                </p>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col col-lg-3" id="column-picker">
-                <h3>Column name</h3>
-
-                {columns.map((column, key) => (
-                  <div key={key} className="">
-                    <div className="form-check form-check-inline">
-                      <input
-                        id={"column-" + column}
-                        name={"column" + key}
-                        type="checkbox"
-                        value={key}
-                        className="form-check-input"
-                        onClick={this.onCheckedColumn.bind(this)}
-                        defaultChecked={this.state.checkboxes[key]}
-                      />
-
-                      <label
-                        className="column-name-label"
-                        htmlFor={"column-" + column}
-                      >
-                        {column || "Not available"}
-                      </label>
-
-                      {false && (
-                        <button
-                          className="btn btn-primary btn-raised btn-explore"
-                          role="button"
-                          type="button"
-                          data-key={key}
-                          onClick={this.onExploreClick.bind(this)}
-                        >
-                          Explore
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="col col-lg-9">
-                <DataExploration
-                  dataset={this.props.dataset}
-                  firstVariable={this.state.firstVariable}
-                  secondVariable={this.state.secondVariable}
-                  show={this.state.showExploration}
-                  chosenColumns={this.state.chosenColumns}
-                />
-              </div>
-            </div>
-          </div>
-
-          <AdvancedOptions {...this.state} />
-
-          <GroupVariables
-            show={this.state.showVariableGroups}
-            chosenColumns={this.state.chosenColumns}
-            groupWasAdded={this.groupWasAdded.bind(this)}
-            groupsWereValidated={this.groupsWereValidated.bind(this)}
-            availableVariables={this.props.chosenColumns}
-            points={this.sampledPoints()}
-            dataset={this.props.dataset}
-          />
-
-          <input
-            id="conf"
-            name="configuration"
-            type="text"
-            style={{ visibility: "hidden" }}
-          />
-        </form>
-      </div>
-    );
-  }
-
   constructor(props) {
     super(props);
 
@@ -209,6 +74,130 @@ class SessionOptions extends Component {
       showColumns: true,
       showExploration: false,
     };
+  }
+
+  render() {
+    const datasetInfos = this.props.datasetInfos;
+    const columns = datasetInfos.columns;
+
+    return (
+      <div>
+        <ul className="nav nav-tabs bg-primary">
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showColumns ? "nav-link active" : "nav-link"
+              }
+              onClick={this.onBasicOptionClick.bind(this)}
+            >
+              Attribute selection
+            </a>
+          </li>
+
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showVariableGroups ? "nav-link active" : "nav-link"
+              }
+              onClick={this.onVariableGrouping.bind(this)}
+            >
+              Factorization structure
+            </a>
+          </li>
+
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showAdvancedOptions ? "nav-link active" : "nav-link"
+              }
+              onClick={this.onAdvancedOptionClick.bind(this)}
+            >
+              Algorithm selection
+            </a>
+          </li>
+
+          <li>
+            <a
+              className="nav-link"
+              onClick={this.onSessionStartClick.bind(this)}
+            >
+              Start session
+            </a>
+          </li>
+        </ul>
+
+        <form id="choose-columns" className="card">
+          <div style={{ display: this.state.showColumns ? "initial" : "none" }}>
+            <div className="row">
+              <div className="col col-lg-12">
+                <p>
+                  Explore the dataset and pick the variables for the labeling
+                  phase.
+                </p>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col col-lg-3" id="column-picker">
+                <h3>Column name</h3>
+
+                {columns.map((column, key) => (
+                  <div key={key} className="">
+                    <div className="form-check form-check-inline">
+                      <input
+                        id={"column-" + column}
+                        name={"column" + key}
+                        type="checkbox"
+                        value={key}
+                        className="form-check-input"
+                        onClick={this.onCheckedColumn.bind(this)}
+                        defaultChecked={this.state.checkboxes[key]}
+                      />
+
+                      <label
+                        className="column-name-label"
+                        htmlFor={"column-" + column}
+                      >
+                        {column || "Not available"}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="col col-lg-9">
+                <DataExploration
+                  dataset={this.props.dataset}
+                  firstVariable={this.state.firstVariable}
+                  secondVariable={this.state.secondVariable}
+                  show={this.state.showExploration}
+                  chosenColumns={this.state.chosenColumns}
+                />
+              </div>
+            </div>
+          </div>
+
+          <AdvancedOptions {...this.state} />
+
+          <GroupVariables
+            show={this.state.showVariableGroups}
+            chosenColumns={this.state.chosenColumns}
+            groupWasAdded={this.groupWasAdded.bind(this)}
+            groupsWereValidated={this.groupsWereValidated.bind(this)}
+            availableVariables={this.props.chosenColumns}
+            points={this.sampledPoints()}
+            dataset={this.props.dataset}
+          />
+
+          <input
+            id="conf"
+            name="configuration"
+            type="text"
+            style={{ visibility: "hidden" }}
+          />
+        </form>
+      </div>
+    );
   }
 
   sampledPoints() {
@@ -337,12 +326,10 @@ class SessionOptions extends Component {
   }
 
   buildDatasetMetadata() {
-    var metadata = {
-      types: this.state.columnTypes.map((e) => e == "categorical"),
+    return {
+      types: this.state.columnTypes.map((e) => e === "categorical"),
       columnNames: this.state.chosenColumns.map((e) => e["name"]),
     };
-
-    return metadata;
   }
 
   computeVariableColumnIndices(groups) {

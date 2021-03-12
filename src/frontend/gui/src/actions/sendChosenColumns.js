@@ -51,35 +51,7 @@ function sendVariableGroups(
     datasetMetadata
   );
 
-  //configuration['useFakePoint'] = false
-  /*
-    var tsmJson = {
-        hasTSM: true,                
-        searchUnknownRegionProbability: 0.5,                
-        columns: usedColumnNames,
-        decompose: true
-    }
-     
-    if (chosenVariables == 2){
-            
-        var flags = chosenVariables.map(g => { return [true, false]}) 
-        var groups = chosenVariables.map( v => [v.name] ) //array because each variable is a group        
-    }
-    else{        
-        var flags =  groups.map(g => {return [true, false]})        
-        var groups = groups.map( g => { return g.map(v => v.name)})        
-    }
-   
-    Object.assign(tsmJson, {
-        flags: flags,
-        featureGroups: groups,                   
-    })
-    */
-  //configuration["multiTSM"] = tsmJson
-
   $("#conf").val(JSON.stringify(configuration));
-
-  //var payload = $('#choose-columns').serialize()
 
   $.ajax({
     type: "POST",
@@ -101,11 +73,6 @@ function sendColumns(tokens, chosenColumns, onSuccess) {
   var endPoint = backend + "/choose-options";
 
   var configuration = defaultConfiguration;
-  //configuration['useFakePoint'] = state.useFakePoint || false
-
-  //$('#conf').val(JSON.stringify(configuration))
-
-  //var payload = $('#choose-columns').serialize()
 
   $.ajax({
     type: "POST",
@@ -135,11 +102,11 @@ function sendDataToWebPlateform(
     webplatformApi + "/session/" + tokens.sessionToken + "/options";
 
   var numberOfNumerical = availableVariables.reduce((e, acc) => {
-    return acc + 1 * e.type == "numerical";
+    return acc + 1 * e.type === "numerical";
   }, 0);
 
   var numberOfCategorical = availableVariables.reduce((e, acc) => {
-    return acc + 1 * e.type == "categorical";
+    return acc + 1 * e.type === "categorical";
   }, 0);
 
   var statisticData = {

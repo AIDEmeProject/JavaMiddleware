@@ -23,24 +23,7 @@ import React, { Component } from "react";
 import MicroModalComponent from "../MicroModalComponent";
 import Group from "./Group";
 
-import DataPoints from "../DataPoints";
-
 import robot from "../../resources/robot.png";
-
-function containsObject(obj, list) {
-  var i;
-  for (i = 0; i < list.length; i++) {
-    if (list[i] === obj) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-function variableIsUsed(variable, usedVariables) {
-  return containsObject(variable, usedVariables);
-}
 
 class GroupEditor extends Component {
   constructor(props) {
@@ -51,7 +34,6 @@ class GroupEditor extends Component {
   }
 
   render() {
-    const availableVariables = this.props.availableVariables;
     const chosenColumns = this.props.chosenColumns;
 
     return (
@@ -85,9 +67,6 @@ class GroupEditor extends Component {
     if (isChecked) {
       this.props.onVariableAddedToGroup(iGroup, iVariable);
     }
-    //else{
-    //    this.props.onVariableRemovedFromGroup(iGroup, iVariable)
-    //}
   }
 }
 
@@ -266,12 +245,6 @@ class GroupVariables extends Component {
     var newGroupsState = this.state.groups.map((e) => e);
     var modifiedGroup = newGroupsState[groupId];
 
-    /*
-        modifiedGroup = modifiedGroup.filter((variable, i) => {
-            
-            return i !== removedColumnId
-        })
-        */
     modifiedGroup.splice(removedColumnId, 1);
 
     var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(
@@ -299,7 +272,7 @@ class GroupVariables extends Component {
       return a.length + acc;
     });
 
-    if (nVariableInGroups == 0) {
+    if (nVariableInGroups === 0) {
       alert("please put at least variable in a group");
     }
 

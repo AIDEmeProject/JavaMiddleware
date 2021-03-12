@@ -20,15 +20,8 @@
 
 import React, { Component } from "react";
 
-import $ from "jquery";
-import { backend, webplatformApi } from "../../../constants/constants";
-
-import SpecificPointToLabel from "./SpecificPointToLabel";
-import FakePointSampling from "./FakePointSampling";
 import FilteringPoints from "./FilteringPoints";
-
 import PointLabelisation from "../../PointLabelisation";
-import sendFakePoint from "../../../actions/sendFakePoint";
 
 import robot from "../../../resources/robot.png";
 
@@ -48,6 +41,8 @@ class InitialSampling extends Component {
         <div>
           <div className="row">
             <div className="col col-lg-8 offset-lg-2">
+              <h4>Initial sampling</h4>
+
               <p className="card">
                 <span className="chatbot-talk">
                   <img src={robot} width="70" />
@@ -55,7 +50,7 @@ class InitialSampling extends Component {
                     The first phase of labeling continues until we obtain a
                     positive example and a negative example. <br />
                     To get the initial samples, would you like to go through
-                    initial sampling or attribute filtering?
+                    random sampling or attribute filtering?
                   </q>
                 </span>
               </p>
@@ -68,12 +63,11 @@ class InitialSampling extends Component {
                     onClick={() =>
                       this.setState({
                         showLabeling: true,
-                        showFakePointSampling: false,
                         showFilterBasedSampling: false,
                       })
                     }
                   >
-                    Initial sampling
+                    Random sampling
                   </a>
                 </li>
 
@@ -84,7 +78,6 @@ class InitialSampling extends Component {
                     onClick={() =>
                       this.setState({
                         showLabeling: false,
-                        showFakePointSampling: false,
                         showFilterBasedSampling: true,
                       })
                     }
@@ -92,31 +85,7 @@ class InitialSampling extends Component {
                     Faceted search
                   </a>
                 </li>
-
-                {false && (
-                  <li className="nav-item">
-                    <a
-                      className="nav-link active"
-                      href="#"
-                      onClick={() =>
-                        this.setState({
-                          showLabeling: false,
-                          showFakePointSampling: false,
-                        })
-                      }
-                    >
-                      Fake point initial sampling
-                    </a>
-                  </li>
-                )}
               </ul>
-
-              {//this.state.showLabeling &&
-              false && (
-                <SpecificPointToLabel
-                  onNewPointsToLabel={this.props.onNewPointsToLabel}
-                />
-              )}
             </div>
           </div>
 
@@ -138,16 +107,6 @@ class InitialSampling extends Component {
               </div>
             </div>
           )}
-
-          {this.state.showFakePointSampling && (
-            <div>
-              <FakePointSampling
-                pointToLabel={this.props.pointsToLabel[0].data}
-                onFakePointValidation={this.fakePointWasValidated.bind(this)}
-                availableVariables={this.props.availableVariables}
-              />
-            </div>
-          )}
         </div>
       </div>
     );
@@ -159,7 +118,7 @@ class InitialSampling extends Component {
     chosenVariables = this.props.chosenColumns.map((e) => {
       const dataset = this.props.dataset;
 
-      if (e.type == "numerical") {
+      if (e.type === "numerical") {
         //compute min and max
         var min = dataset.min(e.name);
         var max = dataset.max(e.name);
@@ -173,14 +132,6 @@ class InitialSampling extends Component {
     });
 
     return chosenVariables;
-  }
-
-  fakePointWasValidated(fakePointData) {
-    const fakePoint = {
-      data: fakePointData,
-      label: 1,
-    };
-    sendFakePoint(fakePoint, this.props.fakePointWasValidated);
   }
 }
 
