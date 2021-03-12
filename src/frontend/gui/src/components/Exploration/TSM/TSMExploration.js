@@ -633,16 +633,21 @@ class TSMExploration extends Component {
 }
 
 function getWholedatasetLabeled() {
-  var url = backend + "/get-labeled-dataset";
+  $.ajax({
+    type: "GET",
+    url: backend + "/get-labeled-dataset",
+    xhrFields: {
+      withCredentials: true,
+    },
+    success: (response) => {
+      var blob = new Blob([response]);
+      var link = document.createElement("a");
 
-  $.get(url, (response) => {
-    var blob = new Blob([response]);
-    var link = document.createElement("a");
-
-    link.href = window.URL.createObjectURL(blob);
-    document.body.appendChild(link);
-    link.download = "labeled_dataset.csv";
-    link.click();
+      link.href = window.URL.createObjectURL(blob);
+      document.body.appendChild(link);
+      link.download = "labeled_dataset.csv";
+      link.click();
+    },
   });
 }
 

@@ -18,24 +18,30 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-import $ from 'jquery'
-import {backend, webplatformApi} from '../constants/constants'
+import $ from "jquery";
+import { backend, webplatformApi } from "../constants/constants";
 
-function getTSMPredictionsOverGridPoints(dataWasReceived){
+function getTSMPredictionsOverGridPoints(dataWasReceived) {
+  var url = backend + "/get-model-predictions-over-grid-point"; // /get-tsm-predictions-over-grid-point
 
-    var url = backend + "/get-tsm-predictions-over-grid-point"
+  $.ajax({
+    type: "GET",
+    dataType: "JSON",
+    url,
+    xhrFields: {
+      withCredentials: true,
+    },
+    success: (rawLabels) => {
+      var predictedLabels = rawLabels.map((e) => {
+        return {
+          id: e.dataPoint.id,
+          label: e.label.label,
+        };
+      });
 
-    $.get(url, rawLabels =>{
-
-        var predictedLabels = rawLabels.map(e => {
-            return {
-                'id': e.dataPoint.id,
-                'label': e.label.label
-            }
-        })
-
-        dataWasReceived(predictedLabels)
-    })    
+      dataWasReceived(predictedLabels);
+    },
+  });
 }
 
-export default getTSMPredictionsOverGridPoints
+export default getTSMPredictionsOverGridPoints;
