@@ -64,6 +64,11 @@ function sendVariableGroups(
 }
 
 function sendColumns(chosenColumns, configuration, onSuccess) {
+  if (chosenColumns.length === 0) {
+    alert("Please select attributes.");
+    return;
+  }
+
   $.ajax({
     type: "POST",
     url: backend + "/choose-options",
