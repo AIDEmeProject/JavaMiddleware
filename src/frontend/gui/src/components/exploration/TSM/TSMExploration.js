@@ -49,14 +49,10 @@ class TSMExploration extends Component {
       showModelBehavior: false,
 
       pointsToLabel: this.props.pointsToLabel.map((e) => e),
-      noPoints: [],
-      allLabeledPoints: [],
       labeledPoints: [],
+      allLabeledPoints: [],
       hasYes: false,
       hasNo: false,
-      visualizationData: {
-        TSMBound: null,
-      },
 
       fakePointGrid: [],
       TSMPredictionHistory: [],
@@ -263,7 +259,7 @@ class TSMExploration extends Component {
     labeledPoint.labels = this.props.groups.map((g) => 1);
     labeledPoint.label = 1;
 
-    var pointsToLabel = this.state.pointsToLabel.map((p) => p);
+    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
     pointsToLabel.splice(pointId, 1);
 
     if (this.state.initialLabelingSession) {
@@ -277,69 +273,49 @@ class TSMExploration extends Component {
     var labeledPoints = this.state.labeledPoints.map((e) => e);
     labeledPoints.push(labeledPoint);
 
-    var allLabeledPoints = this.state.allLabeledPoints.map((e) => e);
-
     const isYes = labeledPoint.label === 1;
-    var hasYesAndNo;
-
-    if (isYes) {
-      hasYesAndNo = this.state.hasNo;
-    } else {
-      hasYesAndNo = this.state.hasYes;
-    }
+    var hasYesAndNo = isYes && this.state.hasNo;
 
     if (hasYesAndNo) {
-      allLabeledPoints = allLabeledPoints.concat(labeledPoints);
       this.setState(
         {
           pointsToLabel: [],
+          allLabeledPoints: this.state.allLabeledPoints.concat(labeledPoints),
           initialLabelingSession: false,
-          hasYesAndNo: true,
-          allLabeledPoints: allLabeledPoints,
         },
         () => {
           sendLabels(labeledPoints, this.newPointsToLabel.bind(this));
         }
       );
-    } else if (this.state.pointsToLabel.length === 0) {
-      allLabeledPoints = allLabeledPoints.concat(labeledPoints);
-
-      var newState = {
-        pointsToLabel: pointsToLabel,
-        initialLabelingSession: false,
-        allLabeledPoints: allLabeledPoints,
-      };
-      if (isYes) {
-        newState["hasYes"] = true;
-      } else {
-        newState["hasNo"] = true;
-      }
-
-      this.setState(newState, () => {
-        sendLabels(labeledPoints, this.newPointsToLabel.bind(this));
-      });
+    } else if (pointsToLabel.length === 0) {
+      this.setState(
+        {
+          pointsToLabel: [],
+          allLabeledPoints: this.state.allLabeledPoints.concat(labeledPoints),
+          hasYes: isYes,
+          hasNo: !isYes,
+        },
+        () => {
+          sendLabels(labeledPoints, this.newPointsToLabel.bind(this));
+        }
+      );
     } else {
-      var newState = {
+      this.setState({
         pointsToLabel: pointsToLabel,
         labeledPoints: labeledPoints,
-      };
-      if (isYes) {
-        newState["hasYes"] = true;
-      } else {
-        newState["hasNo"] = true;
-      }
-      this.setState(newState);
+        hasYes: isYes,
+        hasNo: !isYes,
+      });
     }
   }
 
   pointWasLabeledAfterInitialSession(labeledPoint) {
     var labeledPoints = this.state.labeledPoints;
     labeledPoints.push(labeledPoint);
-    var allLabeledPoints = this.state.allLabeledPoints.concat(labeledPoints);
 
     this.setState(
       {
-        allLabeledPoints: allLabeledPoints,
+        allLabeledPoints: this.state.allLabeledPoints.concat(labeledPoints),
         pointsToLabel: [],
         labeledPoints: labeledPoints,
       },
@@ -453,16 +429,6 @@ class TSMExploration extends Component {
 
     this.setState({
       iteration: Math.min(iteration, nIteration - 1),
-    });
-  }
-
-  projectionDataWasReceived(boundaryData) {
-    let history = this.state.projectionHistory;
-    history.push(JSON.parse(boundaryData));
-
-    this.setState({
-      projectionHistory: history,
-      isFetchingProjection: false,
     });
   }
 
