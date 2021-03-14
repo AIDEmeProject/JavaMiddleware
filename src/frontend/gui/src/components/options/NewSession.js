@@ -71,6 +71,7 @@ class NewSession extends Component {
           <div>
             <form onSubmit={this.handleSubmit.bind(this)}>
               <h6>1. Choose the dataset to be labeled</h6>
+              <p>Datasets without missing values are supported.</p>
               <div className="form-group">
                 <input
                   required
@@ -83,7 +84,7 @@ class NewSession extends Component {
               </div>
 
               <h6>2. Choose the separator</h6>
-              <p>CSV, TSV and Semi-colon separator are supported.</p>
+              <p>CSV, TSV and Semi-colon separators are supported.</p>
               <div className="row g-2 align-items-center">
                 <div className="col-auto">
                   <label htmlFor="separator" className="col-form-label">
