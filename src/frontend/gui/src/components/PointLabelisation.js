@@ -23,7 +23,6 @@ import Dataset from "../model/Dataset";
 
 class PointLabelisation extends Component {
   render() {
-    const dataset = this.props.dataset;
     return (
       <div className="">
         <div className="row">
@@ -82,7 +81,6 @@ class PointLabelisation extends Component {
                         >
                           Yes
                         </button>
-
                         <button
                           className="btn btn-raised btn-primary"
                           data-key={key}

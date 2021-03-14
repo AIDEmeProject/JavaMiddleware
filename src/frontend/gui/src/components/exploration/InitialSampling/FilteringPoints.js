@@ -167,7 +167,7 @@ class PointFiltering extends Component {
       <div>
         <p className="card">
           <span className="chatbot-talk">
-            <img src={robot} width="70" />
+            <img src={robot} width="50" alt="robot" />
             <q>Filter positive points and click on Get points.</q>
           </span>
         </p>

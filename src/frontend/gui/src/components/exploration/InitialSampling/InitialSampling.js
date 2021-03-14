@@ -45,7 +45,7 @@ class InitialSampling extends Component {
 
               <p className="card">
                 <span className="chatbot-talk">
-                  <img src={robot} width="70" />
+                  <img src={robot} width="50" alt="robot" />
                   <q>
                     The first phase of labeling continues until we obtain a
                     positive example and a negative example. <br />
@@ -55,11 +55,13 @@ class InitialSampling extends Component {
                 </span>
               </p>
 
-              <ul className="nav nav-tabs bg-primary">
+              <ul className="nav nav-tabs bg-light">
                 <li className="nav-item">
                   <a
-                    className="nav-link"
-                    href="#"
+                    className={
+                      this.state.showLabeling ? "nav-link active" : "nav-link"
+                    }
+                    href="javascript:void(0)"
                     onClick={() =>
                       this.setState({
                         showLabeling: true,
@@ -73,8 +75,12 @@ class InitialSampling extends Component {
 
                 <li className="nav-item">
                   <a
-                    className="nav-link"
-                    href="#"
+                    className={
+                      this.state.showFilterBasedSampling
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    href="javascript:void(0)"
                     onClick={() =>
                       this.setState({
                         showLabeling: false,

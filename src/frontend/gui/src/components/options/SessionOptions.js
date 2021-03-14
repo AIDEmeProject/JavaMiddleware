@@ -88,6 +88,7 @@ class SessionOptions extends Component {
               className={
                 this.state.showColumns ? "nav-link active" : "nav-link"
               }
+              href="javascript:void(0)"
               onClick={this.onBasicOptionClick.bind(this)}
             >
               Attribute selection
@@ -99,6 +100,7 @@ class SessionOptions extends Component {
               className={
                 this.state.showVariableGroups ? "nav-link active" : "nav-link"
               }
+              href="javascript:void(0)"
               onClick={this.onVariableGrouping.bind(this)}
             >
               Factorization structure
@@ -110,6 +112,7 @@ class SessionOptions extends Component {
               className={
                 this.state.showAdvancedOptions ? "nav-link active" : "nav-link"
               }
+              href="javascript:void(0)"
               onClick={this.onAdvancedOptionClick.bind(this)}
             >
               Algorithm selection

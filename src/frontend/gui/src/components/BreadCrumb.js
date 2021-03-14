@@ -23,7 +23,7 @@ import React, { Component } from "react";
 class BreadCrumb extends Component {
   render() {
     return (
-      <ol className="breadcrumb">
+      <ol className="breadcrumb bg-primary">
         {this.props.items.map((item, i) => {
           const className = item.active
             ? "breadcrumb-item active"

@@ -24,6 +24,7 @@ import $ from "jquery";
 
 import DataPoints from "./DataPoints";
 import GroupedPointTableHead from "./GroupedPointTableHead";
+import GroupedPointTableBody from "./GroupedPointTableBody";
 import ModelBehavior from "../../visualisation/ModelBehavior";
 import ModelBehaviorControls from "../../visualisation/ModelBehaviorControls";
 import LabelInfos from "../../visualisation/LabelInfos";
@@ -77,6 +78,7 @@ class TSMExploration extends Component {
                 className={
                   this.state.showLabelView ? "nav-link active" : "nav-link"
                 }
+                href="javascript:void(0)"
                 onClick={() =>
                   this.setState({
                     showLabelView: true,
@@ -94,6 +96,7 @@ class TSMExploration extends Component {
                 className={
                   this.state.showLabelHistory ? "nav-link active" : "nav-link"
                 }
+                href="javascript:void(0)"
                 onClick={() =>
                   this.setState({
                     showLabelView: false,
@@ -111,6 +114,7 @@ class TSMExploration extends Component {
                 className={
                   this.state.showModelBehavior ? "nav-link active" : "nav-link"
                 }
+                href="javascript:void(0)"
                 onClick={this.onModelBehaviorClick.bind(this)}
               >
                 Model Behavior
@@ -135,7 +139,7 @@ class TSMExploration extends Component {
                 {this.state.initialLabelingSession && (
                   <p className="card">
                     <span className="chatbot-talk">
-                      <img src={robot} width="70" />
+                      <img src={robot} width="50" alt="robot" />
                       <q>
                         The first phase of labeling continues until we obtain a
                         positive example and a negative example.
@@ -146,7 +150,7 @@ class TSMExploration extends Component {
 
                 <p className="card">
                   <span className="chatbot-talk">
-                    <img src={robot} width="70" />
+                    <img src={robot} width="50" alt="robot" />
                     <q>
                       Grouped variable exploration. If you chose no, you will be
                       asked to label each subgroup independently.
@@ -156,101 +160,17 @@ class TSMExploration extends Component {
 
                 <table className="group-variable">
                   <GroupedPointTableHead groups={this.props.groups} />
-
-                  <tbody>
-                    {this.state.pointsToLabel.map((point, i) => {
-                      const pointData = dataset.get_selected_columns_point(
-                        point.id
-                      );
-                      return (
-                        <tr key={i} className="variable-group">
-                          {this.props.groups.map((g, iGroup) => {
-                            console.log(g);
-                            var pointIds = g.map((e) => e.realId);
-
-                            var dataAsGroups = [];
-
-                            pointIds.forEach((realId) => {
-                              var value = pointData[realId];
-
-                              dataAsGroups.push(value);
-                            });
-
-                            var values = dataAsGroups.join(", ");
-                            if (typeof point.labels !== "undefined") {
-                              var L = () => {
-                                return (
-                                  <button
-                                    data-point={i}
-                                    data-subgroup={iGroup}
-                                    className="btn btn-primary btn-raised"
-                                    onClick={this.onSubGroupNo.bind(this)}
-                                  >
-                                    No
-                                  </button>
-                                );
-                              };
-                            } else {
-                              var L = () => {
-                                return <span></span>;
-                              };
-                            }
-
-                            return (
-                              <td colSpan={g.length} key={iGroup}>
-                                {values} <L />
-                              </td>
-                            );
-                          })}
-                          <td className="label-col">
-                            <button
-                              style={{
-                                display:
-                                  typeof point.labels === "undefined"
-                                    ? "inherit"
-                                    : "none",
-                              }}
-                              className="btn btn-primary btn-raised"
-                              data-point={i}
-                              onClick={this.groupWasLabeledAsYes.bind(this)}
-                            >
-                              Yes
-                            </button>
-
-                            <button
-                              style={{
-                                display:
-                                  typeof point.labels === "undefined"
-                                    ? "inherit"
-                                    : "none",
-                              }}
-                              className="btn btn-primary btn-raised"
-                              data-point={i}
-                              onClick={this.groupWasLabeledAsNo.bind(this)}
-                            >
-                              No
-                            </button>
-
-                            <button
-                              className="btn btn-primary btn-raised"
-                              style={{
-                                display:
-                                  typeof point.labels === "undefined"
-                                    ? "none"
-                                    : "inherit",
-                              }}
-                              data-point={i}
-                              onClick={this.groupSubLabelisationFinished.bind(
-                                this
-                              )}
-                            >
-                              Validate Subgroup labels
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
+                  <GroupedPointTableBody
+                    pointsToLabel={this.state.pointsToLabel}
+                    dataset={dataset}
+                    groups={this.props.groups}
+                    groupWasLabeledAsYes={this.groupWasLabeledAsYes.bind(this)}
+                    groupWasLabeledAsNo={this.groupWasLabeledAsNo.bind(this)}
+                    groupSubLabelisationFinished={this.groupSubLabelisationFinished.bind(
+                      this
+                    )}
+                    onSubgroupNo={this.onSubgroupNo.bind(this)}
+                  />
                 </table>
               </div>
             </div>
@@ -340,10 +260,10 @@ class TSMExploration extends Component {
   groupWasLabeledAsYes(e) {
     var pointId = e.target.dataset.point;
     var labeledPoint = this.state.pointsToLabel[pointId];
-    labeledPoint.labels = this.props.groups.map((e) => 1);
+    labeledPoint.labels = this.props.groups.map((g) => 1);
     labeledPoint.label = 1;
 
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
+    var pointsToLabel = this.state.pointsToLabel.map((p) => p);
     pointsToLabel.splice(pointId, 1);
 
     if (this.state.initialLabelingSession) {
@@ -433,36 +353,39 @@ class TSMExploration extends Component {
   }
 
   groupWasLabeledAsNo(e) {
-    var iPoint = e.target.dataset.point;
+    var pointId = e.target.dataset.point;
 
     var pointsToLabel = this.state.pointsToLabel.map((e) => e);
 
-    var point = pointsToLabel[iPoint];
+    var point = pointsToLabel[pointId];
     point.labels = this.props.groups.map((e) => 1);
     point.label = 0;
 
     this.setState({
       pointsToLabel: pointsToLabel,
-      hasNo: true,
     });
   }
 
   groupSubLabelisationFinished(e) {
-    var iPoint = e.target.dataset.point;
+    var pointId = e.target.dataset.point;
     var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-    var labeledPoint = pointsToLabel[iPoint];
+    var labeledPoint = pointsToLabel[pointId];
 
     if (
-      labeledPoint.labels.reduce((acc, v) => acc + v) ==
+      labeledPoint.labels.reduce((acc, v) => acc + v) ===
       labeledPoint.labels.length
     ) {
-      alert("please label at least one subgroup");
+      alert("Please label at least one subgroup.");
       return;
     }
 
-    pointsToLabel.splice(iPoint, 1);
+    pointsToLabel.splice(pointId, 1);
     var labeledPoints = this.state.labeledPoints.map((e) => e);
     labeledPoints.push(labeledPoint);
+
+    this.setState({
+      hasNo: true,
+    });
 
     if (this.state.initialLabelingSession) {
       this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel);
@@ -565,17 +488,15 @@ class TSMExploration extends Component {
     }
   }
 
-  onSubGroupNo(e) {
+  onSubgroupNo(e) {
     var data = e.target.dataset;
-    var iPoint = data.point;
-    var iSubgroup = data.subgroup;
+    var pointId = data.point;
+    var subgroupId = data.subgroup;
 
     var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-    var point = pointsToLabel[iPoint];
+    pointsToLabel[pointId].labels[subgroupId] =
+      1 - pointsToLabel[pointId].labels[subgroupId];
 
-    point.labels[iSubgroup] = 0;
-
-    pointsToLabel[iPoint] = point;
     this.setState({
       pointsToLabel: pointsToLabel,
     });

@@ -84,6 +84,7 @@ class Exploration extends Component {
                   className={
                     this.state.showLabelView ? "nav-link active" : "nav-link"
                   }
+                  href="javascript:void(0)"
                   onClick={() =>
                     this.setState({
                       showLabelView: true,
@@ -101,6 +102,7 @@ class Exploration extends Component {
                   className={
                     this.state.showLabelHistory ? "nav-link active" : "nav-link"
                   }
+                  href="javascript:void(0)"
                   onClick={() =>
                     this.setState({
                       showLabelView: false,
@@ -120,6 +122,7 @@ class Exploration extends Component {
                       ? "nav-link active"
                       : "nav-link"
                   }
+                  href="javascript:void(0)"
                   onClick={this.onModelBehaviorClick.bind(this)}
                 >
                   Model Behavior

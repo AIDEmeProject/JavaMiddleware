@@ -23,10 +23,10 @@ import React, { Component } from "react";
 import Welcome from "./components/Welcome";
 import NewSession from "./components/options/NewSession";
 import SessionOptions from "./components/options/SessionOptions";
-import Exploration from "./components/Exploration/Exploration";
-import TSMExploration from "./components/Exploration/TSM/TSMExploration";
+import Exploration from "./components/exploration/Exploration";
+import TSMExploration from "./components/exploration/TSM/TSMExploration";
 import BreadCrumb from "./components/BreadCrumb";
-import Trace from "./components/Trace/Trace";
+import Trace from "./components/trace/Trace";
 
 import MicroModal from "micromodal";
 
@@ -97,7 +97,7 @@ class App extends Component {
 
     return (
       <div>
-        <ul className="navbar navbar-dark box-shadow ">
+        <ul className="navbar navbar-dark box-shadow">
           <li className="nav-item">
             <a className="navbar-brand" href="/">
               <img src={logo} height="50" alt="logo" /> AIDEme

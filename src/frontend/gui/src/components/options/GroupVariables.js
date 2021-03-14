@@ -83,7 +83,7 @@ class GroupVariables extends Component {
 
         <p className="card">
           <span className="chatbot-talk">
-            <img src={robot} width="70" />
+            <img src={robot} width="50" alt="robot" />
             <q>
               By grouping variables in formal subgroups, the convergence speed
               can be improved. Group variables by click on "Edit" on a given

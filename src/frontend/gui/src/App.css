@@ -22,6 +22,10 @@ select {
   -webkit-appearance: menulist;
 }
 
+.breadcrumb > .active {
+  color: white;
+}
+
 .container-fluid {
   width: 100%;
 }

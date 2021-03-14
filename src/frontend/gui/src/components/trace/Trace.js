@@ -22,7 +22,7 @@ import $ from "jquery";
 import * as d3 from "d3";
 import React, { Component } from "react";
 
-import TSMPredictionStatistics from "../Exploration/TSM/TSMPredictionStatistics";
+import TSMPredictionStatistics from "../exploration/TSM/TSMPredictionStatistics";
 
 import { algorithmNames } from "../../constants/constants";
 import loadFileFromInputFile from "../../lib/data_utils";
@@ -49,7 +49,7 @@ import {
   versionSpaceConfiguration,
   factorizedVersionSpaceConfiguration,
 } from "../../constants/constants";
-import PredictionStatistics from "../Exploration/TSM/PredictionStatitics";
+import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
 
 const ENCODED_DATASET_NAME = "./cars_encoded.csv";
 
