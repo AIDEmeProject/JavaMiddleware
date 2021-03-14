@@ -18,25 +18,19 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-import {
-  backend,
-  webplatformApi,
-  defaultConfiguration,
-} from "../constants/constants";
+import { backend } from "../constants/constants";
 import buildTSMConfiguration from "../lib/buildTSMConfiguration";
 
 import $ from "jquery";
 
 function sendVariableGroups(
-  tokens,
   chosenVariables,
   groups,
   datasetMetadata,
+  configuration,
   onSuccess
 ) {
   var endPoint = backend + "/choose-options";
-
-  var configuration = defaultConfiguration;
 
   var usedColumnNames = chosenVariables.map((e) => e.name);
   console.log(groups);
@@ -69,14 +63,10 @@ function sendVariableGroups(
   });
 }
 
-function sendColumns(tokens, chosenColumns, onSuccess) {
-  var endPoint = backend + "/choose-options";
-
-  var configuration = defaultConfiguration;
-
+function sendColumns(chosenColumns, configuration, onSuccess) {
   $.ajax({
     type: "POST",
-    url: endPoint,
+    url: backend + "/choose-options",
     xhrFields: {
       withCredentials: true,
     },
@@ -90,54 +80,7 @@ function sendColumns(tokens, chosenColumns, onSuccess) {
   });
 }
 
-function sendDataToWebPlateform(
-  availableVariables,
-  options,
-  hasTSM,
-  featureGroups,
-  sessionOptionsUrl,
-  tokens
-) {
-  var sessionOptionsUrl =
-    webplatformApi + "/session/" + tokens.sessionToken + "/options";
-
-  var numberOfNumerical = availableVariables.reduce((e, acc) => {
-    return acc + 1 * e.type === "numerical";
-  }, 0);
-
-  var numberOfCategorical = availableVariables.reduce((e, acc) => {
-    return acc + 1 * e.type === "categorical";
-  }, 0);
-
-  var statisticData = {
-    column_number: availableVariables.length,
-    numberOfCategorical: numberOfCategorical,
-    numberOfNumerical: numberOfNumerical,
-    has_tsm: hasTSM,
-    learner: options.learner,
-    classifier: options.classifier,
-  };
-
-  if (hasTSM) {
-    if (availableVariables.length == 2) {
-      var nGroups = 2;
-    } else {
-      var nGroups = featureGroups.length;
-    }
-    statisticData["number_of_variable_groups"] = nGroups;
-  }
-
-  $.ajax({
-    type: "PUT",
-    url: sessionOptionsUrl,
-    data: statisticData,
-    headers: {
-      Authorization: "Token " + tokens.authorizationToken,
-    },
-  });
-}
-
 export default {
-  sendColumns: sendColumns,
-  sendVariableGroups: sendVariableGroups,
+  sendColumns,
+  sendVariableGroups,
 };

@@ -74,9 +74,6 @@ class GroupVariables extends Component {
   render() {
     var availableVariables = this.state.variablesNotAlreadyInAGivenGroup;
 
-    if (!this.props.show) {
-      return <div></div>;
-    }
     return (
       <div>
         <h4>Variable subgroups</h4>

@@ -22,10 +22,6 @@ import React, { Component } from "react";
 
 class AdvancedOptions extends Component {
   render() {
-    if (!this.props.showAdvancedOptions) {
-      return <div></div>;
-    }
-
     return (
       <div className="row">
         <div className="col col-lg-6 offset-lg-3">
@@ -35,8 +31,9 @@ class AdvancedOptions extends Component {
               className="form-control"
               id="algorithm-selection"
               name="active-learner"
+              onChange={this.props.onLearnerChange}
             >
-              <option value="UncertaintySampler" defaultValue>
+              <option value="simpleMargin" defaultValue>
                 Simple Margin
               </option>
               <option value="versionSpace">Version Space</option>

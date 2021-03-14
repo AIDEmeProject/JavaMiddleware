@@ -20,12 +20,15 @@
 
 import React, { Component } from "react";
 
+import {
+  simpleMarginConfiguration,
+  versionSpaceConfiguration,
+} from "../../constants/constants";
 import actions from "../../actions/sendChosenColumns";
 
+import AttributeSelection from "./AttributeSelection";
 import GroupVariables from "./GroupVariables";
 import AdvancedOptions from "./AdvancedOptions";
-
-import DataExploration from "../visualisation/DataExploration";
 
 class SessionOptions extends Component {
   constructor(props) {
@@ -58,28 +61,21 @@ class SessionOptions extends Component {
     });
 
     this.state = {
+      showColumns: true,
+      showVariableGroups: false,
+      showAdvancedOptions: false,
+
       firstVariable: 0,
       secondVariable: 1,
       columnTypes: chosenColumns.map((e) => e["type"]),
       checkboxes: datasetInfos.columns.map((c) => false),
       chosenColumns: chosenColumns,
-      showAdvancedOptions: false,
-      showVariableGroups: false,
-      availableVariables: [],
-      variableGroups: [[], []],
-      finalVariables: [],
 
-      learner: "Uncertainty sampling",
-      classifier: "SVM",
-      showColumns: true,
-      showExploration: false,
+      configuration: simpleMarginConfiguration,
     };
   }
 
   render() {
-    const datasetInfos = this.props.datasetInfos;
-    const columns = datasetInfos.columns;
-
     return (
       <div>
         <ul className="nav nav-tabs bg-primary">
@@ -130,88 +126,35 @@ class SessionOptions extends Component {
         </ul>
 
         <form id="choose-columns" className="card">
-          <div style={{ display: this.state.showColumns ? "initial" : "none" }}>
-            <div className="row">
-              <div className="col col-lg-12">
-                <p>
-                  Explore the dataset and pick the variables for the labeling
-                  phase.
-                </p>
-              </div>
-            </div>
+          {this.state.showColumns && (
+            <AttributeSelection
+              columns={this.props.datasetInfos.columns}
+              checkboxes={this.state.checkboxes}
+              dataset={this.props.dataset}
+              firstVariable={this.state.firstVariable}
+              secondVariable={this.state.secondVariable}
+              chosenColumns={this.state.chosenColumns}
+              onCheckedColumn={this.onCheckedColumn.bind(this)}
+            />
+          )}
 
-            <div className="row">
-              <div className="col col-lg-3" id="column-picker">
-                <h3>Column name</h3>
+          {this.state.showVariableGroups && (
+            <GroupVariables
+              chosenColumns={this.state.chosenColumns}
+              groupsWereValidated={this.groupsWereValidated.bind(this)}
+              availableVariables={this.props.chosenColumns}
+              dataset={this.props.dataset}
+            />
+          )}
 
-                {columns.map((column, key) => (
-                  <div key={key} className="">
-                    <div className="form-check form-check-inline">
-                      <input
-                        id={"column-" + column}
-                        name={"column" + key}
-                        type="checkbox"
-                        value={key}
-                        className="form-check-input"
-                        onClick={this.onCheckedColumn.bind(this)}
-                        defaultChecked={this.state.checkboxes[key]}
-                      />
-
-                      <label
-                        className="column-name-label"
-                        htmlFor={"column-" + column}
-                      >
-                        {column || "Not available"}
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="col col-lg-9">
-                <DataExploration
-                  dataset={this.props.dataset}
-                  firstVariable={this.state.firstVariable}
-                  secondVariable={this.state.secondVariable}
-                  show={this.state.showExploration}
-                  chosenColumns={this.state.chosenColumns}
-                />
-              </div>
-            </div>
-          </div>
-
-          <AdvancedOptions {...this.state} />
-
-          <GroupVariables
-            show={this.state.showVariableGroups}
-            chosenColumns={this.state.chosenColumns}
-            groupWasAdded={this.groupWasAdded.bind(this)}
-            groupsWereValidated={this.groupsWereValidated.bind(this)}
-            availableVariables={this.props.chosenColumns}
-            points={this.sampledPoints()}
-            dataset={this.props.dataset}
-          />
-
-          <input
-            id="conf"
-            name="configuration"
-            type="text"
-            style={{ visibility: "hidden" }}
-          />
+          {this.state.showAdvancedOptions && (
+            <AdvancedOptions
+              onLearnerChange={this.onLearnerChange.bind(this)}
+            />
+          )}
         </form>
       </div>
     );
-  }
-
-  sampledPoints() {
-    return [
-      {
-        id: 243,
-      },
-      {
-        id: 666,
-      },
-    ];
   }
 
   componentDidMount() {
@@ -243,26 +186,13 @@ class SessionOptions extends Component {
     });
   }
 
-  onExploreClick(e) {
-    e.preventDefault();
-
-    var columnId = e.target.dataset.key;
-
-    this.setState({
-      firstVariable: columnId,
-      showExploration: true,
-    });
-
-    return false;
-  }
-
   onCheckedColumn(e) {
     var idx = e.target.value;
     var checkboxes = this.state.checkboxes.map((e) => e);
 
     var newChosenColumns = this.state.chosenColumns.map((e) => e);
     newChosenColumns[idx].isUsed = e.target.checked;
-    var idx = 0;
+    idx = 0;
     newChosenColumns.forEach((e, i) => {
       if (e.isUsed) {
         newChosenColumns[i] = Object.assign({}, e, {
@@ -280,24 +210,18 @@ class SessionOptions extends Component {
     });
   }
 
-  onColumnTypeChange(e) {
-    var iColumn = e.target.dataset.key;
-
-    var newChosenColumnState = this.state.chosenColumns.map((e) => e);
-    newChosenColumnState[iColumn].type = e.target.value;
-
-    this.setState({
-      chosenColumns: newChosenColumnState,
-    });
+  onLearnerChange(e) {
+    const learner = e.target.value;
+    if (learner === "versionSpace")
+      this.setState({ configuration: versionSpaceConfiguration });
+    else this.setState({ configuration: simpleMarginConfiguration });
   }
 
   onSessionStartClick(e) {
-    e.preventDefault();
-    var chosenColumns = this.state.chosenColumns.filter((e) => e.isUsed);
-    //const enableTSM = chosenColumns.length == 2
+    var chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
     actions.sendColumns(
-      this.props.tokens,
       chosenColumns,
+      this.state.configuration,
       this.props.sessionWasStarted
     );
     this.props.sessionOptionsWereChosen({
@@ -319,10 +243,10 @@ class SessionOptions extends Component {
 
     this.props.groupsWereValidated(chosenColumns, groups, () => {
       actions.sendVariableGroups(
-        this.props.tokens,
         chosenColumns,
         groups,
         datasetMetadata,
+        this.state.configuration,
         this.props.sessionWasStarted
       );
     });
@@ -343,23 +267,6 @@ class SessionOptions extends Component {
         variable["realId"] = i;
         i++;
       });
-    });
-  }
-
-  groupWasAdded() {
-    var groups = this.state.variableGroups.map((e) => e);
-    groups.push([]);
-
-    this.setState({
-      variableGroups: groups,
-    });
-
-    this.forceUpdate();
-  }
-
-  onFakePointClick(e) {
-    this.setState({
-      useFakePoint: e.target.checked,
     });
   }
 }

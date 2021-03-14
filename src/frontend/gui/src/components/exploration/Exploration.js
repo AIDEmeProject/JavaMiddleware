@@ -76,70 +76,64 @@ class Exploration extends Component {
 
     return (
       <div>
-        <div className="row">
-          <div className="col col-lg-8 offset-lg-2">
-            <ul className="nav nav-tabs bg-primary">
-              <li className="nav-item">
-                <a
-                  className={
-                    this.state.showLabelView ? "nav-link active" : "nav-link"
-                  }
-                  href="javascript:void(0)"
-                  onClick={() =>
-                    this.setState({
-                      showLabelView: true,
-                      showLabelHistory: false,
-                      showModelBehavior: false,
-                    })
-                  }
-                >
-                  Labeling
-                </a>
-              </li>
+        <ul className="nav nav-tabs bg-primary">
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showLabelView ? "nav-link active" : "nav-link"
+              }
+              href="javascript:void(0)"
+              onClick={() =>
+                this.setState({
+                  showLabelView: true,
+                  showLabelHistory: false,
+                  showModelBehavior: false,
+                })
+              }
+            >
+              Labeling
+            </a>
+          </li>
 
-              <li className="nav-item">
-                <a
-                  className={
-                    this.state.showLabelHistory ? "nav-link active" : "nav-link"
-                  }
-                  href="javascript:void(0)"
-                  onClick={() =>
-                    this.setState({
-                      showLabelView: false,
-                      showLabelHistory: true,
-                      showModelBehavior: false,
-                    })
-                  }
-                >
-                  History
-                </a>
-              </li>
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showLabelHistory ? "nav-link active" : "nav-link"
+              }
+              href="javascript:void(0)"
+              onClick={() =>
+                this.setState({
+                  showLabelView: false,
+                  showLabelHistory: true,
+                  showModelBehavior: false,
+                })
+              }
+            >
+              History
+            </a>
+          </li>
 
-              <li className="nav-item">
-                <a
-                  className={
-                    this.state.showModelBehavior
-                      ? "nav-link active"
-                      : "nav-link"
-                  }
-                  href="javascript:void(0)"
-                  onClick={this.onModelBehaviorClick.bind(this)}
-                >
-                  Model Behavior
-                </a>
-              </li>
+          <li className="nav-item">
+            <a
+              className={
+                this.state.showModelBehavior ? "nav-link active" : "nav-link"
+              }
+              href="javascript:void(0)"
+              onClick={this.onModelBehaviorClick.bind(this)}
+            >
+              Model Behavior
+            </a>
+          </li>
 
-              <li className="nav-item">
-                <a
-                  className="nav-link"
-                  onClick={this.onLabelWholeDatasetClick.bind(this)}
-                >
-                  Auto-labeling
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+          <li className="nav-item">
+            <a
+              className="nav-link"
+              onClick={this.onLabelWholeDatasetClick.bind(this)}
+            >
+              Auto-labeling
+            </a>
+          </li>
+        </ul>
 
         {this.state.showLabelView && (
           <div className="row">
