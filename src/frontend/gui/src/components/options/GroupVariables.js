@@ -114,7 +114,7 @@ class GroupVariables extends Component {
             return (
               <div key={iGroup} className="card group">
                 <p>
-                  Group {iGroup}
+                  Group {iGroup + 1}
                   <button
                     type="button"
                     role="button"
