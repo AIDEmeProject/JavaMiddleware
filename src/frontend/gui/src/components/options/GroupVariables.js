@@ -20,25 +20,17 @@
 
 import React, { Component } from "react";
 
-import MicroModalComponent from "../MicroModalComponent";
+import MicroModalComponent from "./MicroModalComponent";
 import Group from "./Group";
 
 import robot from "../../resources/robot.png";
 
 class GroupEditor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      includedVariables: [],
-    };
-  }
-
   render() {
-    const chosenColumns = this.props.chosenColumns;
-
+    const variablesInGroup = this.props.group.map((variable) => variable.idx);
     return (
       <div>
-        {chosenColumns.map((variable, i) => {
+        {this.props.chosenColumns.map((variable, i) => {
           return (
             <div key={i} className="form-inline in-line">
               <label htmlFor={"column-group-" + i}>{variable.name}</label>
@@ -47,7 +39,7 @@ class GroupEditor extends Component {
                 type="checkbox"
                 className="form-control"
                 data-variableid={variable.idx}
-                data-variableorder={i}
+                checked={variablesInGroup.includes(variable.idx)}
                 onChange={this.onVariableAddedClick.bind(this)}
               />
             </div>
@@ -58,22 +50,27 @@ class GroupEditor extends Component {
   }
 
   onVariableAddedClick(e) {
-    const dataset = e.target.dataset;
-    const iVariable = parseInt(dataset.variableid);
+    const iVariable = parseInt(e.target.dataset.variableid);
 
-    const iGroup = this.props.iGroup;
-    const isChecked = e.target.checked;
-
-    if (isChecked) {
-      this.props.onVariableAddedToGroup(iGroup, iVariable);
+    if (e.target.checked) {
+      this.props.onVariableAddedToGroup(this.props.iGroup, iVariable);
+    } else {
+      this.props.onVariableRemovedFromGroup(this.props.iGroup, iVariable);
     }
   }
 }
 
 class GroupVariables extends Component {
-  render() {
-    var availableVariables = this.state.variablesNotAlreadyInAGivenGroup;
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      groups: [[]],
+      editedGroupId: null,
+    };
+  }
+
+  render() {
     return (
       <div>
         <h4>Variable subgroups</h4>
@@ -129,11 +126,6 @@ class GroupVariables extends Component {
                 <Group
                   group={group}
                   iGroup={iGroup}
-                  chosenColumns={this.props.chosenColumns}
-                  availableVariables={availableVariables}
-                  onVariableAddedToGroup={this.onVariableAddedToGroup.bind(
-                    this
-                  )}
                   onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(
                     this
                   )}
@@ -154,7 +146,6 @@ class GroupVariables extends Component {
               group={this.state.groups[this.state.editedGroupId]}
               iGroup={this.state.editedGroupId}
               chosenColumns={this.props.chosenColumns.filter((e) => e.isUsed)}
-              availableVariables={availableVariables}
               onVariableAddedToGroup={this.onVariableAddedToGroup.bind(this)}
               onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(
                 this
@@ -164,16 +155,6 @@ class GroupVariables extends Component {
         )}
       </div>
     );
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      groups: [[]],
-      editedGroupId: null,
-      variablesNotAlreadyInAGivenGroup: this.props.chosenColumns.map((e) => e),
-    };
   }
 
   componentDidUpdate() {
@@ -191,18 +172,6 @@ class GroupVariables extends Component {
     this.setState({
       editedGroupId: groupId,
     });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    //merge stuff
-    this.setState(
-      {
-        variablesNotAlreadyInAGivenGroup: nextProps.chosenColumns.filter(
-          (e) => e.isUsed
-        ),
-      },
-      this.forceUpdate
-    );
   }
 
   isVariableInGroup(group, variable) {
@@ -227,33 +196,23 @@ class GroupVariables extends Component {
 
     newGroupsState[groupId] = modifiedGroup;
 
-    var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.filter(
-      (v) => {
-        return v.idx !== variable.idx;
-      }
-    );
-
     this.setState({
       groups: newGroupsState,
-      variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup,
     });
   }
 
-  onVariableRemovedFromGroup(groupId, removedColumnId) {
-    var variable = this.props.chosenColumns[removedColumnId];
+  onVariableRemovedFromGroup(groupId, variableId) {
     var newGroupsState = this.state.groups.map((e) => e);
     var modifiedGroup = newGroupsState[groupId];
 
+    const removedColumnId = modifiedGroup.findIndex(
+      (e) => e.idx === variableId
+    );
     modifiedGroup.splice(removedColumnId, 1);
 
-    var variablesNotAlreadyInAGivenGroup = this.state.variablesNotAlreadyInAGivenGroup.map(
-      (e) => e
-    );
-    variablesNotAlreadyInAGivenGroup.push(variable);
     newGroupsState[groupId] = modifiedGroup;
     this.setState({
       groups: newGroupsState,
-      variablesNotAlreadyInAGivenGroup: variablesNotAlreadyInAGivenGroup,
     });
   }
 
@@ -267,12 +226,13 @@ class GroupVariables extends Component {
   }
 
   validateGroups() {
-    const nVariableInGroups = this.state.groups.reduce((a, acc) => {
+    const nVariableInGroups = this.state.groups.reduce((acc, a) => {
       return a.length + acc;
-    });
+    }, 0);
 
     if (nVariableInGroups === 0) {
-      alert("please put at least variable in a group");
+      alert("Please put at least a variable in a group.");
+      return;
     }
 
     this.props.groupsWereValidated(this.state.groups);

@@ -35,7 +35,7 @@ class Group extends Component {
                   {variable.name}{" "}
                   <button
                     className="btn btn-raised btn-sm"
-                    data-variable={iVariable}
+                    data-variableid={variable.idx}
                     data-group={iGroup}
                     onClick={this.removeVariable.bind(this)}
                   >
@@ -50,29 +50,11 @@ class Group extends Component {
     );
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   removeVariable(e) {
-    e.preventDefault();
-    var iVariable = parseInt(e.target.dataset.variable);
-    var iGroup = parseInt(e.target.dataset.group);
-    this.props.onVariableRemovedFromGroup(iGroup, iVariable);
-  }
-
-  onVariableCheckboxClick(e) {
-    var isChecked = e.target.checked;
-    var iVariable = parseInt(e.target.dataset.variableorder);
-
-    var iGroup = parseInt(e.target.dataset.groupid);
-
-    if (isChecked) {
-      this.props.onVariableAddedToGroup(iGroup, iVariable);
-    } else {
-      this.props.onVariableRemovedFromGroup(iGroup, iVariable);
-    }
+    this.props.onVariableRemovedFromGroup(
+      this.props.iGroup,
+      e.target.dataset.variableid
+    );
   }
 }
 

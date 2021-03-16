@@ -36,14 +36,12 @@ class SessionOptions extends Component {
 
     var datasetInfos = this.props.datasetInfos;
 
-    var chosenColumns = datasetInfos.columns.map((name, idx) => {
-      return {
-        name,
-        idx,
-        isUsed: false,
-        type: datasetInfos.types[idx],
-      };
-    });
+    var chosenColumns = datasetInfos.columns.map((name, idx) => ({
+      name,
+      idx,
+      isUsed: false,
+      type: datasetInfos.types[idx],
+    }));
 
     this.state = {
       showColumns: true,
@@ -128,8 +126,6 @@ class SessionOptions extends Component {
             <GroupVariables
               chosenColumns={this.state.chosenColumns}
               groupsWereValidated={this.groupsWereValidated.bind(this)}
-              availableVariables={this.props.chosenColumns}
-              dataset={this.props.dataset}
             />
           )}
 
@@ -221,7 +217,6 @@ class SessionOptions extends Component {
         return v;
       });
     });
-    //var chosenColumns = this.state.chosenColumns //.filter(e => e.isUsed)
 
     this.computeVariableColumnIndices(groups);
 
