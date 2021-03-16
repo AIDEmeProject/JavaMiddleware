@@ -196,6 +196,11 @@ class App extends Component {
   }
 
   fileUploaded(response) {
+    if (response.error) {
+      alert(response.error);
+      return;
+    }
+
     this.setState({
       step: SESSION_OPTIONS,
       bread: this.getBreadCrum(SESSION_OPTIONS),
