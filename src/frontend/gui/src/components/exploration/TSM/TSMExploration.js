@@ -268,12 +268,55 @@ class TSMExploration extends Component {
     }
   }
 
+  groupWasLabeledAsNo(e) {
+    var pointId = e.target.dataset.point;
+
+    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
+
+    var point = pointsToLabel[pointId];
+    point.labels = this.props.groups.map((e) => 1);
+    point.label = 0;
+
+    this.setState({
+      pointsToLabel: pointsToLabel,
+    });
+  }
+
+  groupSubLabelisationFinished(e) {
+    var pointId = e.target.dataset.point;
+    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
+    var labeledPoint = pointsToLabel[pointId];
+
+    if (
+      labeledPoint.labels.reduce((acc, v) => acc + v) ===
+      labeledPoint.labels.length
+    ) {
+      alert("Please label at least one subgroup.");
+      return;
+    }
+
+    pointsToLabel.splice(pointId, 1);
+    var labeledPoints = this.state.labeledPoints.map((e) => e);
+    labeledPoints.push(labeledPoint);
+
+    // this.setState({
+    //   hasNo: true,
+    // });
+
+    if (this.state.initialLabelingSession) {
+      this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel);
+    } else {
+      this.pointWasLabeledAfterInitialSession(labeledPoint, pointsToLabel);
+    }
+  }
+
   pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel) {
     var labeledPoints = this.state.labeledPoints.map((e) => e);
     labeledPoints.push(labeledPoint);
 
     const isYes = labeledPoint.label === 1;
-    var hasYesAndNo = isYes && this.state.hasNo;
+    var hasYesAndNo =
+      (isYes && this.state.hasNo) || (!isYes && this.state.hasYes);
 
     if (hasYesAndNo) {
       this.setState(
@@ -325,48 +368,6 @@ class TSMExploration extends Component {
         });
       }
     );
-  }
-
-  groupWasLabeledAsNo(e) {
-    var pointId = e.target.dataset.point;
-
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-
-    var point = pointsToLabel[pointId];
-    point.labels = this.props.groups.map((e) => 1);
-    point.label = 0;
-
-    this.setState({
-      pointsToLabel: pointsToLabel,
-    });
-  }
-
-  groupSubLabelisationFinished(e) {
-    var pointId = e.target.dataset.point;
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-    var labeledPoint = pointsToLabel[pointId];
-
-    if (
-      labeledPoint.labels.reduce((acc, v) => acc + v) ===
-      labeledPoint.labels.length
-    ) {
-      alert("Please label at least one subgroup.");
-      return;
-    }
-
-    pointsToLabel.splice(pointId, 1);
-    var labeledPoints = this.state.labeledPoints.map((e) => e);
-    labeledPoints.push(labeledPoint);
-
-    this.setState({
-      hasNo: true,
-    });
-
-    if (this.state.initialLabelingSession) {
-      this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel);
-    } else {
-      this.pointWasLabeledAfterInitialSession(labeledPoint, pointsToLabel);
-    }
   }
 
   getModelBoundaries() {
