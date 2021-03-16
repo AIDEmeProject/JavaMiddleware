@@ -169,7 +169,6 @@ class Exploration extends Component {
               <ModelBehavior
                 iteration={iteration}
                 labeledPoints={this.state.allLabeledPoints}
-                datasetInfos={this.props.datasetInfos}
                 availableVariables={this.props.chosenColumns}
                 projectionHistory={this.state.projectionHistory}
                 fakePointGrid={this.state.fakePointGrid}
@@ -197,25 +196,6 @@ class Exploration extends Component {
         )}
       </div>
     );
-  }
-
-  onNewPointsToLabel(points) {
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-
-    var receivedPoints = points.map((e) => {
-      return {
-        id: e.id,
-        data: e.data.array,
-      };
-    });
-
-    for (var point of receivedPoints) {
-      pointsToLabel.push(point);
-    }
-
-    this.setState({
-      pointsToLabel: pointsToLabel,
-    });
   }
 
   getNumberOfIterations() {
@@ -256,16 +236,6 @@ class Exploration extends Component {
         "Please label at least one more point or wait for computation to finish."
       );
     }
-  }
-
-  onPositiveLabel(e) {
-    var dataIndex = parseInt(e.target.dataset.key);
-    this.dataWasLabeled(dataIndex, 1);
-  }
-
-  onNegativeLabel(e) {
-    var dataIndex = parseInt(e.target.dataset.key);
-    this.dataWasLabeled(dataIndex, 0);
   }
 
   componentDidUpdate() {
@@ -479,12 +449,12 @@ class Exploration extends Component {
   }
 
   onPositiveLabel(e) {
-    var dataIndex = e.target.dataset.key;
+    var dataIndex = parseInt(e.target.dataset.key);
     this.dataWasLabeled(dataIndex, 1);
   }
 
   onNegativeLabel(e) {
-    var dataIndex = e.target.dataset.key;
+    var dataIndex = parseInt(e.target.dataset.key);
     this.dataWasLabeled(dataIndex, 0);
   }
 

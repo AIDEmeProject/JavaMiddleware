@@ -145,7 +145,9 @@ class GroupVariables extends Component {
 
         {this.state.editedGroupId !== null && (
           <MicroModalComponent
-            title={"Edition of group " + this.state.editedGroupId}
+            title={
+              "Edition of group " + String(Number(this.state.editedGroupId) + 1)
+            }
             onClose={this.closeFactorizationGroupEdition.bind(this)}
           >
             <GroupEditor

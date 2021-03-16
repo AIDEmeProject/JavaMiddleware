@@ -192,7 +192,6 @@ class TSMExploration extends Component {
               <ModelBehavior
                 iteration={this.getIteration()}
                 labeledPoints={this.state.allLabeledPoints}
-                datasetInfos={this.props.datasetInfos}
                 availableVariables={this.props.chosenColumns}
                 fakePointGrid={this.state.fakePointGrid}
                 TSMPredictionHistory={this.state.TSMPredictionHistory}

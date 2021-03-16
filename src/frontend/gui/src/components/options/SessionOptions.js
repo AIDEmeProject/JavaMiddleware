@@ -36,27 +36,12 @@ class SessionOptions extends Component {
 
     var datasetInfos = this.props.datasetInfos;
 
-    const columnTypes = datasetInfos.uniqueValueNumbers.map((e, i) => {
-      var nRow = this.props.dataset.getLength();
-
-      var uniqueValues = datasetInfos.uniqueValueNumbers[i];
-      var hasFloats = datasetInfos.hasFloats[i];
-      var hasMoreThanXPercentOfUniqueValues = uniqueValues > 0.2 * nRow;
-
-      var hasMaxOverNRow = datasetInfos.maximums[i] > nRow;
-
-      var shouldBeNumeric =
-        hasFloats || hasMoreThanXPercentOfUniqueValues || hasMaxOverNRow;
-
-      return shouldBeNumeric ? "numerical" : "categorical";
-    });
-
-    var chosenColumns = datasetInfos.columns.map((col, idx) => {
+    var chosenColumns = datasetInfos.columns.map((name, idx) => {
       return {
-        name: col,
-        idx: idx,
+        name,
+        idx,
         isUsed: false,
-        type: columnTypes[idx],
+        type: datasetInfos.types[idx],
       };
     });
 
@@ -67,7 +52,8 @@ class SessionOptions extends Component {
 
       firstVariable: 0,
       secondVariable: 1,
-      columnTypes: chosenColumns.map((e) => e["type"]),
+      columnTypes: datasetInfos.types,
+
       checkboxes: datasetInfos.columns.map((c) => false),
       chosenColumns: chosenColumns,
 

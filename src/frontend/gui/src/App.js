@@ -50,7 +50,12 @@ class App extends Component {
     this.state = {
       step: WELCOME,
       bread: this.getBreadCrum(NEW_SESSION),
-      columns: [],
+
+      datasetInfos: {},
+      dataset: null,
+
+      options: {},
+      chosenColumns: [],
 
       initialLabelingSession: true,
       hasYesAndNo: false,
@@ -78,23 +83,71 @@ class App extends Component {
     return order.map((id) => ({ name: names[id], active: id === group }));
   }
 
-  render() {
-    var views = {
-      [WELCOME]: Welcome,
-      [TRACE]: Trace,
-      [NEW_SESSION]: NewSession,
-      [SESSION_OPTIONS]: SessionOptions,
-      [TSM_EXPLORATION]: TSMExploration,
-      [EXPLORATION]: Exploration,
-    };
-
-    var View;
-    if (views.hasOwnProperty(this.state.step)) {
-      View = views[this.state.step];
-    } else {
-      View = NewSession;
+  getCurrentView(step) {
+    if (step === NEW_SESSION) {
+      return (
+        <NewSession
+          fileUploaded={this.fileUploaded.bind(this)}
+          onDatasetLoaded={this.onDatasetLoaded.bind(this)}
+        />
+      );
     }
 
+    if (step === SESSION_OPTIONS) {
+      return (
+        <SessionOptions
+          datasetInfos={this.state.datasetInfos}
+          dataset={this.state.dataset}
+          sessionWasStarted={this.sessionWasStarted.bind(this)}
+          sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
+          groupsWereValidated={this.groupsWereValidated.bind(this)}
+        />
+      );
+    }
+
+    if (step === EXPLORATION) {
+      return (
+        <Exploration
+          dataset={this.state.dataset}
+          chosenColumns={this.state.chosenColumns}
+          finalVariables={this.state.finalVariables}
+          pointsToLabel={this.state.pointsToLabel}
+          tokens={{
+            authorizationToken: this.state.authorizationToken,
+            sessionToken: this.state.sessionToken,
+          }}
+        />
+      );
+    }
+
+    if (step === TSM_EXPLORATION) {
+      return (
+        <TSMExploration
+          dataset={this.state.dataset}
+          chosenColumns={this.state.chosenColumns}
+          groups={this.state.groups}
+          pointsToLabel={this.state.pointsToLabel}
+          tokens={{
+            authorizationToken: this.state.authorizationToken,
+            sessionToken: this.state.sessionToken,
+          }}
+        />
+      );
+    }
+
+    if (step === TRACE) {
+      return <Trace />;
+    }
+
+    return (
+      <Welcome
+        onInteractiveSessionClick={this.onInteractiveSessionClick.bind(this)}
+        onTraceClick={this.onTraceClick.bind(this)}
+      />
+    );
+  }
+
+  render() {
     return (
       <div>
         <ul className="navbar navbar-dark box-shadow">
@@ -112,24 +165,7 @@ class App extends Component {
         <div className="App container-fluid">
           <div className="row">
             <div className="col col-lg-12">
-              <View
-                {...this.state}
-                fileUploaded={this.fileUploaded.bind(this)}
-                sessionWasStarted={this.sessionWasStarted.bind(this)}
-                sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(
-                  this
-                )}
-                tokens={{
-                  authorizationToken: this.state.authorizationToken,
-                  sessionToken: this.state.sessionToken,
-                }}
-                groupsWereValidated={this.groupsWereValidated.bind(this)}
-                onDatasetLoaded={this.onDatasetLoaded.bind(this)}
-                onTraceClick={this.onTraceClick.bind(this)}
-                onInteractiveSessionClick={this.onInteractiveSessionClick.bind(
-                  this
-                )}
-              />
+              {this.getCurrentView(this.state.step)}
             </div>
           </div>
 
@@ -152,12 +188,10 @@ class App extends Component {
   }
 
   onDatasetLoaded(event) {
-    var fileContent = event.target.result;
-    var csv = d3.csvParse(fileContent);
-    var dataset = new Dataset(csv);
+    var csv = d3.csvParse(event.target.result);
 
     this.setState({
-      dataset: dataset,
+      dataset: new Dataset(csv),
     });
   }
 
