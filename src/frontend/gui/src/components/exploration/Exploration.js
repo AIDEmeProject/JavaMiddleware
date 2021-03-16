@@ -376,7 +376,7 @@ class Exploration extends Component {
           modelPredictionHistory: history,
           isFetchingProjection: false,
         });
-      }, false);
+      });
     }
   }
 

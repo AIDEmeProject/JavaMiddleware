@@ -21,23 +21,24 @@
 import $ from "jquery";
 import { backend } from "../constants/constants";
 
-function getModelPredictionsOverGridPoints(dataWasReceived, isTSM) {
-  var url = backend + "/get-model-predictions-over-grid-point";
+const labelsMap = { POSITIVE: 1, NEGATIVE: -1 };
 
+function getModelPredictionsOverGridPoints(dataWasReceived) {
   $.ajax({
     type: "GET",
     dataType: "JSON",
-    url,
+    url: backend + "/get-model-predictions-over-grid-point",
     xhrFields: {
       withCredentials: true,
     },
     success: (rawPoints) => {
       const predictions = rawPoints.map((e) => {
         return {
-          id: isTSM ? e.id : e.dataPoint.id,
-          label: e.label === "POSITIVE" ? 1 : -1,
+          id: e.id,
+          label: labelsMap[e.label],
         };
       });
+
       dataWasReceived(predictions);
     },
   });

@@ -404,7 +404,7 @@ class TSMExploration extends Component {
           modelPredictionHistory: history,
           isFetchingModelPrediction: false,
         });
-      }, true);
+      });
     }
   }
 

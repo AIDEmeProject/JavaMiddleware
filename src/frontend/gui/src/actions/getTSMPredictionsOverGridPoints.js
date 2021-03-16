@@ -19,23 +19,27 @@
  */
 
 import $ from "jquery";
-import { backend, webplatformApi } from "../constants/constants";
+import { backend } from "../constants/constants";
+
+const labelsMap = {
+  POSITIVE: 1,
+  UNKNOWN: 0,
+  NEGATIVE: -1,
+};
 
 function getTSMPredictionsOverGridPoints(dataWasReceived) {
-  var url = backend + "/get-model-predictions-over-grid-point"; // /get-tsm-predictions-over-grid-point
-
   $.ajax({
     type: "GET",
     dataType: "JSON",
-    url,
+    url: backend + "/get-tsm-predictions-over-grid-point",
     xhrFields: {
       withCredentials: true,
     },
     success: (rawLabels) => {
       var predictedLabels = rawLabels.map((e) => {
         return {
-          id: e.dataPoint.id,
-          label: e.label.label,
+          id: e.id,
+          label: labelsMap[e.label],
         };
       });
 
