@@ -125,7 +125,7 @@ class SessionOptions extends Component {
           {this.state.showVariableGroups && (
             <GroupVariables
               chosenColumns={this.state.chosenColumns}
-              groupsWereValidated={this.groupsWereValidated.bind(this)}
+              onValidateGroupsClick={this.onValidateGroupsClick.bind(this)}
             />
           )}
 
@@ -201,36 +201,39 @@ class SessionOptions extends Component {
 
   onSessionStartClick(e) {
     var chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
+
     actions.sendColumns(
       chosenColumns,
       this.state.configuration,
       this.props.sessionWasStarted
     );
-    this.props.sessionOptionsWereChosen({
-      chosenColumns: chosenColumns,
-    });
+
+    this.props.sessionOptionsWereChosen(
+      chosenColumns,
+      this.state.configuration
+    );
   }
 
-  groupsWereValidated(groups) {
-    var chosenColumns = groups.flatMap((g) => {
-      return g.map((v) => {
-        return v;
-      });
-    });
+  onValidateGroupsClick(groups) {
+    var chosenColumns = groups.flatMap((g) => [...g]); // columns may be repeated
 
     this.computeVariableColumnIndices(groups);
 
     var datasetMetadata = this.buildDatasetMetadata();
 
-    this.props.groupsWereValidated(chosenColumns, groups, () => {
-      actions.sendVariableGroups(
-        chosenColumns,
-        groups,
-        datasetMetadata,
-        this.state.configuration,
-        this.props.sessionWasStarted
-      );
-    });
+    actions.sendVariableGroups(
+      chosenColumns,
+      groups,
+      datasetMetadata,
+      this.state.configuration,
+      this.props.sessionWasStarted
+    );
+
+    this.props.groupsWereValidated(
+      chosenColumns,
+      groups,
+      this.state.configuration
+    );
   }
 
   buildDatasetMetadata() {

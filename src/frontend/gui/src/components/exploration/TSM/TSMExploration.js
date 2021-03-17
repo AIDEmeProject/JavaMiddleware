@@ -37,6 +37,13 @@ import { backend, webplatformApi } from "../../../constants/constants";
 
 import robot from "../../../resources/robot.png";
 
+function isSimpleMargin(configuration) {
+  return (
+    configuration.activeLearner.name &&
+    configuration.activeLearner.name === "SimpleMargin"
+  );
+}
+
 class TSMExploration extends Component {
   constructor(props) {
     super(props);
@@ -385,7 +392,7 @@ class TSMExploration extends Component {
   _getModelBoundaries() {
     this.getGridPoints();
 
-    if (!this.state.initialLabelingSession) {
+    if (isSimpleMargin(this.props.configuration)) {
       getTSMPredictions((predictedLabels) => {
         var TSMPredictionHistory = this.state.TSMPredictionHistory;
         TSMPredictionHistory.push(predictedLabels);
@@ -395,17 +402,17 @@ class TSMExploration extends Component {
           isFetchingTSMPrediction: false,
         });
       });
-
-      getModelPredictionsOverGridPoints((predictions) => {
-        var history = this.state.modelPredictionHistory;
-
-        history.push(predictions);
-        this.setState({
-          modelPredictionHistory: history,
-          isFetchingModelPrediction: false,
-        });
-      });
     }
+
+    getModelPredictionsOverGridPoints((predictions) => {
+      var history = this.state.modelPredictionHistory;
+
+      history.push(predictions);
+      this.setState({
+        modelPredictionHistory: history,
+        isFetchingModelPrediction: false,
+      });
+    });
   }
 
   getNumberOfIterations() {

@@ -54,19 +54,12 @@ class App extends Component {
       datasetInfos: {},
       dataset: null,
 
-      options: {},
       chosenColumns: [],
+      groups: null,
+      configuration: null,
 
-      initialLabelingSession: true,
-      hasYesAndNo: false,
-      hasYes: false,
-      hasFalse: false,
-      availableVariables: [],
       finalVariables: [],
-      labeledPoints: [],
       pointsToLabel: [],
-      allLabeledPoints: [],
-      history: [],
     };
   }
 
@@ -126,6 +119,7 @@ class App extends Component {
           dataset={this.state.dataset}
           chosenColumns={this.state.chosenColumns}
           groups={this.state.groups}
+          configuration={this.state.configuration}
           pointsToLabel={this.state.pointsToLabel}
           tokens={{
             authorizationToken: this.state.authorizationToken,
@@ -208,60 +202,37 @@ class App extends Component {
     });
   }
 
-  sessionOptionsWereChosen(options) {
-    var newOptions = Object.assign({}, this.state.options, options);
-
-    const chosenColumns = options.chosenColumns;
-
+  sessionOptionsWereChosen(chosenColumns, configuration) {
     this.state.dataset.set_column_names_selected_by_user(chosenColumns);
 
-    this.setState({
-      options: newOptions,
-    });
+    this.setState({ chosenColumns, configuration });
   }
 
-  groupsWereValidated(chosenColumns, groups, callback) {
-    var options = {
-      chosenColumns: chosenColumns,
-      groups: groups,
-    };
-
+  groupsWereValidated(chosenColumns, groups, configuration) {
     this.state.dataset.set_column_names_selected_by_user(chosenColumns);
 
-    var newOptions = Object.assign({}, this.state.options, options);
-
-    this.setState({ options: newOptions }, callback);
+    this.setState({ chosenColumns, groups, configuration });
   }
 
   sessionWasStarted(response) {
-    var options = this.state.options;
-
-    var pointsToLabel = response.map((pointToLabel) => {
+    const pointsToLabel = response.map((pointToLabel) => {
       return {
         id: pointToLabel.id,
         data: pointToLabel.data.array,
       };
     });
 
-    var finalVariables = options.chosenColumns;
-    var hasTSM = options.groups;
-
-    if (hasTSM) {
-      var groups = options.groups;
-
+    if (this.state.groups) {
       this.setState({
         step: TSM_EXPLORATION,
         bread: this.getBreadCrum(TSM_EXPLORATION),
         pointsToLabel: pointsToLabel,
-        groups: groups,
-        chosenColumns: finalVariables,
       });
     } else {
       this.setState({
         step: EXPLORATION,
         bread: this.getBreadCrum(EXPLORATION),
         pointsToLabel: pointsToLabel,
-        chosenColumns: this.state.options.chosenColumns,
       });
     }
   }

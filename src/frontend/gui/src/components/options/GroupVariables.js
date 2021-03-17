@@ -235,7 +235,7 @@ class GroupVariables extends Component {
       return;
     }
 
-    this.props.groupsWereValidated(this.state.groups);
+    this.props.onValidateGroupsClick(this.state.groups);
   }
 }
 
