@@ -169,26 +169,15 @@ class SessionOptions extends Component {
   }
 
   onCheckedColumn(e) {
-    var idx = e.target.value;
-    var checkboxes = this.state.checkboxes.map((e) => e);
+    var newCheckboxes = [...this.state.checkboxes];
+    newCheckboxes[e.target.value] = e.target.checked;
 
-    var newChosenColumns = this.state.chosenColumns.map((e) => e);
-    newChosenColumns[idx].isUsed = e.target.checked;
-    idx = 0;
-    newChosenColumns.forEach((e, i) => {
-      if (e.isUsed) {
-        newChosenColumns[i] = Object.assign({}, e, {
-          finalIdx: idx,
-        });
-        idx++;
-      }
-    });
-
-    checkboxes[idx] = e.target.checked;
+    var newChosenColumns = [...this.state.chosenColumns];
+    newChosenColumns[e.target.value].isUsed = e.target.checked;
 
     this.setState({
+      checkboxes: newCheckboxes,
       chosenColumns: newChosenColumns,
-      checkboxes: checkboxes,
     });
   }
 
