@@ -22,6 +22,7 @@ import React, { Component } from "react";
 
 import FilteringPoints from "./FilteringPoints";
 import PointLabelisation from "../../PointLabelisation";
+import explorationSendLabeledPoint from "../../../actions/explorationSendLabeledPoint";
 
 import robot from "../../../resources/robot.png";
 
@@ -32,6 +33,15 @@ class InitialSampling extends Component {
     this.state = {
       showLabeling: false,
       showFilterBasedSampling: false,
+
+      pointsToLabel: [...this.props.pointsToLabel],
+      // randomPointsToLabel: [...this.props.pointsToLabel],
+      // filteredPointsToLabel: [],
+      labeledPoints: [],
+      allLabeledPoints: [],
+
+      hasYes: false,
+      hasNo: false,
     };
   }
 
@@ -98,11 +108,17 @@ class InitialSampling extends Component {
           {this.state.showLabeling && (
             <div>
               <PointLabelisation
-                pointsToLabel={this.props.pointsToLabel}
+                // pointsToLabel={this.props.pointsToLabel}
+                pointsToLabel={this.state.pointsToLabel}
+                // pointsToLabel={this.state.randomPointsToLabel}
                 chosenColumns={this.props.chosenColumns}
                 dataset={this.props.dataset}
-                onPositiveLabel={this.props.onPositiveLabel}
-                onNegativeLabel={this.props.onNegativeLabel}
+                // onPositiveLabel={this.props.onPositiveLabel}
+                // onNegativeLabel={this.props.onNegativeLabel}
+                onPositiveLabel={this.onPositiveLabel.bind(this)}
+                onNegativeLabel={this.onNegativeLabel.bind(this)}
+                // onPositiveLabel={this.onLabelRandomPointPositive}
+                // onNegativeLabel={this.onLabelRandomPointNegative}
               />
             </div>
           )}
@@ -113,8 +129,12 @@ class InitialSampling extends Component {
                 <FilteringPoints
                   chosenVariables={this.props.chosenColumns}
                   dataset={this.props.dataset}
-                  onPositiveLabel={this.props.onPositiveLabel}
-                  onNegativeLabel={this.props.onNegativeLabel}
+                  // onPositiveLabel={this.props.onPositiveLabel}
+                  // onNegativeLabel={this.props.onNegativeLabel}
+                  onPositiveLabel={this.onPositiveLabel.bind(this)}
+                  onNegativeLabel={this.onNegativeLabel.bind(this)}
+                  // onPositiveLabel={this.onLabelFilteredPointPositive}
+                  // onNegativeLabel={this.onLabelFilteredPointPositive}
                 />
               </div>
             </div>
@@ -123,6 +143,88 @@ class InitialSampling extends Component {
       </div>
     );
   }
+
+  onPositiveLabel(e) {
+    var dataIndex = parseInt(e.target.dataset.key);
+    this.dataWasLabeled(dataIndex, 1);
+  }
+
+  onNegativeLabel(e) {
+    var dataIndex = parseInt(e.target.dataset.key);
+    this.dataWasLabeled(dataIndex, 0);
+  }
+
+  dataWasLabeled(dataIndex, label) {
+    const newLabeledPoint = { ...this.state.pointsToLabel[dataIndex], label };
+    const newLabeledPoints = [...this.state.labeledPoints, newLabeledPoint];
+
+    var newPointsToLabel = [...this.state.pointsToLabel];
+    newPointsToLabel.splice(dataIndex, 1);
+
+    const isYes = label === 1;
+
+    this.setState(
+      {
+        allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
+        labeledPoints: newLabeledPoints,
+        pointsToLabel: newPointsToLabel,
+        hasYes: this.state.hasYes || isYes,
+        hasNo: this.state.hasNo || !isYes,
+      },
+      () => {
+        this.labelForInitialSession(newLabeledPoints, newPointsToLabel);
+      }
+    );
+  }
+
+  labelForInitialSession(labeledPoints, pointsToLabel) {
+    var tokens = this.props.tokens;
+
+    if (this.state.hasYes && this.state.hasNo) {
+      explorationSendLabeledPoint(
+        {
+          labeledPoints,
+        },
+        tokens,
+        (response) => {
+          this.props.hasPositiveAndNegativeLabels(
+            this.state.allLabeledPoints,
+            this.parseReceivedPoints(response)
+          );
+        }
+      );
+
+      return;
+    }
+
+    if (pointsToLabel.length === 0) {
+      explorationSendLabeledPoint(
+        {
+          labeledPoints,
+        },
+        tokens,
+        (response) => {
+          this.setState({
+            labeledPoints: [],
+            pointsToLabel: [
+              ...this.state.pointsToLabel,
+              ...this.parseReceivedPoints(response),
+            ],
+          });
+        }
+      );
+    }
+  }
+
+  parseReceivedPoints(points) {
+    return points.map((id) => ({ id }));
+  }
+
+  // onLabelRandomPointPositive() {}
+
+  // onLabelRandomPointNegative() {}
+
+  // onLabelRandomPoint(pointId, label) {}
 }
 
 export default InitialSampling;

@@ -23,6 +23,7 @@ import React, { Component } from "react";
 import Welcome from "./components/Welcome";
 import NewSession from "./components/options/NewSession";
 import SessionOptions from "./components/options/SessionOptions";
+import InitialSampling from "./components/exploration/InitialSampling/InitialSampling";
 import Exploration from "./components/exploration/Exploration";
 import TSMExploration from "./components/exploration/TSM/TSMExploration";
 import BreadCrumb from "./components/BreadCrumb";
@@ -36,9 +37,10 @@ import logo from "./resources/logo.png";
 import * as d3 from "d3";
 import Dataset from "./model/Dataset";
 
-const EXPLORATION = "Exploration";
 const NEW_SESSION = "NewSession";
 const SESSION_OPTIONS = "SessionOptions";
+const INITIAL_SAMPLING = "InitialSampling";
+const EXPLORATION = "Exploration";
 const TSM_EXPLORATION = "TSMExploration";
 const TRACE = "Trace";
 const WELCOME = "Welcome";
@@ -60,6 +62,8 @@ class App extends Component {
 
       finalVariables: [],
       pointsToLabel: [],
+
+      allLabeledPoints: [],
     };
   }
 
@@ -69,6 +73,7 @@ class App extends Component {
     var names = {
       [NEW_SESSION]: "New session",
       [SESSION_OPTIONS]: "Session options",
+      // [INITIAL_SAMPLING]: "Initial sampling",
       [EXPLORATION]: "Interactive labeling",
     };
     var order = [NEW_SESSION, SESSION_OPTIONS, EXPLORATION];
@@ -98,6 +103,23 @@ class App extends Component {
       );
     }
 
+    if (step === INITIAL_SAMPLING) {
+      return (
+        <InitialSampling
+          dataset={this.state.dataset}
+          chosenColumns={this.state.chosenColumns}
+          pointsToLabel={this.state.pointsToLabel}
+          hasPositiveAndNegativeLabels={this.hasPositiveAndNegativeLabels.bind(
+            this
+          )}
+          tokens={{
+            authorizationToken: this.state.authorizationToken,
+            sessionToken: this.state.sessionToken,
+          }}
+        />
+      );
+    }
+
     if (step === EXPLORATION) {
       return (
         <Exploration
@@ -105,6 +127,7 @@ class App extends Component {
           chosenColumns={this.state.chosenColumns}
           finalVariables={this.state.finalVariables}
           pointsToLabel={this.state.pointsToLabel}
+          allLabeledPoints={this.state.allLabeledPoints}
           tokens={{
             authorizationToken: this.state.authorizationToken,
             sessionToken: this.state.sessionToken,
@@ -225,11 +248,20 @@ class App extends Component {
       });
     } else {
       this.setState({
-        step: EXPLORATION,
+        step: INITIAL_SAMPLING,
         bread: this.getBreadCrum(EXPLORATION),
         pointsToLabel: pointsToLabel,
       });
     }
+  }
+
+  hasPositiveAndNegativeLabels(allLabeledPoints, pointsToLabel) {
+    this.setState({
+      step: EXPLORATION,
+      bread: this.getBreadCrum(EXPLORATION),
+      allLabeledPoints,
+      pointsToLabel,
+    });
   }
 
   componentDidMount() {

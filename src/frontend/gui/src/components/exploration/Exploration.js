@@ -23,7 +23,6 @@ import React, { Component } from "react";
 import ModelBehaviorControls from "../visualisation/ModelBehaviorControls";
 
 import PointLabelisation from "../PointLabelisation";
-import InitialSampling from "./InitialSampling/InitialSampling";
 import ModelBehavior from "../visualisation/ModelBehavior";
 import LabelInfos from "../visualisation/LabelInfos";
 
@@ -33,27 +32,20 @@ import wholeDatasetLabelizationWasAsked from "../../actions/statisticCollection/
 import explorationSendLabeledPoint from "../../actions/explorationSendLabeledPoint";
 import getWholedatasetLabeled from "../../actions/getWholeLabeledDataset";
 
-import getGridPoints from "../../actions/getGridPoints";
 import getModelPredictionsOverGridPoints from "../../actions/getModelPredictionsOverGridPoints";
 
 class Exploration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      initialLabelingSession: true,
-
       showLabelView: true,
       showLabelHistory: false,
       showModelBehavior: false,
 
-      hasYes: false,
-      hasNo: false,
-
       labeledPoints: [],
-      pointsToLabel: this.props.pointsToLabel.map((e) => e),
-      allLabeledPoints: [],
-      fakePointGridabelHistory: [],
-      projectionHistory: [],
+      pointsToLabel: [...this.props.pointsToLabel],
+      allLabeledPoints: [...this.props.allLabeledPoints],
+
       fakePointGrid: [],
       modelPredictionHistory: [],
       iteration: 0,
@@ -62,19 +54,6 @@ class Exploration extends Component {
   }
 
   render() {
-    const iteration = this.getIteration();
-    if (this.state.initialLabelingSession) {
-      return (
-        <InitialSampling
-          pointsToLabel={this.state.pointsToLabel}
-          chosenColumns={this.props.chosenColumns}
-          dataset={this.props.dataset}
-          onPositiveLabel={this.onPositiveLabel.bind(this)}
-          onNegativeLabel={this.onNegativeLabel.bind(this)}
-        />
-      );
-    }
-
     return (
       <div>
         <ul className="nav nav-tabs bg-primary">
@@ -154,7 +133,7 @@ class Exploration extends Component {
           <div className="row">
             <div className="col col-lg-4">
               <ModelBehaviorControls
-                iteration={iteration}
+                iteration={this.state.iteration}
                 nIteration={this.state.nIteration}
                 onPreviousIteration={this.onPreviousIteration.bind(this)}
                 onNextIteration={this.onNextIteration.bind(this)}
@@ -168,10 +147,9 @@ class Exploration extends Component {
 
             <div className="col col-lg-8">
               <ModelBehavior
-                iteration={iteration}
+                iteration={this.state.iteration}
                 labeledPoints={this.state.allLabeledPoints}
                 availableVariables={this.props.chosenColumns}
-                projectionHistory={this.state.projectionHistory}
                 fakePointGrid={this.state.fakePointGrid}
                 modelPredictionHistory={this.state.modelPredictionHistory}
                 hasTSM={false}
@@ -199,27 +177,15 @@ class Exploration extends Component {
     );
   }
 
-  getNumberOfIterations() {
-    return this.state.nIteration;
-  }
-
-  getIteration() {
-    return this.state.iteration;
-  }
-
   onPreviousIteration() {
-    var iteration = this.getIteration() - 1;
     this.setState({
-      iteration: Math.max(iteration, 0),
+      iteration: Math.max(this.state.iteration - 1, 0),
     });
   }
 
   onNextIteration() {
-    const nIteration = this.getNumberOfIterations();
-    var iteration = this.getIteration() + 1;
-
     this.setState({
-      iteration: Math.min(iteration, nIteration - 1),
+      iteration: Math.min(this.state.iteration + 1, this.state.nIteration - 1),
     });
   }
 
@@ -239,163 +205,6 @@ class Exploration extends Component {
     }
   }
 
-  dataWasLabeled(dataIndex, label) {
-    var newPointsToLabel = [...this.state.pointsToLabel];
-
-    var newLabeledPoint = newPointsToLabel[dataIndex];
-    newLabeledPoint.label = label;
-
-    newPointsToLabel.splice(dataIndex, 1);
-
-    const newLabeledPoints = [...this.state.labeledPoints, newLabeledPoint];
-
-    this.setState({
-      allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
-      labeledPoints: newLabeledPoints,
-      pointsToLabel: newPointsToLabel,
-    });
-
-    if (this.state.initialLabelingSession) {
-      const isYes = label === 1;
-      this.setState(
-        {
-          hasYes: this.state.hasYes || isYes,
-          hasNo: this.state.hasNo || !isYes,
-        },
-        () => {
-          this.labelForInitialSession(newLabeledPoints, newPointsToLabel);
-        }
-      );
-    } else {
-      this.setState(
-        {
-          labeledPoints: [],
-        },
-        () => {
-          explorationSendLabeledPoint(
-            {
-              labeledPoints: newLabeledPoints,
-            },
-            this.props.tokens,
-            (response) => {
-              this.onNewPointsToLabel(response);
-
-              this.getModelBehaviorData();
-            }
-          );
-        }
-      );
-    }
-  }
-
-  getModelBehaviorData() {
-    this.setState(
-      {
-        isFetchingPrediction: true,
-        isFetchingProjection: true,
-        nIteration: this.state.nIteration + 1,
-      },
-      this._getModelBehaviorData.bind(this)
-    );
-  }
-
-  _getModelBehaviorData() {
-    if (this.props.useRealData) {
-      const usedColumnNames = this.props.chosenColumns.map((e) => e["name"]);
-      var grid = this.props.dataset.get_parsed_columns_by_names(
-        usedColumnNames
-      );
-      this.setState({
-        fakePointGrid: grid,
-      });
-    } else {
-      if (this.state.fakePointGrid.length === 0) {
-        getGridPoints((points) => {
-          this.setState({
-            fakePointGrid: points,
-          });
-        });
-      }
-    }
-
-    if (!this.state.initialLabelingSession) {
-      getModelPredictionsOverGridPoints((predictedLabels) => {
-        var history = this.state.modelPredictionHistory;
-        history.push(predictedLabels);
-        console.log(history);
-        this.setState({
-          modelPredictionHistory: history,
-          isFetchingProjection: false,
-        });
-      });
-    }
-  }
-
-  labelForInitialSession(labeledPoints, pointsToLabel) {
-    var tokens = this.props.tokens;
-
-    if (this.state.hasYes && this.state.hasNo) {
-      this.setState(
-        {
-          initialLabelingSession: false,
-          pointsToLabel: [],
-          labeledPoints: [],
-        },
-        () => {
-          explorationSendLabeledPoint(
-            {
-              labeledPoints,
-            },
-            tokens,
-            this.onNewPointsToLabel.bind(this)
-          );
-        }
-      );
-
-      return;
-    }
-
-    if (pointsToLabel.length === 0) {
-      this.setState(
-        {
-          labeledPoints: [],
-        },
-        () => {
-          explorationSendLabeledPoint(
-            {
-              labeledPoints,
-            },
-            tokens,
-            this.onNewPointsToLabel.bind(this)
-          );
-        }
-      );
-    }
-  }
-
-  onLabelWholeDatasetClick(e) {
-    e.preventDefault();
-
-    getWholedatasetLabeled();
-
-    wholeDatasetLabelizationWasAsked(this.props.tokens);
-  }
-
-  dataWasReceived(data) {
-    this.setState({
-      showModelVisualisation: true,
-      visualizationData: data,
-    });
-  }
-
-  onNewPointsToLabel(points) {
-    const receivedPoints = points.map((id) => ({ id }));
-
-    this.setState({
-      pointsToLabel: [...this.state.pointsToLabel, ...receivedPoints],
-    });
-  }
-
   onPositiveLabel(e) {
     var dataIndex = parseInt(e.target.dataset.key);
     this.dataWasLabeled(dataIndex, 1);
@@ -406,14 +215,72 @@ class Exploration extends Component {
     this.dataWasLabeled(dataIndex, 0);
   }
 
-  projectionDataWasReceived(boundaryData) {
-    let history = this.state.projectionHistory;
-    history.push(JSON.parse(boundaryData));
+  dataWasLabeled(dataIndex, label) {
+    const newLabeledPoint = { ...this.state.pointsToLabel[dataIndex], label };
+    const newLabeledPoints = [...this.state.labeledPoints, newLabeledPoint];
+
+    var newPointsToLabel = [...this.state.pointsToLabel];
+    newPointsToLabel.splice(dataIndex, 1);
 
     this.setState({
-      isFetchingProjection: false,
-      projectionHistory: history,
+      allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
+      labeledPoints: newLabeledPoints,
+      pointsToLabel: newPointsToLabel,
     });
+
+    explorationSendLabeledPoint(
+      {
+        labeledPoints: newLabeledPoints,
+      },
+      this.props.tokens,
+      (response) => {
+        this.setState({
+          labeledPoints: [],
+          pointsToLabel: [
+            ...this.state.pointsToLabel,
+            ...this.parseReceivedPoints(response),
+          ],
+        });
+
+        this.getModelBehaviorData();
+      }
+    );
+  }
+
+  parseReceivedPoints(points) {
+    return points.map((id) => ({ id }));
+  }
+
+  getModelBehaviorData() {
+    if (this.state.nIteration === 0) this.getFakePointGrid();
+
+    getModelPredictionsOverGridPoints((predictedLabels) => {
+      this.setState({
+        nIteration: this.state.nIteration + 1,
+        modelPredictionHistory: [
+          ...this.state.modelPredictionHistory,
+          predictedLabels,
+        ],
+      });
+    });
+  }
+
+  getFakePointGrid() {
+    const chosenColumnNames = this.props.chosenColumns.map((e) => e["name"]);
+    var grid = this.props.dataset.get_parsed_columns_by_names(
+      chosenColumnNames
+    );
+    this.setState({
+      fakePointGrid: grid,
+    });
+  }
+
+  onLabelWholeDatasetClick(e) {
+    e.preventDefault();
+
+    getWholedatasetLabeled();
+
+    wholeDatasetLabelizationWasAsked(this.props.tokens);
   }
 }
 
