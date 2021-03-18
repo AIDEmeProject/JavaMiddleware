@@ -20,8 +20,23 @@
 
 import React, { Component } from "react";
 
+import isSimpleMargin from "../../utils/isSimpleMargin";
+
 class AdvancedOptions extends Component {
   render() {
+    const activeLearners = [
+      {
+        value: "simpleMargin",
+        label: "Simple Margin",
+        selected: isSimpleMargin(this.props.configuration),
+      },
+      {
+        value: "versionSpace",
+        label: "Version Space",
+        selected: !isSimpleMargin(this.props.configuration),
+      },
+    ];
+
     return (
       <div className="row">
         <div className="col col-lg-6 offset-lg-3">
@@ -33,18 +48,21 @@ class AdvancedOptions extends Component {
               name="active-learner"
               onChange={this.props.onLearnerChange}
             >
-              <option value="simpleMargin" defaultValue>
-                Simple Margin
-              </option>
-              <option value="versionSpace">Version Space</option>
+              {activeLearners.map((learner, idx) => (
+                <option
+                  key={`learner-${idx}`}
+                  value={learner.value}
+                  selected={learner.selected}
+                >
+                  {learner.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
       </div>
     );
   }
-
-  componentDidMount() {}
 }
 
 export default AdvancedOptions;

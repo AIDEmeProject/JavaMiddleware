@@ -131,6 +131,7 @@ class SessionOptions extends Component {
 
           {this.state.showAdvancedOptions && (
             <AdvancedOptions
+              configuration={this.state.configuration}
               onLearnerChange={this.onLearnerChange.bind(this)}
             />
           )}
