@@ -97,7 +97,13 @@ class InitialSampling extends Component {
 
           {this.state.showLabeling && (
             <div>
-              <PointLabelisation {...this.props} {...this.state} />
+              <PointLabelisation
+                pointsToLabel={this.props.pointsToLabel}
+                chosenColumns={this.props.chosenColumns}
+                dataset={this.props.dataset}
+                onPositiveLabel={this.props.onPositiveLabel}
+                onNegativeLabel={this.props.onNegativeLabel}
+              />
             </div>
           )}
 
@@ -105,7 +111,7 @@ class InitialSampling extends Component {
             <div className="row">
               <div className="col col-lg-8 offset-lg-2">
                 <FilteringPoints
-                  chosenVariables={this.buildChosenVariableForFiltering()}
+                  chosenVariables={this.props.chosenColumns}
                   dataset={this.props.dataset}
                   onPositiveLabel={this.props.onPositiveLabel}
                   onNegativeLabel={this.props.onNegativeLabel}
@@ -116,28 +122,6 @@ class InitialSampling extends Component {
         </div>
       </div>
     );
-  }
-
-  buildChosenVariableForFiltering() {
-    var chosenVariables = this.props.chosenColumns;
-
-    chosenVariables = this.props.chosenColumns.map((e) => {
-      const dataset = this.props.dataset;
-
-      if (e.type === "numerical") {
-        //compute min and max
-        var min = dataset.min(e.name);
-        var max = dataset.max(e.name);
-        return Object.assign(e, { min: min, max: max });
-      } else {
-        var uniqueValues = Object.entries(dataset.uniqueValues(e.name)).map(
-          (e) => e[0]
-        );
-        return Object.assign(e, { values: uniqueValues });
-      }
-    });
-
-    return chosenVariables;
   }
 }
 

@@ -46,6 +46,9 @@ class Exploration extends Component {
       showLabelHistory: false,
       showModelBehavior: false,
 
+      hasYes: false,
+      hasNo: false,
+
       labeledPoints: [],
       pointsToLabel: this.props.pointsToLabel.map((e) => e),
       allLabeledPoints: [],
@@ -65,11 +68,9 @@ class Exploration extends Component {
         <InitialSampling
           pointsToLabel={this.state.pointsToLabel}
           chosenColumns={this.props.chosenColumns}
-          availableVariables={this.props.availableVariables}
+          dataset={this.props.dataset}
           onPositiveLabel={this.onPositiveLabel.bind(this)}
           onNegativeLabel={this.onNegativeLabel.bind(this)}
-          onNewPointsToLabel={this.onNewPointsToLabel.bind(this)}
-          dataset={this.props.dataset}
         />
       );
     }
@@ -238,53 +239,33 @@ class Exploration extends Component {
     }
   }
 
-  componentDidUpdate() {
-    //console.log(this.state)
-    //console.log(this.state.allLabeledPoints)
-  }
-
   dataWasLabeled(dataIndex, label) {
-    var tokens = this.props.tokens;
-    var labeledPoint = this.state.pointsToLabel[dataIndex];
+    var newPointsToLabel = [...this.state.pointsToLabel];
 
-    labeledPoint.label = label;
+    var newLabeledPoint = newPointsToLabel[dataIndex];
+    newLabeledPoint.label = label;
 
-    var allLabeledPoints = this.state.allLabeledPoints;
-    allLabeledPoints.push(labeledPoint);
+    newPointsToLabel.splice(dataIndex, 1);
 
-    var labeledPoints = this.state.labeledPoints.map((e) => e);
-    labeledPoints.push(labeledPoint);
-
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-
-    pointsToLabel.splice(dataIndex, 1);
+    const newLabeledPoints = [...this.state.labeledPoints, newLabeledPoint];
 
     this.setState({
-      allLabeledPoints: allLabeledPoints,
-      pointsToLabel: pointsToLabel,
-      labeledPoints: labeledPoints,
+      allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
+      labeledPoints: newLabeledPoints,
+      pointsToLabel: newPointsToLabel,
     });
 
     if (this.state.initialLabelingSession) {
-      if (label === 1) {
-        this.setState(
-          {
-            hasYes: true,
-          },
-          () => {
-            this.labelForInitialSession(labeledPoints, pointsToLabel);
-          }
-        );
-      } else {
-        this.setState(
-          {
-            hasNo: true,
-          },
-          () => {
-            this.labelForInitialSession(labeledPoints, pointsToLabel);
-          }
-        );
-      }
+      const isYes = label === 1;
+      this.setState(
+        {
+          hasYes: this.state.hasYes || isYes,
+          hasNo: this.state.hasNo || !isYes,
+        },
+        () => {
+          this.labelForInitialSession(newLabeledPoints, newPointsToLabel);
+        }
+      );
     } else {
       this.setState(
         {
@@ -293,9 +274,9 @@ class Exploration extends Component {
         () => {
           explorationSendLabeledPoint(
             {
-              data: labeledPoints,
+              labeledPoints: newLabeledPoints,
             },
-            tokens,
+            this.props.tokens,
             (response) => {
               this.onNewPointsToLabel(response);
 
@@ -353,20 +334,17 @@ class Exploration extends Component {
   labelForInitialSession(labeledPoints, pointsToLabel) {
     var tokens = this.props.tokens;
 
-    const hasYesAndNo = this.state.hasYes && this.state.hasNo;
-
-    if (hasYesAndNo) {
+    if (this.state.hasYes && this.state.hasNo) {
       this.setState(
         {
-          hasYesAndNo: true,
           initialLabelingSession: false,
-          labeledPoints: [],
           pointsToLabel: [],
+          labeledPoints: [],
         },
         () => {
           explorationSendLabeledPoint(
             {
-              data: labeledPoints,
+              labeledPoints,
             },
             tokens,
             this.onNewPointsToLabel.bind(this)
@@ -378,39 +356,20 @@ class Exploration extends Component {
     }
 
     if (pointsToLabel.length === 0) {
-      if (this.state.hasYes && this.state.hasNo) {
-        this.setState(
-          {
-            hasYesAndNo: true,
-            initialLabelingSession: false,
-            labeledPoints: [],
-          },
-          () => {
-            explorationSendLabeledPoint(
-              {
-                data: labeledPoints,
-              },
-              tokens,
-              this.onNewPointsToLabel.bind(this)
-            );
-          }
-        );
-      } else {
-        this.setState(
-          {
-            labeledPoints: [],
-          },
-          () => {
-            explorationSendLabeledPoint(
-              {
-                data: labeledPoints,
-              },
-              tokens,
-              this.onNewPointsToLabel.bind(this)
-            );
-          }
-        );
-      }
+      this.setState(
+        {
+          labeledPoints: [],
+        },
+        () => {
+          explorationSendLabeledPoint(
+            {
+              labeledPoints,
+            },
+            tokens,
+            this.onNewPointsToLabel.bind(this)
+          );
+        }
+      );
     }
   }
 

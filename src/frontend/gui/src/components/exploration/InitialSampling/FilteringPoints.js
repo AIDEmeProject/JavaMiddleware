@@ -19,26 +19,37 @@
  */
 
 import React, { Component } from "react";
-import sendFilters from "../../../actions/sendFilters";
-import PointLabelisation from "../../PointLabelisation";
 
 import * as d3 from "d3";
+
+import sendFilters from "../../../actions/sendFilters";
+import PointLabelisation from "../../PointLabelisation";
 
 import robot from "../../../resources/robot.png";
 
 class NumericalFilter extends Component {
+  constructor(props) {
+    super(props);
+
+    const valuesInColumn = this.props.dataset.get_column_name(
+      this.props.variable.name
+    );
+    const [min, max] = d3.extent(valuesInColumn);
+
+    this.state = {
+      min,
+      max,
+      step: (max - min) / 100,
+      minValue: min,
+      maxValue: max,
+    };
+  }
+
   render() {
-    const variable = this.props.variable;
-    const values = this.props.dataset.get_column_name(variable.name);
-    const extend = d3.extent(values);
-
-    const min = extend[0],
-      max = extend[1];
-
     return (
       <div className="card filter inline-block">
         <p>
-          {variable.name} <br />
+          {this.props.variable.name} <br />
           range: [{this.state.minValue}, {this.state.maxValue}]
         </p>
         <label>
@@ -47,54 +58,40 @@ class NumericalFilter extends Component {
             value={this.state.minValue}
             onChange={this.minChanged.bind(this)}
             type="range"
-            min={min}
-            max={max}
+            min={this.state.min}
+            max={this.state.max}
+            step={this.state.step}
           />
         </label>
 
         <br />
 
         <label>
-          Max: {this.state.max}
+          Max
           <input
             value={this.state.maxValue}
             onChange={this.maxChanged.bind(this)}
             type="range"
-            min={min}
-            max={max}
+            min={this.state.min}
+            max={this.state.max}
+            step={this.state.step}
           />
         </label>
       </div>
     );
   }
 
-  constructor(props) {
-    super(props);
-    const variable = this.props.variable;
-    const values = this.props.dataset.get_column_name(variable.name);
-    const extend = d3.extent(values);
-
-    const min = extend[0],
-      max = extend[1];
-
-    this.state = {
-      minValue: min,
-      maxValue: max,
-    };
-  }
-
   minChanged(e) {
     var newValue = parseFloat(e.target.value);
-
     if (newValue >= this.state.maxValue) {
       newValue = this.state.maxValue;
     }
+
     this.setState({
       minValue: newValue,
     });
 
-    const iFilter = this.props.iFilter;
-    this.props.filterChanged(iFilter, { min: newValue });
+    this.props.filterChanged(this.props.iFilter, { min: newValue });
   }
 
   maxChanged(e) {
@@ -105,17 +102,29 @@ class NumericalFilter extends Component {
 
     this.setState({ maxValue: newValue });
 
-    const iFilter = this.props.iFilter;
-    this.props.filterChanged(iFilter, { max: newValue });
+    this.props.filterChanged(this.props.iFilter, { max: newValue });
   }
 }
 
 class CategoricalFilter extends Component {
+  constructor(props) {
+    super(props);
+
+    var uniqueValues = Object.entries(
+      this.props.dataset.uniqueValues(this.props.variable.name)
+    ).map((e) => e[0]);
+
+    this.state = {
+      uniqueValues,
+      filterValues: [],
+    };
+  }
+
   render() {
     return (
       <div className="card filter categorical-filter inline-block">
         <p>{this.props.variable.name}</p>
-        {this.props.variable.values.map((value, i) => {
+        {this.state.uniqueValues.map((value, i) => {
           return (
             <div>
               <label htmlFor={"cat-filter-" + i}>{value}</label>
@@ -131,37 +140,41 @@ class CategoricalFilter extends Component {
     );
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      filterValues: [],
-    };
-  }
-
   categoryWasClicked(e) {
-    const iFilter = this.props.iFilter;
-    var isIncluded = e.target.checked;
     var value = e.target.dataset.value;
 
-    if (isIncluded) {
-      var filterValues = this.state.filterValues;
-      filterValues.push(value);
-    } else {
-      var filterValues = this.state.filterValues.filter((e) => e !== value);
-    }
+    var parsedValue = parseFloat(value);
+    if (!isNaN(parsedValue)) value = parsedValue;
+
+    const newFilterValues = e.target.checked
+      ? [...this.state.filterValues, value]
+      : this.state.filterValues.filter((e) => e !== value);
 
     this.setState(
       {
-        filterValues: filterValues,
+        filterValues: newFilterValues,
       },
       () => {
-        this.props.filterChanged(iFilter, { filterValues: filterValues });
+        this.props.filterChanged(this.props.iFilter, {
+          filterValues: newFilterValues,
+        });
       }
     );
   }
 }
 
-class PointFiltering extends Component {
+class FilteringPoints extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      filters: this.props.chosenVariables.map((e) => ({
+        columnName: e.name,
+      })),
+      points: [],
+    };
+  }
+
   render() {
     return (
       <div>
@@ -170,15 +183,6 @@ class PointFiltering extends Component {
             <img src={robot} width="50" alt="robot" />
             <q>Filter positive points and click on Get points.</q>
           </span>
-        </p>
-
-        <p>
-          <button
-            className="btn btn-raised"
-            onClick={this.getPoints.bind(this)}
-          >
-            Get Points
-          </button>
         </p>
 
         {this.props.chosenVariables.map((variable, i) => {
@@ -197,7 +201,7 @@ class PointFiltering extends Component {
 
         <p>
           <button
-            className="btn btn-raised"
+            className="btn btn-primary btn-raised"
             onClick={this.getPoints.bind(this)}
           >
             Get Points
@@ -219,22 +223,10 @@ class PointFiltering extends Component {
     );
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      filters: this.props.chosenVariables.map((e) => {
-        return {
-          columnName: e.name,
-        };
-      }),
-      points: [],
-    };
-  }
-
   onPositiveLabel(e) {
     var iPoint = e.target.dataset.key;
 
-    var points = this.state.points;
+    var points = [...this.state.points];
     points.splice(iPoint, 1);
     this.setState({
       points,
@@ -246,57 +238,37 @@ class PointFiltering extends Component {
   onNegativeLabel(e) {
     var iPoint = e.target.dataset.key;
 
-    var points = this.state.points;
+    var points = [...this.state.points];
     points.splice(iPoint, 1);
     this.setState({
       points,
     });
+
     this.props.onNegativeLabel(e);
   }
 
   filterChanged(iFilter, change) {
-    var filter = this.getFilter(iFilter);
-
-    filter = Object.assign(filter, change);
-
-    var filters = this.updateFilter(iFilter, filter);
-
-    this.setState({
-      filters: filters,
-    });
-  }
-
-  updateFilter(iFilter, filter) {
-    var filters = this.state.filters.map((e) => e);
-    filters[iFilter] = filter;
-    return filters;
-  }
-
-  getFilter(iFilter) {
-    return this.state.filters[iFilter];
+    var newFilters = [...this.state.filters];
+    Object.assign(newFilters[iFilter], change);
+    this.setState({ filters: newFilters });
   }
 
   getPoints() {
-    const filters = this.state.filters;
-
-    sendFilters(filters, this.pointsReceived.bind(this));
+    sendFilters(this.state.filters, this.pointsReceived.bind(this));
   }
 
   pointsReceived(points) {
-    var receivedPoints = points
-      .map((e) => {
-        return {
-          id: e.id,
-          data: e.data.array,
-        };
-      })
-      .filter((e, i) => {
-        return i < 25;
-      });
+    if (points.length === 0) alert("No points satisfy the criteria.");
+
+    var formattedPoints = points.map((id) => ({ id }));
+    // .filter((e, i) => {
+    //   return i < 25;
+    // });
+
     this.setState({
-      points: receivedPoints,
+      points: formattedPoints,
     });
   }
 }
 
-export default PointFiltering;
+export default FilteringPoints;

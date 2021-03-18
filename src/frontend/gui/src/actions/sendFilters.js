@@ -18,25 +18,24 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-import {backend, webplatformApi, defaultConfiguration} from '../constants/constants'
+import { backend } from "../constants/constants";
 
 import $ from "jquery";
 
-function sendFilters(filters, onSuccess){
+function sendFilters(filters, onSuccess) {
+  $.ajax({
+    type: "POST",
+    dataType: "JSON",
+    url: backend + "/get-points-by-filtering",
+    xhrFields: {
+      withCredentials: true,
+    },
+    data: {
+      filters: JSON.stringify(filters),
+    },
 
-    var url = backend + "/get-points-by-filtering"
-
-    $.ajax({
-        type: "POST",
-        dataType: 'JSON',
-        url: url,
-        data: {
-            filters: JSON.stringify(filters)
-        },
-        
-        success: onSuccess
-    })
+    success: onSuccess,
+  });
 }
 
-export default sendFilters
-
+export default sendFilters;
