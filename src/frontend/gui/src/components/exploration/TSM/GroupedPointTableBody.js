@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import Dataset from "../../../model/Dataset";
+
 class GroupedPointTableBody extends Component {
   render() {
     return (
@@ -13,8 +15,8 @@ class GroupedPointTableBody extends Component {
           return (
             <tr key={pointIdx} className="constiable-group">
               {this.props.groups.map((group, groupIdx) => {
-                const valuesInGroup = group.map(
-                  (attribute) => pointData[attribute.realId]
+                const valuesInGroup = group.map((attribute) =>
+                  Dataset.displayValue(pointData[attribute.realId])
                 );
 
                 const SubgroupNoButton = () => (
