@@ -215,12 +215,7 @@ class App extends Component {
   }
 
   sessionWasStarted(response) {
-    const pointsToLabel = response.map((pointToLabel) => {
-      return {
-        id: pointToLabel.id,
-        data: pointToLabel.data.array,
-      };
-    });
+    const pointsToLabel = response.map((id) => ({ id }));
 
     if (this.state.groups) {
       this.setState({

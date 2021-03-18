@@ -243,19 +243,11 @@ class TSMExploration extends Component {
   }
 
   newPointsToLabel(points) {
-    var newPoints = points.map((e) => {
-      return {
-        id: e.id,
-        data: e.data.array,
-      };
-    });
-
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
+    var newPoints = points.map((id) => ({ id }));
 
     this.setState({
-      pointsToLabel: pointsToLabel.concat(newPoints),
+      pointsToLabel: [...this.state.pointsToLabel, ...newPoints],
       labeledPoints: [],
-      //initialLabelingSession: ! (this.state.hasYes && this.state.hasNo)
     });
   }
 
@@ -305,10 +297,6 @@ class TSMExploration extends Component {
     pointsToLabel.splice(pointId, 1);
     var labeledPoints = this.state.labeledPoints.map((e) => e);
     labeledPoints.push(labeledPoint);
-
-    // this.setState({
-    //   hasNo: true,
-    // });
 
     if (this.state.initialLabelingSession) {
       this.pointWasLabeledDuringInitialSession(labeledPoint, pointsToLabel);
@@ -521,26 +509,22 @@ function notifyLabelWholeDataset(tokens) {
 }
 
 function sendLabels(labeledPoints, onSuccess) {
-  var labeledPoints = labeledPoints.map((e) => {
+  const formattedLabeledPoints = labeledPoints.map((e) => {
     return {
       id: e.id,
       labels: e.labels,
-      data: {
-        array: e.data,
-      },
     };
   });
 
-  var endPoint = backend + "/data-point-were-labeled"; // /tsm-data-point-were-labeled
   $.ajax({
     type: "POST",
     dataType: "JSON",
-    url: endPoint,
+    url: backend + "/data-point-were-labeled", // /tsm-data-point-were-labeled
     xhrFields: {
       withCredentials: true,
     },
     data: {
-      labeledPoints: JSON.stringify(labeledPoints),
+      labeledPoints: JSON.stringify(formattedLabeledPoints),
     },
 
     success: onSuccess,

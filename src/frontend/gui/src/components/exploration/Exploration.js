@@ -389,21 +389,10 @@ class Exploration extends Component {
   }
 
   onNewPointsToLabel(points) {
-    var pointsToLabel = this.state.pointsToLabel.map((e) => e);
-
-    var receivedPoints = points.map((e) => {
-      return {
-        id: e.id,
-        data: e.data.array,
-      };
-    });
-
-    for (var point of receivedPoints) {
-      pointsToLabel.push(point);
-    }
+    const receivedPoints = points.map((id) => ({ id }));
 
     this.setState({
-      pointsToLabel: pointsToLabel,
+      pointsToLabel: [...this.state.pointsToLabel, ...receivedPoints],
     });
   }
 

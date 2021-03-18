@@ -25,9 +25,6 @@ function explorationSendLabeledPoint(data, tokens, onSuccess) {
   const formattedLabeledPoints = data.labeledPoints.map((e) => ({
     id: e.id,
     label: e.label,
-    data: {
-      array: e.data,
-    },
   }));
 
   $.ajax({
