@@ -340,20 +340,19 @@ class ModelBehavior extends Component {
   }
 
   getModelPredictionOverGridPoints() {
-    const iteration = this.getIteration();
-    const modelPredictions = this.props.modelPredictionHistory[iteration];
-
     const grid = this.props.fakePointGrid;
-
-    const vars = this.getChosenVariables();
-    const iColOne = vars[0];
-    const iColTwo = vars[1];
+    const modelPredictions = this.props.modelPredictionHistory[
+      this.getIteration()
+    ];
 
     const scatter = d3.zip(grid, modelPredictions).map((e) => {
       const gridPoint = e[0];
       const prediction = e[1];
-
-      return [gridPoint[iColOne], gridPoint[iColTwo], prediction.label];
+      return [
+        gridPoint[this.state.firstVariable],
+        gridPoint[this.state.secondVariable],
+        prediction.label,
+      ];
     });
 
     return scatter;
@@ -366,18 +365,25 @@ class ModelBehavior extends Component {
   }
 
   getHumanLabeledPoints() {
-    const iteration = this.getIteration();
-    var labeledPoints = this.props.labeledPoints.filter((e, i) => {
-      return i <= iteration;
+    const labeledPoints = this.props.labeledPoints.filter((e, i) => {
+      return i <= this.getIteration();
     });
 
-    labeledPoints = labeledPoints.map((e) => {
-      var v = e.data;
-      v.push(e.label);
-      return v;
+    // labeledPoints = labeledPoints.map((e) => {
+    //   var v = e.data;
+    //   v.push(e.label);
+    //   return v;
+    // });
+    const formattedLabeledPoints = labeledPoints.map((point) => {
+      const row = this.props.fakePointGrid[point.id];
+      return [
+        row[this.state.firstVariable],
+        row[this.state.secondVariable],
+        point.label,
+      ];
     });
 
-    return labeledPoints;
+    return formattedLabeledPoints;
   }
 
   getLabeledEmbedding() {
