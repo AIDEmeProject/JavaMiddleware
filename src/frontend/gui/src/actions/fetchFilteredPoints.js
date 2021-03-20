@@ -22,7 +22,7 @@ import { backend } from "../constants/constants";
 
 import $ from "jquery";
 
-function sendFilters(filters, onSuccess) {
+function fetchFilteredPoints(labeledPoints, filters, onSuccess) {
   $.ajax({
     type: "POST",
     dataType: "JSON",
@@ -31,6 +31,7 @@ function sendFilters(filters, onSuccess) {
       withCredentials: true,
     },
     data: {
+      labeledPoints: JSON.stringify(labeledPoints),
       filters: JSON.stringify(filters),
     },
 
@@ -38,4 +39,4 @@ function sendFilters(filters, onSuccess) {
   });
 }
 
-export default sendFilters;
+export default fetchFilteredPoints;

@@ -22,23 +22,32 @@ import React, { Component } from "react";
 
 import FilteringPoints from "./FilteringPoints";
 import PointLabelisation from "../../PointLabelisation";
+
 import explorationSendLabeledPoint from "../../../actions/explorationSendLabeledPoint";
+import fetchFilteredPoints from "../../../actions/fetchFilteredPoints";
 
 import robot from "../../../resources/robot.png";
+
+const RANDOM = "random";
+const FILTERED = "filtered";
 
 class InitialSampling extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      showLabeling: false,
+      showRandomSampling: false,
       showFilterBasedSampling: false,
 
-      pointsToLabel: [...this.props.pointsToLabel],
-      // randomPointsToLabel: [...this.props.pointsToLabel],
-      // filteredPointsToLabel: [],
+      randomPointsToLabel: [...this.props.pointsToLabel],
+      filteredPointsToLabel: [],
       labeledPoints: [],
       allLabeledPoints: [],
+
+      filters: this.props.chosenColumns.map((e) => ({
+        columnName: e.name,
+        type: e.type,
+      })),
 
       hasYes: false,
       hasNo: false,
@@ -69,15 +78,12 @@ class InitialSampling extends Component {
                 <li className="nav-item">
                   <a
                     className={
-                      this.state.showLabeling ? "nav-link active" : "nav-link"
+                      this.state.showRandomSampling
+                        ? "nav-link active"
+                        : "nav-link"
                     }
                     href="javascript:void(0)"
-                    onClick={() =>
-                      this.setState({
-                        showLabeling: true,
-                        showFilterBasedSampling: false,
-                      })
-                    }
+                    onClick={this.onRandomSamplingClicked.bind(this)}
                   >
                     Random sampling
                   </a>
@@ -93,7 +99,7 @@ class InitialSampling extends Component {
                     href="javascript:void(0)"
                     onClick={() =>
                       this.setState({
-                        showLabeling: false,
+                        showRandomSampling: false,
                         showFilterBasedSampling: true,
                       })
                     }
@@ -105,20 +111,14 @@ class InitialSampling extends Component {
             </div>
           </div>
 
-          {this.state.showLabeling && (
+          {this.state.showRandomSampling && (
             <div>
               <PointLabelisation
-                // pointsToLabel={this.props.pointsToLabel}
-                pointsToLabel={this.state.pointsToLabel}
-                // pointsToLabel={this.state.randomPointsToLabel}
+                pointsToLabel={this.state.randomPointsToLabel}
                 chosenColumns={this.props.chosenColumns}
                 dataset={this.props.dataset}
-                // onPositiveLabel={this.props.onPositiveLabel}
-                // onNegativeLabel={this.props.onNegativeLabel}
-                onPositiveLabel={this.onPositiveLabel.bind(this)}
-                onNegativeLabel={this.onNegativeLabel.bind(this)}
-                // onPositiveLabel={this.onLabelRandomPointPositive}
-                // onNegativeLabel={this.onLabelRandomPointNegative}
+                onPositiveLabel={this.onPositiveRandomPoint.bind(this)}
+                onNegativeLabel={this.onNegativeRandomPoint.bind(this)}
               />
             </div>
           )}
@@ -127,14 +127,14 @@ class InitialSampling extends Component {
             <div className="row">
               <div className="col col-lg-8 offset-lg-2">
                 <FilteringPoints
-                  chosenVariables={this.props.chosenColumns}
+                  pointsToLabel={this.state.filteredPointsToLabel}
+                  chosenColumns={this.props.chosenColumns}
                   dataset={this.props.dataset}
-                  // onPositiveLabel={this.props.onPositiveLabel}
-                  // onNegativeLabel={this.props.onNegativeLabel}
-                  onPositiveLabel={this.onPositiveLabel.bind(this)}
-                  onNegativeLabel={this.onNegativeLabel.bind(this)}
-                  // onPositiveLabel={this.onLabelFilteredPointPositive}
-                  // onNegativeLabel={this.onLabelFilteredPointPositive}
+                  filters={this.state.filters}
+                  onPositiveLabel={this.onPositiveFilteredPoint.bind(this)}
+                  onNegativeLabel={this.onNegativeFilteredPoint.bind(this)}
+                  getFilteredPoints={this.getFilteredPoints.bind(this)}
+                  onFilterChanged={this.onFilterChanged.bind(this)}
                 />
               </div>
             </div>
@@ -144,22 +144,65 @@ class InitialSampling extends Component {
     );
   }
 
-  onPositiveLabel(e) {
-    var dataIndex = parseInt(e.target.dataset.key);
-    this.dataWasLabeled(dataIndex, 1);
+  onRandomSamplingClicked() {
+    this.setState({
+      showRandomSampling: true,
+      showFilterBasedSampling: false,
+    });
+
+    if (this.state.randomPointsToLabel.length === 0) this.getRandomPoints();
   }
 
-  onNegativeLabel(e) {
-    var dataIndex = parseInt(e.target.dataset.key);
-    this.dataWasLabeled(dataIndex, 0);
+  onPositiveRandomPoint(e) {
+    this.onPositiveLabel(e, RANDOM);
   }
 
-  dataWasLabeled(dataIndex, label) {
-    const newLabeledPoint = { ...this.state.pointsToLabel[dataIndex], label };
+  onNegativeRandomPoint(e) {
+    this.onNegativeLabel(e, RANDOM);
+  }
+
+  onPositiveFilteredPoint(e) {
+    this.onPositiveLabel(e, FILTERED);
+  }
+
+  onNegativeFilteredPoint(e) {
+    this.onNegativeLabel(e, FILTERED);
+  }
+
+  onPositiveLabel(e, pointType) {
+    var dataIndex = parseInt(e.target.dataset.key);
+    this.dataWasLabeled(dataIndex, 1, pointType);
+  }
+
+  onNegativeLabel(e, pointType) {
+    var dataIndex = parseInt(e.target.dataset.key);
+    this.dataWasLabeled(dataIndex, 0, pointType);
+  }
+
+  dataWasLabeled(dataIndex, label, pointType) {
+    var newLabeledPoint;
+    if (pointType === RANDOM) {
+      newLabeledPoint = {
+        ...this.state.randomPointsToLabel[dataIndex],
+        label,
+      };
+    } else {
+      newLabeledPoint = {
+        ...this.state.filteredPointsToLabel[dataIndex],
+        label,
+      };
+    }
+
     const newLabeledPoints = [...this.state.labeledPoints, newLabeledPoint];
 
-    var newPointsToLabel = [...this.state.pointsToLabel];
-    newPointsToLabel.splice(dataIndex, 1);
+    const newRandomPointsToLabel = this.removeLabeledPoint(
+      newLabeledPoint,
+      this.state.randomPointsToLabel
+    );
+    const newFilteredPointsToLabel = this.removeLabeledPoint(
+      newLabeledPoint,
+      this.state.filteredPointsToLabel
+    );
 
     const isYes = label === 1;
 
@@ -167,25 +210,35 @@ class InitialSampling extends Component {
       {
         allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
         labeledPoints: newLabeledPoints,
-        pointsToLabel: newPointsToLabel,
+
+        randomPointsToLabel: newRandomPointsToLabel,
+        filteredPointsToLabel: newFilteredPointsToLabel,
+
         hasYes: this.state.hasYes || isYes,
         hasNo: this.state.hasNo || !isYes,
       },
       () => {
-        this.labelForInitialSession(newLabeledPoints, newPointsToLabel);
+        this.getNextPointsToLabel(pointType);
       }
     );
   }
 
-  labelForInitialSession(labeledPoints, pointsToLabel) {
-    var tokens = this.props.tokens;
+  removeLabeledPoint(labeledPoint, pointsToLabel) {
+    const labeledPointIdx = pointsToLabel.findIndex(
+      (point) => point.id === labeledPoint.id
+    );
+    var newPointsToLabel = [...pointsToLabel];
+    if (labeledPointIdx !== -1) newPointsToLabel.splice(labeledPointIdx, 1);
+    return newPointsToLabel;
+  }
 
+  getNextPointsToLabel(pointType) {
     if (this.state.hasYes && this.state.hasNo) {
       explorationSendLabeledPoint(
         {
-          labeledPoints,
+          labeledPoints: this.state.labeledPoints,
         },
-        tokens,
+        this.props.tokens,
         (response) => {
           this.props.hasPositiveAndNegativeLabels(
             this.state.allLabeledPoints,
@@ -197,34 +250,58 @@ class InitialSampling extends Component {
       return;
     }
 
-    if (pointsToLabel.length === 0) {
-      explorationSendLabeledPoint(
-        {
-          labeledPoints,
-        },
-        tokens,
-        (response) => {
-          this.setState({
-            labeledPoints: [],
-            pointsToLabel: [
-              ...this.state.pointsToLabel,
-              ...this.parseReceivedPoints(response),
-            ],
-          });
-        }
-      );
+    if (pointType === RANDOM && this.state.randomPointsToLabel.length === 0) {
+      this.getRandomPoints();
     }
+  }
+
+  getRandomPoints() {
+    explorationSendLabeledPoint(
+      {
+        labeledPoints: this.state.labeledPoints,
+      },
+      this.props.tokens,
+      (response) => {
+        this.setState({
+          labeledPoints: [],
+          randomPointsToLabel: [
+            ...this.state.randomPointsToLabel,
+            ...this.parseReceivedPoints(response),
+          ],
+        });
+      }
+    );
+  }
+
+  getFilteredPoints() {
+    fetchFilteredPoints(
+      this.state.labeledPoints,
+      this.state.filters.map((f) => {
+        const { type, ...others } = f;
+        return others;
+      }),
+      this.onFilteredPointsReceived.bind(this)
+    );
+  }
+
+  onFilteredPointsReceived(points) {
+    if (points.length === 0) alert("No points satisfy the criteria.");
+
+    this.setState({
+      labeledPoints: [],
+      filteredPointsToLabel: this.parseReceivedPoints(points),
+    });
   }
 
   parseReceivedPoints(points) {
     return points.map((id) => ({ id }));
   }
 
-  // onLabelRandomPointPositive() {}
-
-  // onLabelRandomPointNegative() {}
-
-  // onLabelRandomPoint(pointId, label) {}
+  onFilterChanged(iFilter, change) {
+    var newFilters = [...this.state.filters];
+    Object.assign(newFilters[iFilter], change);
+    this.setState({ filters: newFilters });
+  }
 }
 
 export default InitialSampling;
