@@ -51,7 +51,7 @@ import {
 } from "../../constants/constants";
 import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
 
-const ENCODED_DATASET_NAME = "./cars_encoded.csv";
+const ENCODED_DATASET_NAME = "cars_encoded.csv";
 
 class QueryTrace extends Component {
   render() {
@@ -284,16 +284,20 @@ class QueryTrace extends Component {
       showModelBehavior: false,
       showLoading: true,
       isComputing: false,
-      useTSM: false,
-      useFactorizedInformation: false,
       loadMode: false,
 
       nIteration: 0,
       iteration: 0,
       lastIndice: 0,
 
+      dataset: null,
+      isCarDataset: null,
+
       columnNames: [],
       availableVariables: [],
+      traceColumns: [],
+
+      traceDataset: null,
 
       TSMStatsHistory: [],
       classifierStatsHistory: [],
@@ -306,6 +310,8 @@ class QueryTrace extends Component {
       allLabeledPoints: [],
 
       algorithm: "simplemargin",
+      useTSM: false,
+      useFactorizedInformation: false,
     };
   }
 
@@ -355,7 +361,7 @@ class QueryTrace extends Component {
     });
   }
 
-  onValidateTrace(e) {
+  onValidateTrace() {
     this.loadDataset();
     this.loadF1Score();
   }
@@ -376,18 +382,15 @@ class QueryTrace extends Component {
 
   loadDataset() {
     loadFileFromInputFile("dataset", (event) => {
-      var fileContent = event.target.result;
-      var dataset = Dataset.buildFromLoadedInput(fileContent);
+      const dataset = Dataset.buildFromLoadedInput(event.target.result);
 
       const filename = $("#dataset").val();
-
       const isCarDataset = filename.toLowerCase().indexOf("car") !== -1;
-      console.log(isCarDataset);
 
       this.setState(
         {
-          dataset: dataset,
-          isCarDataset: isCarDataset,
+          dataset,
+          isCarDataset,
         },
         this.loadTraceScenario
       );
@@ -396,25 +399,26 @@ class QueryTrace extends Component {
 
   loadTraceScenario() {
     loadFileFromInputFile("trace-columns", (event) => {
-      var fileContent = event.target.result;
-      var traceColumns = JSON.parse(fileContent);
+      const traceColumns = JSON.parse(event.target.result);
       var dataset = this.state.dataset;
 
-      const usedColumnIds = traceColumns.rawDataset;
-      var columnNames = dataset.get_column_names_from_ids(usedColumnIds);
+      var columnNames = dataset.get_column_names_from_ids(
+        traceColumns.rawDataset
+      );
 
       dataset.set_column_names_selected_by_user(columnNames);
 
-      var availableVariables = columnNames.map((e, i) => {
-        return { name: e, realId: i };
-      });
+      var availableVariables = columnNames.map((name, i) => ({
+        name,
+        realId: i,
+      }));
 
       this.setState(
         {
-          traceColumns: traceColumns,
-          columnNames: columnNames,
-          availableVariables: availableVariables,
-          dataset: dataset,
+          traceColumns,
+          columnNames,
+          availableVariables,
+          dataset,
         },
         this.loadTraceFile
       );
@@ -425,12 +429,10 @@ class QueryTrace extends Component {
     loadFileFromInputFile("trace", (event) => {
       var fileContent = event.target.result;
 
-      var ext = getFileExtension("trace");
-      const isCsv = ext === "csv";
-      const useFactorizedInformation = this.state.useFactorizedInformation;
+      const isCsv = getFileExtension("trace") === "csv";
 
       var trace;
-      if (useFactorizedInformation) {
+      if (this.state.useFactorizedInformation) {
         trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv);
       } else {
         trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv);
@@ -469,7 +471,7 @@ class QueryTrace extends Component {
   }
 
   buildConfiguration() {
-    var configurations = {
+    const configurations = {
       simplemargin: simpleMarginConfiguration,
       simplemargintsm: simpleMarginConfiguration,
       versionspace: versionSpaceConfiguration,
@@ -480,13 +482,12 @@ class QueryTrace extends Component {
 
     if (this.state.useFactorizedInformation) {
       const datasetMetadata = this.getDatasetMetadata();
-      const allColumns = datasetMetadata.columnNames;
-      const columnsUsedInTrace = this.state.traceColumns;
 
-      const factorizationGroups = columnsUsedInTrace.factorizationGroups;
       const usedColumnNames = this.state.traceColumns.encodedDataset.map(
-        (e) => allColumns[e]
+        (e) => datasetMetadata.columnNames[e]
       );
+
+      const factorizationGroups = this.state.traceColumns.factorizationGroups;
 
       configuration = buildTSMConfiguration(
         configuration,
@@ -512,25 +513,20 @@ class QueryTrace extends Component {
   }
 
   buildFactorizedVersionSpaceGroup(configuration) {
-    var flags = configuration.multiTSM.flags;
     var categorical = [];
-    flags.forEach((flag, i) => {
+    configuration.multiTSM.flags.forEach((flag, i) => {
       if (flag[1]) {
         categorical.push(i);
       }
     });
 
-    configuration[
-      "activeLearner"
-    ].repeat = this.state.traceColumns.factorizationGroups.length;
-    configuration["activeLearner"].categorical = categorical;
-    configuration["multiTSM"]["hasTsm"] = false;
+    configuration.activeLearner.categorical = categorical;
+    configuration.activeLearner.repeat = this.state.traceColumns.factorizationGroups.length;
+    configuration.multiTSM.hasTsm = false;
     return configuration;
   }
 
-  traceBackendWasInitialized(fakePointGrid) {
-    //var grid = fakePointGrid.map(e => {return e.data.array})
-
+  traceBackendWasInitialized() {
     var grid = this.state.dataset.get_parsed_columns_by_names(
       this.state.columnNames
     );
@@ -541,15 +537,6 @@ class QueryTrace extends Component {
       },
       this.sendLabelDataForComputation.bind(this)
     );
-  }
-
-  getLabeledPointToSend(iRowTrace) {
-    var point = this.state.traceDataset.get_point(iRowTrace);
-
-    point.data = {
-      array: [2],
-    };
-    return point;
   }
 
   sendLabelDataForComputation() {
@@ -572,37 +559,13 @@ class QueryTrace extends Component {
     );
   }
 
-  getDataPointFromId(sentPoint) {
-    const id = sentPoint.id;
+  getLabeledPointToSend(iRowTrace) {
+    var point = this.state.traceDataset.get_point(iRowTrace);
 
-    var data = {
-      id: id,
-      label: this.getLabelFromPoint(sentPoint),
-      data: this.state.dataset
-        .get_selected_columns_point(id)
-        .map((e) => parseFloat(e)),
+    point.data = {
+      array: [2],
     };
-
-    return data;
-  }
-
-  getLabelFromPoint(point) {
-    if (this.state.useFactorizedInformation) {
-      return point.labels.every((e) => e === 1) ? 1 : 0;
-    }
-    return point.label;
-  }
-
-  computeClassifierStats(modelPredictions) {
-    var nPositives = modelPredictions.filter((e) => e.label === 1).length;
-    var nNegative = modelPredictions.filter((e) => e.label !== 1).length;
-
-    var stats = {
-      positive: nPositives,
-      negative: nNegative,
-    };
-
-    return stats;
+    return point;
   }
 
   /* Process and data received from the backend and put it in the component state */
@@ -660,6 +623,39 @@ class QueryTrace extends Component {
     }
 
     this.setState(newState);
+  }
+
+  getDataPointFromId(sentPoint) {
+    const id = sentPoint.id;
+
+    var data = {
+      id: id,
+      label: this.getLabelFromPoint(sentPoint),
+      data: this.state.dataset
+        .get_selected_columns_point(id)
+        .map((e) => parseFloat(e)),
+    };
+
+    return data;
+  }
+
+  getLabelFromPoint(point) {
+    if (this.state.useFactorizedInformation) {
+      return point.labels.every((e) => e === 1) ? 1 : 0;
+    }
+    return point.label;
+  }
+
+  computeClassifierStats(modelPredictions) {
+    var nPositives = modelPredictions.filter((e) => e.label === 1).length;
+    var nNegative = modelPredictions.filter((e) => e.label !== 1).length;
+
+    var stats = {
+      positive: nPositives,
+      negative: nNegative,
+    };
+
+    return stats;
   }
 
   computeTSMStats(TSMPredictionOverPoints) {
