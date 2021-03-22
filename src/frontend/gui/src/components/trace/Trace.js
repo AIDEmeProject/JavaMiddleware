@@ -51,6 +51,8 @@ import {
 } from "../../constants/constants";
 import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
 
+import { modelPredictionMap, TSMPredictionMap } from "../exploration/labelMaps";
+
 const ENCODED_DATASET_NAME = "cars_encoded.csv";
 
 class QueryTrace extends Component {
@@ -229,6 +231,7 @@ class QueryTrace extends Component {
                         hasTSM={this.state.useTSM}
                         plotLabels={false}
                         realDataset={true}
+                        plotProjection={false}
                       />
                     </div>
                   </div>
@@ -281,7 +284,9 @@ class QueryTrace extends Component {
     super(props);
 
     this.state = {
+      showDataPoints: true,
       showModelBehavior: false,
+
       showLoading: true,
       isComputing: false,
       loadMode: false,
@@ -540,10 +545,10 @@ class QueryTrace extends Component {
   }
 
   sendLabelDataForComputation() {
-    var nPointToSend = 1;
+    var nPointToSend = this.state.lastIndice === 0 ? 2 : 1;
     var lastIndice = this.state.lastIndice;
     var pointsToSend = d3.range(nPointToSend).map((e, i) => {
-      return this.getLabeledPointToSend(i + lastIndice);
+      return this.state.traceDataset.get_point(i + lastIndice);
     });
 
     this.setState(
@@ -559,67 +564,54 @@ class QueryTrace extends Component {
     );
   }
 
-  getLabeledPointToSend(iRowTrace) {
-    var point = this.state.traceDataset.get_point(iRowTrace);
-
-    point.data = {
-      array: [2],
-    };
-    return point;
-  }
-
   /* Process and data received from the backend and put it in the component state */
   dataReceived(response, sentPoints) {
-    var projectionHistory = this.state.projectionHistory;
-    var projectionData = JSON.parse(response.jsonProjectionPredictions);
-
-    projectionHistory.push(projectionData);
-
-    var modelPredictionHistory = this.state.modelPredictionHistory;
-    var useTSM = this.state.useTSM;
-    var modelPredictions = backendPredToFrontendFormat(
-      response.labeledPointsOverGrid,
-      useTSM
-    );
-    modelPredictionHistory.push(modelPredictions);
-
-    var allLabeledPoints = this.state.allLabeledPoints;
-    allLabeledPoints = allLabeledPoints.concat(
+    const newAllLabeledPoints = this.state.allLabeledPoints.concat(
       sentPoints.map(this.getDataPointFromId.bind(this))
     );
 
-    var classifierStats = this.computeClassifierStats(modelPredictions);
-    var classifierStatsHistory = this.state.classifierStatsHistory;
-    classifierStatsHistory.push(classifierStats);
+    // const newProjectionHistory = [
+    //   ...this.state.projectionHistory,
+    //   response.projectionPredictions,
+    //   // JSON.parse(response.projectionPredictions),
+    // ];
+
+    const modelPredictions = response.labeledPointsOverGrid.map((point) => ({
+      id: point.id,
+      label: modelPredictionMap[point.label],
+    }));
 
     var newState = {
-      modelPredictionHistory: modelPredictionHistory,
-      projectionHistory: projectionHistory,
-      showLoading: false,
+      allLabeledPoints: newAllLabeledPoints,
+      modelPredictionHistory: [
+        ...this.state.modelPredictionHistory,
+        modelPredictions,
+      ],
+      // projectionHistory: newProjectionHistory,
+      classifierStatsHistory: [
+        ...this.state.classifierStatsHistory,
+        this.computeClassifierStats(modelPredictions),
+      ],
       nIteration: this.state.nIteration + 1,
-      allLabeledPoints: allLabeledPoints,
+      showLoading: false,
       isComputing: false,
     };
 
     if (this.state.useTSM) {
-      var TSMPredictionsOverGrid = response.TSMPredictionsOverGrid.map(
-        (e, i) => {
-          return {
-            id: e.dataPoint.id,
-            label: e.label.label,
-          };
-        }
-      );
+      const TSMPredictions = response.TSMPredictionsOverGrid.map((point) => ({
+        id: point.id,
+        label: TSMPredictionMap[point.label],
+      }));
 
-      var TSMPredictionHistory = this.state.TSMPredictionHistory;
-      TSMPredictionHistory.push(TSMPredictionsOverGrid);
-      newState["TSMPredictionHistory"] = TSMPredictionHistory;
+      newState["TSMPredictionHistory"] = [
+        ...this.state.TSMPredictionHistory,
+        TSMPredictions,
+      ];
 
-      var TSMstats = this.computeTSMStats(TSMPredictionsOverGrid);
-      var TSMStatsHistory = this.state.TSMStatsHistory;
-      TSMStatsHistory.push(TSMstats);
-
-      newState["TSMStatsHistory"] = TSMStatsHistory;
+      newState["TSMStatsHistory"] = [
+        ...this.state.TSMStatsHistory,
+        this.computeTSMStats(TSMPredictions),
+      ];
     }
 
     this.setState(newState);
@@ -647,26 +639,17 @@ class QueryTrace extends Component {
   }
 
   computeClassifierStats(modelPredictions) {
-    var nPositives = modelPredictions.filter((e) => e.label === 1).length;
-    var nNegative = modelPredictions.filter((e) => e.label !== 1).length;
-
-    var stats = {
-      positive: nPositives,
-      negative: nNegative,
+    return {
+      positive: modelPredictions.filter((e) => e.label === 1).length,
+      negative: modelPredictions.filter((e) => e.label !== 1).length,
     };
-
-    return stats;
   }
 
-  computeTSMStats(TSMPredictionOverPoints) {
-    var negative = TSMPredictionOverPoints.filter((e) => e.label === -1).length;
-    var positive = TSMPredictionOverPoints.filter((e) => e.label === 1).length;
-    var unknown = TSMPredictionOverPoints.filter((e) => e.label === 0).length;
-
+  computeTSMStats(TSMPredictions) {
     return {
-      positive,
-      negative,
-      unknown,
+      positive: TSMPredictions.filter((e) => e.label === 1).length,
+      negative: TSMPredictions.filter((e) => e.label === -1).length,
+      unknown: TSMPredictions.filter((e) => e.label === 0).length,
     };
   }
 
@@ -696,15 +679,6 @@ function getFileExtension(id) {
   var filePath = $("#" + id).val();
   const ext = filePath.substr(filePath.lastIndexOf(".") + 1, filePath.length);
   return ext;
-}
-
-function backendPredToFrontendFormat(rawPoints, useTSM) {
-  return rawPoints.map((e) => {
-    return {
-      id: useTSM ? e.id : e.dataPoint.id,
-      label: e.label === "POSITIVE" ? 1 : -1,
-    };
-  });
 }
 
 export default QueryTrace;

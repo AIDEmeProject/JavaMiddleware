@@ -195,10 +195,6 @@ class Dataset {
     return this.dataset.map((e, i) => this.get_selected_columns_point(i));
   }
 
-  get_point(id) {
-    const row = this.dataset[id];
-  }
-
   get_columns(ids, aliases) {
     const names = this.get_column_names();
     return this.dataset.map((row) => {

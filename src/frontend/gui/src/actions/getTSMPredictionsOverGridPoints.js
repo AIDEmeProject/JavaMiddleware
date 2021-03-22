@@ -20,12 +20,7 @@
 
 import $ from "jquery";
 import { backend } from "../constants/constants";
-
-const labelsMap = {
-  POSITIVE: 1,
-  UNKNOWN: 0,
-  NEGATIVE: -1,
-};
+import { TSMPredictionMap } from "../components/exploration/labelMaps";
 
 function getTSMPredictionsOverGridPoints(dataWasReceived) {
   $.ajax({
@@ -39,7 +34,7 @@ function getTSMPredictionsOverGridPoints(dataWasReceived) {
       var predictedLabels = rawLabels.map((e) => {
         return {
           id: e.id,
-          label: labelsMap[e.label],
+          label: TSMPredictionMap[e.label],
         };
       });
 

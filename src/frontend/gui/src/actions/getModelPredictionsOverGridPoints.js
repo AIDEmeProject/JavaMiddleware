@@ -20,8 +20,7 @@
 
 import $ from "jquery";
 import { backend } from "../constants/constants";
-
-const labelsMap = { POSITIVE: 1, NEGATIVE: -1 };
+import { modelPredictionMap } from "../components/exploration/labelMaps";
 
 function getModelPredictionsOverGridPoints(dataWasReceived) {
   $.ajax({
@@ -35,7 +34,7 @@ function getModelPredictionsOverGridPoints(dataWasReceived) {
       const predictions = rawPoints.map((e) => {
         return {
           id: e.id,
-          label: labelsMap[e.label],
+          label: modelPredictionMap[e.label],
         };
       });
 

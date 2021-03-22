@@ -24,7 +24,7 @@ class TSMPredictionStatistics extends Component {
   render() {
     return (
       <div id="tsm-pred-stats">
-        <h5>TSM prediction Statistics</h5>
+        <h5>TSM prediction statistics</h5>
 
         <table className="table">
           <tbody>
