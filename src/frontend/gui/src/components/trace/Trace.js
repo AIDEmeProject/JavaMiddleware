@@ -138,7 +138,7 @@ class QueryTrace extends Component {
                         <button
                           className="btn btn-primary btn-raised"
                           onClick={this.sendLabelDataForComputation.bind(this)}
-                          disabled={this.state.isComputing ? true : false}
+                          disabled={this.state.isComputing}
                         >
                           Compute next iteration
                         </button>
@@ -207,7 +207,11 @@ class QueryTrace extends Component {
                       </div>
 
                       <div id="f1-score-img">
-                        <img width="450" src={this.state.f1ScoreImg} />
+                        <img
+                          width="450"
+                          src={this.state.f1ScoreImg}
+                          alt="f1 score"
+                        />
                       </div>
                     </div>
 
@@ -308,7 +312,6 @@ class QueryTrace extends Component {
   getTSMStats() {
     const iteration = this.state.iteration;
     var stat = this.state.TSMStatsHistory[iteration];
-
     return stat;
   }
 
@@ -316,9 +319,6 @@ class QueryTrace extends Component {
     const iteration = this.state.iteration;
     var stat = this.state.classifierStatsHistory[iteration];
     return stat;
-  }
-  getAlgorithmName(algorithm) {
-    return algorithmNames[algorithm];
   }
 
   getNumberOfIterations() {
@@ -346,20 +346,12 @@ class QueryTrace extends Component {
   }
 
   learnerChanged(algorithm) {
-    var useTSM = algorithm === "simplemargintsm";
-    var useFactorizedInformation =
-      algorithm === "simplemargintsm" || algorithm === "factorizedversionspace";
-
     this.setState({
-      useTSM: useTSM,
-      useFactorizedInformation: useFactorizedInformation,
-      algorithm: algorithm,
-    });
-  }
-
-  encodedDatasetChanged(e) {
-    this.setState({
-      encodedDatasetChanged: e.target.value,
+      useTSM: algorithm === "simplemargintsm",
+      useFactorizedInformation:
+        algorithm === "simplemargintsm" ||
+        algorithm === "factorizedversionspace",
+      algorithm,
     });
   }
 
@@ -437,10 +429,11 @@ class QueryTrace extends Component {
       const isCsv = ext === "csv";
       const useFactorizedInformation = this.state.useFactorizedInformation;
 
+      var trace;
       if (useFactorizedInformation) {
-        var trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv);
+        trace = TSMTraceDataset.buildFromLoadedInput(fileContent, isCsv);
       } else {
-        var trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv);
+        trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv);
       }
 
       //var encodedColumnNames = trace.get_column_names_from_ids(this.state.traceColumns.rawDataset)
@@ -502,7 +495,7 @@ class QueryTrace extends Component {
         datasetMetadata
       );
 
-      if (this.state.algorithm == "factorizedversionspace") {
+      if (this.state.algorithm === "factorizedversionspace") {
         configuration = this.buildFactorizedVersionSpaceGroup(configuration);
       }
     }
@@ -581,26 +574,28 @@ class QueryTrace extends Component {
 
   getDataPointFromId(sentPoint) {
     const id = sentPoint.id;
-    var data = this.state.dataset.get_selected_columns_point(id);
 
     var data = {
       id: id,
       label: this.getLabelFromPoint(sentPoint),
-      data: data.map((e) => parseFloat(e)),
+      data: this.state.dataset
+        .get_selected_columns_point(id)
+        .map((e) => parseFloat(e)),
     };
 
     return data;
   }
+
   getLabelFromPoint(point) {
     if (this.state.useFactorizedInformation) {
-      return point.labels.every((e) => e == 1) ? 1 : 0;
+      return point.labels.every((e) => e === 1) ? 1 : 0;
     }
     return point.label;
   }
 
   computeClassifierStats(modelPredictions) {
-    var nPositives = modelPredictions.filter((e) => e.label == 1).length;
-    var nNegative = modelPredictions.filter((e) => e.label != 1).length;
+    var nPositives = modelPredictions.filter((e) => e.label === 1).length;
+    var nNegative = modelPredictions.filter((e) => e.label !== 1).length;
 
     var stats = {
       positive: nPositives,
@@ -667,24 +662,15 @@ class QueryTrace extends Component {
     this.setState(newState);
   }
 
-  /* compute final model stats. To add negative ones*/
-  getPositivePredictedPoints(modelPredictionHistory, step) {
-    var iteration = Math.min(step, modelPredictionHistory.length - 1);
-
-    return modelPredictionHistory[iteration].filter((e) => {
-      return e.label === 1;
-    }).length;
-  }
-
   computeTSMStats(TSMPredictionOverPoints) {
-    var negative = TSMPredictionOverPoints.filter((e) => e.label == -1).length;
-    var positive = TSMPredictionOverPoints.filter((e) => e.label == 1).length;
-    var unknown = TSMPredictionOverPoints.filter((e) => e.label == 0).length;
+    var negative = TSMPredictionOverPoints.filter((e) => e.label === -1).length;
+    var positive = TSMPredictionOverPoints.filter((e) => e.label === 1).length;
+    var unknown = TSMPredictionOverPoints.filter((e) => e.label === 0).length;
 
     return {
-      positive: positive,
-      negative: negative,
-      unknown: unknown,
+      positive,
+      negative,
+      unknown,
     };
   }
 
@@ -720,7 +706,7 @@ function backendPredToFrontendFormat(rawPoints, useTSM) {
   return rawPoints.map((e) => {
     return {
       id: useTSM ? e.id : e.dataPoint.id,
-      label: e.label == "POSITIVE" ? 1 : -1,
+      label: e.label === "POSITIVE" ? 1 : -1,
     };
   });
 }
