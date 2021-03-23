@@ -30,13 +30,8 @@ function sendVariableGroups(
   configuration,
   onSuccess
 ) {
-  var endPoint = backend + "/choose-options";
-
-  var usedColumnNames = chosenVariables.map((e) => e.name);
-  console.log(groups);
-  var groupsWithIds = groups.map((variables) => {
-    return variables.map((v) => v["id"]);
-  });
+  const usedColumnNames = chosenVariables.map((e) => e.name);
+  const groupsWithIds = groups.map((variables) => variables.map((v) => v.id));
 
   configuration = buildTSMConfiguration(
     configuration,
@@ -49,7 +44,7 @@ function sendVariableGroups(
 
   $.ajax({
     type: "POST",
-    url: endPoint,
+    url: backend + "/choose-options",
     xhrFields: {
       withCredentials: true,
     },
@@ -57,9 +52,7 @@ function sendVariableGroups(
       configuration: JSON.stringify(configuration),
       columnIds: JSON.stringify(chosenVariables.map((e) => e.idx)),
     },
-    success: (response) => {
-      onSuccess(response);
-    },
+    success: onSuccess,
   });
 }
 
@@ -79,9 +72,7 @@ function sendColumns(chosenColumns, configuration, onSuccess) {
       configuration: JSON.stringify(configuration),
       columnIds: JSON.stringify(chosenColumns.map((e) => e.idx)),
     },
-    success: (response) => {
-      onSuccess(response);
-    },
+    success: onSuccess,
   });
 }
 

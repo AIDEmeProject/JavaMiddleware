@@ -183,8 +183,7 @@ class SessionOptions extends Component {
   }
 
   onLearnerChange(e) {
-    const learner = e.target.value;
-    if (learner === "versionSpace")
+    if (e.target.value === "versionSpace")
       this.setState({ configuration: versionSpaceConfiguration });
     else this.setState({ configuration: simpleMarginConfiguration });
   }
@@ -229,7 +228,7 @@ class SessionOptions extends Component {
   buildDatasetMetadata() {
     return {
       types: this.state.columnTypes.map((e) => e === "categorical"),
-      columnNames: this.state.chosenColumns.map((e) => e["name"]),
+      columnNames: this.state.chosenColumns.map((e) => e.name),
     };
   }
 
