@@ -59,10 +59,12 @@ class ModelBehavior extends Component {
               <div className="form-group">
                 <label htmlFor="xMin">Minimum</label>
                 <input
+                  type="number"
                   id="xMin"
                   data-name="xMin"
                   className="range-input"
                   value={scale.xMin}
+                  step="any"
                   onChange={this.onChangeScale.bind(this)}
                 />
               </div>
@@ -108,8 +110,8 @@ class ModelBehavior extends Component {
                 <input
                   id="yMin"
                   data-name="yMin"
-                  value={scale.yMin}
                   className="range-input"
+                  value={scale.yMin}
                   onChange={this.onChangeScale.bind(this)}
                 />
               </div>
@@ -117,9 +119,10 @@ class ModelBehavior extends Component {
               <div className="form-group">
                 <label htmlFor="yMax">Maximum</label>
                 <input
+                  id="yMax"
                   data-name="yMax"
-                  value={scale.yMax}
                   className="range-input"
+                  value={scale.yMax}
                   onChange={this.onChangeScale.bind(this)}
                 />
               </div>
@@ -465,25 +468,21 @@ class ModelBehavior extends Component {
   }
 
   onChangeScale(e) {
-    var key = e.target.dataset.name;
-    var value = e.target.value;
+    const key = e.target.dataset.name;
+    const value = e.target.value;
 
-    if (!isNaN(value) && value.toString().indexOf(".") != -1) {
-      var newScale = Object.assign({}, this.state.scale, { [key]: value });
-      this.setState({
-        scale: newScale,
-      });
+    if (isNaN(value)) {
+      if (!isNaN(parseFloat(value))) {
+        this.setState({
+          scale: Object.assign({}, this.state.scale, {
+            [key]: parseFloat(value),
+          }),
+        });
+      }
     } else {
-      var newScale = Object.assign({}, this.state.scale, {
-        [key]: parseInt(value),
+      this.setState({
+        scale: Object.assign({}, this.state.scale, { [key]: value }),
       });
-
-      this.setState(
-        {
-          scale: newScale,
-        },
-        this.plotGridPointPlot
-      );
     }
   }
 }
