@@ -24,6 +24,12 @@ import * as d3 from "d3";
 
 import ModelBehaviorPlotter from "./ModelBehaviorPlotter";
 
+const colors = {
+  "-1": "red",
+  "0": "grey",
+  "1": "green",
+};
+
 class ModelBehavior extends Component {
   render() {
     const scale = this.state.scale;
@@ -59,12 +65,10 @@ class ModelBehavior extends Component {
               <div className="form-group">
                 <label htmlFor="xMin">Minimum</label>
                 <input
-                  type="number"
                   id="xMin"
                   data-name="xMin"
                   className="range-input"
                   value={scale.xMin}
-                  step="any"
                   onChange={this.onChangeScale.bind(this)}
                 />
               </div>
@@ -142,7 +146,6 @@ class ModelBehavior extends Component {
         <div className="row">
           <div className="col col-lg-12">
             <h4 className="left-title">Model predictions</h4>
-
             <svg id="model-predictions-grid-point"></svg>
           </div>
         </div>
@@ -150,13 +153,11 @@ class ModelBehavior extends Component {
         {this.props.plotProjection && (
           <div className="row">
             <div className="col-lg-12">
-              {this.props.hasTSM && (
+              {this.props.hasTSM ? (
                 <h4 className="left-title">
                   Polytope model Predictions over projected dataset
                 </h4>
-              )}
-
-              {!this.props.hasTSM && (
+              ) : (
                 <h4 className="left-title">
                   Predictions over projected dataset
                 </h4>
@@ -174,7 +175,6 @@ class ModelBehavior extends Component {
     super(props);
 
     this.state = {
-      modelIteration: 0,
       firstVariable: 0,
       secondVariable: 1,
       scale: {
@@ -183,33 +183,15 @@ class ModelBehavior extends Component {
         yMin: -5,
         yMax: 5,
       },
-      nextScale: {
-        xMin: -5,
-        xMax: -5,
-        yMin: -5,
-        yMax: -5,
-      },
     };
   }
 
-  updateScale() {
-    this.setState({ scale: Object.assign({}, this.state.newScale) });
-  }
-
   componentWillMount() {
-    const hasBehaviorData = this.props.modelPredictionHistory.length > 0;
-
-    if (!hasBehaviorData) {
-      return;
+    if (this.props.modelPredictionHistory.length > 0) {
+      this.setState({
+        scale: this.computeMinMaxOfRawData(),
+      });
     }
-
-    this.setState({
-      scale: this.computeMinMaxOfRawData(),
-    });
-  }
-
-  getIteration() {
-    return this.props.iteration;
   }
 
   componentDidMount() {
@@ -256,64 +238,36 @@ class ModelBehavior extends Component {
   }
 
   plotTSMPredictionsOnGridPoints() {
-    var colors = {
-      "-1": "red",
-      "0": "grey",
-      "1": "green",
-    };
-
-    const scatterPoints = this.getTSMPredictionOverGridPoints();
-    const chosenVariables = this.getChosenVariables();
-    const humanLabeledPoints = this.getHumanLabeledPoints();
-    const scale = this.state.scale;
-
     this.tsmPlotter.plotData(
-      scale,
-      humanLabeledPoints,
-      chosenVariables,
-      scatterPoints,
+      this.state.scale,
+      this.getHumanLabeledPoints(),
+      this.getChosenVariables(),
+      this.getPredictions(this.props.TSMPredictionHistory),
       colors
     );
   }
 
   plotPredictionOnGridPoints() {
-    var colors = {
-      "-1": "red",
-      "0": "grey",
-      "1": "green",
-    };
-
-    const scatterPoints = this.getModelPredictionOverGridPoints();
-
-    const chosenVariables = this.getChosenVariables();
-
-    const humanLabeledPoints = this.getHumanLabeledPoints();
-    const scale = this.state.scale;
-
     this.modelPredictionPlotter.plotData(
-      scale,
-      humanLabeledPoints,
-      chosenVariables,
-      scatterPoints,
+      this.state.scale,
+      this.getHumanLabeledPoints(),
+      this.getChosenVariables(),
+      this.getPredictions(this.props.modelPredictionHistory),
       colors
     );
   }
 
   plotDataEmbbedingPlot() {
-    var colors = {
-      "-1": "red",
-      "0": "grey",
-      "1": "green",
-    };
-
     const embeddings = this.getEmbbedings();
+
     const x = embeddings.map((e) => e[0]);
     const y = embeddings.map((e) => e[1]);
-
     const scale = this.computeMinAndMaxScale(x, y);
+
     const humanLabeledPoints = this.getLabeledEmbedding();
 
     const chosenVariables = [0, 1];
+
     this.projectionPlotter.plotData(
       scale,
       humanLabeledPoints,
@@ -323,32 +277,11 @@ class ModelBehavior extends Component {
     );
   }
 
-  getTSMPredictionOverGridPoints() {
-    const iteration = this.getIteration();
-    const modelPredictions = this.props.TSMPredictionHistory[iteration];
+  getPredictions(predictionHistory) {
     const grid = this.props.fakePointGrid;
+    const predictions = predictionHistory[this.getIteration()];
 
-    const vars = this.getChosenVariables();
-    const iColOne = vars[0];
-    const iColTwo = vars[1];
-
-    const gridPoints = d3.zip(grid, modelPredictions).map((e) => {
-      const gridPoint = e[0];
-      const prediction = e[1];
-
-      return [gridPoint[iColOne], gridPoint[iColTwo], prediction.label];
-    });
-
-    return gridPoints;
-  }
-
-  getModelPredictionOverGridPoints() {
-    const grid = this.props.fakePointGrid;
-    const modelPredictions = this.props.modelPredictionHistory[
-      this.getIteration()
-    ];
-
-    const scatter = d3.zip(grid, modelPredictions).map((e) => {
+    const gridPoints = d3.zip(grid, predictions).map((e) => {
       const gridPoint = e[0];
       const prediction = e[1];
       return [
@@ -358,64 +291,51 @@ class ModelBehavior extends Component {
       ];
     });
 
-    return scatter;
+    return gridPoints;
   }
 
   getEmbbedings() {
-    const iteration = this.getIteration();
-
-    return this.props.projectionHistory[iteration].embedding;
+    return this.props.projectionHistory[this.getIteration()].embedding;
   }
 
   getHumanLabeledPoints() {
-    const labeledPoints = this.props.labeledPoints.filter((e, i) => {
-      return i <= this.getIteration();
-    });
-
-    // labeledPoints = labeledPoints.map((e) => {
-    //   var v = e.data;
-    //   v.push(e.label);
-    //   return v;
-    // });
-    const formattedLabeledPoints = labeledPoints.map((point) => {
-      const row = this.props.fakePointGrid[point.id];
-      return [
-        row[this.state.firstVariable],
-        row[this.state.secondVariable],
-        point.label,
-      ];
-    });
-
+    const formattedLabeledPoints = this.props.labeledPoints
+      .slice(0, this.getIteration() + 1)
+      .map((point) => {
+        const row = this.props.fakePointGrid[point.id];
+        return [
+          row[this.state.firstVariable],
+          row[this.state.secondVariable],
+          point.label,
+        ];
+      });
     return formattedLabeledPoints;
   }
 
   getLabeledEmbedding() {
     const embeddings = this.getEmbbedings();
-    const iteration = this.getIteration();
-
-    const labeledPoints = this.props.labeledPoints.filter((e, i) => {
-      return i <= iteration;
-    });
-
-    const labeledEmbeddings = labeledPoints
-      .map((e) => {
-        return embeddings[e.id];
-      })
-      .filter((e) => {
-        return typeof e !== "undefined";
-      });
-
+    const labeledEmbeddings = this.props.labeledPoints
+      .slice(0, this.getIteration() + 1)
+      .map((e) => embeddings[e.id])
+      .filter((e) => typeof e !== "undefined");
     return labeledEmbeddings;
   }
 
-  computeMinMaxOfRawData() {
-    const grid = this.getModelPredictionOverGridPoints();
+  getIteration() {
+    return this.props.iteration;
+  }
 
+  getChosenVariables() {
+    return [this.state.firstVariable, this.state.secondVariable];
+  }
+
+  computeMinMaxOfRawData() {
+    const grid = this.getPredictions(this.props.modelPredictionHistory);
     const offset = {
       x: 0,
       y: 0,
     };
-    var scale = this.computeMinAndMaxScale(
+    const scale = this.computeMinAndMaxScale(
       grid.map((e) => e[0]),
       grid.map((e) => e[1]),
       offset
@@ -424,38 +344,31 @@ class ModelBehavior extends Component {
   }
 
   computeMinAndMaxScale(xValues, yValues, offset = { x: 0, y: 0 }) {
-    var scale = {
+    const scale = {
       xMin: d3.min(xValues) - offset.x,
       xMax: d3.max(xValues) + offset.x,
       yMin: d3.min(yValues) - offset.y,
       yMax: d3.max(yValues) + offset.y,
     };
-
     return scale;
   }
 
-  getChosenVariables() {
-    const variables = [this.state.firstVariable, this.state.secondVariable];
-    return variables;
-  }
-
   firstVariableChanged(e) {
-    var firstVariable = parseInt(e.target.value);
-
-    var newState = {
-      firstVariable: firstVariable,
-    };
-
-    this.setState(newState, this.variableToDisplayChanged);
+    this.setState(
+      {
+        firstVariable: parseInt(e.target.value),
+      },
+      this.variableToDisplayChanged
+    );
   }
 
   secondVariableChanged(e) {
-    var secondVariable = parseInt(e.target.value);
-    var newState = {
-      secondVariable: secondVariable,
-    };
-
-    this.setState(newState, this.variableToDisplayChanged);
+    this.setState(
+      {
+        secondVariable: parseInt(e.target.value),
+      },
+      this.variableToDisplayChanged
+    );
   }
 
   variableToDisplayChanged() {

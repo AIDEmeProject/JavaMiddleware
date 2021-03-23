@@ -221,13 +221,13 @@ class QueryTrace extends Component {
                       <ModelBehavior
                         availableVariables={this.state.availableVariables}
                         labeledPoints={this.state.allLabeledPoints}
-                        projectionHistory={this.state.projectionHistory}
                         fakePointGrid={this.state.fakePointGrid}
+                        projectionHistory={this.state.projectionHistory}
                         modelPredictionHistory={
                           this.state.modelPredictionHistory
                         }
-                        iteration={iteration}
                         TSMPredictionHistory={this.state.TSMPredictionHistory}
+                        iteration={iteration}
                         hasTSM={this.state.useTSM}
                         plotLabels={false}
                         realDataset={true}
