@@ -31,12 +31,12 @@ class ModelBehaviorPlotter {
   }
 
   createPlot(svgId, scale) {
-    // set the dimensions and margins of the graph
-    var margin = { top: 40, right: 20, bottom: 50, left: 80 },
-      width = 600 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+    // Set the dimensions and margins of the graph
+    var margin = { top: 40, right: 20, bottom: 50, left: 80 };
+    var width = 600 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
+    // Append the svg object to the body of the page
     var svg = d3
       .select(svgId)
       .attr("width", width + margin.left + margin.right)
@@ -58,8 +58,9 @@ class ModelBehaviorPlotter {
     this.width = width;
     this.height = height;
 
-    var { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax } = scale;
+    var { xMin, xMax, yMin, yMax } = scale;
 
+    // Add X axis
     var x = d3
       .scaleLinear()
       .domain([xMin, xMax])
@@ -71,7 +72,6 @@ class ModelBehaviorPlotter {
       .scaleLinear()
       .domain([yMin, yMax])
       .range([height, 0]);
-
     this.y = y;
 
     this.xAxis = svg
@@ -79,6 +79,7 @@ class ModelBehaviorPlotter {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x));
 
+    // Text label for the x axis
     this.xLabel = d3
       .select(svgId)
       .append("text")
@@ -90,7 +91,7 @@ class ModelBehaviorPlotter {
       .style("fill", "black")
       .text("Variable 1");
 
-    // text label for the y axis
+    // Text label for the y axis
     this.yLabel = svg
       .append("text")
       .attr("transform", "rotate(-90)")
@@ -138,7 +139,6 @@ class ModelBehaviorPlotter {
   }
 
   plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors) {
-    const svg = this.svg;
     const x = this.x;
     const y = this.y;
 
@@ -200,7 +200,9 @@ class ModelBehaviorPlotter {
       .style("fill", function(d) {
         return colors[d[2]];
       })
-      .style("opacity", 0.4)
+      .style("opacity", function(d) {
+        return d[2] === 1 ? 1 : 0.2;
+      })
       .style("stroke", "white");
 
     if (this.plotLabels) {
@@ -208,8 +210,8 @@ class ModelBehaviorPlotter {
         .selectAll("circle")
         .data(humanLabeledPoints);
 
-      const var1 = chosenVariables[0],
-        var2 = chosenVariables[1];
+      const var1 = chosenVariables[0];
+      const var2 = chosenVariables[1];
 
       updateHumanLabels
         .enter()
@@ -224,10 +226,10 @@ class ModelBehaviorPlotter {
         })
         .attr("r", 7)
         .style("fill", function(d) {
-          return d[2] == 1 ? "green" : "red";
+          return d[2] === 1 ? "green" : "red";
         })
         .style("stroke", function(d) {
-          return d[2] == 1 ? "green" : "red";
+          return d[2] === 1 ? "green" : "red";
         });
 
       updateHumanLabels.exit().remove();
@@ -239,10 +241,10 @@ class ModelBehaviorPlotter {
     const yLabel = this.columnNames[chosenColumns[1]];
 
     this.xLabel.text(xLabel);
-
     this.yLabel.text(yLabel);
 
     const transitionLength = 200;
+
     x.domain([scale.xMin, scale.xMax]);
     this.xAxis
       .transition()
