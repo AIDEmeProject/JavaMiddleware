@@ -367,8 +367,32 @@ class QueryTrace extends Component {
   }
 
   onValidateTrace() {
-    this.loadDataset();
-    this.loadF1Score();
+    this.validateInputs(() => {
+      this.loadDataset();
+      this.loadF1Score();
+    });
+  }
+
+  validateInputs(onInputsValid) {
+    const inputIds = ["dataset", "trace", "trace-columns", "f1-score"];
+    const inputNames = ["dataset", "trace", "trace columns", "f1 score"];
+
+    var missingInputs = [];
+    inputIds.forEach((inputId, idx) => {
+      if (document.getElementById(inputId).files.length === 0)
+        missingInputs.push(inputNames[idx]);
+    });
+
+    if (missingInputs.length !== 0) {
+      alert(
+        `Please select the following ${
+          missingInputs.length === 1 ? "file" : "files"
+        }: ${missingInputs.join(", ")}`
+      );
+      return;
+    }
+
+    onInputsValid();
   }
 
   loadF1Score() {

@@ -23,11 +23,9 @@ import React, { Component } from "react";
 import axios from "axios";
 
 import { backend } from "../../constants/constants";
-import loadCSVFromInputFile from "../../lib/data_utils";
+import loadFileFromInputFile from "../../lib/data_utils";
 
 function uploadFile(event, onSuccess) {
-  var endPoint = backend + "/new-session";
-
   var file = document.querySelector("form input[type=file]").files[0];
 
   if (!file) {
@@ -40,7 +38,7 @@ function uploadFile(event, onSuccess) {
   formData.append("separator", document.getElementById("csv-separator").value);
 
   axios
-    .post(endPoint, formData, {
+    .post(backend + "/new-session", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -59,7 +57,7 @@ class NewSession extends Component {
     event.preventDefault();
     uploadFile(event, this.props.fileUploaded);
 
-    loadCSVFromInputFile("dataset", this.props.onDatasetLoaded);
+    loadFileFromInputFile("dataset", this.props.onDatasetLoaded);
   }
 
   render() {
@@ -85,19 +83,17 @@ class NewSession extends Component {
 
               <h6>2. Choose the separator</h6>
               <p>CSV, TSV and Semi-colon separators are supported.</p>
-              <div className="row g-2 align-items-center">
-                <div className="col-auto">
-                  <label htmlFor="separator" className="col-form-label">
-                    Separator
-                  </label>
-                </div>
-                <div className="col-auto">
-                  <select id="csv-separator" name="separator">
-                    <option value=",">Comma ","</option>
-                    <option value="\t">Tab</option>
-                    <option value=";">Semi-colon ";"</option>
-                  </select>
-                </div>
+              <div className="form-group">
+                <label htmlFor="separator">Separator</label>
+                <select
+                  className="form-control"
+                  id="csv-separator"
+                  name="separator"
+                >
+                  <option value=",">Comma ","</option>
+                  <option value="\t">Tab</option>
+                  <option value=";">Semi-colon ";"</option>
+                </select>
               </div>
 
               <div className="form-group bmd-form-group">
