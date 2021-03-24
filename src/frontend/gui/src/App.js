@@ -86,7 +86,7 @@ class App extends Component {
       return (
         <NewSession
           fileUploaded={this.fileUploaded.bind(this)}
-          onDatasetLoaded={this.onDatasetLoaded.bind(this)}
+          datasetLoaded={this.datasetLoaded.bind(this)}
         />
       );
     }
@@ -204,11 +204,12 @@ class App extends Component {
     this.setState({ step: NEW_SESSION });
   }
 
-  onDatasetLoaded(event) {
-    var csv = d3.csvParse(event.target.result);
+  datasetLoaded(dsv, separator) {
+    const sep = (separator !== ",") & (separator !== ";") ? "\t" : separator;
+    const parsed_rows = d3.dsvFormat(sep).parse(dsv);
 
     this.setState({
-      dataset: new Dataset(csv),
+      dataset: new Dataset(parsed_rows),
     });
   }
 

@@ -25,17 +25,10 @@ import axios from "axios";
 import { backend } from "../../constants/constants";
 import loadFileFromInputFile from "../../lib/data_utils";
 
-function uploadFile(event, onSuccess) {
-  var file = document.querySelector("form input[type=file]").files[0];
-
-  if (!file) {
-    alert("Please select a file");
-    return;
-  }
-
+function uploadFile(file, separator, onSuccess) {
   var formData = new FormData();
   formData.append("dataset", file);
-  formData.append("separator", document.getElementById("csv-separator").value);
+  formData.append("separator", separator);
 
   axios
     .post(backend + "/new-session", formData, {
@@ -55,9 +48,20 @@ function uploadFile(event, onSuccess) {
 class NewSession extends Component {
   handleSubmit(event) {
     event.preventDefault();
-    uploadFile(event, this.props.fileUploaded);
 
-    loadFileFromInputFile("dataset", this.props.onDatasetLoaded);
+    const file = document.querySelector("form input[type=file]").files[0];
+    const separator = document.getElementById("csv-separator").value;
+
+    if (!file) {
+      alert("Please select a file");
+      return;
+    }
+
+    uploadFile(file, separator, this.props.fileUploaded);
+
+    loadFileFromInputFile("dataset", (event) => {
+      this.props.datasetLoaded(event.target.result, separator);
+    });
   }
 
   render() {
