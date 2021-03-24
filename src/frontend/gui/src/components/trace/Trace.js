@@ -222,7 +222,7 @@ class QueryTrace extends Component {
                         availableVariables={this.state.availableVariables}
                         labeledPoints={this.state.allLabeledPoints}
                         fakePointGrid={this.state.fakePointGrid}
-                        projectionHistory={this.state.projectionHistory}
+                        // projectionHistory={this.state.projectionHistory}
                         modelPredictionHistory={
                           this.state.modelPredictionHistory
                         }
@@ -310,7 +310,7 @@ class QueryTrace extends Component {
       fakePointGrid: [],
       TSMPredictionHistory: [],
       modelPredictionHistory: [],
-      projectionHistory: [],
+      // projectionHistory: [],
 
       allLabeledPoints: [],
 
@@ -443,10 +443,6 @@ class QueryTrace extends Component {
         trace = TraceDataset.buildFromLoadedInput(fileContent, isCsv);
       }
 
-      //var encodedColumnNames = trace.get_column_names_from_ids(this.state.traceColumns.rawDataset)
-      //console.log(encodedColumnNames, this.state.traceColumns.encodedDataset)
-      //trace.set_column_names_selected_by_user(encodedColumnNames)
-
       this.setState(
         {
           traceDataset: trace,
@@ -572,8 +568,7 @@ class QueryTrace extends Component {
 
     // const newProjectionHistory = [
     //   ...this.state.projectionHistory,
-    //   response.projectionPredictions,
-    //   // JSON.parse(response.projectionPredictions),
+    //   JSON.parse(response.projectionPredictions),
     // ];
 
     const modelPredictions = response.labeledPointsOverGrid.map((point) => ({
