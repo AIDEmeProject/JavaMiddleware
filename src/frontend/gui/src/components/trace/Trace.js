@@ -387,7 +387,7 @@ class QueryTrace extends Component {
       alert(
         `Please select the following ${
           missingInputs.length === 1 ? "file" : "files"
-        }: ${missingInputs.join(", ")}`
+        }: ${missingInputs.join(", ")}.`
       );
       return;
     }
@@ -683,6 +683,11 @@ class QueryTrace extends Component {
   }
 
   loadTrace() {
+    if (document.getElementById("load-trace").files.length === 0) {
+      alert("Please select a trace file.");
+      return;
+    }
+
     loadFileFromInputFile("load-trace", (event) => {
       var state = JSON.parse(event.target.result);
       var dataset = state.dataset;
