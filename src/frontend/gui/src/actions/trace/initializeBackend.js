@@ -23,19 +23,13 @@ import { backend } from "../../constants/constants";
 import $ from "jquery";
 
 function initializeBackend(traceOptions, onSuccess) {
-  const {
-    algorithm,
-    configuration,
-    columnIds,
-    encodedDatasetName,
-  } = traceOptions;
+  const { configuration, columnIds, encodedDatasetName } = traceOptions;
 
   $.ajax({
     type: "POST",
     dataType: "JSON",
     url: backend + "/start-trace",
     data: {
-      algorithm,
       configuration: JSON.stringify(configuration),
       columnIds: JSON.stringify(columnIds),
       encodedDatasetName,

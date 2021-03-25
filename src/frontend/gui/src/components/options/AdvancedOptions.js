@@ -19,28 +19,20 @@
  */
 
 import React, { Component } from "react";
-
-import isSimpleMargin from "../../utils/isSimpleMargin";
+import LearnerOptions from "./LearnerOptions";
+import { learnersInInteractiveSession } from "../../constants/constants";
 
 class AdvancedOptions extends Component {
   render() {
-    const activeLearners = [
-      {
-        value: "simpleMargin",
-        label: "Simple Margin",
-        selected: isSimpleMargin(this.props.configuration),
-      },
-      {
-        value: "versionSpace",
-        label: "Version Space",
-        selected: !isSimpleMargin(this.props.configuration),
-      },
-    ];
-
     return (
       <div className="row">
         <div className="col col-lg-6 offset-lg-3">
-          <div className="form-group">
+          <LearnerOptions
+            learners={learnersInInteractiveSession}
+            selected={this.props.learner}
+            learnerChanged={this.props.learnerChanged}
+          />
+          {/* <div className="form-group">
             <label htmlFor="algorithm-selection">Learner</label>
             <select
               className="form-control"
@@ -48,17 +40,17 @@ class AdvancedOptions extends Component {
               name="active-learner"
               onChange={this.props.onLearnerChange}
             >
-              {activeLearners.map((learner, idx) => (
+              {learnersInInteractiveSession.map((learner, idx) => (
                 <option
                   key={`learner-${idx}`}
                   value={learner.value}
-                  selected={learner.selected}
+                  selected={learner.value === this.props.learner}
                 >
                   {learner.label}
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
         </div>
       </div>
     );

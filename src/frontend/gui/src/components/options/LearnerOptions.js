@@ -20,30 +20,26 @@
 
 import React, { Component } from "react";
 
-class LearnerOption extends Component {
+class LearnerOptions extends Component {
   render() {
     return (
       <div className="form-group">
         <label htmlFor="algorithm-selection">Learner</label>
         <select
-          onChange={this.onLearnerChange.bind(this)}
           className="form-control"
           id="algorithm-selection"
           name="active-learner"
+          onChange={this.onLearnerChange.bind(this)}
         >
-          <option value="simplemargin" defaultValue>
-            Simple margin (SVM)
-          </option>
-
-          <option value="simplemargintsm" defaultValue>
-            Simple margin (SVM) + TSM
-          </option>
-
-          <option value="versionspace">Version Space</option>
-
-          <option value="factorizedversionspace">
-            Factorized Version Space
-          </option>
+          {this.props.learners.map((learner, idx) => (
+            <option
+              key={`learner-${idx}`}
+              value={learner.value}
+              selected={learner.value === this.props.selected}
+            >
+              {learner.label}
+            </option>
+          ))}
         </select>
       </div>
     );
@@ -54,4 +50,4 @@ class LearnerOption extends Component {
   }
 }
 
-export default LearnerOption;
+export default LearnerOptions;

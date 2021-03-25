@@ -21,8 +21,11 @@
 import React, { Component } from "react";
 
 import {
+  SIMPLE_MARGIN,
   simpleMarginConfiguration,
   versionSpaceConfiguration,
+  factorizedDualSpaceConfiguration,
+  factorizedVersionSpaceConfiguration,
 } from "../../constants/constants";
 import actions from "../../actions/sendChosenColumns";
 
@@ -55,7 +58,7 @@ class SessionOptions extends Component {
       checkboxes: datasetInfos.columns.map((c) => false),
       chosenColumns: chosenColumns,
 
-      configuration: simpleMarginConfiguration,
+      learner: SIMPLE_MARGIN,
     };
   }
 
@@ -131,8 +134,8 @@ class SessionOptions extends Component {
 
           {this.state.showAdvancedOptions && (
             <AdvancedOptions
-              configuration={this.state.configuration}
-              onLearnerChange={this.onLearnerChange.bind(this)}
+              learner={this.state.learner}
+              learnerChanged={this.learnerChanged.bind(this)}
             />
           )}
         </form>
@@ -182,47 +185,48 @@ class SessionOptions extends Component {
     });
   }
 
-  onLearnerChange(e) {
-    if (e.target.value === "versionSpace")
-      this.setState({ configuration: versionSpaceConfiguration });
-    else this.setState({ configuration: simpleMarginConfiguration });
+  learnerChanged(newLearner) {
+    this.setState({ learner: newLearner });
   }
 
   onSessionStartClick(e) {
-    var chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
+    const chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
+
+    const configuration =
+      this.state.learner === SIMPLE_MARGIN
+        ? simpleMarginConfiguration
+        : versionSpaceConfiguration;
 
     actions.sendColumns(
       chosenColumns,
-      this.state.configuration,
+      configuration,
       this.props.sessionWasStarted
     );
 
-    this.props.sessionOptionsWereChosen(
-      chosenColumns,
-      this.state.configuration
-    );
+    this.props.sessionOptionsWereChosen(chosenColumns, configuration);
   }
 
   onValidateGroupsClick(groups) {
-    var chosenColumns = groups.flatMap((g) => [...g]); // columns may be repeated
+    const chosenColumns = groups.flatMap((g) => [...g]); // columns may be repeated
 
     this.computeVariableColumnIndices(groups);
 
-    var datasetMetadata = this.buildDatasetMetadata();
+    const datasetMetadata = this.buildDatasetMetadata();
+
+    const configuration =
+      this.state.learner === SIMPLE_MARGIN
+        ? factorizedDualSpaceConfiguration
+        : factorizedVersionSpaceConfiguration;
 
     actions.sendVariableGroups(
       chosenColumns,
       groups,
       datasetMetadata,
-      this.state.configuration,
+      configuration,
       this.props.sessionWasStarted
     );
 
-    this.props.groupsWereValidated(
-      chosenColumns,
-      groups,
-      this.state.configuration
-    );
+    this.props.groupsWereValidated(chosenColumns, groups, configuration);
   }
 
   buildDatasetMetadata() {

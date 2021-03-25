@@ -19,18 +19,14 @@
  */
 
 function buildTSMConfiguration(
-  baseConfiguration,
   groupsWithIds,
   usedColumnNames,
   datasetMetadata
 ) {
   return {
-    ...baseConfiguration,
     multiTSM: {
-      hasTsm: true,
       searchUnknownRegionProbability: 0.5,
       columns: usedColumnNames,
-      decompose: true,
       flags: buildFlagsFromColumnTypes(groupsWithIds, datasetMetadata.types),
       featureGroups: buildGroupsFromJson(
         groupsWithIds,

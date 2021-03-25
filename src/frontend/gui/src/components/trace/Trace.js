@@ -24,14 +24,17 @@ import React, { Component } from "react";
 
 import TSMPredictionStatistics from "../exploration/TSM/TSMPredictionStatistics";
 
-import { algorithmNames } from "../../constants/constants";
+import {
+  learnersInTraceSession,
+  SIMPLE_MARGIN,
+} from "../../constants/constants";
 import loadFileFromInputFile from "../../lib/data_utils";
 import TSMTraceDataset from "../../model/TSMTraceDataset";
 import TraceDataset from "../../model/TraceDataset";
 import Dataset from "../../model/Dataset";
 
 import LabelInfos from "../visualisation/LabelInfos";
-import LearnerOption from "../options/LearnerOption";
+import LearnerOptions from "../options/LearnerOptions";
 
 import DataPoints from "../DataPoints";
 import ModelBehavior from "../visualisation/ModelBehavior";
@@ -45,9 +48,9 @@ import jobDatasetMetadata from "./jobColumns";
 
 import buildTSMConfiguration from "../../lib/buildTSMConfiguration";
 import {
-  simpleMarginConfiguration,
-  versionSpaceConfiguration,
-  factorizedVersionSpaceConfiguration,
+  allLearnerConfigurations,
+  FACTORIZED_DUAL_SPACE_MODEL,
+  FACTORIZED_VERSION_SPACE,
 } from "../../constants/constants";
 import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
 
@@ -57,7 +60,9 @@ const ENCODED_DATASET_NAME = "cars_encoded.csv";
 
 class QueryTrace extends Component {
   render() {
-    const algorithm = algorithmNames[this.state.algorithm];
+    const algorithm = learnersInTraceSession.find(
+      (learner) => learner.value === this.state.algorithm
+    ).label;
     const iteration = this.state.iteration;
 
     return (
@@ -114,7 +119,9 @@ class QueryTrace extends Component {
                     ></input>
                   </p>
 
-                  <LearnerOption
+                  <LearnerOptions
+                    learners={learnersInTraceSession}
+                    selected={this.state.algorithm}
                     learnerChanged={this.learnerChanged.bind(this)}
                   />
 
@@ -313,7 +320,7 @@ class QueryTrace extends Component {
 
       allLabeledPoints: [],
 
-      algorithm: "simplemargin",
+      algorithm: SIMPLE_MARGIN,
       useTSM: false,
       useFactorizedInformation: false,
     };
@@ -357,10 +364,10 @@ class QueryTrace extends Component {
 
   learnerChanged(algorithm) {
     this.setState({
-      useTSM: algorithm === "simplemargintsm",
+      useTSM: algorithm === FACTORIZED_DUAL_SPACE_MODEL,
       useFactorizedInformation:
-        algorithm === "simplemargintsm" ||
-        algorithm === "factorizedversionspace",
+        algorithm === FACTORIZED_DUAL_SPACE_MODEL ||
+        algorithm === FACTORIZED_VERSION_SPACE,
       algorithm,
     });
   }
@@ -477,7 +484,7 @@ class QueryTrace extends Component {
 
   initializeBackend() {
     var options = {
-      algorithm: this.state.algorithm,
+      // algorithm: this.state.algorithm,
       columnIds: this.state.traceColumns.encodedDataset,
       encodedDatasetName: ENCODED_DATASET_NAME,
       configuration: this.buildConfiguration(),
@@ -495,14 +502,7 @@ class QueryTrace extends Component {
   }
 
   buildConfiguration() {
-    const configurations = {
-      simplemargin: simpleMarginConfiguration,
-      simplemargintsm: simpleMarginConfiguration,
-      versionspace: versionSpaceConfiguration,
-      factorizedversionspace: factorizedVersionSpaceConfiguration,
-    };
-
-    var configuration = configurations[this.state.algorithm];
+    var configuration = allLearnerConfigurations[this.state.algorithm];
 
     if (this.state.useFactorizedInformation) {
       const datasetMetadata = this.getDatasetMetadata();
@@ -513,16 +513,13 @@ class QueryTrace extends Component {
 
       const factorizationGroups = this.state.traceColumns.factorizationGroups;
 
-      configuration = buildTSMConfiguration(
-        configuration,
+      const TSMConfiguration = buildTSMConfiguration(
         factorizationGroups,
         usedColumnNames,
         datasetMetadata
       );
 
-      if (this.state.algorithm === "factorizedversionspace") {
-        configuration = this.buildFactorizedVersionSpaceGroup(configuration);
-      }
+      return { ...configuration, ...TSMConfiguration };
     }
 
     return configuration;
@@ -534,20 +531,6 @@ class QueryTrace extends Component {
     } else {
       return jobDatasetMetadata;
     }
-  }
-
-  buildFactorizedVersionSpaceGroup(configuration) {
-    var categorical = [];
-    configuration.multiTSM.flags.forEach((flag, i) => {
-      if (flag[1]) {
-        categorical.push(i);
-      }
-    });
-
-    configuration.activeLearner.categorical = categorical;
-    configuration.activeLearner.repeat = this.state.traceColumns.factorizationGroups.length;
-    configuration.multiTSM.hasTsm = false;
-    return configuration;
   }
 
   traceBackendWasInitialized() {

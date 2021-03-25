@@ -18,101 +18,101 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-var factorizedVersionSpaceConfiguration = {
-  activeLearner: {
-    learner: {
-      name: "MajorityVote",
-      sampleSize: 8,
-      versionSpace: {
-        addIntercept: true,
-        decompose: false,
-        hitAndRunSampler: {
-          cache: true,
-          rounding: true,
-          roundingCache: false,
-          selector: {
-            name: "WarmUpAndThin",
-            thin: 64,
-            warmUp: 256,
-          },
-        },
-        jitter: 1e-9,
-        kernel: {
-          gamma: 0,
-          name: "gaussian",
-        },
-        solver: "ojalgo",
-      },
-    },
-    lossFunctionId: "GREEDY",
-    name: "SubspatialSampler",
+export const SIMPLE_MARGIN = "SimpleMargin";
+export const VERSION_SPACE = "VersionSpace";
+export const FACTORIZED_DUAL_SPACE_MODEL = "FactorizedDualSpaceModel";
+export const FACTORIZED_VERSION_SPACE = "SubspatialVersionSpace";
+
+export const simpleMarginConfiguration = {
+  name: SIMPLE_MARGIN,
+  params: {
+    C: 100000.0,
   },
-  subsampleSize: 50000,
-  task: "sdss_overlapping_0.1%",
-  useFactorizationInformation: true,
 };
 
-var versionSpaceConfiguration = {
-  activeLearner: {
-    learner: {
-      name: "MajorityVote", // MajorityVote | SVM |
-      sampleSize: 8, // Only for MajorityVote : >= 1
-      versionSpace: {
-        addIntercept: true,
-        hitAndRunSampler: {
-          cache: true,
-          rounding: true,
-          selector: {
-            name: "WarmUpAndThin", // Only For Majority Vote
-            thin: 10,
-            warmUp: 100,
-          },
-        },
-        kernel: {
-          name: "gaussian",
-        },
-        solver: "ojalgo",
-      },
-    },
-    name: "UncertaintySampler", //Version space = uncertainty sampler
-  },
-  subsampleSize: 50000,
-  task: "sdss_Q4_0.1%",
-};
-
-var simpleMarginConfiguration = {
-  activeLearner: {
-    name: "SimpleMargin",
-    svmLearner: {
-      C: 1024,
-      kernel: {
-        gamma: 0,
-        name: "gaussian",
-      },
-      name: "SVM",
+export const versionSpaceConfiguration = {
+  name: VERSION_SPACE,
+  params: {
+    decompose: true,
+    n_samples: 16,
+    warmup: 100,
+    thin: 100,
+    rounding: true,
+    rounding_cache: true,
+    rounding_options: {
+      strategy: "opt",
+      z_cut: true,
+      sphere_cuts: true,
     },
   },
-  subsampleSize: 50000,
-  useFactorizationInformation: false,
 };
 
-var algorithmNames = {
-  simplemargin: "Simple Margin (SVM)",
-  simplemargintsm: "Simple Margin (SVM) + TSM",
-  versionspace: "Version Space",
-  factorizedversionspace: "Factorized Version Space",
+export const factorizedDualSpaceConfiguration = {
+  name: FACTORIZED_DUAL_SPACE_MODEL,
+  params: {
+    active_learner: {
+      name: "SimpleMargin",
+      params: {
+        C: 100000.0,
+      },
+    },
+  },
 };
 
-module.exports = {
-  backend: "http://localhost:7060",
-  webplatformApi: "http://localhost:8000/api",
-  defaultConfiguration: versionSpaceConfiguration,
-
-  versionSpaceConfiguration: versionSpaceConfiguration,
-
-  simpleMarginConfiguration: simpleMarginConfiguration,
-
-  factorizedVersionSpaceConfiguration: factorizedVersionSpaceConfiguration,
-
-  algorithmNames: algorithmNames,
+export const factorizedVersionSpaceConfiguration = {
+  name: FACTORIZED_VERSION_SPACE,
+  params: {
+    loss: "PRODUCT",
+    decompose: true,
+    n_samples: 16,
+    warmup: 100,
+    thin: 100,
+    rounding: true,
+    rounding_cache: true,
+    rounding_options: {
+      strategy: "opt",
+      z_cut: true,
+      sphere_cuts: true,
+    },
+  },
 };
+
+export const allLearnerConfigurations = {
+  [SIMPLE_MARGIN]: simpleMarginConfiguration,
+  [VERSION_SPACE]: versionSpaceConfiguration,
+  [FACTORIZED_DUAL_SPACE_MODEL]: factorizedDualSpaceConfiguration,
+  [FACTORIZED_VERSION_SPACE]: factorizedVersionSpaceConfiguration,
+};
+
+export const learnersInTraceSession = [
+  {
+    value: SIMPLE_MARGIN,
+    label: "Simple Margin (SVM)",
+  },
+  {
+    value: FACTORIZED_DUAL_SPACE_MODEL,
+    label: "Simple Margin (SVM) + TSM",
+  },
+  {
+    value: VERSION_SPACE,
+    label: "Version Space",
+  },
+  {
+    value: FACTORIZED_VERSION_SPACE,
+    label: "Factorized Version Space",
+  },
+];
+
+export const learnersInInteractiveSession = [
+  {
+    value: SIMPLE_MARGIN,
+    label: "Simple Margin",
+  },
+  {
+    value: VERSION_SPACE,
+    label: "Version Space",
+  },
+];
+
+export const backend = "http://localhost:7060";
+export const webplatformApi = "http://localhost:8000/api";

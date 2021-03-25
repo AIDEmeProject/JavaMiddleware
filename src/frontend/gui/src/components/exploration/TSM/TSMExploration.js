@@ -33,9 +33,11 @@ import getGridPoints from "../../../actions/getGridPoints";
 import getTSMPredictions from "../../../actions/getTSMPredictionsOverGridPoints";
 import getModelPredictionsOverGridPoints from "../../../actions/getModelPredictionsOverGridPoints";
 
-import isSimpleMargin from "../../../utils/isSimpleMargin";
-
-import { backend, webplatformApi } from "../../../constants/constants";
+import {
+  backend,
+  webplatformApi,
+  FACTORIZED_DUAL_SPACE_MODEL,
+} from "../../../constants/constants";
 
 import robot from "../../../resources/robot.png";
 
@@ -375,7 +377,7 @@ class TSMExploration extends Component {
   }
 
   _getModelBoundaries() {
-    if (isSimpleMargin(this.props.configuration)) {
+    if (this.props.configuration.name === FACTORIZED_DUAL_SPACE_MODEL) {
       getTSMPredictions((predictedLabels) => {
         this.setState({
           TSMPredictionHistory: [

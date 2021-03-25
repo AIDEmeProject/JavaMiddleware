@@ -33,8 +33,7 @@ function sendVariableGroups(
   const usedColumnNames = chosenVariables.map((e) => e.name);
   const groupsWithIds = groups.map((variables) => variables.map((v) => v.id));
 
-  configuration = buildTSMConfiguration(
-    configuration,
+  const TSMConfiguration = buildTSMConfiguration(
     groupsWithIds,
     usedColumnNames,
     datasetMetadata
@@ -49,7 +48,7 @@ function sendVariableGroups(
       withCredentials: true,
     },
     data: {
-      configuration: JSON.stringify(configuration),
+      configuration: JSON.stringify({ ...configuration, ...TSMConfiguration }),
       columnIds: JSON.stringify(chosenVariables.map((e) => e.idx)),
     },
     success: onSuccess,
