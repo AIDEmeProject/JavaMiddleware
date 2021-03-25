@@ -20,7 +20,7 @@
 
 var factorizedVersionSpaceConfiguration = {
   activeLearner: {
-    learners: {
+    learner: {
       name: "MajorityVote",
       sampleSize: 8,
       versionSpace: {

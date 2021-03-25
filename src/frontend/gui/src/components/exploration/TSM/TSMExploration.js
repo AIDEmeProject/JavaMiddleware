@@ -85,7 +85,7 @@ class TSMExploration extends Component {
                   })
                 }
               >
-                Labeleling
+                Labeling
               </a>
             </li>
 
