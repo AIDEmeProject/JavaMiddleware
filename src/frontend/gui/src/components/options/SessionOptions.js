@@ -26,8 +26,9 @@ import {
   versionSpaceConfiguration,
   factorizedDualSpaceConfiguration,
   factorizedVersionSpaceConfiguration,
+  subsampling,
 } from "../../constants/constants";
-import actions from "../../actions/sendChosenColumns";
+import sendConfiguration from "../../actions/sendConfiguration";
 
 import AttributeSelection from "./AttributeSelection";
 import GroupVariables from "./GroupVariables";
@@ -192,12 +193,13 @@ class SessionOptions extends Component {
   onSessionStartClick(e) {
     const chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
 
-    const configuration =
+    const activeLearner =
       this.state.learner === SIMPLE_MARGIN
         ? simpleMarginConfiguration
         : versionSpaceConfiguration;
+    const configuration = { activeLearner, subsampling };
 
-    actions.sendColumns(
+    sendConfiguration(
       chosenColumns,
       configuration,
       this.props.sessionWasStarted
@@ -211,29 +213,24 @@ class SessionOptions extends Component {
 
     this.computeVariableColumnIndices(groups);
 
-    const datasetMetadata = this.buildDatasetMetadata();
-
-    const configuration =
+    const activeLearner =
       this.state.learner === SIMPLE_MARGIN
         ? factorizedDualSpaceConfiguration
         : factorizedVersionSpaceConfiguration;
+    const partition = groups.map((variables) => variables.map((v) => v.id));
+    const configuration = {
+      activeLearner,
+      subsampling,
+      factorization: { partition },
+    };
 
-    actions.sendVariableGroups(
+    sendConfiguration(
       chosenColumns,
-      groups,
-      datasetMetadata,
       configuration,
       this.props.sessionWasStarted
     );
 
     this.props.groupsWereValidated(chosenColumns, groups, configuration);
-  }
-
-  buildDatasetMetadata() {
-    return {
-      types: this.state.columnTypes.map((e) => e === "categorical"),
-      columnNames: this.state.chosenColumns.map((e) => e.name),
-    };
   }
 
   computeVariableColumnIndices(groups) {

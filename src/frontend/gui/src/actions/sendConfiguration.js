@@ -19,43 +19,10 @@
  */
 
 import { backend } from "../constants/constants";
-import buildTSMConfiguration from "../lib/buildTSMConfiguration";
 
 import $ from "jquery";
 
-function sendVariableGroups(
-  chosenVariables,
-  groups,
-  datasetMetadata,
-  configuration,
-  onSuccess
-) {
-  const usedColumnNames = chosenVariables.map((e) => e.name);
-  const groupsWithIds = groups.map((variables) => variables.map((v) => v.id));
-
-  const TSMConfiguration = buildTSMConfiguration(
-    groupsWithIds,
-    usedColumnNames,
-    datasetMetadata
-  );
-
-  $("#conf").val(JSON.stringify(configuration));
-
-  $.ajax({
-    type: "POST",
-    url: backend + "/choose-options",
-    xhrFields: {
-      withCredentials: true,
-    },
-    data: {
-      configuration: JSON.stringify({ ...configuration, ...TSMConfiguration }),
-      columnIds: JSON.stringify(chosenVariables.map((e) => e.idx)),
-    },
-    success: onSuccess,
-  });
-}
-
-function sendColumns(chosenColumns, configuration, onSuccess) {
+function sendConfiguration(chosenColumns, configuration, onSuccess) {
   if (chosenColumns.length === 0) {
     alert("Please select attributes.");
     return;
@@ -75,7 +42,4 @@ function sendColumns(chosenColumns, configuration, onSuccess) {
   });
 }
 
-export default {
-  sendColumns,
-  sendVariableGroups,
-};
+export default sendConfiguration;

@@ -18,36 +18,14 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-function buildTSMConfiguration(
-  groupsWithIds,
-  usedColumnNames,
-  datasetMetadata
-) {
-  return {
-    multiTSM: {
-      searchUnknownRegionProbability: 0.5,
-      columns: usedColumnNames,
-      flags: buildFlagsFromColumnTypes(groupsWithIds, datasetMetadata.types),
-      featureGroups: buildGroupsFromJson(
-        groupsWithIds,
-        datasetMetadata.columnNames
-      ),
-    },
-  };
-}
-
 function isGroupCategorical(group, columnTypes) {
   return group.map((variableId) => columnTypes[variableId]).every(Boolean);
 }
 
-function buildFlagsFromColumnTypes(groups, columnTypes) {
-  return groups.map((group) => [true, isGroupCategorical(group, columnTypes)]);
-}
-
-function buildGroupsFromJson(groupsWithIds, encodedColumnNames) {
-  return groupsWithIds.map((group) =>
-    group.map((id) => encodedColumnNames[id])
+function buildMode(groups, columnTypes) {
+  return groups.map((group) =>
+    isGroupCategorical(group, columnTypes) ? "categorical" : "persist"
   );
 }
 
-export default buildTSMConfiguration;
+export default buildMode;

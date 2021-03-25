@@ -46,9 +46,11 @@ import sendPointBatch from "../../actions/trace/sendPointBatch";
 import carDatasetMetadata from "./carColumns";
 import jobDatasetMetadata from "./jobColumns";
 
-import buildTSMConfiguration from "../../lib/buildTSMConfiguration";
+import buildMode from "../../lib/buildMode";
+
 import {
   allLearnerConfigurations,
+  subsampling,
   FACTORIZED_DUAL_SPACE_MODEL,
   FACTORIZED_VERSION_SPACE,
 } from "../../constants/constants";
@@ -484,7 +486,6 @@ class QueryTrace extends Component {
 
   initializeBackend() {
     var options = {
-      // algorithm: this.state.algorithm,
       columnIds: this.state.traceColumns.encodedDataset,
       encodedDatasetName: ENCODED_DATASET_NAME,
       configuration: this.buildConfiguration(),
@@ -502,24 +503,16 @@ class QueryTrace extends Component {
   }
 
   buildConfiguration() {
-    var configuration = allLearnerConfigurations[this.state.algorithm];
+    const activeLearner = allLearnerConfigurations[this.state.algorithm];
+    const configuration = { activeLearner, subsampling };
 
     if (this.state.useFactorizedInformation) {
+      const partition = this.state.traceColumns.factorizationGroups;
+
       const datasetMetadata = this.getDatasetMetadata();
+      const mode = buildMode(partition, datasetMetadata.types);
 
-      const usedColumnNames = this.state.traceColumns.encodedDataset.map(
-        (e) => datasetMetadata.columnNames[e]
-      );
-
-      const factorizationGroups = this.state.traceColumns.factorizationGroups;
-
-      const TSMConfiguration = buildTSMConfiguration(
-        factorizationGroups,
-        usedColumnNames,
-        datasetMetadata
-      );
-
-      return { ...configuration, ...TSMConfiguration };
+      return { ...configuration, factorization: { partition, mode } };
     }
 
     return configuration;

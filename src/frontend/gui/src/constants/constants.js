@@ -19,7 +19,7 @@
  */
 
 export const SIMPLE_MARGIN = "SimpleMargin";
-export const VERSION_SPACE = "VersionSpace";
+export const VERSION_SPACE = "KernelVersionSpace";
 export const FACTORIZED_DUAL_SPACE_MODEL = "FactorizedDualSpaceModel";
 export const FACTORIZED_VERSION_SPACE = "SubspatialVersionSpace";
 
@@ -76,6 +76,8 @@ export const factorizedVersionSpaceConfiguration = {
     },
   },
 };
+
+export const subsampling = 50000;
 
 export const allLearnerConfigurations = {
   [SIMPLE_MARGIN]: simpleMarginConfiguration,
