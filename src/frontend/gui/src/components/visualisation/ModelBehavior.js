@@ -301,6 +301,7 @@ class ModelBehavior extends Component {
   getHumanLabeledPoints() {
     const formattedLabeledPoints = this.props.labeledPoints
       .slice(0, this.getIteration() + 1)
+      .flat()
       .map((point) => {
         const row = this.props.fakePointGrid[point.id];
         return [
@@ -316,6 +317,7 @@ class ModelBehavior extends Component {
     const embeddings = this.getEmbbedings();
     const labeledEmbeddings = this.props.labeledPoints
       .slice(0, this.getIteration() + 1)
+      .flat()
       .map((e) => embeddings[e.id])
       .filter((e) => typeof e !== "undefined");
     return labeledEmbeddings;

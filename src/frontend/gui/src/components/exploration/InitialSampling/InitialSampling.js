@@ -42,7 +42,7 @@ class InitialSampling extends Component {
       randomPointsToLabel: [...this.props.pointsToLabel],
       filteredPointsToLabel: [],
       labeledPoints: [],
-      allLabeledPoints: [],
+      allLabeledInitialPoints: [],
 
       filters: this.props.chosenColumns.map((e) => ({
         columnName: e.name,
@@ -208,7 +208,10 @@ class InitialSampling extends Component {
 
     this.setState(
       {
-        allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
+        allLabeledInitialPoints: [
+          ...this.state.allLabeledInitialPoints,
+          newLabeledPoint,
+        ],
         labeledPoints: newLabeledPoints,
 
         randomPointsToLabel: newRandomPointsToLabel,
@@ -241,7 +244,7 @@ class InitialSampling extends Component {
         this.props.tokens,
         (response) => {
           this.props.hasPositiveAndNegativeLabels(
-            this.state.allLabeledPoints,
+            this.state.allLabeledInitialPoints,
             this.parseReceivedPoints(response)
           );
         }

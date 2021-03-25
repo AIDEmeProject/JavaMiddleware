@@ -191,7 +191,6 @@ class QueryTrace extends Component {
                       <LabelInfos
                         iteration={this.state.iteration}
                         labeledPoints={this.state.allLabeledPoints}
-                        live={false}
                       />
 
                       <div>
@@ -239,7 +238,7 @@ class QueryTrace extends Component {
 
                 {this.state.showDataPoints && (
                   <DataPoints
-                    points={this.state.allLabeledPoints}
+                    points={this.state.allLabeledPoints.flat()}
                     chosenColumns={this.state.availableVariables}
                     show={true}
                     dataset={this.state.dataset}
@@ -586,9 +585,10 @@ class QueryTrace extends Component {
 
   /* Process and data received from the backend and put it in the component state */
   dataReceived(response, sentPoints) {
-    const newAllLabeledPoints = this.state.allLabeledPoints.concat(
-      sentPoints.map(this.getDataPointFromId.bind(this))
-    );
+    const newAllLabeledPoints = [
+      ...this.state.allLabeledPoints,
+      sentPoints.map(this.getDataPointFromId.bind(this)),
+    ];
 
     // const newProjectionHistory = [
     //   ...this.state.projectionHistory,

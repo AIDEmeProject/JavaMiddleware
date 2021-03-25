@@ -256,11 +256,11 @@ class App extends Component {
     }
   }
 
-  hasPositiveAndNegativeLabels(allLabeledPoints, pointsToLabel) {
+  hasPositiveAndNegativeLabels(allLabeledInitialPoints, pointsToLabel) {
     this.setState({
       step: EXPLORATION,
       bread: this.getBreadCrum(EXPLORATION),
-      allLabeledPoints,
+      allLabeledPoints: [allLabeledInitialPoints],
       pointsToLabel,
     });
   }

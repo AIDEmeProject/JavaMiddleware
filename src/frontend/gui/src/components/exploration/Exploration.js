@@ -164,7 +164,7 @@ class Exploration extends Component {
             <div className="col col-lg-8 offset-lg-2">
               <DataPoints
                 availableVariables={this.props.finalVariables}
-                points={this.state.allLabeledPoints}
+                points={this.state.allLabeledPoints.flat()}
                 chosenColumns={this.props.chosenColumns}
                 show={true}
                 normal={true}
@@ -223,7 +223,7 @@ class Exploration extends Component {
     newPointsToLabel.splice(dataIndex, 1);
 
     this.setState({
-      allLabeledPoints: [...this.state.allLabeledPoints, newLabeledPoint],
+      allLabeledPoints: [...this.state.allLabeledPoints, [newLabeledPoint]],
       labeledPoints: newLabeledPoints,
       pointsToLabel: newPointsToLabel,
     });

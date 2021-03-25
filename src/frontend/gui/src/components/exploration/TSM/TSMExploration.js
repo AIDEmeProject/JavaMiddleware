@@ -209,7 +209,7 @@ class TSMExploration extends Component {
         {this.state.showLabelHistory && (
           <DataPoints
             availableVariables={this.props.chosenColumns}
-            labeledPoints={this.state.allLabeledPoints}
+            labeledPoints={this.state.allLabeledPoints.flat()}
             chosenColumns={this.props.chosenColumns}
             groups={this.props.groups}
             dataset={this.props.dataset}
@@ -312,7 +312,7 @@ class TSMExploration extends Component {
       this.setState(
         {
           pointsToLabel: [],
-          allLabeledPoints: this.state.allLabeledPoints.concat(labeledPoints),
+          allLabeledPoints: [this.state.allLabeledPoints.concat(labeledPoints)],
           initialLabelingSession: false,
         },
         () => {
@@ -347,7 +347,7 @@ class TSMExploration extends Component {
 
     this.setState(
       {
-        allLabeledPoints: this.state.allLabeledPoints.concat(labeledPoints),
+        allLabeledPoints: [...this.state.allLabeledPoints, labeledPoints],
         pointsToLabel: [],
         labeledPoints: labeledPoints,
       },
