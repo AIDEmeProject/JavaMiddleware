@@ -53,6 +53,11 @@ class Exploration extends Component {
     };
   }
 
+  componentDidMount() {
+    this.getFakePointGrid();
+    this.getModelBehaviorData();
+  }
+
   render() {
     return (
       <div>
@@ -199,9 +204,7 @@ class Exploration extends Component {
         showModelBehavior: true,
       });
     } else {
-      alert(
-        "Please label at least one more point or wait for computation to finish."
-      );
+      alert("Please wait for computation to finish.");
     }
   }
 
@@ -252,8 +255,6 @@ class Exploration extends Component {
   }
 
   getModelBehaviorData() {
-    if (this.state.nIteration === 0) this.getFakePointGrid();
-
     getModelPredictionsOverGridPoints((predictedLabels) => {
       this.setState({
         nIteration: this.state.nIteration + 1,

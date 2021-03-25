@@ -231,9 +231,7 @@ class TSMExploration extends Component {
         showModelBehavior: true,
       });
     } else {
-      alert(
-        "Please label at least one more point or wait for computation to finish."
-      );
+      alert("Please wait for computation to finish.");
     }
   }
 
@@ -316,7 +314,11 @@ class TSMExploration extends Component {
           initialLabelingSession: false,
         },
         () => {
-          sendLabels(labeledPoints, this.newPointsToLabel.bind(this));
+          sendLabels(labeledPoints, (points) => {
+            this.newPointsToLabel(points);
+            this.getGridPoints();
+            this.getModelBoundaries();
+          });
         }
       );
     } else if (pointsToLabel.length === 0) {
@@ -373,26 +375,24 @@ class TSMExploration extends Component {
   }
 
   _getModelBoundaries() {
-    this.getGridPoints();
-
     if (isSimpleMargin(this.props.configuration)) {
       getTSMPredictions((predictedLabels) => {
-        var TSMPredictionHistory = this.state.TSMPredictionHistory;
-        TSMPredictionHistory.push(predictedLabels);
-
         this.setState({
-          TSMPredictionHistory: TSMPredictionHistory,
+          TSMPredictionHistory: [
+            ...this.state.TSMPredictionHistory,
+            predictedLabels,
+          ],
           isFetchingTSMPrediction: false,
         });
       });
     }
 
     getModelPredictionsOverGridPoints((predictions) => {
-      var history = this.state.modelPredictionHistory;
-
-      history.push(predictions);
       this.setState({
-        modelPredictionHistory: history,
+        modelPredictionHistory: [
+          ...this.state.modelPredictionHistory,
+          predictions,
+        ],
         isFetchingModelPrediction: false,
       });
     });
@@ -424,10 +424,8 @@ class TSMExploration extends Component {
 
   getGridPoints() {
     if (this.props.useRealData) {
-      //var grid = buildRealDatasetGrid(this.props.dataset)
       const usedColumnNames = this.props.chosenColumns.map((e) => e["name"]);
-      console.log(usedColumnNames);
-      var grid = this.props.dataset.get_parsed_columns_by_names(
+      const grid = this.props.dataset.get_parsed_columns_by_names(
         usedColumnNames
       );
       this.setState({
