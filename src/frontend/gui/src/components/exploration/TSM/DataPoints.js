@@ -19,7 +19,9 @@
  */
 
 import React, { Component } from "react";
+
 import GroupedPointTableHead from "./GroupedPointTableHead";
+import LabeledPointsCount from "../LabeledPointsCount";
 
 class DataPoints extends Component {
   render() {
@@ -28,6 +30,8 @@ class DataPoints extends Component {
     return (
       <div>
         <h3>Labeled Points</h3>
+
+        <LabeledPointsCount points={this.props.labeledPoints} />
 
         <table className="table-label">
           <GroupedPointTableHead groups={this.props.groups} />

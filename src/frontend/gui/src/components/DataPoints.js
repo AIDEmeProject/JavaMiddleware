@@ -19,7 +19,9 @@
  */
 
 import React, { Component } from "react";
+
 import Dataset from "../model/Dataset";
+import LabeledPointsCount from "./exploration/LabeledPointsCount";
 
 class DataPoints extends Component {
   constructor(props) {
@@ -41,6 +43,8 @@ class DataPoints extends Component {
         <div className="col col-lg-12">
           <hr />
           <h3>Labeled Points</h3>
+
+          <LabeledPointsCount points={this.props.points} />
 
           <table className={this.props.normal ? "table" : "table-label"}>
             <thead>
