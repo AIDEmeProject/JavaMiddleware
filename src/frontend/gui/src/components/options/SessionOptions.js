@@ -28,6 +28,7 @@ import {
   factorizedVersionSpaceConfiguration,
   subsampling,
 } from "../../constants/constants";
+
 import sendConfiguration from "../../actions/sendConfiguration";
 
 import AttributeSelection from "./AttributeSelection";
@@ -58,6 +59,8 @@ class SessionOptions extends Component {
 
       checkboxes: datasetInfos.columns.map((c) => false),
       chosenColumns: chosenColumns,
+
+      groups: [[]],
 
       learner: SIMPLE_MARGIN,
     };
@@ -129,7 +132,12 @@ class SessionOptions extends Component {
           {this.state.showVariableGroups && (
             <GroupVariables
               chosenColumns={this.state.chosenColumns}
-              onValidateGroupsClick={this.onValidateGroupsClick.bind(this)}
+              groups={this.state.groups}
+              addGroup={this.addGroup.bind(this)}
+              onVariableAddedToGroup={this.onVariableAddedToGroup.bind(this)}
+              onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(
+                this
+              )}
             />
           )}
 
@@ -190,47 +198,105 @@ class SessionOptions extends Component {
     this.setState({ learner: newLearner });
   }
 
+  addGroup() {
+    this.setState({
+      groups: [...this.state.groups, []],
+    });
+  }
+
+  onVariableAddedToGroup(groupId, variableId) {
+    const variable = this.state.chosenColumns[variableId];
+    const newVariable = {
+      ...variable,
+      ...{ realId: variableId, id: variableId },
+    };
+
+    var newGroups = [...this.state.groups];
+
+    var modifiedGroup = newGroups[groupId];
+    if (!this.isVariableInGroup(modifiedGroup, newVariable)) {
+      modifiedGroup.push(variable);
+    }
+    newGroups[groupId] = modifiedGroup;
+
+    this.setState({
+      groups: newGroups,
+    });
+  }
+
+  isVariableInGroup(group, variable) {
+    const names = group.map((e) => e.name);
+    return names.includes(variable.name);
+  }
+
+  onVariableRemovedFromGroup(groupId, variableId) {
+    var newGroups = [...this.state.groups];
+
+    newGroups[groupId] = newGroups[groupId].filter(
+      (variable) => variable.idx !== variableId
+    );
+
+    this.setState({
+      groups: newGroups,
+    });
+  }
+
   onSessionStartClick(e) {
     const chosenColumns = this.state.chosenColumns.filter((col) => col.isUsed);
 
+    if (chosenColumns.length === 0) {
+      alert("Please select attributes.");
+      return;
+    }
+
+    const columnsInGroups = this.state.groups.flat(); // columns may be repeated
+    const useFactorization = columnsInGroups.length > 0;
+
+    var configuration;
+    var columns;
+    var groups;
+    if (useFactorization) {
+      columns = columnsInGroups;
+      configuration = this.buildFactorizationConfiguration();
+
+      var newGroups = [...this.state.groups];
+      this.computeVariableColumnIndices(newGroups);
+      groups = newGroups;
+    } else {
+      columns = chosenColumns;
+      configuration = this.buildNonFactorizationConfiguration();
+      groups = null;
+    }
+
+    sendConfiguration(columns, configuration, this.props.sessionWasStarted);
+
+    this.props.sessionOptionsWereChosen(columns, groups, configuration);
+  }
+
+  buildNonFactorizationConfiguration() {
     const activeLearner =
       this.state.learner === SIMPLE_MARGIN
         ? simpleMarginConfiguration
         : versionSpaceConfiguration;
-    const configuration = { activeLearner, subsampling };
 
-    sendConfiguration(
-      chosenColumns,
-      configuration,
-      this.props.sessionWasStarted
-    );
-
-    this.props.sessionOptionsWereChosen(chosenColumns, configuration);
+    return { activeLearner, subsampling };
   }
 
-  onValidateGroupsClick(groups) {
-    const chosenColumns = groups.flatMap((g) => [...g]); // columns may be repeated
-
-    this.computeVariableColumnIndices(groups);
-
+  buildFactorizationConfiguration() {
     const activeLearner =
       this.state.learner === SIMPLE_MARGIN
         ? factorizedDualSpaceConfiguration
         : factorizedVersionSpaceConfiguration;
-    const partition = groups.map((variables) => variables.map((v) => v.id));
-    const configuration = {
+
+    const partition = this.state.groups.map((variables) =>
+      variables.map((v) => v.idx)
+    );
+
+    return {
       activeLearner,
       subsampling,
       factorization: { partition },
     };
-
-    sendConfiguration(
-      chosenColumns,
-      configuration,
-      this.props.sessionWasStarted
-    );
-
-    this.props.groupsWereValidated(chosenColumns, groups, configuration);
   }
 
   computeVariableColumnIndices(groups) {

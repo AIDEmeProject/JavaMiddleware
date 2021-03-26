@@ -40,7 +40,7 @@ class GroupEditor extends Component {
                 className="form-control"
                 data-variableid={variable.idx}
                 checked={variablesInGroup.includes(variable.idx)}
-                onChange={this.onVariableAddedClick.bind(this)}
+                onChange={this.onVariableClick.bind(this)}
               />
             </div>
           );
@@ -49,7 +49,7 @@ class GroupEditor extends Component {
     );
   }
 
-  onVariableAddedClick(e) {
+  onVariableClick(e) {
     const iVariable = parseInt(e.target.dataset.variableid);
 
     if (e.target.checked) {
@@ -65,7 +65,6 @@ class GroupVariables extends Component {
     super(props);
 
     this.state = {
-      groups: [[]],
       editedGroupId: null,
     };
   }
@@ -91,23 +90,14 @@ class GroupVariables extends Component {
             role="button"
             type="button"
             className="btn btn-primary btn-raised"
-            onClick={this.addVariableGroup.bind(this)}
+            onClick={this.props.addGroup}
           >
             Add group
-          </button>
-
-          <button
-            type="button"
-            role="button"
-            className="btn btn-primary btn-raised"
-            onClick={this.validateGroups.bind(this)}
-          >
-            Validate groups
           </button>
         </div>
 
         <div>
-          {this.state.groups.map((group, iGroup) => {
+          {this.props.groups.map((group, iGroup) => {
             return (
               <div key={iGroup} className="card group">
                 <p>
@@ -126,9 +116,9 @@ class GroupVariables extends Component {
                 <Group
                   group={group}
                   iGroup={iGroup}
-                  onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(
-                    this
-                  )}
+                  onVariableRemovedFromGroup={
+                    this.props.onVariableRemovedFromGroup
+                  }
                 />
               </div>
             );
@@ -140,16 +130,14 @@ class GroupVariables extends Component {
             title={
               "Edition of group " + String(Number(this.state.editedGroupId) + 1)
             }
-            onClose={this.closeFactorizationGroupEdition.bind(this)}
+            onClose={this.closeGroupEditor.bind(this)}
           >
             <GroupEditor
-              group={this.state.groups[this.state.editedGroupId]}
+              group={this.props.groups[this.state.editedGroupId]}
               iGroup={this.state.editedGroupId}
               chosenColumns={this.props.chosenColumns.filter((e) => e.isUsed)}
-              onVariableAddedToGroup={this.onVariableAddedToGroup.bind(this)}
-              onVariableRemovedFromGroup={this.onVariableRemovedFromGroup.bind(
-                this
-              )}
+              onVariableAddedToGroup={this.props.onVariableAddedToGroup}
+              onVariableRemovedFromGroup={this.props.onVariableRemovedFromGroup}
             />
           </MicroModalComponent>
         )}
@@ -161,11 +149,6 @@ class GroupVariables extends Component {
     window.$("input").bootstrapMaterialDesign();
   }
 
-  closeFactorizationGroupEdition(e) {
-    e.preventDefault();
-    this.setState({ editedGroupId: null });
-  }
-
   onGroupEdit(e) {
     const groupId = e.target.dataset.group;
 
@@ -174,68 +157,9 @@ class GroupVariables extends Component {
     });
   }
 
-  isVariableInGroup(group, variable) {
-    const names = group.map((e) => e.name);
-
-    return names.includes(variable.name);
-  }
-
-  onVariableAddedToGroup(groupId, variableId) {
-    var variable = this.props.chosenColumns[variableId];
-
-    var newGroupsState = this.state.groups.map((e) => e);
-
-    var modifiedGroup = newGroupsState[groupId];
-
-    variable["realId"] = variableId;
-    variable["id"] = variableId;
-
-    if (!this.isVariableInGroup(modifiedGroup, variable)) {
-      modifiedGroup.push(variable);
-    }
-
-    newGroupsState[groupId] = modifiedGroup;
-
-    this.setState({
-      groups: newGroupsState,
-    });
-  }
-
-  onVariableRemovedFromGroup(groupId, variableId) {
-    var newGroupsState = this.state.groups.map((e) => e);
-    var modifiedGroup = newGroupsState[groupId];
-
-    const removedColumnId = modifiedGroup.findIndex(
-      (e) => e.idx === variableId
-    );
-    modifiedGroup.splice(removedColumnId, 1);
-
-    newGroupsState[groupId] = modifiedGroup;
-    this.setState({
-      groups: newGroupsState,
-    });
-  }
-
-  addVariableGroup() {
-    var groups = this.state.groups.map((e) => e);
-
-    groups.push([]);
-    this.setState({
-      groups: groups,
-    });
-  }
-
-  validateGroups() {
-    const nVariableInGroups = this.state.groups.reduce((acc, a) => {
-      return a.length + acc;
-    }, 0);
-
-    if (nVariableInGroups === 0) {
-      alert("Please put at least a variable in a group.");
-      return;
-    }
-
-    this.props.onValidateGroupsClick(this.state.groups);
+  closeGroupEditor(e) {
+    e.preventDefault();
+    this.setState({ editedGroupId: null });
   }
 }
 

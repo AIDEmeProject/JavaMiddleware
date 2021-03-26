@@ -34,6 +34,7 @@ class Group extends Component {
                 <div className="">
                   {variable.name}{" "}
                   <button
+                    type="button"
                     className="btn btn-raised btn-sm"
                     data-variableid={variable.idx}
                     data-group={iGroup}

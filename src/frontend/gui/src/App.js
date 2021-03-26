@@ -98,7 +98,6 @@ class App extends Component {
           dataset={this.state.dataset}
           sessionWasStarted={this.sessionWasStarted.bind(this)}
           sessionOptionsWereChosen={this.sessionOptionsWereChosen.bind(this)}
-          groupsWereValidated={this.groupsWereValidated.bind(this)}
         />
       );
     }
@@ -226,13 +225,7 @@ class App extends Component {
     });
   }
 
-  sessionOptionsWereChosen(chosenColumns, configuration) {
-    this.state.dataset.set_column_names_selected_by_user(chosenColumns);
-
-    this.setState({ chosenColumns, configuration });
-  }
-
-  groupsWereValidated(chosenColumns, groups, configuration) {
+  sessionOptionsWereChosen(chosenColumns, groups, configuration) {
     this.state.dataset.set_column_names_selected_by_user(chosenColumns);
 
     this.setState({ chosenColumns, groups, configuration });

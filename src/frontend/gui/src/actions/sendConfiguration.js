@@ -18,16 +18,11 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
-import { backend } from "../constants/constants";
-
 import $ from "jquery";
 
-function sendConfiguration(chosenColumns, configuration, onSuccess) {
-  if (chosenColumns.length === 0) {
-    alert("Please select attributes.");
-    return;
-  }
+import { backend } from "../constants/constants";
 
+function sendConfiguration(chosenColumns, configuration, onSuccess) {
   $.ajax({
     type: "POST",
     url: backend + "/choose-options",

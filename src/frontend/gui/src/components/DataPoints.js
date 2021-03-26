@@ -74,7 +74,6 @@ class DataPoints extends Component {
                           data-toggle="tooltip"
                           data-placement="top"
                           title={value}
-                          key={valueKey}
                         >
                           {Dataset.displayValue(value)}
                         </td>
