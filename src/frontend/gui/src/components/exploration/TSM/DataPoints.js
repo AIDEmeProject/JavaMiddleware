@@ -23,6 +23,8 @@ import React, { Component } from "react";
 import GroupedPointTableHead from "./GroupedPointTableHead";
 import LabeledPointsCount from "../LabeledPointsCount";
 
+import Dataset from "../../../model/Dataset";
+
 class DataPoints extends Component {
   render() {
     const dataset = this.props.dataset;
@@ -50,7 +52,7 @@ class DataPoints extends Component {
                     pointIds.forEach((realId) => {
                       var value = data[realId];
 
-                      dataAsGroups.push(value);
+                      dataAsGroups.push(Dataset.displayValue(value));
                     });
 
                     var values = dataAsGroups.join(", ");
