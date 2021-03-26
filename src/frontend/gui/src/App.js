@@ -122,6 +122,7 @@ class App extends Component {
     if (step === EXPLORATION) {
       return (
         <Exploration
+          algorithm={this.state.configuration.activeLearner.name}
           dataset={this.state.dataset}
           chosenColumns={this.state.chosenColumns}
           finalVariables={this.state.finalVariables}
@@ -138,6 +139,7 @@ class App extends Component {
     if (step === TSM_EXPLORATION) {
       return (
         <TSMExploration
+          algorithm={this.state.configuration.activeLearner.name}
           dataset={this.state.dataset}
           chosenColumns={this.state.chosenColumns}
           groups={this.state.groups}

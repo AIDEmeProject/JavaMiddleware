@@ -103,10 +103,10 @@ class DataExploration extends Component {
         <hr />
 
         <div>
-          <h2>
+          <h3>
             2D visualisation of {variables[iFirstVariable]} vs{" "}
             {variables[iSecondVariable]}
-          </h2>
+          </h3>
 
           <div className="variable-picker">
             <select

@@ -18,27 +18,26 @@
  * Upon convergence, the model is run through the entire data source to retrieve all relevant records.
  */
 
+import React, { Component } from "react";
 import $ from "jquery";
 import * as d3 from "d3";
-import React, { Component } from "react";
 
-import TSMPredictionStatistics from "../exploration/TSM/TSMPredictionStatistics";
-
-import {
-  learnersInTraceSession,
-  SIMPLE_MARGIN,
-} from "../../constants/constants";
-import loadFileFromInputFile from "../../lib/data_utils";
 import TSMTraceDataset from "../../model/TSMTraceDataset";
 import TraceDataset from "../../model/TraceDataset";
 import Dataset from "../../model/Dataset";
 
-import LabelInfos from "../visualisation/LabelInfos";
 import LearnerOptions from "../options/LearnerOptions";
-
 import DataPoints from "../DataPoints";
+import LabelInfos from "../visualisation/LabelInfos";
 import ModelBehavior from "../visualisation/ModelBehavior";
 import ModelBehaviorControls from "../visualisation/ModelBehaviorControls";
+import AlgorithmName from "../AlgorithmName";
+import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
+import TSMPredictionStatistics from "../exploration/TSM/TSMPredictionStatistics";
+
+import { modelPredictionMap, TSMPredictionMap } from "../exploration/labelMaps";
+import buildMode from "../../lib/buildMode";
+import loadFileFromInputFile from "../../lib/data_utils";
 
 import initializeBackend from "../../actions/trace/initializeBackend";
 import sendPointBatch from "../../actions/trace/sendPointBatch";
@@ -46,25 +45,19 @@ import sendPointBatch from "../../actions/trace/sendPointBatch";
 import carDatasetMetadata from "./carColumns";
 import jobDatasetMetadata from "./jobColumns";
 
-import buildMode from "../../lib/buildMode";
-
 import {
+  allLearners,
   allLearnerConfigurations,
   subsampling,
+  SIMPLE_MARGIN,
   FACTORIZED_DUAL_SPACE_MODEL,
   FACTORIZED_VERSION_SPACE,
 } from "../../constants/constants";
-import PredictionStatistics from "../exploration/TSM/PredictionStatitics";
-
-import { modelPredictionMap, TSMPredictionMap } from "../exploration/labelMaps";
 
 const ENCODED_DATASET_NAME = "cars_encoded.csv";
 
 class QueryTrace extends Component {
   render() {
-    const algorithm = learnersInTraceSession.find(
-      (learner) => learner.value === this.state.algorithm
-    ).label;
     const iteration = this.state.iteration;
 
     return (
@@ -122,7 +115,7 @@ class QueryTrace extends Component {
                   </p>
 
                   <LearnerOptions
-                    learners={learnersInTraceSession}
+                    learners={allLearners}
                     selected={this.state.algorithm}
                     learnerChanged={this.learnerChanged.bind(this)}
                   />
@@ -143,7 +136,7 @@ class QueryTrace extends Component {
               <div className="col col-lg-12">
                 <div className="row">
                   <div className="col col-lg-6 offset-lg-3">
-                    <h4>Algorithm : {algorithm}</h4>
+                    <AlgorithmName algorithm={this.state.algorithm} />
                     <div className="center">
                       {!this.state.loadMode && (
                         <button

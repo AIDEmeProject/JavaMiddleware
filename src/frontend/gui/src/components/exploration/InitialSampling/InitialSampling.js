@@ -60,7 +60,7 @@ class InitialSampling extends Component {
         <div>
           <div className="row">
             <div className="col col-lg-8 offset-lg-2">
-              <h4>Initial sampling</h4>
+              <h3>Initial sampling</h3>
 
               <p className="card">
                 <span className="chatbot-talk">

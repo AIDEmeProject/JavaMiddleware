@@ -28,8 +28,9 @@ import GroupedPointTableBody from "./GroupedPointTableBody";
 import ModelBehavior from "../../visualisation/ModelBehavior";
 import ModelBehaviorControls from "../../visualisation/ModelBehaviorControls";
 import LabelInfos from "../../visualisation/LabelInfos";
-import getGridPoints from "../../../actions/getGridPoints";
+import AlgorithmName from "../../AlgorithmName";
 
+import getGridPoints from "../../../actions/getGridPoints";
 import getTSMPredictions from "../../../actions/getTSMPredictionsOverGridPoints";
 import getModelPredictionsOverGridPoints from "../../../actions/getModelPredictionsOverGridPoints";
 
@@ -193,6 +194,7 @@ class TSMExploration extends Component {
               />
             </div>
             <div className="col col-lg-8">
+              <AlgorithmName algorithm={this.props.algorithm} />
               <ModelBehavior
                 iteration={this.getIteration()}
                 labeledPoints={this.state.allLabeledPoints}

@@ -86,7 +86,7 @@ export const allLearnerConfigurations = {
   [FACTORIZED_VERSION_SPACE]: factorizedVersionSpaceConfiguration,
 };
 
-export const learnersInTraceSession = [
+export const allLearners = [
   {
     value: SIMPLE_MARGIN,
     label: "Simple Margin (SVM)",

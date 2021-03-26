@@ -20,19 +20,17 @@
 
 import React, { Component } from "react";
 
-import ModelBehaviorControls from "../visualisation/ModelBehaviorControls";
-
 import PointLabelisation from "../PointLabelisation";
-import ModelBehavior from "../visualisation/ModelBehavior";
-import LabelInfos from "../visualisation/LabelInfos";
-
 import DataPoints from "../DataPoints";
+import LabelInfos from "../visualisation/LabelInfos";
+import ModelBehaviorControls from "../visualisation/ModelBehaviorControls";
+import ModelBehavior from "../visualisation/ModelBehavior";
+import AlgorithmName from "../AlgorithmName";
 
-import wholeDatasetLabelizationWasAsked from "../../actions/statisticCollection/wholeDatasetLabelizationWasAsked";
 import explorationSendLabeledPoint from "../../actions/explorationSendLabeledPoint";
-import getWholedatasetLabeled from "../../actions/getWholeLabeledDataset";
-
 import getModelPredictionsOverGridPoints from "../../actions/getModelPredictionsOverGridPoints";
+import getWholedatasetLabeled from "../../actions/getWholeLabeledDataset";
+import wholeDatasetLabelizationWasAsked from "../../actions/statisticCollection/wholeDatasetLabelizationWasAsked";
 
 class Exploration extends Component {
   constructor(props) {
@@ -151,6 +149,7 @@ class Exploration extends Component {
             </div>
 
             <div className="col col-lg-8">
+              <AlgorithmName algorithm={this.props.algorithm} />
               <ModelBehavior
                 iteration={this.state.iteration}
                 labeledPoints={this.state.allLabeledPoints}

@@ -42,7 +42,7 @@ class DataPoints extends Component {
       <div className="row">
         <div className="col col-lg-12">
           <hr />
-          <h3>Labeled Points</h3>
+          <h3>Labeled points</h3>
 
           <LabeledPointsCount points={this.props.points} />
 
