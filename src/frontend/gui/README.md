@@ -44,3 +44,7 @@ npm start
 **lib** folder contains some utilitaties functions
 
 **ressources** image and other ressources
+
+## Old version
+
+The old version of the code is in the `v2-dsm-fix` branch.
