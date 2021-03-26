@@ -259,7 +259,7 @@ class SessionOptions extends Component {
       columns = columnsInGroups;
       configuration = this.buildFactorizationConfiguration();
 
-      var newGroups = [...this.state.groups];
+      var newGroups = this.state.groups.filter((group) => group.length > 0);
       this.computeVariableColumnIndices(newGroups);
       groups = newGroups;
     } else {
