@@ -379,7 +379,10 @@ class TSMExploration extends Component {
   }
 
   _getModelBoundaries() {
-    if (this.props.configuration.name === FACTORIZED_DUAL_SPACE_MODEL) {
+    if (
+      this.props.configuration.activeLearner.name ===
+      FACTORIZED_DUAL_SPACE_MODEL
+    ) {
       getTSMPredictions((predictedLabels) => {
         this.setState({
           TSMPredictionHistory: [

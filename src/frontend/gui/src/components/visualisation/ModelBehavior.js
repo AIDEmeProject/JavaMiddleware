@@ -225,11 +225,14 @@ class ModelBehavior extends Component {
 
   plotAll() {
     if (this.props.availableVariables.length <= 4 || this.props.realDataset) {
-      this.plotPredictionOnGridPoints();
+      this.plotPredictions(
+        this.modelPredictionPlotter,
+        this.props.modelPredictionHistory
+      );
     }
 
     if (this.props.hasTSM) {
-      this.plotTSMPredictionsOnGridPoints();
+      this.plotPredictions(this.tsmPlotter, this.props.TSMPredictionHistory);
     }
 
     if (this.props.plotProjection) {
@@ -237,22 +240,12 @@ class ModelBehavior extends Component {
     }
   }
 
-  plotTSMPredictionsOnGridPoints() {
-    this.tsmPlotter.plotData(
+  plotPredictions(plotter, history) {
+    plotter.plotData(
       this.state.scale,
       this.getHumanLabeledPoints(),
       this.getChosenVariables(),
-      this.getPredictions(this.props.TSMPredictionHistory),
-      colors
-    );
-  }
-
-  plotPredictionOnGridPoints() {
-    this.modelPredictionPlotter.plotData(
-      this.state.scale,
-      this.getHumanLabeledPoints(),
-      this.getChosenVariables(),
-      this.getPredictions(this.props.modelPredictionHistory),
+      this.getPredictions(history),
       colors
     );
   }
