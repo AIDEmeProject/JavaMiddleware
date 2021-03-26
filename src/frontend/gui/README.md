@@ -1,17 +1,35 @@
 # AIDEMe Frontend
 
-The frontend is built with react.js a frontend library
-developped by facebook and allowing to build composable
-components. 
+The frontend is built with [React.js](https://reactjs.org/), a frontend library developped by Facebook and allowing to build composable components. Each part of the interface is represented by a component.
 
-Each part of the interface is represented by a component
+The plotting is done with [D3.js](https://d3js.org/).
 
-in order to start the developpement server just run
+The styling is done mainly with [Boostrap](https://getbootstrap.com/).
 
-$ npm start
+## Setup and run the development server
 
-A schema of the architecture is displayed below
+- Install [`npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
+- Install packages
+
+```
+cd src/frontend/gui
+npm install
+```
+
+- Start the developpement server
+
+```
+npm start
+```
+
+- Stop the developpement server: Ctrl + C
+
+## Code editing
+
+- Linter: eslint (to use `eslint` with VSCode, see for example [https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint))
+
+- Formatter: Prettier (see `.vscode/settings.json` for a config example)
 
 ## Folder structure
 
@@ -26,11 +44,3 @@ A schema of the architecture is displayed below
 **lib** folder contains some utilitaties functions
 
 **ressources** image and other ressources
-
-## Implementing a backend
-
-If you want to implement a backend for this front you have
-to implement the following Web api
-
-
-
