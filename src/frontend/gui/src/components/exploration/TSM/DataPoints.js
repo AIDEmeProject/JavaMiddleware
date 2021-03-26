@@ -20,7 +20,6 @@
 
 import React, { Component } from "react";
 
-import GroupedPointTableHead from "./GroupedPointTableHead";
 import LabeledPointsCount from "../LabeledPointsCount";
 
 import Dataset from "../../../model/Dataset";
@@ -29,6 +28,20 @@ class DataPoints extends Component {
   render() {
     const dataset = this.props.dataset;
 
+    var headerCells = [];
+
+    this.props.groups.forEach((g, i) => {
+      const columnNames = g.map((v) => v.name);
+      headerCells.push(
+        <th key={i} colSpan={g.length}>
+          {columnNames.join(", ")}
+        </th>,
+        <th key={"sublabel-" + i}>Sublabel</th>
+      );
+    });
+
+    headerCells.push(<th className="label-col">Label</th>);
+
     return (
       <div>
         <h3>Labeled Points</h3>
@@ -36,35 +49,34 @@ class DataPoints extends Component {
         <LabeledPointsCount points={this.props.labeledPoints} />
 
         <table className="table-label">
-          <GroupedPointTableHead groups={this.props.groups} />
+          <thead>
+            <tr>{headerCells}</tr>
+          </thead>
 
           <tbody>
-            {this.props.labeledPoints.map((point, i) => {
-              const data = dataset.get_selected_columns_point(point.id);
+            {this.props.labeledPoints.map((point, pointIdx) => {
+              const row = dataset.get_selected_columns_point(point.id);
+
+              var rowCells = [];
+
+              this.props.groups.forEach((group, iGroup) => {
+                const values = group.map((variable) =>
+                  Dataset.displayValue(row[variable.realId])
+                );
+
+                rowCells.push(
+                  <td colSpan={group.length} key={iGroup}>
+                    {values.join(",  ")}
+                  </td>,
+                  <td key={"label-" + iGroup}>{point.labels[iGroup]}</td>
+                );
+              });
+
+              rowCells.push(<td>{point.label}</td>);
 
               return (
-                <tr key={i} className="variable-group">
-                  {this.props.groups.map((g, iGroup) => {
-                    var pointIds = g.map((e) => e.realId);
-
-                    var dataAsGroups = [];
-
-                    pointIds.forEach((realId) => {
-                      var value = data[realId];
-
-                      dataAsGroups.push(Dataset.displayValue(value));
-                    });
-
-                    var values = dataAsGroups.join(", ");
-
-                    return (
-                      <td colSpan={g.length} key={iGroup}>
-                        {values}
-                      </td>
-                    );
-                  })}
-
-                  <td>{point.label}</td>
+                <tr key={pointIdx} className="variable-group">
+                  {rowCells}
                 </tr>
               );
             })}

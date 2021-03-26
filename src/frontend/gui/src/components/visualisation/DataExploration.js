@@ -69,7 +69,7 @@ class DataExploration extends Component {
           })}
         </select>
 
-        <h4>{variables[histogramVariable]}</h4>
+        <h3>{variables[histogramVariable]}</h3>
 
         {!isVarCategorical && (
           <VectorStatistics data={firstVariable} uniqueValues={uniqueValues} />

@@ -7,16 +7,14 @@ class GroupedPointTableBody extends Component {
     return (
       <tbody>
         {this.props.pointsToLabel.map((point, pointIdx) => {
-          const pointData = this.props.dataset.get_selected_columns_point(
-            point.id
-          );
+          const row = this.props.dataset.get_selected_columns_point(point.id);
           const isSubgroupLabeling = point.labels;
 
           return (
             <tr key={pointIdx} className="constiable-group">
               {this.props.groups.map((group, groupIdx) => {
-                const valuesInGroup = group.map((attribute) =>
-                  Dataset.displayValue(pointData[attribute.realId])
+                const values = group.map((variable) =>
+                  Dataset.displayValue(row[variable.realId])
                 );
 
                 const SubgroupNoButton = () => (
@@ -36,7 +34,7 @@ class GroupedPointTableBody extends Component {
 
                 return (
                   <td colSpan={group.length} key={groupIdx}>
-                    {valuesInGroup.join(", ")}{" "}
+                    {values.join(",  ")}{" "}
                     {isSubgroupLabeling && <SubgroupNoButton />}
                   </td>
                 );

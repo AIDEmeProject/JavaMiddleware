@@ -30,7 +30,7 @@ class GroupedPointTableHead extends Component {
 
             return (
               <th key={i} colSpan={g.length}>
-                {columnNames.join(", ")}
+                {columnNames.join(",  ")}
               </th>
             );
           })}
