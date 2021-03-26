@@ -63,7 +63,7 @@ class Dataset {
     }
 
     var fetchedRow = this.dataset.filter((row) => {
-      return row[this.index] == id;
+      return row[this.index] === id;
     });
 
     return fetchedRow;

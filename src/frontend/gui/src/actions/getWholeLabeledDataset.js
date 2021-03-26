@@ -19,7 +19,7 @@
  */
 
 import $ from "jquery";
-import { backend, webplatformApi } from "../constants/constants";
+import { backend } from "../constants/constants";
 
 function getWholedatasetLabeled() {
   $.ajax({

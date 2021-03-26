@@ -31,7 +31,7 @@ class Welcome extends Component {
             <h1>Welcome to AIDEme</h1>
 
             <p>
-              <img src={welcomeImg} width="600" />
+              <img src={welcomeImg} width="600" alt="AIDEme keywords" />
             </p>
             <p className="">
               <button
