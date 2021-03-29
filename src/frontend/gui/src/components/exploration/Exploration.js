@@ -45,6 +45,7 @@ class Exploration extends Component {
       allLabeledPoints: [...this.props.allLabeledPoints],
 
       fakePointGrid: [],
+      categories: {},
       modelPredictionHistory: [],
       iteration: 0,
       nIteration: 0,
@@ -159,7 +160,9 @@ class Exploration extends Component {
                 labeledPoints={this.state.allLabeledPoints}
                 availableVariables={this.props.chosenColumns}
                 fakePointGrid={this.state.fakePointGrid}
+                categories={this.state.categories}
                 modelPredictionHistory={this.state.modelPredictionHistory}
+                realDataset={true}
                 hasTSM={false}
                 plotProjection={false}
               />
@@ -271,11 +274,15 @@ class Exploration extends Component {
 
   getFakePointGrid() {
     const chosenColumnNames = this.props.chosenColumns.map((e) => e["name"]);
-    var grid = this.props.dataset.get_parsed_columns_by_names(
+    const grid = this.props.dataset.get_parsed_columns_by_names(
+      chosenColumnNames
+    );
+    const categories = this.props.dataset.getParsedCategoriesByNames(
       chosenColumnNames
     );
     this.setState({
       fakePointGrid: grid,
+      categories,
     });
   }
 

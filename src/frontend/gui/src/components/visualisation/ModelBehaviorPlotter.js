@@ -138,11 +138,18 @@ class ModelBehaviorPlotter {
     return svg;
   }
 
-  plotData(scale, humanLabeledPoints, chosenVariables, scatterPoints, colors) {
+  plotData(
+    scale,
+    categories,
+    humanLabeledPoints,
+    chosenVariables,
+    scatterPoints,
+    colors
+  ) {
     const x = this.x;
     const y = this.y;
 
-    this.updateAxis(x, y, scale, chosenVariables);
+    this.updateAxis(x, y, scale, categories, chosenVariables);
     // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
     // Its opacity is set to 0: we don't see it by default.
 
@@ -236,7 +243,7 @@ class ModelBehaviorPlotter {
     }
   }
 
-  updateAxis(x, y, scale, chosenColumns) {
+  updateAxis(x, y, scale, categories, chosenColumns) {
     const xLabel = this.columnNames[chosenColumns[0]];
     const yLabel = this.columnNames[chosenColumns[1]];
 
@@ -246,16 +253,41 @@ class ModelBehaviorPlotter {
     const transitionLength = 200;
 
     x.domain([scale.xMin, scale.xMax]);
+    const xTicks =
+      Object.keys(categories[0]).length !== 0 ? Object.keys(categories[0]) : [];
     this.xAxis
       .transition()
       .duration(transitionLength)
-      .call(d3.axisBottom(x));
+      .call(
+        xTicks.length === 0
+          ? d3.axisBottom(x)
+          : d3
+              .axisBottom(x)
+              .tickValues(d3.range(xTicks.length))
+              .tickFormat((d, i) => xTicks[i])
+      );
+    this.xAxis
+      .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 9)
+      .attr("dy", ".35em")
+      .attr("transform", `rotate(45)`)
+      .style("text-anchor", "start");
 
     y.domain([scale.yMin, scale.yMax]);
+    const yTicks =
+      Object.keys(categories[1]).length !== 0 ? Object.keys(categories[1]) : [];
     this.yAxis
       .transition()
       .duration(transitionLength)
-      .call(d3.axisLeft(y));
+      .call(
+        yTicks.length === 0
+          ? d3.axisLeft(y)
+          : d3
+              .axisLeft(y)
+              .tickValues(d3.range(yTicks.length))
+              .tickFormat((d, i) => yTicks[i])
+      );
   }
 }
 

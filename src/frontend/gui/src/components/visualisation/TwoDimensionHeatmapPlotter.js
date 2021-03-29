@@ -38,7 +38,6 @@ class TwoDimensionHeatmapPlotter {
     var g = svg
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    console.log(data);
 
     var x = d3
       .scaleLinear()

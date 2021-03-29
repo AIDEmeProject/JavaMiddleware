@@ -223,6 +223,7 @@ class QueryTrace extends Component {
                         availableVariables={this.state.availableVariables}
                         labeledPoints={this.state.allLabeledPoints}
                         fakePointGrid={this.state.fakePointGrid}
+                        categories={this.state.categories}
                         // projectionHistory={this.state.projectionHistory}
                         modelPredictionHistory={
                           this.state.modelPredictionHistory
@@ -309,6 +310,7 @@ class QueryTrace extends Component {
       classifierStatsHistory: [],
 
       fakePointGrid: [],
+      categories: {},
       TSMPredictionHistory: [],
       modelPredictionHistory: [],
       // projectionHistory: [],
@@ -520,13 +522,16 @@ class QueryTrace extends Component {
   }
 
   traceBackendWasInitialized() {
-    var grid = this.state.dataset.get_parsed_columns_by_names(
+    const grid = this.state.dataset.get_parsed_columns_by_names(
       this.state.columnNames
     );
-
+    const categories = this.state.dataset.getParsedCategoriesByNames(
+      this.state.columnNames
+    );
     this.setState(
       {
         fakePointGrid: grid,
+        categories,
       },
       this.sendLabelDataForComputation.bind(this)
     );

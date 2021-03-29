@@ -243,11 +243,13 @@ class ModelBehavior extends Component {
   plotPredictions(plotter, history) {
     plotter.plotData(
       this.state.scale,
+      this.getCategories(),
       this.getHumanLabeledPoints(),
       this.getChosenVariables(),
       this.getPredictions(history),
       colors
     );
+    console.log(this.getCategories());
   }
 
   plotDataEmbbedingPlot() {
@@ -268,6 +270,23 @@ class ModelBehavior extends Component {
       embeddings,
       colors
     );
+  }
+
+  getCategories() {
+    const columnNames = this.props.availableVariables.map((e) => e.name);
+    const firstVariableName = columnNames[this.state.firstVariable];
+    const secondVariableName = columnNames[this.state.secondVariable];
+
+    var categories = [
+      this.props.categories.hasOwnProperty(firstVariableName)
+        ? this.props.categories[firstVariableName]
+        : {},
+      this.props.categories.hasOwnProperty(secondVariableName)
+        ? this.props.categories[secondVariableName]
+        : {},
+    ];
+
+    return categories;
   }
 
   getPredictions(predictionHistory) {

@@ -60,6 +60,7 @@ class TSMExploration extends Component {
       hasNo: false,
 
       fakePointGrid: [],
+      categories: {},
       TSMPredictionHistory: [],
       modelPredictionHistory: [],
       projectionHistory: [],
@@ -206,9 +207,11 @@ class TSMExploration extends Component {
                 labeledPoints={this.state.allLabeledPoints}
                 availableVariables={this.props.chosenColumns}
                 fakePointGrid={this.state.fakePointGrid}
+                categories={this.state.categories}
                 TSMPredictionHistory={this.state.TSMPredictionHistory}
                 modelPredictionHistory={this.state.modelPredictionHistory}
                 projectionHistory={this.state.projectionHistory}
+                realDataset={true}
                 hasTSM={this.state.TSMPredictionHistory.length > 0}
                 plotProjection={false}
               />
@@ -441,8 +444,12 @@ class TSMExploration extends Component {
       const grid = this.props.dataset.get_parsed_columns_by_names(
         usedColumnNames
       );
+      const categories = this.props.dataset.getParsedCategoriesByNames(
+        usedColumnNames
+      );
       this.setState({
         fakePointGrid: grid,
+        categories,
       });
     } else {
       if (this.state.fakePointGrid.length === 0) {

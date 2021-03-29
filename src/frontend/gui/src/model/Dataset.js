@@ -43,6 +43,7 @@ class Dataset {
   constructor(d3dataset) {
     this.dataset = d3dataset;
     this.parsedColumns = {};
+    this.parsedCategories = {};
   }
 
   set_column_as_index(name) {
@@ -77,6 +78,15 @@ class Dataset {
     return this.dataset.length;
   }
 
+  getParsedCategoriesByNames(names) {
+    var categories = {};
+    names.forEach((name) => {
+      if (this.parsedCategories.hasOwnProperty(name))
+        categories[name] = this.parsedCategories[name];
+    });
+    return categories;
+  }
+
   get_parsed_columns_by_names(names) {
     var columns = names.map((name) => {
       return this.get_column_name(name);
@@ -103,7 +113,9 @@ class Dataset {
 
   get_parsed_column_by_name(name) {
     if (!(name in this.parsedColumns)) {
-      this.parsedColumns[name] = this.parse_string_column(name);
+      const { parsed, categories } = this.parse_string_column(name);
+      this.parsedColumns[name] = parsed;
+      this.parsedCategories[name] = categories;
     }
 
     return this.parsedColumns[name];
@@ -131,7 +143,7 @@ class Dataset {
       parsed.push(categories[value]);
     });
 
-    return parsed;
+    return { parsed, categories };
   }
 
   _get_column_name_from_id(id) {
