@@ -33,7 +33,7 @@ class Group extends Component {
                 {/* required because bs theme removes inner div */}
                 <div className="">
                   {variable.name}{" "}
-                  <button
+                  {/* <button
                     type="button"
                     className="btn btn-raised btn-sm"
                     data-variableid={variable.idx}
@@ -41,7 +41,7 @@ class Group extends Component {
                     onClick={this.removeVariable.bind(this)}
                   >
                     Remove
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -51,12 +51,12 @@ class Group extends Component {
     );
   }
 
-  removeVariable(e) {
-    this.props.onVariableRemovedFromGroup(
-      this.props.iGroup,
-      e.target.dataset.variableid
-    );
-  }
+  // removeVariable(e) {
+  //   this.props.onVariableRemovedFromGroup(
+  //     this.props.iGroup,
+  //     e.target.dataset.variableid
+  //   );
+  // }
 }
 
 export default Group;
