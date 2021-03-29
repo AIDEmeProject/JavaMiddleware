@@ -32,9 +32,9 @@ class ModelBehaviorPlotter {
 
   createPlot(svgId, scale) {
     // Set the dimensions and margins of the graph
-    var margin = { top: 40, right: 20, bottom: 50, left: 80 };
-    var width = 600 - margin.left - margin.right;
-    var height = 500 - margin.top - margin.bottom;
+    var margin = { top: 40, right: 120, bottom: 180, left: 150 };
+    var width = 770 - margin.left - margin.right;
+    var height = 630 - margin.top - margin.bottom;
 
     // Append the svg object to the body of the page
     var svg = d3
