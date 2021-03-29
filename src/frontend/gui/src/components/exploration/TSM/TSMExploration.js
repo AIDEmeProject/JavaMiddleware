@@ -137,16 +137,22 @@ class TSMExploration extends Component {
           <div className="center card">
             <div className="row">
               <div className="col col-lg-8 offset-lg-2">
-                {this.state.initialLabelingSession && (
-                  <p className="card">
-                    <span className="chatbot-talk">
-                      <img src={robot} width="50" alt="robot" />
-                      <q>
-                        The first phase of labeling continues until we obtain a
-                        positive example and a negative example.
-                      </q>
-                    </span>
-                  </p>
+                {this.state.initialLabelingSession ? (
+                  <div>
+                    <h3>Initial sampling</h3>
+
+                    <p className="card">
+                      <span className="chatbot-talk">
+                        <img src={robot} width="50" alt="robot" />
+                        <q>
+                          The first phase of labeling continues until we obtain
+                          a positive example and a negative example.
+                        </q>
+                      </span>
+                    </p>
+                  </div>
+                ) : (
+                  <h3>Exploration</h3>
                 )}
 
                 <p className="card">

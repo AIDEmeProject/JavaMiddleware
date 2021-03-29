@@ -119,15 +119,19 @@ class Exploration extends Component {
         </ul>
 
         {this.state.showLabelView && (
-          <div className="row">
-            <div className="col col-lg-12">
-              <PointLabelisation
-                chosenColumns={this.props.chosenColumns}
-                pointsToLabel={this.state.pointsToLabel}
-                onPositiveLabel={this.onPositiveLabel.bind(this)}
-                onNegativeLabel={this.onNegativeLabel.bind(this)}
-                dataset={this.props.dataset}
-              />
+          <div>
+            <h3>Exploration</h3>
+
+            <div className="row">
+              <div className="col col-lg-12">
+                <PointLabelisation
+                  chosenColumns={this.props.chosenColumns}
+                  pointsToLabel={this.state.pointsToLabel}
+                  onPositiveLabel={this.onPositiveLabel.bind(this)}
+                  onNegativeLabel={this.onNegativeLabel.bind(this)}
+                  dataset={this.props.dataset}
+                />
+              </div>
             </div>
           </div>
         )}
